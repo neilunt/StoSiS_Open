@@ -1,0 +1,2566 @@
+{
+    "format": "StoSiS-Materialdatenbank",
+    "version": 1,
+    "info": {
+        "beschreibung": "Stoffdaten für StoSiS. Jeder Wert trägt eine Quelle (source) und einen Prüfstatus (status).",
+        "einheiten": "SI: Temperatur T in K, Druck p in Pa, Masse in kg, Länge in m, Energie in J, Zeit in s. Ausnahme: bond_work_index in kWh/t (üblich).",
+        "status": "unchecked = aus Dyssol übernommen bzw. abgeleitet, noch nicht geprüft; checked = geprüft (Beleg in source bzw. reference eintragen).",
+        "dichte": "density ist die Feststoffdichte: Partikel gelten zunächst als unporös (Entscheidung 12.10.2026). Die Porosität kommt später als Partikeleigenschaft an den Inlet.",
+        "waerme": "Gespeichert wird nur die Wärmekapazität heat_capacity c_p(T); die Enthalpie h(T) berechnet StoSiS daraus (Entscheidung 12.10.2026).",
+        "bereiche": "T_range und p_range: Gültigkeitsbereich. Mehrere Einträge je Eigenschaft gelten für verschiedene Bereiche.",
+        "warnungen": "warnings: Auffälligkeiten aus der Erstprüfung am 12.10.2026 - dort zuerst nachsehen.",
+        "herkunft": "Startinhalt aus Dyssol Materials.dmdb (Format 3, BSD-3-Lizenz, siehe LICENSE_Dyssol.txt), umgewandelt mit tools/dmdb_to_json.pl am 12.10.2026. dyssol_key bleibt erhalten, weil Dyssol-Flowsheets (.dflw) Stoffe über diesen Schlüssel ansprechen."
+    },
+    "materials": [
+        {
+            "name": "Air",
+            "dyssol_key": "4e3a9D257E6A9E4F03D1",
+            "state": { "value": "gas", "source": "Dyssol Materials.dmdb" },
+            "constants": {
+                "critical_pressure": { "value": 3.774e+06, "unit": "Pa", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "critical_temperature": { "value": 132.45, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_fusion": { "value": 744.272, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 5763.04, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.028951, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 78.67, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 58, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "ideal_gas",
+                        "formula": "y = M * p / (R * T), R = universelle Gaskonstante",
+                        "molar_mass": 0.028951,
+                        "unit": "kg/m3",
+                        "T_range": [248.15, 498.15],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "constant",
+                        "value": 1006,
+                        "unit": "J/(kg K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "note": "Zum Vergleich: Steigung der Dyssol-Enthalpie bei 298.15 K = 1005 J/(kg K)."
+                    }
+                ],
+                "viscosity": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "Pa s",
+                        "T_range": [253.15, 373.15],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [253.15, 1.63e-05],
+                            [273.15, 1.71e-05],
+                            [283.15, 1.76e-05],
+                            [293.15, 1.82e-05],
+                            [303.15, 1.86e-05],
+                            [323.15, 1.95e-05],
+                            [373.15, 2.17e-05]
+                        ]
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [83.15, 0.00782],
+                            [123.15, 0.01169],
+                            [173.15, 0.0162],
+                            [198.15, 0.01834],
+                            [223.15, 0.02041],
+                            [248.15, 0.02241],
+                            [258.15, 0.0232],
+                            [263.15, 0.02359],
+                            [268.15, 0.02397],
+                            [273.15, 0.02436],
+                            [278.15, 0.02474],
+                            [283.15, 0.02512],
+                            [288.15, 0.0255],
+                            [293.15, 0.02587],
+                            [298.15, 0.02624],
+                            [303.15, 0.02662],
+                            [313.15, 0.02735],
+                            [323.15, 0.02808],
+                            [333.15, 0.0288],
+                            [353.15, 0.03023],
+                            [373.15, 0.03162],
+                            [398.15, 0.03333],
+                            [423.15, 0.035],
+                            [448.15, 0.03664],
+                            [473.15, 0.03825],
+                            [498.15, 0.03983],
+                            [573.15, 0.04441],
+                            [685.15, 0.05092],
+                            [773.15, 0.05579],
+                            [873.15, 0.06114],
+                            [973.15, 0.06632],
+                            [1073.15, 0.07135],
+                            [1173.15, 0.07626],
+                            [1273.15, 0.08108],
+                            [1373.15, 0.08583]
+                        ]
+                    }
+                ],
+                "vapor_pressure": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "Pa",
+                        "T_range": [59, 132.45],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [59, 0],
+                            [59.15, 5642],
+                            [60, 6650],
+                            [70, 34132],
+                            [80, 116963],
+                            [90, 306404],
+                            [100, 665467],
+                            [110, 1.2616e+06],
+                            [120, 2.16059e+06],
+                            [130, 3.42264e+06],
+                            [132.45, 3.774e+06]
+                        ]
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 8.86e-12,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "CaCO3",
+            "dyssol_key": "F02A953A6F884B5D8C4D00BF0267FD71",
+            "state": { "value": "solid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "warnings": [
+                "Abgeleitete Wärmekapazität weicht stark von der Literatur ab: c_p(298.15 K) = 1436 J/(kg K); Literatur (NIST, 298 K) etwa 834 J/(kg K), Abweichung +72 % - prüfen."
+            ],
+            "notes": [
+                "normal_boiling_point: kein Wert; Dyssol-Hinweis: 'Decomposes'"
+            ],
+            "constants": {
+                "heat_of_fusion": { "value": 5740, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.100087, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 1603, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -1.2069e+06, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "bond_work_index": { "value": 12.7, "unit": "kWh/t", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "constant",
+                        "value": 2711,
+                        "unit": "kg/m3",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "J/(kg K)",
+                        "T_range": [273, 2773],
+                        "p_range": [1000, 1e+09],
+                        "source": "abgeleitet: c_p = dh/dT aus der Enthalpie in Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [285.5, 1436.24],
+                            [310.5, 1436.24],
+                            [335.5, 1436.24],
+                            [360.5, 1436.24],
+                            [385.5, 1436.24],
+                            [410.5, 1436.24],
+                            [435.5, 1436.24],
+                            [460.5, 1436.24],
+                            [485.5, 1436.24],
+                            [510.5, 1436.24],
+                            [535.5, 1436.24],
+                            [560.5, 1436.24],
+                            [585.5, 1436.24],
+                            [610.5, 1436.24],
+                            [635.5, 1436.24],
+                            [660.5, 1436.24],
+                            [685.5, 1436.24],
+                            [710.5, 1436.24],
+                            [735.5, 1436.24],
+                            [760.5, 1436.24],
+                            [785.5, 1436.24],
+                            [810.5, 1436.24],
+                            [835.5, 1436.24],
+                            [860.5, 1436.24],
+                            [885.5, 1436.24],
+                            [910.5, 1436.24],
+                            [935.5, 1436.24],
+                            [960.5, 1436.24],
+                            [985.5, 1436.32],
+                            [1010.5, 1436],
+                            [1035.5, 1436.4],
+                            [1060.5, 1436.4],
+                            [1085.5, 1436],
+                            [1110.5, 1436.4],
+                            [1135.5, 1436],
+                            [1160.5, 1436.4],
+                            [1185.5, 1436.4],
+                            [1210.5, 1436],
+                            [1235.5, 1436.4],
+                            [1260.5, 1436],
+                            [1285.5, 1436.4],
+                            [1310.5, 1436.4],
+                            [1335.5, 1436],
+                            [1360.5, 1436.4],
+                            [1385.5, 1436],
+                            [1410.5, 1436.4],
+                            [1435.5, 1436.4],
+                            [1460.5, 1436],
+                            [1485.5, 1436.4],
+                            [1510.5, 1436],
+                            [1535.5, 1436.4],
+                            [1560.5, 1436.4],
+                            [1585.5, 1436],
+                            [1610.5, 1436.4],
+                            [1635.5, 1436],
+                            [1660.5, 1436.4],
+                            [1685.5, 1436.4],
+                            [1710.5, 1436],
+                            [1735.5, 1436.4],
+                            [1760.5, 1436],
+                            [1785.5, 1436.4],
+                            [1810.5, 1436.4],
+                            [1835.5, 1436],
+                            [1860.5, 1436.4],
+                            [1885.5, 1436],
+                            [1910.5, 1436.4],
+                            [1935.5, 1436.4],
+                            [1960.5, 1436],
+                            [1985.5, 1436.4],
+                            [2010.5, 1436],
+                            [2035.5, 1436.4],
+                            [2060.5, 1436.4],
+                            [2085.5, 1436],
+                            [2110.5, 1436.4],
+                            [2135.5, 1436],
+                            [2160.5, 1436.4],
+                            [2185.5, 1436.4],
+                            [2210.5, 1436],
+                            [2235.5, 1436.4],
+                            [2260.5, 1436],
+                            [2285.5, 1436.4],
+                            [2310.5, 1436.4],
+                            [2335.5, 1436],
+                            [2360.5, 1436.4],
+                            [2385.5, 1436],
+                            [2410.5, 1436.4],
+                            [2435.5, 1436.4],
+                            [2460.5, 1436],
+                            [2485.5, 1436.4],
+                            [2510.5, 1436],
+                            [2535.5, 1436.4],
+                            [2560.5, 1436.4],
+                            [2585.5, 1436],
+                            [2610.5, 1436.4],
+                            [2635.5, 1436],
+                            [2660.5, 1436.4],
+                            [2685.5, 1436.4],
+                            [2710.5, 1436],
+                            [2735.5, 1436.4],
+                            [2760.5, 1436]
+                        ],
+                        "note": "c_p(298.15 K) = 1436 J/(kg K); Literatur (NIST, 298 K) etwa 834 J/(kg K), Abweichung +72 %."
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "constant",
+                        "value": 2.259,
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 7.53e-11,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "CaO",
+            "dyssol_key": "66F52F5AD48044FD95D1E7BA39484572",
+            "state": { "value": "solid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "constants": {
+                "heat_of_fusion": { "value": 80022.4, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 615048, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.0560774, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 3123.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 2845.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -635090, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "bond_work_index": { "value": 11, "unit": "kWh/t", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "constant",
+                        "value": 3340,
+                        "unit": "kg/m3",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "J/(kg K)",
+                        "T_range": [273, 2773],
+                        "p_range": [1000, 1e+09],
+                        "source": "abgeleitet: c_p = dh/dT aus der Enthalpie in Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [285.5, 817.808],
+                            [310.5, 817.808],
+                            [335.5, 817.808],
+                            [360.5, 817.804],
+                            [385.5, 817.808],
+                            [410.5, 817.812],
+                            [435.5, 817.8],
+                            [460.5, 817.8],
+                            [485.5, 817.8],
+                            [510.5, 817.84],
+                            [535.5, 817.8],
+                            [560.5, 817.8],
+                            [585.5, 817.8],
+                            [610.5, 817.8],
+                            [635.5, 817.84],
+                            [660.5, 817.8],
+                            [685.5, 817.8],
+                            [710.5, 817.8],
+                            [735.5, 817.8],
+                            [760.5, 817.8],
+                            [785.5, 817.84],
+                            [810.5, 817.8],
+                            [835.5, 817.8],
+                            [860.5, 817.8],
+                            [885.5, 817.8],
+                            [910.5, 817.84],
+                            [935.5, 817.8],
+                            [960.5, 817.8],
+                            [985.5, 817.8],
+                            [1010.5, 817.8],
+                            [1035.5, 817.8],
+                            [1060.5, 817.84],
+                            [1085.5, 817.8],
+                            [1110.5, 817.8],
+                            [1135.5, 817.8],
+                            [1160.5, 817.8],
+                            [1185.5, 817.8],
+                            [1210.5, 817.84],
+                            [1235.5, 817.8],
+                            [1260.5, 817.8],
+                            [1285.5, 817.8],
+                            [1310.5, 817.8],
+                            [1335.5, 817.84],
+                            [1360.5, 817.8],
+                            [1385.5, 817.8],
+                            [1410.5, 817.8],
+                            [1435.5, 817.8],
+                            [1460.5, 817.8],
+                            [1485.5, 817.84],
+                            [1510.5, 817.64],
+                            [1535.5, 818],
+                            [1560.5, 817.6],
+                            [1585.5, 818],
+                            [1610.5, 817.6],
+                            [1635.5, 818],
+                            [1660.5, 817.6],
+                            [1685.5, 818],
+                            [1710.5, 818],
+                            [1735.5, 817.6],
+                            [1760.5, 818],
+                            [1785.5, 817.6],
+                            [1810.5, 818],
+                            [1835.5, 817.6],
+                            [1860.5, 818],
+                            [1885.5, 817.6],
+                            [1910.5, 818],
+                            [1935.5, 817.6],
+                            [1960.5, 818],
+                            [1985.5, 817.6],
+                            [2010.5, 818],
+                            [2035.5, 817.6],
+                            [2060.5, 818],
+                            [2085.5, 817.6],
+                            [2110.5, 818],
+                            [2135.5, 817.6],
+                            [2160.5, 818],
+                            [2185.5, 817.6],
+                            [2210.5, 818],
+                            [2235.5, 817.6],
+                            [2260.5, 818],
+                            [2285.5, 817.6],
+                            [2310.5, 818],
+                            [2335.5, 817.6],
+                            [2360.5, 818],
+                            [2385.5, 818],
+                            [2410.5, 817.6],
+                            [2435.5, 818],
+                            [2460.5, 817.6],
+                            [2485.5, 818],
+                            [2510.5, 817.6],
+                            [2535.5, 818],
+                            [2560.5, 817.6],
+                            [2585.5, 818],
+                            [2610.5, 817.6],
+                            [2635.5, 818],
+                            [2660.5, 817.6],
+                            [2685.5, 818],
+                            [2710.5, 817.6],
+                            [2735.5, 818],
+                            [2760.5, 817.6]
+                        ],
+                        "note": "c_p(298.15 K) = 818 J/(kg K); Literatur (NIST, 298 K) etwa 750 J/(kg K), Abweichung +9 %."
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "constant",
+                        "value": 0.318,
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 1.06e-10,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "CO2",
+            "dyssol_key": "7FC07071EB0E4693AF53B1F756F03EF4",
+            "state": { "value": "gas", "source": "Dyssol Materials.dmdb" },
+            "warnings": [
+                "Abgeleitete Wärmekapazität weicht stark von der Literatur ab: c_p(298.15 K) = 947 J/(kg K); Literatur (NIST, 298 K) etwa 843 J/(kg K), Abweichung +12 % - prüfen."
+            ],
+            "constants": {
+                "critical_pressure": { "value": 7.38659e+06, "unit": "Pa", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "critical_temperature": { "value": 304.2, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_fusion": { "value": 9020, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 16700, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.0440095, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 194.75, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 216.58, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -393522, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "kg/m3",
+                        "T_range": [273, 1973],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [273, 1.96456],
+                            [373, 1.43787],
+                            [473, 1.13388],
+                            [573, 0.935997],
+                            [673, 0.796919],
+                            [773, 0.693824],
+                            [873, 0.614348],
+                            [973, 0.551209],
+                            [1073, 0.499838],
+                            [1173, 0.457226],
+                            [1273, 0.421309],
+                            [1373, 0.390624],
+                            [1473, 0.364105],
+                            [1573, 0.340958],
+                            [1673, 0.320578],
+                            [1773, 0.302496],
+                            [1873, 0.286346],
+                            [1973, 0.271833]
+                        ]
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "polynomial",
+                        "formula": "y = a0 + a1*T + a2*T^2 + ... (T in K)",
+                        "coefficients": [765.703, 0.68542, -0.000276562, 4.98504e-08, -3.27759e-12],
+                        "unit": "J/(kg K)",
+                        "T_range": [290, 6000],
+                        "p_range": [1000, 1e+09],
+                        "source": "abgeleitet: c_p = dh/dT aus der Enthalpie in Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/inchi?ID=C124389&Mask=1#Thermo-Gas",
+                        "note": "c_p(298.15 K) = 947 J/(kg K); Literatur (NIST, 298 K) etwa 843 J/(kg K), Abweichung +12 %."
+                    }
+                ],
+                "viscosity": [
+                    {
+                        "type": "sutherland",
+                        "formula": "y = y_ref * (T_ref + S) / (T + S) * (T / T_ref)^1.5",
+                        "y_ref": 1.37e-05,
+                        "T_ref": 273,
+                        "S": 222,
+                        "unit": "Pa s",
+                        "T_range": [190, 2000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "F. M. White, Viscous Fluid Flow, 3rd ed., McGraw-Hill, p28. | Valid up to T=1700K"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "sutherland",
+                        "formula": "y = y_ref * (T_ref + S) / (T + S) * (T / T_ref)^1.5",
+                        "y_ref": 0.0146,
+                        "T_ref": 273,
+                        "S": 1800,
+                        "unit": "W/(m K)",
+                        "T_range": [200, 2000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://doc.comsol.com/5.5/doc/com.comsol.help.cfd/cfd_ug_fluidflow_high_mach.08.27.html"
+                    }
+                ],
+                "vapor_pressure": [
+                    {
+                        "type": "antoine",
+                        "formula": "p_sat = 1e5 * 10^(A - B / (T + C)) Pa (NIST-Form: log10(p/bar) = A - B/(T + C))",
+                        "A": 6.81228,
+                        "B": 1301.68,
+                        "C": -3.494,
+                        "unit": "Pa",
+                        "T_range": [154.26, 195.89],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C124389&Mask=4&Type=ANTOINE&Plot=on#ANTOINE | https://dx.doi.org/10.1063/1.1749929 | https://webbook.nist.gov/cgi/cbook.cgi?ID=C124389&Mask=4&Type=ANTOINE#ANTOINE"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 1.42e-11,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Coal",
+            "dyssol_key": "73A34bf0BD4939EBDE92",
+            "state": { "value": "solid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "warnings": [
+                "Dyssol-Enthalpie ist konstant (46105 J/kg), daraus folgt c_p = 0 - keine Wärmekapazität vorhanden. Literatur für trockene Kohle etwa 1000-1300 J/(kg K), z. B. Merrick (1983) - ergänzen.",
+                "Siede-/Schmelzpunkt (2000/1800 K) und Molmasse sind für Kohle (zersetzt sich, kein Reinstoff) vermutlich Platzhalter."
+            ],
+            "constants": {
+                "molar_mass": { "value": 0.20725, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 2000, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 1800, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -110730, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "bond_work_index": { "value": 14.3, "unit": "kWh/t", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "constant",
+                        "value": 1400,
+                        "unit": "kg/m3",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "constant",
+                        "value": 0.26,
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 1.77e-11,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "H2O",
+            "dyssol_key": "4b3f8A1A71A315EFB4E5",
+            "state": { "value": "liquid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "constants": {
+                "critical_pressure": { "value": 2.21058e+07, "unit": "Pa", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 40660.5, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -285820, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "kg/m3",
+                        "T_range": [273, 1973],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [274.15, 999.9],
+                            [275.15, 999.94],
+                            [276.15, 1000],
+                            [277.15, 1000],
+                            [278.15, 1000],
+                            [279.15, 999.94],
+                            [280.15, 999.9],
+                            [281.15, 999.85],
+                            [282.15, 999.78],
+                            [283.15, 999.7],
+                            [284.15, 999.61],
+                            [285.15, 999.5],
+                            [286.15, 999.38],
+                            [287.15, 999.25],
+                            [288.15, 999.1],
+                            [289.15, 998.94],
+                            [290.15, 998.78],
+                            [291.15, 998.6],
+                            [292.15, 998.41],
+                            [293.15, 998.21],
+                            [295.15, 997.77],
+                            [297.15, 997.3],
+                            [298.15, 997.05],
+                            [299.15, 996.79],
+                            [301.15, 996.24],
+                            [303.15, 995.65],
+                            [305.15, 995.03],
+                            [307.15, 994.38],
+                            [309.15, 993.69],
+                            [311.15, 992.97],
+                            [313.15, 992.22],
+                            [315.15, 991.44],
+                            [317.15, 990.64],
+                            [319.15, 989.8],
+                            [321.15, 988.94],
+                            [323.15, 988.05],
+                            [328.15, 985.71],
+                            [333.15, 983.21],
+                            [338.15, 980.57],
+                            [343.15, 977.78],
+                            [348.15, 974.86],
+                            [353.15, 971.8],
+                            [358.15, 968.62],
+                            [363.15, 965.32],
+                            [368.15, 961.89],
+                            [372.76, 958.64]
+                        ]
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "constant",
+                        "value": 4185,
+                        "unit": "J/(kg K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "At 20degC from VDI",
+                        "note": "Zum Vergleich: Steigung der Dyssol-Enthalpie bei 298.15 K = 4186 J/(kg K)."
+                    }
+                ],
+                "viscosity": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "Pa s",
+                        "T_range": [273, 373],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [274.15, 0.001731],
+                            [275.15, 0.0016735],
+                            [276.15, 0.001619],
+                            [277.15, 0.0015673],
+                            [278.15, 0.0015182],
+                            [279.15, 0.0014715],
+                            [280.15, 0.001427],
+                            [281.15, 0.0013847],
+                            [282.15, 0.0013444],
+                            [283.15, 0.0013059],
+                            [284.15, 0.0012692],
+                            [285.15, 0.001234],
+                            [286.15, 0.0012005],
+                            [287.15, 0.0011683],
+                            [288.15, 0.0011376],
+                            [289.15, 0.0011081],
+                            [290.15, 0.0010798],
+                            [291.15, 0.0010527],
+                            [292.15, 0.0010266],
+                            [293.15, 0.0010016],
+                            [295.15, 0.0009544],
+                            [297.15, 0.00091068],
+                            [298.15, 0.00089002],
+                            [299.15, 0.00087011],
+                            [301.15, 0.00083238],
+                            [303.15, 0.00079722],
+                            [305.15, 0.00076441],
+                            [307.15, 0.00073373],
+                            [309.15, 0.00070499],
+                            [311.15, 0.00067804],
+                            [313.15, 0.00065273],
+                            [315.15, 0.00062892],
+                            [317.15, 0.0006065],
+                            [319.15, 0.00058535],
+                            [321.15, 0.00056539],
+                            [323.15, 0.00054652],
+                            [328.15, 0.00050363],
+                            [333.15, 0.00046604],
+                            [338.15, 0.00043291],
+                            [343.15, 0.00040356],
+                            [348.15, 0.00037742],
+                            [353.15, 0.00035406],
+                            [358.15, 0.00033308],
+                            [363.15, 0.00031418],
+                            [368.15, 0.00029709],
+                            [372.76, 0.00028275]
+                        ]
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "W/(m K)",
+                        "T_range": [273, 373],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [274.15, 0.55818],
+                            [275.15, 0.56066],
+                            [276.15, 0.56309],
+                            [277.15, 0.56547],
+                            [278.15, 0.56779],
+                            [279.15, 0.57008],
+                            [280.15, 0.57231],
+                            [281.15, 0.57451],
+                            [282.15, 0.57666],
+                            [283.15, 0.57878],
+                            [284.15, 0.58085],
+                            [285.15, 0.58289],
+                            [286.15, 0.58489],
+                            [287.15, 0.58686],
+                            [288.15, 0.5888],
+                            [289.15, 0.5907],
+                            [290.15, 0.59257],
+                            [291.15, 0.59442],
+                            [292.15, 0.59623],
+                            [293.15, 0.59801],
+                            [295.15, 0.60149],
+                            [297.15, 0.60487],
+                            [298.15, 0.60652],
+                            [299.15, 0.60814],
+                            [301.15, 0.61131],
+                            [303.15, 0.61439],
+                            [305.15, 0.61738],
+                            [307.15, 0.62029],
+                            [309.15, 0.6231],
+                            [311.15, 0.62584],
+                            [313.15, 0.62849],
+                            [315.15, 0.63107],
+                            [317.15, 0.63357],
+                            [319.15, 0.636],
+                            [321.15, 0.63835],
+                            [323.15, 0.64064],
+                            [328.15, 0.64604],
+                            [333.15, 0.65102],
+                            [338.15, 0.65559],
+                            [343.15, 0.65978],
+                            [348.15, 0.66358],
+                            [353.15, 0.66701],
+                            [358.15, 0.67008],
+                            [363.15, 0.6728],
+                            [368.15, 0.67517],
+                            [372.76, 0.67707]
+                        ]
+                    }
+                ],
+                "vapor_pressure": [
+                    {
+                        "type": "antoine",
+                        "formula": "p_sat = 1e5 * 10^(A - B / (T + C)) Pa (NIST-Form: log10(p/bar) = A - B/(T + C))",
+                        "A": 4.6543,
+                        "B": 1435.26,
+                        "C": -64.848,
+                        "unit": "Pa",
+                        "T_range": [255.9, 373],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7732185&Type=ANTOINE&Plot=on#ANTOINE | https://dx.doi.org/10.1021/ie50448a022"
+                    },
+                    {
+                        "type": "antoine",
+                        "formula": "p_sat = 1e5 * 10^(A - B / (T + C)) Pa (NIST-Form: log10(p/bar) = A - B/(T + C))",
+                        "A": 3.55959,
+                        "B": 643.748,
+                        "C": -198.043,
+                        "unit": "Pa",
+                        "T_range": [379, 573],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7732185&Type=ANTOINE&Plot=on#ANTOINE | https://dx.doi.org/10.1021/je60047a015"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [273.15, 7.78e-10],
+                            [293.15, 7.1e-10],
+                            [373.15, 4.91e-10]
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "H2O_gas",
+            "dyssol_key": "Es8yKDAVn3QLJwWy0vNK",
+            "state": { "value": "gas", "source": "Dyssol Materials.dmdb" },
+            "warnings": [
+                "Viskosität 9.6e-08 Pa s ist etwa 100-fach zu klein; Wasserdampf hat bei 373 K etwa 1.2e-05 Pa s (IAPWS, Huber et al. 2009)."
+            ],
+            "constants": {
+                "critical_pressure": { "value": 2.21058e+07, "unit": "Pa", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 40660.5, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -241826, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "kg/m3",
+                        "T_range": [273, 1973],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [273, 0.804195],
+                            [373, 0.588593],
+                            [473, 0.464155],
+                            [573, 0.383151],
+                            [673, 0.326219],
+                            [773, 0.284017],
+                            [873, 0.251484],
+                            [973, 0.225637],
+                            [1073, 0.204609],
+                            [1173, 0.187166],
+                            [1273, 0.172463],
+                            [1373, 0.159902],
+                            [1473, 0.149046],
+                            [1573, 0.139571],
+                            [1673, 0.131228],
+                            [1773, 0.123827],
+                            [1873, 0.117216],
+                            [1973, 0.111275]
+                        ]
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "constant",
+                        "value": 1906,
+                        "unit": "J/(kg K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "At 20degC from VDI",
+                        "note": "Zum Vergleich: Steigung der Dyssol-Enthalpie bei 298.15 K = 1865 J/(kg K)."
+                    }
+                ],
+                "viscosity": [
+                    {
+                        "type": "constant",
+                        "value": 9.6e-08,
+                        "unit": "Pa s",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "W/(m K)",
+                        "T_range": [273, 1273],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [273, 0.0169995],
+                            [373.12, 0.025093],
+                            [473, 0.033276],
+                            [573, 0.043409],
+                            [673, 0.054744],
+                            [773, 0.066961],
+                            [873, 0.079877],
+                            [973, 0.093362],
+                            [1073, 0.10731],
+                            [1173, 0.12165],
+                            [1273, 0.13631]
+                        ]
+                    }
+                ],
+                "vapor_pressure": [
+                    {
+                        "type": "antoine",
+                        "formula": "p_sat = 1e5 * 10^(A - B / (T + C)) Pa (NIST-Form: log10(p/bar) = A - B/(T + C))",
+                        "A": 4.6543,
+                        "B": 1435.26,
+                        "C": -64.848,
+                        "unit": "Pa",
+                        "T_range": [255.9, 573],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7732185&Type=ANTOINE&Plot=on#ANTOINE | https://dx.doi.org/10.1021/ie50448a022"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "F/m",
+                        "T_range": [273.16, 647.14],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [273.16, 7.77488e-10],
+                            [278.15, 7.6062e-10],
+                            [283.15, 7.43841e-10],
+                            [288.15, 7.27258e-10],
+                            [293.15, 7.10917e-10],
+                            [298.15, 6.94853e-10],
+                            [323.15, 6.19211e-10],
+                            [348.15, 5.51577e-10],
+                            [373.15, 4.91358e-10],
+                            [398.15, 4.37629e-10],
+                            [423.15, 3.89448e-10],
+                            [448.15, 3.46281e-10],
+                            [473.15, 3.07087e-10],
+                            [498.15, 2.71047e-10],
+                            [523.15, 2.37564e-10],
+                            [548.15, 2.06017e-10],
+                            [573.15, 1.75683e-10],
+                            [583.15, 1.63659e-10],
+                            [593.15, 1.5158e-10],
+                            [598.15, 1.45466e-10],
+                            [603.15, 1.39257e-10],
+                            [613.15, 1.26481e-10],
+                            [623.15, 1.12819e-10],
+                            [633.15, 9.73066e-11],
+                            [638.15, 8.7266e-11],
+                            [643.15, 7.58973e-11],
+                            [644.15, 7.26975e-11],
+                            [645.15, 6.89203e-11],
+                            [646.15, 6.38381e-11],
+                            [647.14, 4.77688e-11]
+                        ]
+                    }
+                ],
+                "mass_diffusion_coefficient": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "m2/s",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [10, 3.45e-08],
+                            [20, 1.32e-07],
+                            [30, 2.91e-07],
+                            [40, 5.08e-07],
+                            [50, 7.83e-07],
+                            [60, 1.12e-06],
+                            [70, 1.5e-06],
+                            [80, 1.95e-06],
+                            [90, 2.45e-06],
+                            [100, 3e-06],
+                            [110, 3.61e-06],
+                            [120, 4.28e-06],
+                            [130, 5e-06],
+                            [140, 5.77e-06],
+                            [150, 6.6e-06],
+                            [160, 7.48e-06],
+                            [170, 8.41e-06],
+                            [180, 9.39e-06],
+                            [190, 1.04e-05],
+                            [200, 1.15e-05],
+                            [210, 1.27e-05],
+                            [220, 1.39e-05],
+                            [230, 1.51e-05],
+                            [240, 1.64e-05],
+                            [250, 1.78e-05],
+                            [260, 1.92e-05],
+                            [270, 2.06e-05],
+                            [280, 2.21e-05],
+                            [290, 2.37e-05],
+                            [300, 2.53e-05],
+                            [310, 2.7e-05],
+                            [320, 2.87e-05],
+                            [330, 3.04e-05],
+                            [340, 3.23e-05],
+                            [350, 3.41e-05],
+                            [360, 3.6e-05],
+                            [370, 3.8e-05],
+                            [380, 4e-05],
+                            [390, 4.21e-05],
+                            [400, 4.42e-05],
+                            [410, 4.64e-05],
+                            [420, 4.86e-05],
+                            [430, 5.09e-05],
+                            [440, 5.32e-05],
+                            [450, 5.56e-05],
+                            [460, 5.8e-05],
+                            [470, 6.05e-05],
+                            [480, 6.3e-05],
+                            [490, 6.56e-05],
+                            [500, 6.82e-05],
+                            [510, 7.09e-05],
+                            [520, 7.36e-05],
+                            [530, 7.63e-05],
+                            [540, 7.92e-05],
+                            [550, 8.2e-05],
+                            [560, 8.49e-05],
+                            [570, 8.79e-05],
+                            [580, 9.09e-05],
+                            [590, 9.4e-05],
+                            [600, 9.71e-05],
+                            [610, 0.0001],
+                            [620, 0.000103],
+                            [630, 0.000107],
+                            [640, 0.00011],
+                            [650, 0.000113],
+                            [660, 0.000117],
+                            [670, 0.00012],
+                            [680, 0.000124],
+                            [690, 0.000127],
+                            [700, 0.000131],
+                            [710, 0.000135],
+                            [720, 0.000138],
+                            [730, 0.000142],
+                            [740, 0.000146],
+                            [750, 0.00015],
+                            [760, 0.000154],
+                            [770, 0.000158],
+                            [780, 0.000162],
+                            [790, 0.000166],
+                            [800, 0.00017],
+                            [810, 0.000174],
+                            [820, 0.000178],
+                            [830, 0.000182],
+                            [840, 0.000187],
+                            [850, 0.000191],
+                            [860, 0.000195],
+                            [870, 0.0002],
+                            [880, 0.000204],
+                            [890, 0.000209],
+                            [900, 0.000213],
+                            [910, 0.000218],
+                            [920, 0.000223],
+                            [930, 0.000227],
+                            [940, 0.000232],
+                            [950, 0.000237],
+                            [960, 0.000242],
+                            [970, 0.000247],
+                            [980, 0.000252],
+                            [990, 0.000257],
+                            [1000, 0.000262],
+                            [1010, 0.000267],
+                            [1020, 0.000272],
+                            [1030, 0.000277],
+                            [1040, 0.000282],
+                            [1050, 0.000288],
+                            [1060, 0.000293],
+                            [1070, 0.000298],
+                            [1080, 0.000304],
+                            [1090, 0.000309],
+                            [1100, 0.000315],
+                            [1110, 0.00032],
+                            [1120, 0.000326],
+                            [1130, 0.000332],
+                            [1140, 0.000337],
+                            [1150, 0.000343],
+                            [1160, 0.000349],
+                            [1170, 0.000355],
+                            [1180, 0.000361],
+                            [1190, 0.000367],
+                            [1200, 0.000373],
+                            [1210, 0.000379],
+                            [1220, 0.000385],
+                            [1230, 0.000391],
+                            [1240, 0.000397],
+                            [1250, 0.000403],
+                            [1260, 0.00041],
+                            [1270, 0.000416],
+                            [1280, 0.000422],
+                            [1290, 0.000429],
+                            [1300, 0.000435],
+                            [1310, 0.000442],
+                            [1320, 0.000448],
+                            [1330, 0.000455],
+                            [1340, 0.000462],
+                            [1350, 0.000468],
+                            [1360, 0.000475],
+                            [1370, 0.000482],
+                            [1380, 0.000489],
+                            [1390, 0.000496],
+                            [1400, 0.000503],
+                            [1410, 0.00051],
+                            [1420, 0.000517],
+                            [1430, 0.000524],
+                            [1440, 0.000531],
+                            [1450, 0.000538],
+                            [1460, 0.000545],
+                            [1470, 0.000552],
+                            [1480, 0.00056],
+                            [1490, 0.000567],
+                            [1500, 0.000574],
+                            [1510, 0.000582],
+                            [1520, 0.000589],
+                            [1530, 0.000597],
+                            [1540, 0.000605],
+                            [1550, 0.000612],
+                            [1560, 0.00062],
+                            [1570, 0.000628],
+                            [1580, 0.000635],
+                            [1590, 0.000643],
+                            [1600, 0.000651],
+                            [1610, 0.000659],
+                            [1620, 0.000667],
+                            [1630, 0.000675],
+                            [1640, 0.000683],
+                            [1650, 0.000691],
+                            [1660, 0.000699],
+                            [1670, 0.000708],
+                            [1680, 0.000716],
+                            [1690, 0.000724],
+                            [1700, 0.000732],
+                            [1710, 0.000741],
+                            [1720, 0.000749],
+                            [1730, 0.000758],
+                            [1740, 0.000766],
+                            [1750, 0.000775],
+                            [1760, 0.000783],
+                            [1770, 0.000792],
+                            [1780, 0.000801],
+                            [1790, 0.000809],
+                            [1800, 0.000818],
+                            [1810, 0.000827],
+                            [1820, 0.000836],
+                            [1830, 0.000845],
+                            [1840, 0.000854],
+                            [1850, 0.000863],
+                            [1860, 0.000872],
+                            [1870, 0.000881],
+                            [1880, 0.00089],
+                            [1890, 0.000899],
+                            [1900, 0.000909],
+                            [1910, 0.000918],
+                            [1920, 0.000927],
+                            [1930, 0.000937],
+                            [1940, 0.000946],
+                            [1950, 0.000956],
+                            [1960, 0.000965],
+                            [1970, 0.000975],
+                            [1980, 0.000984],
+                            [1990, 0.000994],
+                            [2000, 0.001],
+                            [2010, 0.00101],
+                            [2020, 0.00102],
+                            [2030, 0.00103],
+                            [2040, 0.00104],
+                            [2050, 0.00105],
+                            [2060, 0.00106],
+                            [2070, 0.00107],
+                            [2080, 0.00108],
+                            [2090, 0.00109],
+                            [2100, 0.0011],
+                            [2110, 0.00111],
+                            [2120, 0.00112],
+                            [2130, 0.00113],
+                            [2140, 0.00114],
+                            [2150, 0.00116],
+                            [2160, 0.00117],
+                            [2170, 0.00118],
+                            [2180, 0.00119],
+                            [2190, 0.0012],
+                            [2200, 0.00121],
+                            [2210, 0.00122],
+                            [2220, 0.00123],
+                            [2230, 0.00124],
+                            [2240, 0.00125],
+                            [2250, 0.00126],
+                            [2260, 0.00127],
+                            [2270, 0.00128],
+                            [2280, 0.00129],
+                            [2290, 0.00131],
+                            [2300, 0.00132],
+                            [2310, 0.00133],
+                            [2320, 0.00134],
+                            [2330, 0.00135],
+                            [2340, 0.00136],
+                            [2350, 0.00137],
+                            [2360, 0.00138],
+                            [2370, 0.0014],
+                            [2380, 0.00141],
+                            [2390, 0.00142],
+                            [2400, 0.00143],
+                            [2410, 0.00144],
+                            [2420, 0.00145],
+                            [2430, 0.00146],
+                            [2440, 0.00148],
+                            [2450, 0.00149],
+                            [2460, 0.0015],
+                            [2470, 0.00151],
+                            [2480, 0.00152],
+                            [2490, 0.00154],
+                            [2500, 0.00155],
+                            [2510, 0.00156],
+                            [2520, 0.00157],
+                            [2530, 0.00158],
+                            [2540, 0.0016],
+                            [2550, 0.00161],
+                            [2560, 0.00162],
+                            [2570, 0.00163],
+                            [2580, 0.00165],
+                            [2590, 0.00166],
+                            [2600, 0.00167],
+                            [2610, 0.00168],
+                            [2620, 0.00169],
+                            [2630, 0.00171],
+                            [2640, 0.00172],
+                            [2650, 0.00173],
+                            [2660, 0.00175],
+                            [2670, 0.00176],
+                            [2680, 0.00177],
+                            [2690, 0.00178],
+                            [2700, 0.0018],
+                            [2710, 0.00181],
+                            [2720, 0.00182],
+                            [2730, 0.00184],
+                            [2740, 0.00185],
+                            [2750, 0.00186],
+                            [2760, 0.00188],
+                            [2770, 0.00189],
+                            [2780, 0.0019],
+                            [2790, 0.00191],
+                            [2800, 0.00193],
+                            [2810, 0.00194],
+                            [2820, 0.00196],
+                            [2830, 0.00197],
+                            [2840, 0.00198],
+                            [2850, 0.002],
+                            [2860, 0.00201],
+                            [2870, 0.00202],
+                            [2880, 0.00204],
+                            [2890, 0.00205],
+                            [2900, 0.00206],
+                            [2910, 0.00208],
+                            [2920, 0.00209],
+                            [2930, 0.00211],
+                            [2940, 0.00212],
+                            [2950, 0.00213],
+                            [2960, 0.00215],
+                            [2970, 0.00216],
+                            [2980, 0.00218],
+                            [2990, 0.00219],
+                            [3000, 0.0022],
+                            [3010, 0.00222],
+                            [3020, 0.00223],
+                            [3030, 0.00225],
+                            [3040, 0.00226],
+                            [3050, 0.00228],
+                            [3060, 0.00229],
+                            [3070, 0.00231],
+                            [3080, 0.00232],
+                            [3090, 0.00233],
+                            [3100, 0.00235],
+                            [3110, 0.00236],
+                            [3120, 0.00238],
+                            [3130, 0.00239],
+                            [3140, 0.00241],
+                            [3150, 0.00242],
+                            [3160, 0.00244],
+                            [3170, 0.00245],
+                            [3180, 0.00247],
+                            [3190, 0.00248],
+                            [3200, 0.0025],
+                            [3210, 0.00251],
+                            [3220, 0.00253],
+                            [3230, 0.00254],
+                            [3240, 0.00256]
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "N2",
+            "dyssol_key": "CW97G1G9PPKP63NZ6R0L",
+            "state": { "value": "gas", "source": "Dyssol Materials.dmdb" },
+            "constants": {
+                "critical_pressure": { "value": 3.3958e+06, "unit": "Pa", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "critical_temperature": { "value": 126.192, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_fusion": { "value": 710.14, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 5569.06, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.0280134, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 77.355, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 63.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "kg/m3",
+                        "T_range": [273, 1973],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [273, 1.25051],
+                            [373, 0.91525],
+                            [473, 0.721751],
+                            [573, 0.595791],
+                            [673, 0.507263],
+                            [773, 0.441641],
+                            [873, 0.391052],
+                            [973, 0.350861],
+                            [1073, 0.318162],
+                            [1173, 0.291038],
+                            [1273, 0.268176],
+                            [1373, 0.248644],
+                            [1473, 0.231764],
+                            [1573, 0.21703],
+                            [1673, 0.204057],
+                            [1773, 0.192548],
+                            [1873, 0.182268],
+                            [1973, 0.17303]
+                        ]
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "constant",
+                        "value": 1041,
+                        "unit": "J/(kg K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "At 20degC from VDI",
+                        "note": "Zum Vergleich: Steigung der Dyssol-Enthalpie bei 298.15 K = 1011 J/(kg K)."
+                    }
+                ],
+                "viscosity": [
+                    {
+                        "type": "sutherland",
+                        "formula": "y = y_ref * (T_ref + S) / (T + S) * (T / T_ref)^1.5",
+                        "y_ref": 1.663e-05,
+                        "T_ref": 273,
+                        "S": 107,
+                        "unit": "Pa s",
+                        "T_range": [100, 2000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "F. M. White, Viscous Fluid Flow, 3rd ed., McGraw-Hill, p28. | Valid up to T=1500K"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "sutherland",
+                        "formula": "y = y_ref * (T_ref + S) / (T + S) * (T / T_ref)^1.5",
+                        "y_ref": 0.02407,
+                        "T_ref": 273.16,
+                        "S": 178.1,
+                        "unit": "W/(m K)",
+                        "T_range": [200, 2000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "http://dx.doi.org/10.3390/app8060893"
+                    }
+                ],
+                "vapor_pressure": [
+                    {
+                        "type": "antoine",
+                        "formula": "p_sat = 1e5 * 10^(A - B / (T + C)) Pa (NIST-Form: log10(p/bar) = A - B/(T + C))",
+                        "A": 3.7362,
+                        "B": 264.651,
+                        "C": -6.788,
+                        "unit": "Pa",
+                        "T_range": [63.14, 126],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7727379&Mask=4&Type=ANTOINE&Plot=on#ANTOINE | https://dx.doi.org/10.1021/je60033a014 | https://webbook.nist.gov/cgi/cbook.cgi?ID=C7727379&Mask=4&Type=ANTOINE#ANTOINE"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 8.86e-12,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "NaCl",
+            "dyssol_key": "SodiumChloride1",
+            "state": { "value": "solid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "warnings": [
+                "Keine Wärmekapazität: aus der Dyssol-Enthalpie lässt sich kein brauchbares c_p ableiten (Enthalpie gilt nur für 2500-6000 K). Literatur (NIST, 298 K) etwa 864 J/(kg K) - prüfen."
+            ],
+            "constants": {
+                "heat_of_fusion": { "value": 28156.4, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 229700, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.05844, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 1738.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 1073.85, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -410900, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "bond_work_index": { "value": 10, "unit": "kWh/t", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "constant",
+                        "value": 2170,
+                        "unit": "kg/m3",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "vapor_pressure": [
+                    {
+                        "type": "antoine",
+                        "formula": "p_sat = 1e5 * 10^(A - B / (T + C)) Pa (NIST-Form: log10(p/bar) = A - B/(T + C))",
+                        "A": 3.56682,
+                        "B": 5200.9,
+                        "C": -317.409,
+                        "unit": "Pa",
+                        "T_range": [859.99, 1239.99],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7647145&Mask=4&Type=ANTOINE&Plot=on#ANTOINE | https://dx.doi.org/10.1021/j100613a005 | https://webbook.nist.gov/cgi/cbook.cgi?ID=C7647145&Mask=4&Type=ANTOINE#ANTOINE"
+                    },
+                    {
+                        "type": "antoine",
+                        "formula": "p_sat = 1e5 * 10^(A - B / (T + C)) Pa (NIST-Form: log10(p/bar) = A - B/(T + C))",
+                        "A": 5.07184,
+                        "B": 8388.5,
+                        "C": -82.638,
+                        "unit": "Pa",
+                        "T_range": [1138, 1738],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7647145&Mask=4&Type=ANTOINE | https://dx.doi.org/10.1021/ie50448a022 | https://webbook.nist.gov/cgi/cbook.cgi?ID=C7647145&Mask=4&Type=ANTOINE#ANTOINE"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 8.85e-11,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "O2",
+            "dyssol_key": "IO7L4XGUOJLM5503A8TW",
+            "state": { "value": "gas", "source": "Dyssol Materials.dmdb" },
+            "constants": {
+                "critical_pressure": { "value": 5.043e+06, "unit": "Pa", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "critical_temperature": { "value": 154.58, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_fusion": { "value": 441.58, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 6819, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.0319988, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 90.2, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 54.36, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "kg/m3",
+                        "T_range": [273, 1973],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [273, 1.42841],
+                            [373, 1.04546],
+                            [473, 0.824433],
+                            [573, 0.680553],
+                            [673, 0.57943],
+                            [773, 0.504472],
+                            [873, 0.446686],
+                            [973, 0.400778],
+                            [1073, 0.363426],
+                            [1173, 0.332444],
+                            [1273, 0.306329],
+                            [1373, 0.284018],
+                            [1473, 0.264736],
+                            [1573, 0.247906],
+                            [1673, 0.233088],
+                            [1773, 0.219942],
+                            [1873, 0.208199],
+                            [1973, 0.197647]
+                        ]
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "polynomial",
+                        "formula": "y = a0 + a1*T + a2*T^2 + ... (T in K)",
+                        "coefficients": [851.364, 0.320396, -0.000112466, 2.07015e-08, -1.42688e-12],
+                        "unit": "J/(kg K)",
+                        "T_range": [100, 6000],
+                        "p_range": [1000, 1e+09],
+                        "source": "abgeleitet: c_p = dh/dT aus der Enthalpie in Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/inchi?ID=C7782447&Mask=1#Thermo-Gas",
+                        "note": "c_p(298.15 K) = 937 J/(kg K); Literatur (NIST, 298 K) etwa 918 J/(kg K), Abweichung +2 %."
+                    }
+                ],
+                "viscosity": [
+                    {
+                        "type": "sutherland",
+                        "formula": "y = y_ref * (T_ref + S) / (T + S) * (T / T_ref)^1.5",
+                        "y_ref": 1.919e-05,
+                        "T_ref": 273,
+                        "S": 139,
+                        "unit": "Pa s",
+                        "T_range": [190, 2000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "F. M. White, Viscous Fluid Flow, 3rd ed., McGraw-Hill, p28. | Valid up to T=2000K"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "sutherland",
+                        "formula": "y = y_ref * (T_ref + S) / (T + S) * (T / T_ref)^1.5",
+                        "y_ref": 0.02449,
+                        "T_ref": 273.16,
+                        "S": 268.8,
+                        "unit": "W/(m K)",
+                        "T_range": [200, 2000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "http://dx.doi.org/10.3390/app8060893"
+                    }
+                ],
+                "vapor_pressure": [
+                    {
+                        "type": "antoine",
+                        "formula": "p_sat = 1e5 * 10^(A - B / (T + C)) Pa (NIST-Form: log10(p/bar) = A - B/(T + C))",
+                        "A": 3.9523,
+                        "B": 340.024,
+                        "C": -4.144,
+                        "unit": "Pa",
+                        "T_range": [54.36, 154.33],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782447&Mask=4&Type=ANTOINE&Plot=on#ANTOINE | https://dx.doi.org/10.1021/je60037a038 | https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782447&Mask=4&Type=ANTOINE#ANTOINE"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 1.33e-11,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Sand",
+            "dyssol_key": "4031BC62EC7F17EFA33F",
+            "state": { "value": "solid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "warnings": [
+                "Viskosität 1 Pa s ist für einen Feststoff ohne Bedeutung."
+            ],
+            "constants": {
+                "heat_of_fusion": { "value": 9372, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.06008, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 2503.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 1993.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -911000, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "bond_work_index": { "value": 15.51, "unit": "kWh/t", "source": "Dyssol Materials.dmdb", "status": "unchecked", "reference": "Bond work index for silica sand" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "constant",
+                        "value": 2200,
+                        "unit": "kg/m3",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "constant",
+                        "value": 830,
+                        "unit": "J/(kg K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "note": "Zum Vergleich: Steigung der Dyssol-Enthalpie bei 298.15 K = 789 J/(kg K)."
+                    }
+                ],
+                "viscosity": [
+                    {
+                        "type": "constant",
+                        "value": 1,
+                        "unit": "Pa s",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "constant",
+                        "value": 0.335,
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 3.54e-11,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "SO2",
+            "dyssol_key": "55D5555B48AE4F20ADA256654A2F3DF7",
+            "state": { "value": "gas", "source": "Dyssol Materials.dmdb" },
+            "constants": {
+                "critical_pressure": { "value": 7.88308e+06, "unit": "Pa", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "critical_temperature": { "value": 430.7, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_fusion": { "value": 7400, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 24940, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.064064, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 263.1, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 197.65, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -296842, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "kg/m3",
+                        "T_range": [273, 1973],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [273, 2.85979],
+                            [373, 2.09309],
+                            [473, 1.65058],
+                            [573, 1.36252],
+                            [673, 1.16006],
+                            [773, 1.00999],
+                            [873, 0.894298],
+                            [973, 0.802387],
+                            [1073, 0.727607],
+                            [1173, 0.665577],
+                            [1273, 0.613293],
+                            [1373, 0.568625],
+                            [1473, 0.530022],
+                            [1573, 0.496327],
+                            [1673, 0.46666],
+                            [1773, 0.44034],
+                            [1873, 0.41683],
+                            [1973, 0.395703]
+                        ]
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "J/(kg K)",
+                        "T_range": [273, 2773],
+                        "p_range": [1000, 1e+09],
+                        "source": "abgeleitet: c_p = dh/dT aus der Enthalpie in Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [285.5, 614.929],
+                            [310.5, 629.635],
+                            [335.5, 644.072],
+                            [360.5, 658.104],
+                            [385.5, 671.664],
+                            [410.5, 684.696],
+                            [435.5, 697.172],
+                            [460.5, 709.088],
+                            [485.5, 720.4],
+                            [510.5, 731.2],
+                            [535.5, 741.4],
+                            [560.5, 751.04],
+                            [585.5, 760.2],
+                            [610.5, 768.76],
+                            [635.5, 776.84],
+                            [660.5, 784.44],
+                            [685.5, 791.56],
+                            [710.5, 798.28],
+                            [735.5, 804.52],
+                            [760.5, 810.36],
+                            [785.5, 815.84],
+                            [810.5, 820.96],
+                            [835.5, 825.68],
+                            [860.5, 830.2],
+                            [885.5, 834.32],
+                            [910.5, 838.2],
+                            [935.5, 841.84],
+                            [960.5, 845.28],
+                            [985.5, 848.48],
+                            [1010.5, 851.48],
+                            [1035.5, 854.4],
+                            [1060.5, 857.16],
+                            [1085.5, 859.76],
+                            [1110.5, 862.36],
+                            [1135.5, 864.84],
+                            [1160.5, 867.32],
+                            [1185.5, 869.72],
+                            [1210.5, 871.24],
+                            [1235.5, 873.68],
+                            [1260.5, 875.64],
+                            [1285.5, 877.52],
+                            [1310.5, 879.28],
+                            [1335.5, 880.96],
+                            [1360.5, 882.56],
+                            [1385.5, 884.12],
+                            [1410.5, 885.6],
+                            [1435.5, 887],
+                            [1460.5, 888.36],
+                            [1485.5, 889.68],
+                            [1510.5, 890.96],
+                            [1535.5, 892.24],
+                            [1560.5, 893.2],
+                            [1585.5, 894.4],
+                            [1610.5, 895.6],
+                            [1635.5, 896.4],
+                            [1660.5, 897.6],
+                            [1685.5, 898.8],
+                            [1710.5, 899.6],
+                            [1735.5, 900.4],
+                            [1760.5, 901.2],
+                            [1785.5, 902.4],
+                            [1810.5, 903.2],
+                            [1835.5, 903.6],
+                            [1860.5, 904.8],
+                            [1885.5, 905.6],
+                            [1910.5, 906.4],
+                            [1935.5, 906.8],
+                            [1960.5, 908],
+                            [1985.5, 908.4],
+                            [2010.5, 909.2],
+                            [2035.5, 909.6],
+                            [2060.5, 910.8],
+                            [2085.5, 910.8],
+                            [2110.5, 912],
+                            [2135.5, 912.4],
+                            [2160.5, 912.8],
+                            [2185.5, 913.6],
+                            [2210.5, 914.4],
+                            [2235.5, 914.8],
+                            [2260.5, 915.2],
+                            [2285.5, 916],
+                            [2310.5, 916.4],
+                            [2335.5, 917.2],
+                            [2360.5, 917.6],
+                            [2385.5, 918],
+                            [2410.5, 918.4],
+                            [2435.5, 919.2],
+                            [2460.5, 919.6],
+                            [2485.5, 920],
+                            [2510.5, 920.8],
+                            [2535.5, 920.8],
+                            [2560.5, 921.6],
+                            [2585.5, 922],
+                            [2610.5, 922.4],
+                            [2635.5, 922.8],
+                            [2660.5, 923.6],
+                            [2685.5, 923.6],
+                            [2710.5, 924.4],
+                            [2735.5, 924.4],
+                            [2760.5, 925.2]
+                        ],
+                        "note": "c_p(298.15 K) = 622 J/(kg K); Literatur (NIST, 298 K) etwa 622 J/(kg K), Abweichung +0 %."
+                    }
+                ],
+                "viscosity": [
+                    {
+                        "type": "constant",
+                        "value": 1.29e-05,
+                        "unit": "Pa s",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "table_T",
+                        "formula": "Messpunkte [T in K, Wert]; dazwischen linear interpoliert",
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [300, 0.0096],
+                            [400, 0.0143],
+                            [500, 0.02],
+                            [600, 0.0256]
+                        ]
+                    }
+                ],
+                "vapor_pressure": [
+                    {
+                        "type": "antoine",
+                        "formula": "p_sat = 1e5 * 10^(A - B / (T + C)) Pa (NIST-Form: log10(p/bar) = A - B/(T + C))",
+                        "A": 3.48586,
+                        "B": 668.225,
+                        "C": -72.252,
+                        "unit": "Pa",
+                        "T_range": [177.7, 263],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7446095&Mask=4&Type=ANTOINE#ANTOINE | https://dx.doi.org/10.1021/ie50448a022"
+                    },
+                    {
+                        "type": "antoine",
+                        "formula": "p_sat = 1e5 * 10^(A - B / (T + C)) Pa (NIST-Form: log10(p/bar) = A - B/(T + C))",
+                        "A": 4.37798,
+                        "B": 966.575,
+                        "C": -42.071,
+                        "unit": "Pa",
+                        "T_range": [263, 414.9],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7446095&Mask=4&Type=ANTOINE#ANTOINE | https://dx.doi.org/10.1021/ie50448a022"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 2.03e-10,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Urea",
+            "dyssol_key": "03399E9F80FD4ccfAAA2",
+            "state": { "value": "solid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "warnings": [
+                "Viskosität 0.00178 Pa s ist für einen Feststoff ohne Bedeutung (evtl. Wert der Schmelze)."
+            ],
+            "constants": {
+                "heat_of_fusion": { "value": 1470.3, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 87400, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.06007, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 447.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 407.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -333300, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "bond_work_index": { "value": 7.5, "unit": "kWh/t", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "constant",
+                        "value": 1320,
+                        "unit": "kg/m3",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "constant",
+                        "value": 1544.7,
+                        "unit": "J/(kg K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "reference": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C57136&Mask=2"
+                    }
+                ],
+                "viscosity": [
+                    {
+                        "type": "constant",
+                        "value": 0.00178,
+                        "unit": "Pa s",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "constant",
+                        "value": 0.58,
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "vapor_pressure": [
+                    {
+                        "type": "constant",
+                        "value": 0.00159987,
+                        "unit": "Pa",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 2.57e-11,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Milk",
+            "dyssol_key": "Rljb5lvLO42JAbNsGIla",
+            "state": { "value": "solid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "warnings": [
+                "Dichte 751 kg/m3 ist vermutlich eine Schüttdichte (gerüttelte Schüttdichte Magermilchpulver etwa 737 kg/m3); Feststoffdichte Milchpulver etwa 1300 (Vollmilch) bis 1460 kg/m3 (Magermilch) - eigene Recherche, noch zu prüfen.",
+                "Konstanten offensichtlich von Sand übernommen (Molmasse 0.06008 = SiO2, Bildungsenthalpie -911000 J/mol, Siede-/Schmelzpunkt) - Platzhalter.",
+                "Permittivität 4 F/m ist unmöglich (Vakuum 8.85e-12 F/m); vermutlich relative Permittivität 4, also etwa 3.5e-11 F/m."
+            ],
+            "constants": {
+                "critical_pressure": { "value": 1e+06, "unit": "Pa", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "critical_temperature": { "value": 3500, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_fusion": { "value": 910860, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.06008, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 2503.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 1993.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -911000, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "constant",
+                        "value": 751,
+                        "unit": "kg/m3",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "constant",
+                        "value": 2000,
+                        "unit": "J/(kg K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "note": "Dyssol-Enthalpie zum Vergleich unbrauchbar: dh/dT bei 298.15 K wäre 6.53e+10 J/(kg K); die Parameter sind die NIST-Shomate-Koeffizienten von flüssigem Wasser, ohne Umrechnung T/1000 und mol -> kg"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "constant",
+                        "value": 0.58,
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "equilibrium_moisture_content": [
+                    {
+                        "type": "table_relative_humidity",
+                        "formula": "Messpunkte [relative Luftfeuchte 0..1, Wert]; dazwischen linear interpoliert (in Dyssol über die Druckachse kodiert)",
+                        "unit": "kg/kg",
+                        "T_range": [273, 308],
+                        "relative_humidity_range": [0, 1],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [0, 0],
+                            [0.1, 0.0115932],
+                            [0.2, 0.0177257],
+                            [0.3, 0.0230636],
+                            [0.4, 0.0285683],
+                            [0.5, 0.0353197],
+                            [0.6, 0.0447883],
+                            [0.7, 0.0593227],
+                            [0.8, 0.0847699],
+                            [0.9, 0.154882]
+                        ]
+                    },
+                    {
+                        "type": "table_relative_humidity",
+                        "formula": "Messpunkte [relative Luftfeuchte 0..1, Wert]; dazwischen linear interpoliert (in Dyssol über die Druckachse kodiert)",
+                        "unit": "kg/kg",
+                        "T_range": [308, 329],
+                        "relative_humidity_range": [0, 1],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [0, 0],
+                            [0.1, 0.0115948],
+                            [0.2, 0.017064],
+                            [0.3, 0.021863],
+                            [0.4, 0.0270436],
+                            [0.5, 0.0335974],
+                            [0.6, 0.0437167],
+                            [0.7, 0.0586069],
+                            [0.8, 0.0851898],
+                            [0.9, 0.154042]
+                        ]
+                    },
+                    {
+                        "type": "table_relative_humidity",
+                        "formula": "Messpunkte [relative Luftfeuchte 0..1, Wert]; dazwischen linear interpoliert (in Dyssol über die Druckachse kodiert)",
+                        "unit": "kg/kg",
+                        "T_range": [329, 373],
+                        "relative_humidity_range": [0, 1],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [0, 0],
+                            [0.1, 0.0102015],
+                            [0.2, 0.0151948],
+                            [0.3, 0.0203336],
+                            [0.4, 0.0265107],
+                            [0.5, 0.03491],
+                            [0.6, 0.0465401],
+                            [0.7, 0.0619564],
+                            [0.8, 0.0892608],
+                            [0.9, 0.142666]
+                        ]
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 4,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Al2O3",
+            "dyssol_key": "8qvJP3B6Uiu1gJ03OhmW",
+            "state": { "value": "solid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "warnings": [
+                "Dichte 1045 kg/m3 passt nicht zu unporösen Teilchen: kompaktes Al2O3 (Korund) hat etwa 3950 kg/m3 - vermutlich Partikeldichte poröser Teilchen.",
+                "Konstanten außer der Molmasse offensichtlich von Sand übernommen (Bildungsenthalpie -911000 J/mol = SiO2, Siede-/Schmelzpunkt) - Platzhalter.",
+                "Permittivität 4 F/m ist unmöglich (Vakuum 8.85e-12 F/m); vermutlich relative Permittivität 4.",
+                "Gleichgewichtsfeuchte, erster Bereich (273-308 K): Feuchtebereich [1, 1] und erster Punkt (0; 0.1) sehen nach Tippfehler aus (die anderen Bereiche: [0, 1] und (0; 0)).",
+                "Abgeleitete Wärmekapazität weicht stark von der Literatur ab: c_p(298.15 K) = 900 J/(kg K); Literatur (NIST, 298 K) etwa 775 J/(kg K), Abweichung +16 % - prüfen."
+            ],
+            "constants": {
+                "critical_pressure": { "value": 1e+06, "unit": "Pa", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "critical_temperature": { "value": 3500, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_fusion": { "value": 910860, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "molar_mass": { "value": 0.10196, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 2503.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 1993.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -911000, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "constant",
+                        "value": 1045,
+                        "unit": "kg/m3",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "constant",
+                        "value": 900,
+                        "unit": "J/(kg K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "abgeleitet: c_p = dh/dT aus der Enthalpie in Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "note": "c_p(298.15 K) = 900 J/(kg K); Literatur (NIST, 298 K) etwa 775 J/(kg K), Abweichung +16 %."
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "constant",
+                        "value": 0.58,
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "equilibrium_moisture_content": [
+                    {
+                        "type": "table_relative_humidity",
+                        "formula": "Messpunkte [relative Luftfeuchte 0..1, Wert]; dazwischen linear interpoliert (in Dyssol über die Druckachse kodiert)",
+                        "unit": "kg/kg",
+                        "T_range": [273, 308],
+                        "relative_humidity_range": [1, 1],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [0, 0.1],
+                            [0.1, 0.0269558],
+                            [0.2, 0.0362608],
+                            [0.3, 0.0430612],
+                            [0.4, 0.0493275],
+                            [0.5, 0.0568226],
+                            [0.6, 0.0689678],
+                            [0.7, 0.0943971],
+                            [0.8, 0.186885]
+                        ]
+                    },
+                    {
+                        "type": "table_relative_humidity",
+                        "formula": "Messpunkte [relative Luftfeuchte 0..1, Wert]; dazwischen linear interpoliert (in Dyssol über die Druckachse kodiert)",
+                        "unit": "kg/kg",
+                        "T_range": [308, 323],
+                        "relative_humidity_range": [0, 1],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [0, 0],
+                            [0.1, 0.0250676],
+                            [0.2, 0.0352048],
+                            [0.3, 0.0426971],
+                            [0.4, 0.0493104],
+                            [0.5, 0.0566844],
+                            [0.6, 0.067479],
+                            [0.7, 0.088029],
+                            [0.8, 0.144441]
+                        ]
+                    },
+                    {
+                        "type": "table_relative_humidity",
+                        "formula": "Messpunkte [relative Luftfeuchte 0..1, Wert]; dazwischen linear interpoliert (in Dyssol über die Druckachse kodiert)",
+                        "unit": "kg/kg",
+                        "T_range": [323, 373],
+                        "relative_humidity_range": [0, 1],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "points": [
+                            [0, 0],
+                            [0.1, 0.0213597],
+                            [0.2, 0.0326904],
+                            [0.3, 0.0414432],
+                            [0.4, 0.0493291],
+                            [0.5, 0.0586483],
+                            [0.6, 0.0718115],
+                            [0.7, 0.0935124],
+                            [0.8, 0.142256]
+                        ]
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 4,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Cellets",
+            "dyssol_key": "F3SLLny30KKziHtRbOE2",
+            "state": { "value": "solid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "warnings": [
+                "Konstanten offensichtlich von Wasser übernommen (Verdampfungs-/Bildungsenthalpie von Wasserdampf; Siede-/Schmelzpunkt 3730.15/2730.15 K = 373.15/273.15 K mit zusätzlicher Ziffer) - Platzhalter. Keine Molmasse.",
+                "Permittivität 4 F/m ist unmöglich (Vakuum 8.85e-12 F/m); vermutlich relative Permittivität 4.",
+                "Dichte 1114 kg/m3: bei porösen Pellets evtl. Partikel- statt Feststoffdichte - prüfen.",
+                "Keine Wärmekapazität: aus der Dyssol-Enthalpie lässt sich kein brauchbares c_p ableiten (dh/dT bei 298.15 K wäre 6.53e+10 J/(kg K); die Parameter sind die NIST-Shomate-Koeffizienten von flüssigem Wasser, ohne Umrechnung T/1000 und mol -> kg)."
+            ],
+            "constants": {
+                "critical_pressure": { "value": 220001, "unit": "Pa", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 40660.5, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 3730.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 2730.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -241826, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "constant",
+                        "value": 1114,
+                        "unit": "kg/m3",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "constant",
+                        "value": 0.58,
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "equilibrium_moisture_content": [
+                    {
+                        "type": "constant",
+                        "value": 0.05,
+                        "unit": "kg/kg",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 4,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "FCC",
+            "dyssol_key": "qvJP3B6Uiu1gJ03OhmWv",
+            "state": { "value": "solid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "warnings": [
+                "Konstanten offensichtlich von Wasser übernommen (wie Cellets) - Platzhalter. Keine Molmasse.",
+                "Permittivität 4 F/m ist unmöglich (Vakuum 8.85e-12 F/m); vermutlich relative Permittivität 4.",
+                "Dichte 1632.5 kg/m3: FCC-Katalysator ist porös, vermutlich Partikel- statt Feststoffdichte - prüfen."
+            ],
+            "constants": {
+                "critical_pressure": { "value": 220001, "unit": "Pa", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "heat_of_vaporization": { "value": 40660.5, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_boiling_point": { "value": 3730.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "normal_freezing_point": { "value": 2730.15, "unit": "K", "source": "Dyssol Materials.dmdb", "status": "unchecked" },
+                "formation_enthalpy": { "value": -241826, "unit": "J/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "constant",
+                        "value": 1632.5,
+                        "unit": "kg/m3",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "constant",
+                        "value": 1014,
+                        "unit": "J/(kg K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked",
+                        "note": "Dyssol-Enthalpie zum Vergleich unbrauchbar: dh/dT bei 298.15 K wäre 6.53e+10 J/(kg K); die Parameter sind die NIST-Shomate-Koeffizienten von flüssigem Wasser, ohne Umrechnung T/1000 und mol -> kg"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "constant",
+                        "value": 0.58,
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "equilibrium_moisture_content": [
+                    {
+                        "type": "constant",
+                        "value": 0.012,
+                        "unit": "kg/kg",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "permittivity": [
+                    {
+                        "type": "constant",
+                        "value": 4,
+                        "unit": "F/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Lactose",
+            "dyssol_key": "j9zAhr99xPsXYmADI7F5",
+            "state": { "value": "solid", "source": "Annahme StoSiS (in Dyssol nicht angegeben)" },
+            "constants": {
+                "molar_mass": { "value": 0.342297, "unit": "kg/mol", "source": "Dyssol Materials.dmdb", "status": "unchecked" }
+            },
+            "properties": {
+                "density": [
+                    {
+                        "type": "constant",
+                        "value": 1525,
+                        "unit": "kg/m3",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "heat_capacity": [
+                    {
+                        "type": "constant",
+                        "value": 1220,
+                        "unit": "J/(kg K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "thermal_conductivity": [
+                    {
+                        "type": "constant",
+                        "value": 0.35,
+                        "unit": "W/(m K)",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ],
+                "equilibrium_moisture_content": [
+                    {
+                        "type": "constant",
+                        "value": 0.0001,
+                        "unit": "kg/kg",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        }
+    ],
+    "interactions": [
+        {
+            "materials": [
+                "H2O",
+                "Air"
+            ],
+            "dyssol_keys": [
+                "4b3f8A1A71A315EFB4E5",
+                "4e3a9D257E6A9E4F03D1"
+            ],
+            "properties": {
+                "interface_tension": [
+                    {
+                        "type": "constant",
+                        "value": 0.072,
+                        "unit": "N/m",
+                        "T_range": [10, 10000],
+                        "p_range": [1000, 1e+09],
+                        "source": "Dyssol Materials.dmdb",
+                        "status": "unchecked"
+                    }
+                ]
+            }
+        }
+    ]
+}

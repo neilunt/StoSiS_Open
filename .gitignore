@@ -1,0 +1,20 @@
+# Build-Ausgabe (wird von CMake/Visual Studio jederzeit neu erzeugt)
+build/
+out/
+
+# Visual Studio / IDE-Dateien
+.vs/
+*.user
+*.suo
+*.vcxproj.user
+CMakeSettings.json
+CMakeUserPresets.json
+
+# Compiler-Zwischendateien
+*.obj
+*.pdb
+*.ilk
+*.exe
+
+# Aus docs/StoSiS_Methoden.html erzeugte PDFs (bei Bedarf selbst drucken)
+docs/*.pdf

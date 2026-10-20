@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="455" viewBox="0 0 680 455">
+<title>Stochastische Aufloesung: Lupe fuer ein Koagulationsereignis</title>
+<style>
+text { font-family: Calibri, Arial, sans-serif; }
+.t { font-size: 14px; fill: #222222; }
+.ts { font-size: 12px; fill: #595959; }
+.th { font-size: 14px; font-weight: bold; fill: #222222; }
+.c-amber rect, .c-amber circle, rect.c-amber, circle.c-amber { fill: #FAEEDA; stroke: #854F0B; }
+.c-amber text { fill: #633806; }
+.c-gray rect, .c-gray circle, rect.c-gray, circle.c-gray { fill: #F1EFE8; stroke: #5F5E5A; }
+.c-gray text { fill: #444441; }
+.box { fill: #F7F6F2; stroke: #B4B2A9; }
+.arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
+.c-red rect, rect.c-red { fill: #FCEBEB; stroke: #A32D2D; }
+.c-red text { fill: #791F1F; }
+.c-green rect, rect.c-green { fill: #EAF3DE; stroke: #3B6D11; }
+.c-green text { fill: #27500A; }
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="th" x="340" y="26" text-anchor="middle">Zwei Karten mit unterschiedlichem Gewicht</text>
+<g class="c-amber"><rect x="220" y="38" width="110" height="44" rx="4" stroke-width="0.5"/><text class="th" x="275" y="54" text-anchor="middle" dominant-baseline="central">Sand</text><text class="ts" x="275" y="71" text-anchor="middle" dominant-baseline="central">w = 10 000</text></g>
+<g class="c-gray"><rect x="350" y="38" width="110" height="44" rx="4" stroke-width="0.5"/><text class="th" x="405" y="54" text-anchor="middle" dominant-baseline="central">Kohle</text><text class="ts" x="405" y="71" text-anchor="middle" dominant-baseline="central">w = 2 000</text></g>
+<text class="th" x="40" y="118">Lupe s<tspan baseline-shift="sub" font-size="11">F</tspan> = 2 000 (Gregors Wahl): 1 Punkt = 2 000 Körner</text>
+<circle class="c-amber" cx="50" cy="150" r="7" stroke-width="0.5"/><circle class="c-amber" cx="68" cy="150" r="7" stroke-width="0.5"/><circle class="c-amber" cx="86" cy="150" r="7" stroke-width="0.5"/><circle class="c-amber" cx="104" cy="150" r="7" stroke-width="0.5"/><circle class="c-amber" cx="122" cy="150" r="7" stroke-width="0.5"/>
+<circle class="c-gray" cx="148" cy="150" r="7" stroke-width="0.5"/>
+<ellipse cx="135" cy="150" rx="24" ry="13" fill="none" stroke="#888780" stroke-width="1" stroke-dasharray="3 3"/>
+<line x1="172" y1="150" x2="296" y2="150" class="arr" marker-end="url(#arrow)"/>
+<g class="c-amber"><rect x="310" y="130" width="70" height="40" rx="4" stroke-width="0.5"/><text class="ts" x="345" y="143" text-anchor="middle" dominant-baseline="central">Sand</text><text class="ts" x="345" y="159" text-anchor="middle" dominant-baseline="central">8 000</text></g>
+<rect class="c-amber" x="388" y="130" width="35" height="40" stroke-width="0"/><rect class="c-gray" x="423" y="130" width="35" height="40" stroke-width="0"/><rect x="388" y="130" width="70" height="40" rx="4" fill="none" stroke="#888780" stroke-width="0.5"/>
+<text class="ts" x="423" y="143" text-anchor="middle" dominant-baseline="central">S+K</text><text class="ts" x="423" y="159" text-anchor="middle" dominant-baseline="central">2 000</text>
+<text class="ts" x="40" y="192">Kartenzahl bleibt 2: die leichtere Karte wird ganz verbraucht = Totalkoagulation</text>
+<text class="th" x="40" y="226">Lupe s<tspan baseline-shift="sub" font-size="11">F</tspan> = 1 000 (feiner): 1 Punkt = 1 000 Körner</text>
+<circle class="c-amber" cx="50" cy="258" r="7" stroke-width="0.5"/><circle class="c-amber" cx="66" cy="258" r="7" stroke-width="0.5"/><circle class="c-amber" cx="82" cy="258" r="7" stroke-width="0.5"/><circle class="c-amber" cx="98" cy="258" r="7" stroke-width="0.5"/><circle class="c-amber" cx="114" cy="258" r="7" stroke-width="0.5"/><circle class="c-amber" cx="130" cy="258" r="7" stroke-width="0.5"/><circle class="c-amber" cx="146" cy="258" r="7" stroke-width="0.5"/><circle class="c-amber" cx="162" cy="258" r="7" stroke-width="0.5"/><circle class="c-amber" cx="178" cy="258" r="7" stroke-width="0.5"/><circle class="c-amber" cx="194" cy="258" r="7" stroke-width="0.5"/>
+<circle class="c-gray" cx="218" cy="258" r="7" stroke-width="0.5"/><circle class="c-gray" cx="234" cy="258" r="7" stroke-width="0.5"/>
+<ellipse cx="206" cy="258" rx="22" ry="13" fill="none" stroke="#888780" stroke-width="1" stroke-dasharray="3 3"/>
+<line x1="252" y1="258" x2="296" y2="258" class="arr" marker-end="url(#arrow)"/>
+<g class="c-amber"><rect x="310" y="238" width="70" height="40" rx="4" stroke-width="0.5"/><text class="ts" x="345" y="251" text-anchor="middle" dominant-baseline="central">Sand</text><text class="ts" x="345" y="267" text-anchor="middle" dominant-baseline="central">9 000</text></g>
+<g class="c-gray"><rect x="388" y="238" width="70" height="40" rx="4" stroke-width="0.5"/><text class="ts" x="423" y="251" text-anchor="middle" dominant-baseline="central">Kohle</text><text class="ts" x="423" y="267" text-anchor="middle" dominant-baseline="central">1 000</text></g>
+<rect class="c-amber" x="466" y="238" width="35" height="40" stroke-width="0"/><rect class="c-gray" x="501" y="238" width="35" height="40" stroke-width="0"/><rect x="466" y="238" width="70" height="40" rx="4" fill="none" stroke="#888780" stroke-width="0.5"/>
+<text class="ts" x="501" y="251" text-anchor="middle" dominant-baseline="central">S+K</text><text class="ts" x="501" y="267" text-anchor="middle" dominant-baseline="central">1 000</text>
+<text class="ts" x="40" y="300">3 Karten (eine neu), Ereignisse doppelt so oft und halb so groß = Teilkoagulation</text>
+<text class="th" x="40" y="334">Lupe s<tspan baseline-shift="sub" font-size="11">F</tspan> = 4 000 (gröber als die leichtere Karte)</text>
+<text class="ts" x="40" y="354">Die Kohlekarte wäre nur ein halber Punkt – so grob geht es nicht.</text>
+<rect class="box" x="40" y="372" width="600" height="66" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="392" text-anchor="middle" dominant-baseline="central">Ereignisrate je Kartenpaar = β · W<tspan baseline-shift="sub" font-size="11">i</tspan> · W<tspan baseline-shift="sub" font-size="11">j</tspan> / s<tspan baseline-shift="sub" font-size="11">F</tspan></text>
+<text class="ts" x="340" y="411" text-anchor="middle" dominant-baseline="central">je Ereignis: neue Karte mit dem Gewicht sF, beide Partner verlieren sF</text>
+<text class="ts" x="340" y="427" text-anchor="middle" dominant-baseline="central">bei sF = Wmin (Gewicht der leichteren Karte) wird keine neue Karte gebraucht</text>
+</svg>

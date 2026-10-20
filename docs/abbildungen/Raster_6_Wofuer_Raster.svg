@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="416" viewBox="0 0 680 416">
+<title>Wofuer das Groessenraster</title>
+<style>
+text { font-family: Calibri, Arial, sans-serif; }
+.t { font-size: 14px; fill: #222222; }
+.ts { font-size: 12px; fill: #595959; }
+.th { font-size: 14px; font-weight: bold; fill: #222222; }
+.c-amber rect, .c-amber circle, rect.c-amber, circle.c-amber { fill: #FAEEDA; stroke: #854F0B; }
+.c-amber text { fill: #633806; }
+.c-gray rect, .c-gray circle, rect.c-gray, circle.c-gray { fill: #F1EFE8; stroke: #5F5E5A; }
+.c-gray text { fill: #444441; }
+.box { fill: #F7F6F2; stroke: #B4B2A9; }
+.arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
+.c-red rect, rect.c-red { fill: #FCEBEB; stroke: #A32D2D; }
+.c-red text { fill: #791F1F; }
+.c-green rect, rect.c-green { fill: #EAF3DE; stroke: #3B6D11; }
+.c-green text { fill: #27500A; }
+.c-purple rect, rect.c-purple { fill: #EEEDFE; stroke: #534AB7; }
+.c-purple text { fill: #3C3489; }
+.c-teal rect, rect.c-teal { fill: #E1F5EE; stroke: #0F6E56; }
+.c-teal text { fill: #085041; }
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="th" x="20" y="24">Wofür das Größenraster gebraucht wird</text>
+<text class="ts" x="20" y="44">Am Inlet steht in beiden Fällen eine Formel (Normal, Log-Normal, RRSB). Danach trennen sich die Wege.</text>
+<text class="th" x="175" y="74" text-anchor="middle">Kontinuum (heute)</text>
+<text class="th" x="505" y="74" text-anchor="middle">Partikelmodus (geplant)</text>
+<g class="c-gray"><rect x="60" y="88" width="230" height="46" rx="6" stroke-width="0.6"/><text class="th" x="175" y="105" text-anchor="middle" style="font-size:13px">Inlet: Formel q3(d)</text><text class="ts" x="175" y="122" text-anchor="middle">wird an den Stützstellen ausgewertet</text></g>
+<line x1="175" y1="134" x2="175" y2="152" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="60" y="154" width="230" height="46" rx="6" stroke-width="0.6"/><text class="th" x="175" y="171" text-anchor="middle" style="font-size:13px">Strom = Werte auf dem Raster</text><text class="ts" x="175" y="188" text-anchor="middle">das Raster IST der Strom (Setzkasten)</text></g>
+<line x1="175" y1="200" x2="175" y2="218" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="60" y="220" width="230" height="46" rx="6" stroke-width="0.6"/><text class="th" x="175" y="237" text-anchor="middle" style="font-size:13px">Units rechnen je Stützstelle</text><text class="ts" x="175" y="254" text-anchor="middle">Verzögerung, Splitter, Merger, später Koag.</text></g>
+<line x1="175" y1="266" x2="175" y2="284" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="60" y="286" width="230" height="46" rx="6" stroke-width="0.6"/><text class="th" x="175" y="303" text-anchor="middle" style="font-size:13px">Heatmap, Massenbilanz</text><text class="ts" x="175" y="320" text-anchor="middle">direkt aus den Rasterwerten</text></g>
+<g class="c-gray"><rect x="390" y="88" width="230" height="46" rx="6" stroke-width="0.6"/><text class="th" x="505" y="105" text-anchor="middle" style="font-size:13px">Inlet: Formel q3(d)</text><text class="ts" x="505" y="122" text-anchor="middle">Karten an den Quantilen platziert</text></g>
+<line x1="505" y1="134" x2="505" y2="152" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="390" y="154" width="230" height="46" rx="6" stroke-width="0.6"/><text class="th" x="505" y="171" text-anchor="middle" style="font-size:13px">Strom = Karten</text><text class="ts" x="505" y="188" text-anchor="middle">jede Karte hat ihre eigene Größe</text></g>
+<line x1="505" y1="200" x2="505" y2="218" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="390" y="220" width="230" height="46" rx="6" stroke-width="0.6"/><text class="th" x="505" y="237" text-anchor="middle" style="font-size:13px">Units rechnen mit Karten</text><text class="ts" x="505" y="254" text-anchor="middle">kein Raster nötig</text></g>
+<line x1="505" y1="266" x2="505" y2="284" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="390" y="286" width="230" height="46" rx="6" stroke-width="0.6"/><text class="th" x="505" y="303" text-anchor="middle" style="font-size:13px">Raster nur zum Auszählen</text><text class="ts" x="505" y="320" text-anchor="middle">Heatmap = Histogramm der Karten</text></g>
+<text class="t" x="20" y="362">Warum das Kontinuum nicht bei der Formel bleiben kann: Schon die größenabhängige Verzögerung</text>
+<text class="t" x="20" y="382">verschiebt jede Größe anders in der Zeit – danach gibt es keine Formel mehr, nur noch Zahlen je Größe.</text>
+<text class="ts" x="20" y="404">Lila: hier wird das Raster gebraucht. Im Partikelmodus begrenzt es nur, was man sieht, nicht was gerechnet wird.</text>
+</svg>

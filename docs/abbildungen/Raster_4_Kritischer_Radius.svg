@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="376" viewBox="0 0 680 376">
+<title>Kritischer Radius</title>
+<style>
+text { font-family: Calibri, Arial, sans-serif; }
+.t { font-size: 14px; fill: #222222; }
+.ts { font-size: 12px; fill: #595959; }
+.th { font-size: 14px; font-weight: bold; fill: #222222; }
+.c-amber rect, .c-amber circle, rect.c-amber, circle.c-amber { fill: #FAEEDA; stroke: #854F0B; }
+.c-amber text { fill: #633806; }
+.c-gray rect, .c-gray circle, rect.c-gray, circle.c-gray { fill: #F1EFE8; stroke: #5F5E5A; }
+.c-gray text { fill: #444441; }
+.box { fill: #F7F6F2; stroke: #B4B2A9; }
+.arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
+.c-red rect, rect.c-red { fill: #FCEBEB; stroke: #A32D2D; }
+.c-red text { fill: #791F1F; }
+.c-green rect, rect.c-green { fill: #EAF3DE; stroke: #3B6D11; }
+.c-green text { fill: #27500A; }
+.c-purple rect, rect.c-purple { fill: #EEEDFE; stroke: #534AB7; }
+.c-purple text { fill: #3C3489; }
+.c-teal rect, rect.c-teal { fill: #E1F5EE; stroke: #0F6E56; }
+.c-teal text { fill: #085041; }
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="th" x="20" y="24">Keimbildung als Hügel: Energie eines Tröpfchens über seinem Radius</text>
+<text class="ts" x="20" y="44">Beispiel Wasserdampf bei 20 °C, Übersättigung S = 4 (klassische Keimbildungstheorie)</text>
+<line x1="60" y1="60" x2="60" y2="290" stroke="#5F5E5A" stroke-width="1"/><line x1="60" y1="152.0" x2="400" y2="152.0" stroke="#5F5E5A" stroke-width="1"/>
+<line x1="60.0" y1="152.0" x2="60.0" y2="156" stroke="#5F5E5A"/><text class="ts" x="60.0" y="168" text-anchor="middle">0 nm</text><line x1="181.4" y1="152.0" x2="181.4" y2="156" stroke="#5F5E5A"/><text class="ts" x="181.4" y="168" text-anchor="middle">0,5 nm</text><line x1="302.9" y1="152.0" x2="302.9" y2="156" stroke="#5F5E5A"/><text class="ts" x="302.9" y="168" text-anchor="middle">1 nm</text><text class="ts" x="332.857142857143" y="182" text-anchor="end">Radius r</text>
+<line x1="56" y1="228.7" x2="60" y2="228.7" stroke="#5F5E5A"/><text class="ts" x="53" y="232.7" text-anchor="end">−50 kT</text><line x1="56" y1="75.3" x2="60" y2="75.3" stroke="#5F5E5A"/><text class="ts" x="53" y="79.3" text-anchor="end">+50 kT</text><text class="ts" x="66" y="64">ΔG</text>
+<polyline points="60.0,152.0 62.4,152.0 64.9,151.9 67.3,151.7 69.7,151.5 72.1,151.2 74.6,150.8 77.0,150.4 79.4,149.9 81.9,149.4 84.3,148.8 86.7,148.2 89.1,147.5 91.6,146.8 94.0,146.0 96.4,145.2 98.9,144.3 101.3,143.4 103.7,142.5 106.1,141.5 108.6,140.5 111.0,139.5 113.4,138.4 115.9,137.3 118.3,136.1 120.7,135.0 123.1,133.8 125.6,132.6 128.0,131.3 130.4,130.1 132.9,128.8 135.3,127.5 137.7,126.2 140.1,124.9 142.6,123.6 145.0,122.3 147.4,120.9 149.9,119.6 152.3,118.3 154.7,116.9 157.1,115.6 159.6,114.2 162.0,112.9 164.4,111.5 166.9,110.2 169.3,108.9 171.7,107.6 174.1,106.3 176.6,105.0 179.0,103.7 181.4,102.5 183.9,101.3 186.3,100.1 188.7,98.9 191.1,97.7 193.6,96.6 196.0,95.5 198.4,94.4 200.9,93.4 203.3,92.4 205.7,91.4 208.1,90.5 210.6,89.6 213.0,88.7 215.4,87.9 217.9,87.1 220.3,86.4 222.7,85.8 225.1,85.1 227.6,84.6 230.0,84.1 232.4,83.6 234.9,83.2 237.3,82.9 239.7,82.6 242.1,82.4 244.6,82.2 247.0,82.1 249.4,82.1 251.9,82.2 254.3,82.3 256.7,82.5 259.1,82.7 261.6,83.1 264.0,83.5 266.4,84.0 268.9,84.6 271.3,85.3 273.7,86.0 276.1,86.9 278.6,87.8 281.0,88.8 283.4,90.0 285.9,91.2 288.3,92.5 290.7,93.9 293.1,95.4 295.6,97.0 298.0,98.7 300.4,100.5 302.9,102.5 305.3,104.5 307.7,106.6 310.1,108.9 312.6,111.3 315.0,113.8 317.4,116.4 319.9,119.1 322.3,121.9 324.7,124.9 327.1,128.0 329.6,131.2 332.0,134.6 334.4,138.1 336.9,141.7 339.3,145.4 341.7,149.3 344.1,153.3 346.6,157.5 349.0,161.8 351.4,166.2 353.9,170.8 356.3,175.5 358.7,180.4 361.1,185.5 363.6,190.6 366.0,196.0 368.4,201.5 370.9,207.1 373.3,212.9 375.7,218.9 378.1,225.0 380.6,231.3 383.0,237.8 385.4,244.4 387.9,251.2 390.3,258.2 392.7,265.3 395.1,272.6 397.6,280.1 400.0,287.8" fill="none" stroke="#534AB7" stroke-width="2.5"/>
+<line x1="248.9" y1="82.1" x2="248.9" y2="152.0" stroke="#534AB7" stroke-width="0.8" stroke-dasharray="3 3"/>
+<text x="248.9" y="72.1" text-anchor="middle" style="font-size:12px;fill:#3C3489">kritischer Radius r* = 0,78 nm (66 Moleküle)</text>
+<circle cx="169.3" cy="99.9" r="8" fill="#BA7517"/><circle cx="315.0" cy="104.8" r="8" fill="#0F6E56"/>
+<line x1="157.3" y1="103.9" x2="129.3" y2="129.9" class="arr" marker-end="url(#arrow)"/>
+<line x1="327.0" y1="108.8" x2="349.0" y2="138.8" class="arr" marker-end="url(#arrow)"/>
+<circle cx="26" cy="310" r="6" fill="#BA7517"/><text x="38" y="314" style="font-size:12px;fill:#633806">links vom Gipfel: zerfällt meist wieder</text>
+<circle cx="266" cy="310" r="6" fill="#0F6E56"/><text x="278" y="314" style="font-size:12px;fill:#085041">rechts vom Gipfel: wächst weiter</text>
+<text class="th" x="430" y="80">Größe des Keims d* = 2r*</text>
+<text class="ts" x="430" y="104">Fall</text><text class="ts" x="600" y="104" text-anchor="end">d*</text><text class="ts" x="664" y="104" text-anchor="end">Moleküle</text>
+<text class="t" x="430" y="126">Wasser, S = 2</text><text class="t" x="600" y="126" text-anchor="end">3,1 nm</text><text class="t" x="664" y="126" text-anchor="end">526</text>
+<text class="t" x="430" y="148">Wasser, S = 4</text><text class="t" x="600" y="148" text-anchor="end">1,6 nm</text><text class="t" x="664" y="148" text-anchor="end">66</text>
+<text class="t" x="430" y="170">Wasser, S = 10</text><text class="t" x="600" y="170" text-anchor="end">0,9 nm</text><text class="t" x="664" y="170" text-anchor="end">14</text>
+<text class="t" x="430" y="192">Silber, S = 10⁶</text><text class="t" x="600" y="192" text-anchor="end">0,2–0,3 nm</text><text class="t" x="664" y="192" text-anchor="end">&lt; 1</text>
+<text class="ts" x="430" y="218">Silber: Metalldampf bei 1500 K;</text><text class="ts" x="430" y="234">schon ein Atom (0,32 nm) ist stabil.</text>
+<text class="t" x="20" y="340">r* = 2 γ v<tspan baseline-shift="sub" style="font-size:10px">m</tspan> / (k<tspan baseline-shift="sub" style="font-size:10px">B</tspan> T ln S) – Oberflächenspannung γ, Volumen eines Moleküls v<tspan baseline-shift="sub" style="font-size:10px">m</tspan>, Temperatur T, Übersättigung S.</text>
+<text class="t" x="20" y="362">Keime liegen im Nanometerbereich – drei Dekaden unter einem Raster, das bei 1 µm beginnt.</text>
+</svg>

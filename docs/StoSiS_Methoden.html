@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>StoSiS – Methoden und Designentscheidungen</title>
+<style>
+  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.35; max-width: 820px; margin: 24px auto; color: #222; background: #fff; }
+  h1 { font-size: 16pt; color: #1F3864; border-bottom: 1.5px solid #1F3864; padding-bottom: 2pt; margin-top: 22pt; }
+  h2 { font-size: 12.5pt; color: #2F5496; margin-top: 14pt; margin-bottom: 4pt; }
+  p { margin: 4pt 0; }
+  ul { margin-top: 2pt; margin-bottom: 4pt; }
+  li { margin-bottom: 2pt; }
+  .titel { font-size: 24pt; color: #1F3864; font-weight: bold; margin-bottom: 2pt; border: none; }
+  .untertitel { font-size: 12pt; color: #595959; margin-bottom: 10pt; }
+  .formel { font-family: 'Cambria Math', 'Cambria', serif; font-size: 11.5pt; text-align: center; background: #F2F4F8; padding: 5pt; margin: 6pt 0; }
+  .hinweis { color: #595959; font-style: italic; }
+  .kasten { background: #EEF3FA; border-left: 4px solid #2F5496; padding: 5pt 8pt; margin: 6pt 0; }
+  table { border-collapse: collapse; margin: 6pt 0; }
+  th, td { border: 1px solid #A6A6A6; padding: 3pt 7pt; vertical-align: top; font-size: 10pt; }
+  th { background: #DCE6F2; text-align: left; }
+  .label { font-weight: bold; color: #1F3864; }
+  #inhalt ul { list-style: none; padding-left: 0; margin: 4pt 0; }
+  #inhalt ul ul { padding-left: 16pt; }
+  #inhalt li { margin: 1pt 0; }
+  #inhalt a { color: #1F3864; text-decoration: none; }
+  #inhalt > ul > li > a { font-weight: bold; }
+  img { max-width: 100%; }
+  .abb { text-align: center; margin: 6pt 0 8pt; }
+  .abb img { display: block; margin: 0 auto; }
+  .abb .unterschrift { font-size: 9.5pt; color: #595959; margin-top: 2pt; }
+  .tag { padding: 0 4pt; border-radius: 3pt; font-size: 9pt; white-space: nowrap; }
+  .tag.vor { background: #FAEEDA; color: #633806; }
+  .tag.stoff { background: #F1EFE8; color: #444441; }
+  .tag.ber { background: #EEEDFE; color: #3C3489; }
+  .tag.emp { background: #FCEBEB; color: #791F1F; }
+  .tag.erg { background: #E1F5EE; color: #085041; }
+  tr.gruppe td { background: #F2F4F8; font-weight: bold; color: #1F3864; }
+
+  @page { size: A4; margin: 18mm 20mm; }
+  @media print {
+    body { margin: 0; max-width: none; }
+    h1, h2 { break-after: avoid; }
+    table, .formel, .kasten, img, .abb { break-inside: avoid; }
+    h1 { break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<p class="titel">StoSiS – Methoden und Designentscheidungen</p>
+<p class="untertitel">Arbeitsnotizen für die Dissertation · Stand 19. Oktober 2026 · Code-Stand: logarithmisches Größenraster mit SI-Einheiten, Start-Flowsheet mit Rückführung, Zoom und Verschieben im Flowsheet (github.com/neilunt/StoSiS_Open)</p>
+
+<div class="kasten">
+<p>Dieses Dokument sammelt die Ansätze, die bisher in StoSiS (Stochastic Simulation of Solids) eingeflossen sind – jeweils mit <b>Was</b> gemacht wurde, <b>Warum</b> und wie es <b>validiert</b> wurde. Es ist als Gedächtnisstütze für die Begründung in der Dissertation gedacht, nicht als fertiger Text.</p>
+<p class="hinweis">Literaturangaben am Ende bitte vor dem Zitieren im Original prüfen.</p>
+</div>
+
+<p style="font-size: 13pt; color: #1F3864; font-weight: bold; margin-top: 12pt;">Inhalt</p>
+<div id="inhalt"></div>
+
+<h1>1 Architektur</h1>
+<ul>
+  <li><span class="label">Rechenkern und Oberfläche getrennt:</span> <code>stosis_core</code> (reines C++17, keine Qt-Abhängigkeit) und <code>stosis_gui</code> (Qt 6). <b>Warum:</b> Der Kern läuft auch ohne Oberfläche – für automatische Konsolentests und später im Batchbetrieb auf dem Linux-Großrechner amplitUDE. Modell und Darstellung bleiben sauber getrennt.</li>
+  <li><span class="label">Build:</span> CMake, Visual Studio 2022, eigene CUDA-Bibliothek <code>stosis_cuda</code> (GPU-Kernel, z. B. First-Passage-Time-Transport).</li>
+  <li><span class="label">Einheitliche Schnittstelle aller Blöcke</span> (<code>IFlowsheetUnit</code>): <code>Initialize(Raster, Seed)</code>, <code>Step(Zeitschritt, Eingänge, Ausgänge)</code>, <code>IsStochastic()</code>. <b>Warum:</b> Der Flowsheet-Löser muss keine konkreten Unit-Typen kennen; neue Units (Crusher, Sieb, Koagulator …) brauchen nur diese drei Funktionen.</li>
+  <li><span class="label">Automatische Tests</span> (Ordner <code>tests/</code>, Ausführung mit CTest, seit 14. Oktober 2026): Die Prüfungen aus den Kapiteln 2.5, 3, 4, 6, 8–11 und 14 liegen als Testprogramme im Repository und laufen mit einem Befehl in etwa 2 Sekunden (Release). Jedes Programm meldet jede Prüfung als bestanden oder fehlgeschlagen und endet mit einem entsprechenden Exit-Code. <b>Stochastische Tests</b> laufen mit festem Seed, sind also reproduzierbar; ihre Toleranzen sind aus dem statistischen Fehler begründet (etwa 3–5 Standardfehler), nicht frei gewählt. Ein <b>Regressionstest</b> vergleicht Kennzahlen aller Ergebnisse von zehn festen Flowsheets (sieben auf dem linearen, seit 19. Oktober 2026 drei auf dem logarithmischen Raster, darunter das Start-Flowsheet mit RÃ¼ckfÃ¼hrung) mit gespeicherten Referenzwerten (relative Toleranz 10<sup>−9</sup>) und zeigt jede Änderung der Rechnung an; nach bewussten Änderungen werden die Referenzwerte neu erzeugt. Die Daten der Konvergenz-Abbildung (11.1) erzeugt das Programm <code>analysis_convergence</code> zeichengleich neu. <b>Warum:</b> Jeder Validierungsnachweis in diesem Dokument soll jederzeit wiederholbar sein, und Änderungen am Kern (z. B. logarithmisches Raster, MC-Partikel) dürfen bestehende Ergebnisse nicht unbemerkt verändern.</li>
+</ul>
+
+<h1>2 Darstellung der Ströme und Ergebnisse</h1>
+<h2>2.1 Zeit-Größe-Matrix</h2>
+<ul>
+  <li><span class="label">Was:</span> Jedes Ergebnis ist eine Matrix q(t<sub>k</sub>, d<sub>s</sub>) = <b>Massenstromdichte</b> [Masse / (Zeit · Größe)] auf festen Gittern: t<sub>k</sub> = k·Δt und für die Größe entweder linear d<sub>s</sub> = d<sub>min</sub> + s·Δd oder logarithmisch d<sub>s</sub> = d<sub>min</sub>·r<sup>s</sup> (Standard seit 19. Oktober 2026, siehe 2.5); knotenbasiert, d. h. erster und letzter Punkt liegen genau auf d<sub>min</sub> bzw. d<sub>max</sub>. Größen in m (SI), Dichte je m; die Oberfläche zeigt µm.</li>
+  <li><span class="label">Warum Dichte statt Klassenmenge:</span> Ergebnisse sind dann unabhängig von der Klassenbreite vergleichbar, und Integrale haben eine physikalische Bedeutung.</li>
+</ul>
+<h2>2.2 Integrale (Trapezregel)</h2>
+<p class="formel">ṁ(t) = ∫ q(t,d) dd ≈ Δd · [ ½q<sub>0</sub> + q<sub>1</sub> + … + q<sub>n−1</sub> + ½q<sub>n</sub> ] &nbsp; (linear)</p>
+<p class="formel">ṁ(t) = ∫ d·q(t,d) d(ln d) ≈ ln r · [ ½d<sub>0</sub>q<sub>0</sub> + d<sub>1</sub>q<sub>1</sub> + … + ½d<sub>n</sub>q<sub>n</sub> ] &nbsp; (logarithmisch, Trapez in ln d)</p>
+<ul>
+  <li>Massenstrom über die Zeit ṁ(t) = Integral über die Größe; Größenverteilung des Durchsatzes m(d) = Integral über die Zeit; Gesamtmasse = Doppelintegral → Grundlage aller <b>Massenbilanzen</b>.</li>
+  <li><span class="label">Lehre aus einem gefundenen Fehler:</span> Anfangs wurden die Klassenwerte nur aufsummiert (ohne Δd) – der Massenstrom war dadurch um einen Faktor ≈ 0,75 falsch. Seitdem werden alle Größen konsequent als Dichten behandelt und mit Δd integriert.</li>
+</ul>
+<h2>2.3 Heatmap mit Randverteilungen</h2>
+<ul>
+  <li>Heatmap Zeit × Größe × Massenstromdichte, oben/rechts die beiden Randverteilungen (ṁ(t) und m(d), „Joint Plot“), optional logarithmische Farbskala in Dekaden.</li>
+  <li><b>Warum:</b> Man sieht gleichzeitig die zeitliche Dynamik, die Größenverteilung und deren Zusammenspiel (z. B. größenabhängige Verzögerung als schräge Struktur).</li>
+</ul>
+
+<h2>2.4 Kontinuum, Makroschritte und Monte Carlo – Abgrenzung (Stand 13. Oktober 2026)</h2>
+<ul>
+  <li><b>Darstellung des Stroms:</b> Ein Strom ist eine kontinuierliche Massenverteilung – Massenstromdichte je Stoff und Größenklasse, dazu T und p (<code>CStreamSlice</code>). Einzelne Partikel haben keine Identität („Wasser“ statt „Murmeln“). Das gilt vor und nach der Umstellung auf Makroschritte.</li>
+  <li><b>Datenstruktur je Strom und Zeitschritt:</b> Das Größenraster hat N Stützstellen (bis 19. Oktober 2026 Standard 150 linear von 0 bis 200 µm, also Δd = 200/149 ≈ 1,34 µm; seitdem 300 logarithmisch von 1 µm bis 1 mm, siehe 2.5). <b>Jeder Stoff hat eine eigene Zeile</b> mit N Werten auf diesem gemeinsamen Raster; jeder Wert ist die Massenstromdichte an der Stützstelle (Höhe der Verteilungskurve, die Masse eines Bereichs ist die Fläche darunter). Temperatur und Druck gibt es <b>einmal je Strom</b>, nicht je Klasse. Eine Partikelanzahl wird nicht gespeichert; sie folgt bei Bedarf aus Masse, Größe und Dichte. Zwei Stoffe: 2 × 150 + 2 = 302 Zahlen je Strom und Zeitschritt.<div class="abb"><img src="abbildungen/MC_1_Zeitscheibe.svg" width="680" alt="Aufbau einer Zeitscheibe"><div class="unterschrift">Abbildung: Aufbau einer Zeitscheibe mit zwei Stoffen (Beispielwerte 10 kg/s Sand und 5 kg/s Kohle, Normalverteilung um 100): je Stoff eine Zeile auf demselben Größenraster, Temperatur und Druck einmal je Strom.</div></div></li>
+  <li><b>Anschauung:</b> Der Strom gleicht einem Setzkasten mit einer Fachreihe je Stoff (Farbe) und einem Fach je Größe; in jedem Fach steht nur, wie viel Gramm darin liegen, und am ganzen Kasten hängt ein Zettel mit T und p. Mischen heißt zwei Kästen Fach für Fach zusammenschütten. Koagulation steckt zwei Steine verschiedener Farbe zusammen – dafür hat der Kasten kein Fach. MC-Partikel ersetzen den Setzkasten durch einen Karteikasten: eine Karte je Rechenpartikel mit Masse je Stoff und dem Gewicht (wie bei einer Wahlumfrage, in der 1000 Befragte mit ihren Merkmalen für Millionen Wähler stehen).</li>
+
+  <li><b>Was sich am 6. Oktober 2026 geändert hat, ist nur die Zeitführung</b> (Kapitel 5): vorher erhielt jede Unit den kompletten Eingang über den ganzen Zeitraum (Matrix q(t, d), <code>Process(input)</code>) und rechnete daraus den kompletten Ausgang, Units in Flussrichtung nacheinander. In einem Kreis braucht jedoch jede Unit den fertigen Ausgang der anderen – ohne Iteration über den ganzen Zeitraum ist das nicht lösbar, und mit Zufall konvergiert eine solche Iteration nicht. Seitdem rechnet jede Unit je Makroschritt Δt genau eine Zeitscheibe; ein Kreis wird an einer Verbindung aufgeschnitten, die wie ein kurzes Rohr mit Totzeit Δt wirkt.</li>
+  <li><b>„Monte Carlo“ bedeutet bisher: mehrere Läufe</b> des ganzen Flowsheets mit verschiedenen Zufallszahlen (Kapitel 10). Der Zufall steckt im Prozess (z. B. schwankender Splitteranteil), nicht in einzelnen Partikeln.</li>
+  <li><b>MC-Partikel</b> (gewichtete Rechenpartikel mit eigener Größe, später eigener Zusammensetzung) sind im Flowsheet noch nicht umgesetzt. Es gibt sie nur in den isolierten Transportmodellen der Vergleichsansicht (Entwickler-Menü): <code>SParticle</code> mit Position, Größe und Gewicht, Drift und Diffusion in einem Rohr (First Passage Time), auch auf der GPU. Vorgesehen ist, dass später eine Zeitscheibe statt (oder neben) der Verteilung eine Partikelliste trägt; die Schnittstelle <code>Step(Eingänge, Ausgänge)</code> bleibt dabei gleich.</li>
+</ul>
+
+<h2>2.5 Größenraster: logarithmisch, Fächer, SI-Einheiten (Vorschlag und Entscheidung 19. Oktober 2026)</h2>
+<ul>
+  <li><b>Entschieden (19. Oktober 2026):</b> Umgesetzt wird nur Vorschlag 1 – logarithmisches Raster mit SI-Einheiten (Anzeige in µm), Stützstellen wie bisher, Trapezregel in ln d; Standard 1 µm – 1 mm mit 300 Klassen (100 je Dekade). Vorschläge 2 bis 4 sind zurückgestellt (Begründung in der Tabelle unten); Wahl von d<sub>min</sub> und d<sub>max</sub> in 2.6.</li>
+</ul>
+<ul>
+  <li><b>Ausgangslage:</b> Lineares Raster 0–200 mit 150 Stützstellen (Δd = 1,34), gespeichert wird die Massenstromdichte <i>an</i> jeder Stützstelle („Pfosten“), Integrale mit der Trapezregel; die Größeneinheit ist nur stillschweigend µm.</li>
+  <li><b>Was daran stört (Zahlen für das Standardraster):</b>
+    <ul>
+      <li>Eine Stützstelle liegt bei d = 0 (unendlich viele Partikel je kg).</li>
+      <li>Feine Partikel sind grob aufgelöst: Zwischen 1 und 10 µm liegen 7 Stützstellen, zwischen 100 und 200 µm dagegen 75. Feingut mit d<sub>50</sub> = 5 µm (σ<sub>ln</sub> = 0,5) hat nur 4 Stützstellen im Bereich ±1σ; die Trapezregel erfasst davon 99,88 %.</li>
+      <li>Über 200 µm gibt es kein Raster, Agglomerate wachsen aber genau dorthin. Eine breite Log-Normal-Verteilung (d<sub>50</sub> = 30 µm, σ<sub>ln</sub> = 1) verliert schon am Inlet 2,9 % ihrer Masse.</li>
+    </ul>
+  </li>
+  <li><b>Welches Problem löst welcher Vorschlag? (Rückfrage 19. Oktober 2026)</b> Nur Vorschlag 1 behebt ein Problem, das heute besteht. Die übrigen sind Zahlenwahl, Anzeige oder Vorbereitung für später:
+    <table>
+      <tr><th>Vorschlag</th><th>Welches Problem?</th><th>Jetzt nötig?</th></tr>
+      <tr><td>1 Logarithmisches Raster</td><td>Feine Partikel zu grob aufgelöst, nichts über 200 µm, Stützstelle bei d = 0</td><td>ja – der eigentliche Schritt</td></tr>
+      <tr><td>5 Standardraster</td><td>kein eigenes: die Zahlen, die Vorschlag 1 braucht (d<sub>min</sub> &gt; 0 muss gewählt werden)</td><td>ja, als Teil von 1</td></tr>
+      <tr><td>3 Anzeige je Dekade</td><td>Folge von 1: auf der logarithmischen Achse wirkt „je µm“ zum Feinen hin verschoben; die Rechnung ändert sich nicht</td><td>nur Anzeige, entscheidbar beim Blick auf die Heatmap</td></tr>
+      <tr><td>4 Masse außerhalb</td><td>altes, kleines Problem; der Inlet-Editor zeigt den erfassten Anteil schon heute. Mit 1 bis 1000 µm liegen beim Standard-Inlet nur noch 0,004 % außerhalb</td><td>nein</td></tr>
+      <tr><td>2 Fächer statt Pfosten</td><td>heute keins: Auf dem logarithmischen Raster rechnen Pfosten genauso genau, wenn die Trapezregel in ln d angewendet wird (Feingut d<sub>50</sub> = 5 µm, 300 Klassen: 0,9993553 statt exakt 0,9993565, Abweichung 1,3·10<sup>−6</sup>). Der Unterschied 99,88 % / 100,00 % in der Abbildung gilt nur für das alte, grobe Raster. Nutzen erst später: MC-Karten für die Anzeige in Klassen zählen, Dyssol-Import, Kontinuums-Koagulation zum Vergleich</td><td>nein – zurückstellen bis Partikelmodus oder Dyssol-Vergleich</td></tr>
+    </table>
+    Hinweis zur Umsetzung von 1: Die Trapezregel muss auf dem logarithmischen Raster in ln d gerechnet werden (Gewicht der Stützstelle d<sub>i</sub> · ln r). In d gerechnet hätte sie einen festen Fehler von +3,5·10<sup>−4</sup> bei 150 und +8,8·10<sup>−5</sup> bei 300 Klassen.</li>
+
+  <li><b>Vorschlag 1 – logarithmisches (geometrisches) Raster:</b> Klassengrenzen d<sub>i</sub> = d<sub>min</sub> · r<sup>i</sup> mit r = (d<sub>max</sub>/d<sub>min</sub>)<sup>1/N</sup>, also gleich viele Klassen je Dekade und überall derselbe relative Größenschritt. Dieselbe Formel nutzt Dyssol für sein „geometrisches“ Raster. Das lineare Raster bleibt wählbar (Vergleiche, Tests).<div class="abb"><img src="abbildungen/Raster_1_Linear_Log.svg" width="680" alt="Lage der Klassen linear und logarithmisch"><div class="unterschrift">Abbildung: Lage der Stützstellen bzw. Klassengrenzen auf einer logarithmischen Achse – bisher (linear 0–200 µm, 150 Stützstellen) und Vorschlag (logarithmisch 1–1000 µm, 300 Klassen, 100 je Dekade).</div></div></li>
+  <li><b>Vorschlag 2 – Fächer statt Pfosten:</b> N Klassen mit N + 1 Grenzen; gespeichert wird je Klasse der <b>Massenstrom im Fach</b> [kg/s], nicht die Höhe der Kurve an einem Punkt. Das passt zum Setzkasten-Bild aus 2.4: In jedem Fach steht, wie viel darin liegt.
+    <ul>
+      <li>Das Inlet füllt jedes Fach genau: ṁ · [Q<sub>3</sub>(obere Grenze) − Q<sub>3</sub>(untere Grenze)], mit der Verteilungssumme Q<sub>3</sub> (für Normal, Log-Normal und RRSB geschlossen bekannt). Kein Trapez-Schätzfehler mehr, beim Feingut-Beispiel 100,00 % statt 99,88 %.</li>
+      <li>Massenstrom = Summe der Fächer, ohne Δd-Faktor (vgl. die Lehre aus dem Δd-Fehler in 2.2). Splitter, Merger und Verzögerung bleiben Fach für Fach gleich einfach.</li>
+      <li>Größenabhängige Modelle (z. B. Verzögerung) rechnen mit der Fachmitte, beim logarithmischen Raster dem geometrischen Mittel √(d<sub>i</sub> · d<sub>i+1</sub>).</li>
+      <li>Später werden MC-Karten für die Anzeige einfach in die Fächer einsortiert (Roadmap Schritt 3), und Dyssol speichert ebenfalls Massenanteile je Klasse – Import und Vergleich werden direkt möglich.</li>
+      <li>Nachteil: Der Fachinhalt hängt von der Fachbreite ab. Für die Anzeige und für den Vergleich verschiedener Raster wird deshalb durch die Breite geteilt (Dichte).</li>
+    </ul>
+    <div class="abb"><img src="abbildungen/Raster_2_Pfosten_Faecher.svg" width="680" alt="Pfosten gegen Fächer"><div class="unterschrift">Abbildung: Dasselbe Feingut auf denselben Stellen – links als Höhen an Stützstellen mit Trapezfläche (99,88 % erfasst), rechts als Fachinhalte aus der Verteilungssumme Q<sub>3</sub> (100,00 % erfasst).</div></div></li>
+  <li><b>Vorschlag 3 – Anzeige je Dekade:</b> Auf der logarithmischen Achse zeigen Heatmap und Randverteilungen den Massenstrom <b>je Dekade</b> (Fachinhalt geteilt durch die Fachbreite in Dekaden, wie dM/dlog d<sub>p</sub> in der Aerosoltechnik); auf der linearen Achse wie bisher je µm. Nur so entspricht die Fläche auf dem Bildschirm der Masse.<div class="abb"><img src="abbildungen/Raster_3_Anzeige_Dekade.svg" width="680" alt="Anzeige je Dekade"><div class="unterschrift">Abbildung: Dieselbe Log-Normal-Verteilung (d<sub>50</sub> = 30 µm, σ<sub>ln</sub> = 1) auf logarithmischer Achse – je µm erscheint der Gipfel bei 11 µm und schief, je Dekade bei 30 µm und symmetrisch.</div></div></li>
+  <li><b>Vorschlag 4 – Masse außerhalb des Rasters:</b> Was von der Inlet-Verteilung unter d<sub>min</sub> oder über d<sub>max</sub> liegt, wird anteilig auf die Fächer umgelegt (Normierung; Dyssol speichert Verteilungen ebenfalls als Massenanteile, die sich zu 1 summieren), damit genau der eingestellte Massenstrom ins Flowsheet geht. Der Anteil außerhalb steht im Inlet-Editor (rot ab 1 %) und als Hinweis nach der Simulation. Alternative: abschneiden und nur melden (dann fehlt Masse). Bei der Standard-Normalverteilung (100 ± 25 µm) liegen 0,004 % außerhalb von 1–1000 µm.</li>
+  <li><b>Vorschlag 5 – Standardraster:</b> 1 µm bis 1 mm mit 300 Klassen (100 je Dekade, r = 1,023, Volumenverhältnis 1,072). Bei 100 µm ist eine Klasse 2,3 µm breit (bisher 1,34 µm), bei 5 µm 0,12 µm (bisher 1,34 µm). Einstellbar bleiben d<sub>min</sub>, d<sub>max</sub> und die Klassenzahl; der Reiter „Raster“ zeigt zusätzlich Klassen je Dekade und r.</li>
+  <li><b>SI-Einheiten (vereinbart):</b> Intern Meter, Kilogramm, Sekunde, Kelvin, Pascal. In der Oberfläche werden Größen in µm eingegeben und angezeigt (Raster, Verteilungsparameter, Referenzgröße der Verzögerung, Achsen).</li>
+  <li><b>Prüfplan:</b> (1) Erst nur die Einheiten auf SI umstellen – der Regressionstest muss alle Kennzahlen genau um den Faktor 10<sup>6</sup> (Dichten je m statt je µm) bzw. 10<sup>12</sup> (Quadratsummen) verschoben wiederfinden; damit ist belegt, dass sich die Rechnung nicht geändert hat. (2) Dann Fächer und logarithmisches Raster mit neuen fachlichen Tests: Fachinhalte gegen Q<sub>3</sub>, Massenbilanz exakt über Splitter, Merger und Kreis, Verzögerung je Fach, danach neue Referenzwerte.</li>
+  <li>Die alte Vergleichsansicht der Transportmodelle (Entwickler-Menü) behält ihr eigenes lineares Raster.</li>
+  <li><b>Umsetzung (19. Oktober 2026):</b>
+    <ul>
+      <li><b>Raster:</b> <code>SSizeGrid</code> beschreibt Art (linear oder logarithmisch), Zahl der Stützstellen, d<sub>min</sub> und d<sub>max</sub> in m; daraus die Lage jeder Stützstelle und ihr Gewicht in der Trapezregel (linear Δd, logarithmisch d<sub>i</sub>·ln r, Randpunkte halb). Ergebnisse, Ströme (Masse je Stoff für Mischtemperaturen), Merger, Verzögerung und Inlet rechnen mit diesen Gewichten. Standard: logarithmisch, 1 µm – 1 mm, 300 Stützstellen (r = 1,0234, 99,7 je Dekade, weil 300 Stützstellen 299 Abstände haben; mit 301 wären es genau 100 und die Dekaden lägen auf Stützstellen).</li>
+      <li><b>SI-Einheiten:</b> Größen in m, Dichten je m. Verteilungsparameter (Lage, bei der Normalverteilung auch σ), Referenzgröße der Verzögerung und die Rastergrenzen werden in µm eingegeben und angezeigt; die Heatmap zeigt die Dichte je µm und die Masse je µm.</li>
+      <li><b>Oberfläche:</b> Reiter „Raster“ mit Rasterart, d<sub>min</sub> und d<sub>max</sub> in µm, Zahl der Klassen, Anzeige von Klassen je Dekade und r; darunter Richtwerte zum Einsetzen (Agglomeration 1 µm – 1 mm / 300, Mahlen und Bruch 0,1 µm – 1 mm / 400, Keimbildung und Wachstum 0,3 nm – 10 µm / 450, Keimbildung bis Agglomerat 1 nm – 1 mm / 600) mit den Faustregeln aus 2.6, und eine Prüfung des eingegebenen Rasters: Jede Unit kann melden, was nicht passt; bisher melden Inlets, wenn mehr als 0,1 % ihrer Verteilung (exakt aus Q<sub>3</sub>) unter d<sub>min</sub> oder über d<sub>max</sub> liegen. Heatmap und Verteilungsvorschau haben beim logarithmischen Raster eine logarithmische Größenachse (Dekaden beschriftet).</li>
+      <li><b>Nachweis Schritt 1 (nur SI):</b> Alle 220 Kennzahlen des Regressionstests sind genau das 10<sup>6</sup>-Fache (Summen) bzw. 10<sup>12</sup>-Fache (Quadratsummen) der Werte vom 14. Oktober 2026; größte relative Abweichung 9·10<sup>−14</sup> (Rundung). Die bisherigen Fälle laufen seitdem ausdrücklich auf dem linearen Raster und sind auch nach Schritt 2 bitgleich.</li>
+      <li><b>Nachweis Schritt 2 (logarithmisch, Test <code>test_sizegrid</code>):</b> Stützstellen genau auf d<sub>min</sub> und d<sub>max</sub>, Verhältnis überall r (Abweichung &lt; 10<sup>−15</sup>); Erfassungsanteil gegen die exakte Verteilungssumme Q<sub>3</sub> für fünf Verteilungen auf 1,3·10<sup>−6</sup> genau (Normal 100/25 µm: 3·10<sup>−10</sup>); Q<sub>3</sub> gegen numerische Integration der Dichte: 8·10<sup>−12</sup>; Massenbilanz Inlet → Verzögerung (p = 1) → Splitter 30/70: A + B = rein auf 3·10<sup>−14</sup> kg von 50 kg; Verzögerung je Stützstelle von 1 bis 500 µm genau t<sub>ref</sub>·d/d<sub>ref</sub> (Abweichung &lt; 10<sup>−15</sup>); Inlet-Meldungen „79 % unter d<sub>min</sub>“ (d<sub>min</sub> = 120 µm) und „2,3 % über d<sub>max</sub>“ (d<sub>max</sub> = 150 µm) für die Standard-Normalverteilung.</li>
+      <li><b>Beobachtung beim Testen:</b> Beginnt der Zulauf bei t = 0 nicht bei null, zählt die Trapezregel in der Zeit den ersten Wert am Eingang nur halb, die Verzögerung gibt ihn aber ganz weiter – die Massenbilanz der Verzögerung stimmt dann nur auf einen halben Zeitschritt des Anfangswerts (im Test 6·10<sup>−5</sup> relativ). Das betrifft beide Raster und ist keine Folge der Umstellung; Zuläufe, die bei null beginnen, sind exakt.</li>
+    </ul>
+  </li>
+</ul>
+
+
+<h2>2.6 Wahl von d<sub>min</sub> und d<sub>max</sub>: Keimbildung und Agglomerate (Diskussion 19. Oktober 2026)</h2>
+<ul>
+  <li><b>Frage:</b> Nach welchen Gesichtspunkten werden d<sub>min</sub> und d<sub>max</sub> gesetzt? Bei späterer Keimbildung entstehen neue Partikel um den kritischen Radius; liegt er unter d<sub>min</sub>, fehlen die Keime. Idee: den kritischen Radius vorab aus den Inlets abschätzen (Temperatur, über den Massenzulauf gemittelte Stoffwerte) und im Reiter „Raster“ als Warnung zeigen. Können Partikel auch kleiner als der kritische Radius sein? Und nach oben gibt es keine feste Grenze – welcher d<sub>max</sub> ist ein guter Kompromiss?</li>
+  <li><b>Kritischer Radius (klassische Keimbildungstheorie):</b> Ein Tröpfchen oder Cluster gewinnt Energie durch sein Volumen (der Dampf ist übersättigt) und zahlt für seine Oberfläche. Die Energie über dem Radius ist deshalb ein Hügel mit dem Gipfel bei
+    <p class="formel">r* = 2 γ v<sub>m</sub> / (k<sub>B</sub> T ln S)</p>
+    mit Oberflächenspannung γ, Volumen eines Moleküls v<sub>m</sub>, Temperatur T und Übersättigung S. Anschaulich wie eine Kugel auf einem Hügel: Links vom Gipfel rollt sie zurück (der Cluster verdampft wieder), rechts davon rollt sie weiter (er wächst). Gleichwertig mit der Kelvin-Gleichung: Kleine Tröpfchen haben einen höheren Dampfdruck; bei r* ist er gerade so hoch wie der Dampfdruck in der Umgebung.
+    <div class="abb"><img src="abbildungen/Raster_4_Kritischer_Radius.svg" width="680" alt="Energiehügel der Keimbildung"><div class="unterschrift">Abbildung: Energie eines Wassertröpfchens über seinem Radius (20 °C, S = 4) mit dem Gipfel bei r* = 0,78 nm, dazu kritische Keimgrößen für weitere Fälle. Bei Metalldampf mit sehr hoher Übersättigung ist schon ein einzelnes Atom stabil.</div></div></li>
+  <li><b>Größenordnung:</b> Wasser bei 20 °C: d* = 3,1 / 1,6 / 0,9 nm für S = 2 / 4 / 10 (526 / 66 / 14 Moleküle). Silberdampf bei 1500 K und S = 10<sup>6</sup>: d* ≈ 0,2–0,3 nm, kleiner als ein Atom (0,32 nm) – die Theorie sagt dann, dass jedes Atom stabil ist und das Wachstum nur noch von Stößen abhängt. Keime liegen also im Nanometerbereich, drei Dekaden unter einem Raster, das bei 1 µm beginnt.</li>
+  <li><b>Partikel kleiner als r* gibt es:</b>
+    <ul>
+      <li>Unterkritische Cluster entstehen und zerfallen ständig durch Zufall; nur so gelangen überhaupt einige über den Gipfel (das ist die Keimbildungsrate).</li>
+      <li>r* ist nicht fest: Sinkt S, weil Dampf verbraucht wird, wird r* größer, und Partikel, die eben noch stabil waren, verdampfen wieder (große wachsen auf Kosten der kleinen, Ostwald-Reifung).</li>
+      <li>r* gilt nur für den Stoff, der aus dem Dampf kondensiert. Partikel aus anderen Stoffen oder aus einem Inlet (z. B. Nanopartikel aus einer Funkenentladung) und nichtflüchtige Stoffe können beliebig klein sein.</li>
+      <li>Bei sehr hoher Übersättigung liegt r* unter der Größe eines Atoms (siehe oben).</li>
+    </ul>
+  </li>
+  <li><b>Vorabschätzung aus den Inlets – Einschätzung:</b> Die Idee einer Warnung ist richtig, die Inlets sind aber nicht der richtige Ort. (1) Die Übersättigung ist keine Eigenschaft des Zulaufs, sie entsteht im Prozess (Abkühlen, Reaktion) und ändert sich mit der Zeit; r* hängt über ln S stark von ihr ab (S = 2 → 10: Faktor 3,3). (2) Keime bildet ein bestimmter Stoff aus der Gasphase; ein Mittel von γ und v<sub>m</sub> über alle Inlet-Stoffe hat keine physikalische Bedeutung. (3) Die Ströme tragen bisher nur Partikel, noch keine Gas- oder Dampfphase. Die Prüfung gehört deshalb in die Keimbildungs-Unit: Sie kennt Stoff, T und S, rechnet d*(t) während der Simulation und meldet „Keimgröße d* = 1,6 nm liegt unter d<sub>min</sub> = 1 µm“. Verallgemeinert: Jede Unit meldet den Größenbereich, den sie braucht (Inlet: Bereich seiner Verteilung, Keimbildung: d*, Bruch: kleinste Bruchstücke), und der Reiter „Raster“ zeigt alle Meldungen und warnt, wenn etwas außerhalb liegt.</li>
+  <li><b>Im Partikelmodus fällt nichts aus dem Raster:</b> Karten tragen ihre eigene Größe; ein Keim bei 1,6 nm existiert als Karte auch dann, wenn das Raster bei 1 µm beginnt. Das Raster begrenzt dort nur die Anzeige. Im Kontinuum geht Masse außerhalb des Rasters dagegen verloren.</li>
+  <li><b>Unterer Rand nach Anzahl, oberer Rand nach Masse beurteilen:</b> Keime wiegen fast nichts, sind aber sehr zahlreich (10<sup>12</sup> Silberkeime mit 2 nm wiegen zusammen 4·10<sup>−11</sup> kg) – für Koagulation zählt ihre Anzahl. Große Agglomerate sind selten, tragen aber viel Masse (ein Sandkorn von 1 mm wiegt so viel wie 10<sup>6</sup> Körner von 10 µm). Eine massenbezogene Heatmap zeigt Keime deshalb kaum; dafür wäre später eine Anzeige nach Anzahl (q<sub>0</sub>) nützlich.</li>
+  <li><b>Wie groß muss d<sub>max</sub> sein?</b> Der Durchmesser wächst nur mit der dritten Wurzel der Masse: 1000 zusammengewachsene Partikel sind 10-mal so groß im Durchmesser, 10<sup>6</sup> Partikel 100-mal (volumengleicher Kugeldurchmesser; die Stoßgröße lockerer Agglomerate ist größer, siehe Nebenstrecke Agglomeratstruktur in Kapitel 15). Faustregel: d<sub>max</sub> ≈ 10 × größte Inlet-Größe (99,9-%-Quantil), wenn Koagulation stattfindet; ohne Koagulation genügt das 2- bis 3-Fache. Ob es gereicht hat, zeigt erst die Simulation: Ein Randwächter meldet, wenn in den obersten Klassen nennenswert Masse ankommt (sinnvoll, sobald es Koagulation gibt).</li>
+  <li><b>Kosten:</b> Jede Dekade mehr kostet bei 100 Klassen je Dekade 100 Klassen; Rechenzeit und Speicher wachsen nur linear (eine gespeicherte Ergebnismatrix mit 200 Zeitschritten und 600 Klassen: 1 MB; je Port und Stoff werden Einzellauf, Mittelwert und Streuung gespeichert). Der eigentliche Preis eines zu weiten Rasters ist die Anzeige: Leere Dekaden drücken den interessanten Bereich der Heatmap zusammen.<div class="abb"><img src="abbildungen/Raster_5_Groessenband.svg" width="680" alt="Größenband vom Atom zum Agglomerat"><div class="unterschrift">Abbildung: Größenband von 0,1 nm bis 10 mm mit typischen Bereichen und drei Rasterbeispielen bei 100 Klassen je Dekade.</div></div></li>
+  <li><b>Empfehlung:</b> Das Raster passend zum Flowsheet wählen: d<sub>min</sub> etwa ein Drittel der kleinsten erwarteten Größe (Inlet, Bruchstücke, Keime), d<sub>max</sub> nach der Faustregel oben. Standard für die bisherigen Feststoff-Flowsheets: 1 µm – 1 mm mit 300 Klassen; mit Keimbildung z. B. 1 nm – 1 mm mit 600 Klassen.</li>
+</ul>
+
+<h2>2.7 Wofür das Größenraster gebraucht wird (Frage 19. Oktober 2026)</h2>
+<ul>
+  <li><b>Frage:</b> Am Anfang stehen nur Inlets mit einer Verteilungsformel (Normal, Log-Normal, RRSB); danach wird entschieden, ob die Simulation im Kontinuum bleibt oder mit MC-Partikeln rechnet. Wofür genau braucht man dann das Raster?</li>
+  <li><b>Im Kontinuum (heute einzige Darstellung) ist das Raster der Strom selbst.</b> Die Formel beschreibt nur, was am Inlet hereinkommt. Schon die größenabhängige Verzögerung verschiebt jede Größe anders in der Zeit; am Ausgang gibt es dafür keine Formel mehr, nur noch Zahlen je Größe. Diese Zahlen müssen irgendwo stehen – an den Stützstellen des Rasters (Setzkasten-Bild aus 2.4). Jede Unit rechnet Stützstelle für Stützstelle; Heatmap und Massenbilanzen kommen direkt daraus. Später gilt das ebenso für Bruch und Wachstum im Kontinuum: Sie verschieben Masse zwischen den Stützstellen.</li>
+  <li><b>Im Partikelmodus (geplant) wird das Raster zum Rechnen nicht gebraucht.</b> Die Karten werden direkt aus der Formel platziert (Quantile, 13.8), jede Karte trägt ihre eigene Größe, und die Units rechnen mit Karten. Das Raster dient nur noch zum Auszählen für die Anzeige (Heatmap als Histogramm der Karten), für Ausgabe und Vergleich mit dem Kontinuum oder mit Dyssol. Ein zu enges Raster schneidet dort nur die Anzeige ab, nicht die Rechnung.</li>
+  <li><b>Folgerung:</b> Die Wahl von d<sub>min</sub>, d<sub>max</sub> und der Klassenzahl (2.6) ist heute wichtig, weil alles im Kontinuum gerechnet wird; im Partikelmodus ist sie eine Frage der Darstellung.<div class="abb"><img src="abbildungen/Raster_6_Wofuer_Raster.svg" width="680" alt="Wofür das Größenraster gebraucht wird"><div class="unterschrift">Abbildung: Weg der Größenverteilung im Kontinuum und im Partikelmodus – im Kontinuum ist das Raster der Strom, im Partikelmodus nur das Raster zum Auszählen für die Anzeige.</div></div></li>
+</ul>
+
+<h1>3 Inlet: Zulaufprofil und Größenverteilungen</h1>
+<ul>
+  <li><span class="label">Zeitprofil:</span> Massenstrom ṁ(t) stückweise linear zwischen Stützstellen, außerhalb konstant fortgesetzt.</li>
+  <li><span class="label">Separabler Ansatz:</span> q(t,d) = ṁ(t) · q<sub>3</sub>(d) – die Form der Verteilung ist zeitlich konstant, nur die Höhe folgt dem Massenstrom.</li>
+  <li><span class="label">Verteilungen als Massendichte q<sub>3</sub>(d):</span></li>
+</ul>
+<table>
+  <tr><th>Typ</th><th>Parameter</th><th>Dichte q<sub>3</sub>(d)</th></tr>
+  <tr><td>Normal (Gauß)</td><td>d<sub>0</sub>, σ</td><td>1/(σ√(2π)) · exp(−(d−d<sub>0</sub>)² / (2σ²))</td></tr>
+  <tr><td>Log-Normal</td><td>d<sub>50</sub>, σ<sub>ln</sub></td><td>1/(d·σ<sub>ln</sub>√(2π)) · exp(−ln²(d/d<sub>50</sub>) / (2σ<sub>ln</sub>²))</td></tr>
+  <tr><td>RRSB</td><td>d′ (63,2 %), n</td><td>(n/d′)·(d/d′)<sup>n−1</sup> · exp(−(d/d′)<sup>n</sup>), &nbsp;Q<sub>3</sub>(d) = 1 − exp(−(d/d′)<sup>n</sup>)</td></tr>
+</table>
+<ul>
+  <li><span class="label">Erfassungsanteil im Raster:</span> ∫<sub>d<sub>min</sub></sub><sup>d<sub>max</sub></sup> q<sub>3</sub> dd wird im Editor angezeigt (grün bei Abweichung ≤ 1 %, sonst rot). <b>Warum:</b> Was außerhalb des Rasters liegt, geht verloren und verfälscht die Massenbilanz. Seit 19. Oktober 2026 berechnet mit den Gewichten des jeweiligen Rasters; zusätzlich meldet der Reiter „Raster“ schon vor dem Übernehmen, welches Inlet zu mehr als 0,1 % außerhalb liegt (exakt aus der Verteilungssumme Q<sub>3</sub>, siehe 2.5).</li>
+  <li>Startwerte: Normalverteilung d<sub>0</sub> = 100, σ = 25; Standard-Zeitprofil zentral in <code>GetDefaultInletTimeProfile()</code>.</li>
+</ul>
+
+<h1>4 Flowsheet als Graph</h1>
+<ul>
+  <li>Knoten = Units mit nummerierten Ein- und Ausgängen (Ports), Verbindungen von Ausgangs-Port zu Eingangs-Port.</li>
+  <li><span class="label">Je Port höchstens eine Verbindung:</span> Aufteilen und Zusammenführen geschieht nur explizit über Splitter und Merger. <b>Warum:</b> eindeutige Massenbilanz an jedem Knoten, keine „versteckten“ Verzweigungen.</li>
+  <li><span class="label">Strom je Zeitschritt</span> als <code>CStreamSlice</code> (Vektor über die Größenklassen). <b>Warum als eigene Klasse:</b> Später soll dort auch eine Liste gewichteter Monte-Carlo-Partikel stehen können, ohne dass sich die Schnittstelle der Units ändert.</li>
+</ul>
+
+<h1>5 Zeitschrittweise Simulation (Makroschritte)</h1>
+<h2>5.1 Prinzip</h2>
+<ul>
+  <li>Globale Uhr t<sub>k</sub> = k·Δt. In jedem Makroschritt rechnet jede Unit genau einmal: Sie bekommt die Ströme an ihren Eingängen und liefert die Ströme an ihren Ausgängen.</li>
+  <li>Was zwischen zwei Schritten in einer Unit steckt (Material in einer Verzögerungsstrecke, Partikel in einer Mühle), ist ihr <b>innerer Zustand (Hold-up)</b>.</li>
+</ul>
+<h2>5.2 Warum nicht über den ganzen Zeitraum iterieren?</h2>
+<p>Dyssol rechnet sequenziell-modular: Jede Unit verarbeitet einen ganzen Zeitabschnitt, Kreise werden durch Aufschneiden (Tear Streams) und Iteration bis zur Konvergenz gelöst. Für StoSiS wurde bewusst der zeitschrittweise Ansatz gewählt:</p>
+<ul>
+  <li><b>Stochastik:</b> Bei Iteration würfelt jede stochastische Unit in jeder Iteration neu – die Ergebnisse ändern sich ständig, ein Konvergenzkriterium greift nie sauber.</li>
+  <li><b>Rechenaufwand:</b> Ein Monte-Carlo-Lauf müsste je Iteration komplett wiederholt werden.</li>
+  <li><b>Natürlich für Partikel und GPU:</b> MC-Partikel „wandern“ tatsächlich Schritt für Schritt durch das Flowsheet; pro Schritt lassen sich alle Partikel parallel rechnen. Später sind auch Regelungen und Ereignisse möglich.</li>
+  <li><b>Preis:</b> Units müssen zustandsbehaftet sein, und Δt muss kleiner als die kürzeste Verweil- bzw. Rücklaufzeit sein (Kopplungsfehler der Ordnung Δt).</li>
+</ul>
+<h2>5.3 Reihenfolge innerhalb eines Schritts: „der Reihe nach“ (Gauß-Seidel)</h2>
+<ul>
+  <li><b>Jacobi („alle gleichzeitig“):</b> Jede Unit liest die Ausgänge des vorherigen Schritts. Folge: künstliche Totzeit von Δt <b>je Verbindung</b> – eine Kette aus N Units verzögert um N·Δt.</li>
+  <li><b>Gauß-Seidel („der Reihe nach“, gewählt):</b> Die Units rechnen in Flussrichtung und lesen die Ausgänge ihrer Vorgänger aus <b>demselben</b> Schritt. Material läuft innerhalb eines Schritts durch beliebig lange Ketten; künstliche Totzeit nur einmal je Kreis (siehe Kapitel 6).</li>
+  <li>Die Reihenfolge liefert eine <b>topologische Sortierung</b> (Algorithmus nach Kahn): Ein Knoten kommt dran, sobald alle Vorgänger fertig sind.</li>
+</ul>
+<h2>5.4 Multi-Rate (Konzept, noch nicht implementiert)</h2>
+<ul>
+  <li>Eine Unit darf innerhalb eines Makroschritts eigene, kleinere Teilschritte τ machen – nach außen zählt nur der Zustand am Schrittende.</li>
+  <li>Bei ereignisgesteuertem Monte Carlo (Gillespie) ergibt sich τ von selbst aus der Gesamtrate R aller möglichen Ereignisse und wird nach <b>jedem</b> Ereignis neu gezogen:</li>
+</ul>
+<p class="formel">τ = −ln(u) / R, &nbsp;&nbsp; u ~ U(0, 1)</p>
+<ul>
+  <li>An der Makroschrittgrenze wird das nächste Ereignis einfach nicht ausgeführt; im nächsten Schritt wird neu gezogen. Das ist exakt, weil die Exponentialverteilung <b>gedächtnislos</b> ist. Viel Geschehen (großes R) → automatisch kleine Schritte („Aktionsdichte“).</li>
+  <li>Gilt nur für <b>zufällig gezogene</b> Wartezeiten. Verwendet ein Verfahren eine feste MC-Zeitschrittweite τ<sub>MC</sub> = 1/ΣR (mittlere Wartezeit, so im parallelen GPU-Algorithmus von Kotalczyk), führt „nicht ausführen“ wie „immer ausführen“ zu falschen Verteilungen; dann wird das anstehende Ereignis mit der Wahrscheinlichkeit τ<sub>s</sub>/τ<sub>MC</sub> ausgeführt (τ<sub>s</sub> = Restzeit bis zur Grenze, „fractional MC time steps“, Kotalczyk &amp; Kruis 2018; Dissertation Kotalczyk, Kap. 4.2).</li>
+</ul>
+<h2>5.5 Validierung</h2>
+<ul>
+  <li>Alte Rechnung (ganzer Zeitraum je Unit) und neue Rechnung (zeitschrittweise) für 9 Testfälle mit 375 000 Werten verglichen: maximale relative Abweichung 5·10<sup>−12</sup> (reine Rundung).</li>
+</ul>
+
+<h1>6 Rückführungen (Recycle-Ströme)</h1>
+<h2>6.1 Aufschneiden von Kreisen</h2>
+<ul>
+  <li>In einem Kreis gibt es keine „erste“ Unit – die topologische Sortierung bleibt stecken. Dort wird <b>genau eine</b> Verbindung aufgeschnitten (Tear Stream): Ihr Ziel liest den Strom aus dem <b>vorherigen</b> Schritt. Physikalisch wirkt das wie ein kurzes Rohr mit Totzeit Δt.</li>
+  <li><span class="label">Erkennung:</span> Hängt die Sortierung fest, wird für jeden offenen Knoten geprüft, ob er über offene Verbindungen zu sich selbst zurückführt (Tiefensuche). Ein eigener Algorithmus für stark zusammenhängende Komponenten (Tarjan) ist dafür nicht nötig.</li>
+  <li>Der <b>stationäre Zustand hängt nicht vom Schnittort ab</b>; dieser verschiebt nur das zeitliche Verhalten um Δt.</li>
+</ul>
+<h2>6.2 Auswahlregel für die Schnittstelle</h2>
+<ol>
+  <li><b>Merger bevorzugt:</b> Jeder sinnvolle Kreis enthält einen Knoten mit mehreren Eingängen (ein Kreis ohne Zusammenführung hätte keinen Zulauf) – dort mündet die Rückführung.</li>
+  <li><b>Eingang von einem Trennapparat</b> (heute Splitter, später Sieb, Sichter, Zyklon): Dort beginnt der Rückführstrom physikalisch. So erhält Frischgut, das noch nie im Kreis war, keine künstliche Verzögerung.</li>
+  <li>Danach: der Knoten mit den meisten bereits erledigten Eingängen (Eintrittspunkt in den Kreis).</li>
+</ol>
+<ul>
+  <li><b>Ergebnis unabhängig von der Reihenfolge, in der die Blöcke gezeichnet wurden.</b> Eine manuell als Rückführung markierte Verbindung hat Vorrang. Aufgeschnittene Verbindungen werden orange gestrichelt angezeigt.</li>
+  <li>Beispiel mit zwei Mergern im Kreis (Frischgut-Zugabe in die Rückführung): geschnitten wird Splitter → Merger 2, nicht Merger 2 → Merger 1, weil durch letztere Verbindung auch Frischgut fließt.</li>
+</ul>
+<h2>6.3 Validierung</h2>
+<table>
+  <tr><th>Testfall</th><th>Erwartung</th><th>Ergebnis</th></tr>
+  <tr><td>Kreis Merger → Splitter 50/50, Zulauf 10</td><td>stationär: Merger 20, Outlet 10; Einschwingen M<sub>k</sub> = 10 + ½·M<sub>k−1</sub> = 10, 15, 17,5, 18,75 …</td><td>exakt ✓</td></tr>
+  <tr><td>Kreis mit 1 s Verzögerung, 30 % Rücklauf</td><td>Merger 10/0,7 = 14,2857, Outlet 10</td><td>✓</td></tr>
+  <tr><td>Massenbilanz dieses Kreises</td><td>rein − raus = Hold-up = 14,2857·1 s + 4,2857·0,1 s = 14,714</td><td>14,714 ✓</td></tr>
+</table>
+
+<h1>7 Verzögerungs-Unit (Platzhalter-Prozess)</h1>
+<p class="formel">t<sub>delay</sub>(d) = t<sub>ref</sub> · (d / d<sub>ref</sub>)<sup>p</sup></p>
+<ul>
+  <li>Hold-up als <b>Ringpuffer</b> der letzten Eingänge; Länge aus der größten Verzögerung; lineare Interpolation zwischen den Zeitpunkten.</li>
+  <li>d<sub>ref</sub> ist nur ein Normierungsfaktor (dasselbe Verhalten lässt sich über t<sub>ref</sub> einstellen) und wird bewusst <b>nicht</b> automatisch aus dem Zulauf berechnet: Dann hinge die Verweilzeit eines Partikels von den anderen Partikeln ab – physikalisch unbegründet.</li>
+  <li>d<sub>ref</sub> wird in µm eingegeben (intern m, Standard 100 µm). Auf dem logarithmischen Raster gilt die Formel unverändert je Stützstelle; die Stützstelle d = 0 des linearen Rasters wird wie bisher durch eine winzige Größe (10<sup>−12</sup> m) ersetzt.</li>
+  <li>Diese Unit dient zum Testen der Infrastruktur und wird durch realistische Transportmodelle (Verweilzeitverteilungen) ersetzt.</li>
+</ul>
+
+<h1>8 Zufallszahlen und Reproduzierbarkeit</h1>
+<ul>
+  <li><span class="label">Globaler Seed:</span> gleicher Seed → gleiches Ergebnis (Fehlersuche, Nachvollziehbarkeit, Vergleich von Varianten mit identischem Zufall).</li>
+  <li><span class="label">Generator Mersenne Twister</span> <code>mt19937_64</code>: im C++-Standard exakt festgelegt → auf Windows (MSVC) und Linux (GCC, amplitUDE) dieselbe Folge.</li>
+  <li><span class="label">Gleichverteilung:</span> obere 53 Bit einer 64-Bit-Zufallszahl → Zahl in [0, 1) mit voller double-Genauigkeit.</li>
+  <li><span class="label">Eigene Normalverteilung</span> (Polarmethode nach Marsaglia) statt <code>std::normal_distribution</code>. <b>Warum:</b> Der Standard schreibt für die Normalverteilung kein Verfahren vor; jede Standardbibliothek formt die Zufallszahlen anders um. Mit eigener Implementierung sind die Zahlen plattformübergreifend gleich (bis auf Rundung der Logarithmus-Funktion in der letzten Stelle).</li>
+  <li><span class="label">Eigener Zufallsstrom je Unit:</span></li>
+</ul>
+<p class="formel">Seed<sub>Unit</sub> = SplitMix64( Seed ⊕ SplitMix64( FNV-1a(Knoten-ID) ) )</p>
+<ul>
+  <li>Eigener Strom je Unit, damit zwei Splitter nicht im Gleichtakt schwanken (das wäre eine künstliche Korrelation).</li>
+  <li><b>Hash statt Addition:</b> Bei „Seed + ID“ hätten Seed 1/Knoten 2 und Seed 2/Knoten 1 denselben Strom – Läufe mit verschiedenen Seeds wären nicht unabhängig.</li>
+  <li><b>An die Knoten-ID gebunden, nicht an die Reihenfolge:</b> Fügt man einen Block hinzu, ändern sich die Zufallszahlen der anderen Blöcke nicht.</li>
+  <li><code>std::hash</code> ist ungeeignet, weil implementierungsabhängig; FNV-1a und SplitMix64 sind kurz, schnell und überall gleich.</li>
+  <li><span class="label">Lauf-Seeds bei mehreren Läufen:</span> Lauf 1 nutzt genau den eingestellten Seed (ein einzelner Lauf ist damit identisch zu „1 Lauf“), weitere Läufe erhalten per SplitMix64 abgeleitete Seeds.</li>
+  <li>Der Zufallsprozess eines Splitters läuft auch ohne Zulauf weiter → die Zufallsfolge hängt nur vom Seed ab, nicht von der Verdrahtung.</li>
+</ul>
+
+<h1>9 Stochastischer Splitter (Ornstein-Uhlenbeck-Prozess)</h1>
+<h2>9.1 Modell</h2>
+<ul>
+  <li>Reiner <b>Mengenteiler</b>: Der Anteil gilt für alle Partikelgrößen gleich (größenabhängiges Trennen = eigene Unit „Sieb/Sichter“ mit Trennkurve).</li>
+  <li>Der OU-Prozess legt fest, <i>wie viel</i> in jeden Ausgang geht. Im Partikelmodus muss zusätzlich festgelegt werden, <i>wie</i> die Karten verteilt werden, damit dieser Anteil herauskommt (13.18).</li>
+  <li>Der Anteil g<sub>i</sub>(t) jedes Ausgangs i = 1 … N−1 folgt einem eigenen <b>Ornstein-Uhlenbeck-Prozess</b>; der letzte Ausgang erhält den Rest.</li>
+</ul>
+<p class="formel">dg = −(g − μ)/τ · dt + σ·√(2/τ) · dW</p>
+<ul>
+  <li><b>Warum OU:</b> stationär, normalverteilt mit Mittelwert μ und Streuung σ, kehrt immer zum Mittelwert zurück („mean-reverting“) und besitzt genau <b>eine Korrelationszeit τ</b> (Autokorrelation e<sup>−Δt/τ</sup>). Damit ist er das einfachste realistische Modell für „Schwankung um einen Sollwert mit Gedächtnis“ (z. B. träge pendelnde Klappe vs. unruhiger Strom).</li>
+  <li><b>Grenzfälle:</b> τ → 0: jeder Schritt unabhängig N(μ, σ²); τ → ∞: in jedem Lauf ein zufälliger, aber konstanter Anteil.</li>
+</ul>
+<h2>9.2 Exakte Fortschreibung</h2>
+<p class="formel">g<sub>k+1</sub> = μ + (g<sub>k</sub> − μ)·a + σ·√(1 − a²)·ξ, &nbsp;&nbsp; a = e<sup>−Δt/τ</sup>, &nbsp; ξ ~ N(0, 1)</p>
+<ul>
+  <li><b>Warum exakt statt Euler-Maruyama:</b> Das Euler-Verfahren hat einen Diskretisierungsfehler; die exakte Formel liefert für <b>jedes</b> Δt die richtige Verteilung. Mittelwert, Streuung und Zeitverhalten hängen damit nicht von der Schrittweite ab (vgl. Gillespie 1996).</li>
+  <li>√(1 − a²) wird numerisch genauer über <code>expm1</code> berechnet (wichtig bei Δt ≪ τ).</li>
+  <li><b>Stationärer Start:</b> g(0) ~ N(μ, σ²) – keine Einschwingphase, der Prozess ist von Anfang an im statistischen Gleichgewicht.</li>
+</ul>
+<h2>9.3 Massenerhaltung und Grenzen</h2>
+<ul>
+  <li>Anteile werden auf [0, 1] abgeschnitten; ist die Summe der schwankenden Anteile größer als 1, werden sie anteilig gekürzt; der Rest-Ausgang erhält 1 − Summe. → <b>Masse bleibt in jedem Schritt exakt erhalten.</b></li>
+  <li>Abschneiden verschiebt bei großem σ den Mittelwert leicht → Hinweis im Editor, wenn μ ± 3σ außerhalb [0, 1] liegt oder Σμ<sub>i</sub> + 3·√(Σσ<sub>i</sub>²) &gt; 1. Bewusst verworfene Alternative: Schwankung auf Logit-Skala (bleibt automatisch in [0, 1], σ aber weniger anschaulich).</li>
+  <li>Bei 3 Ausgängen: eigene σ<sub>i</sub>, τ<sub>i</sub> je Ausgang; der Rest schwankt mit, Var(Rest) = σ<sub>1</sub>² + σ<sub>2</sub>² (unabhängige Prozesse).</li>
+  <li>Die Vorschau im Editor zeigt <b>exakt</b> den Verlauf der nächsten Simulation, weil die Anteile nur von Seed und Δt abhängen, nicht vom Zulauf.</li>
+</ul>
+<h2>9.4 Validierung (lange Einzelläufe)</h2>
+<table>
+  <tr><th>Fall</th><th>Erwartung</th><th>Ergebnis</th></tr>
+  <tr><td>μ = 0,3, σ = 0,05, τ = 2 s, Δt = 0,1 s</td><td>Mittel 0,3 · Std 0,05 · Autokorr.(2 s) = e<sup>−1</sup> = 0,368</td><td>0,301 · 0,049 · 0,353</td></tr>
+  <tr><td>dasselbe mit Δt = 0,5 s</td><td>gleiche Statistik (Δt-unabhängig)</td><td>0,301 · 0,050 · 0,368 ✓</td></tr>
+  <tr><td>τ = 0</td><td>Autokorrelation ≈ 0</td><td>0,005 ✓</td></tr>
+  <tr><td>3 Ausgänge, σ = 0,03 / 0,06</td><td>Rest-Std = √(0,03² + 0,06²) = 0,067</td><td>0,066 ✓</td></tr>
+  <tr><td>Massenfehler je Schritt</td><td>0</td><td>exakt 0 ✓</td></tr>
+</table>
+
+<h1>10 Mehrere Läufe und Statistik (Monte Carlo)</h1>
+<h2>10.1 Warum mehrere Läufe?</h2>
+<ul>
+  <li>Ein stochastischer Lauf ist nur <b>eine</b> mögliche Realisierung. Aussagen erfordern die Verteilung über viele Läufe (Mittelwert, Streuung, Perzentile). Die Unsicherheit des Mittelwerts sinkt mit 1/√N.</li>
+  <li>Ein rein deterministisches Flowsheet wird nur einmal gerechnet.</li>
+</ul>
+<h2>10.2 Welford-Verfahren für Mittelwert und Varianz</h2>
+<p class="formel">x̄<sub>n</sub> = x̄<sub>n−1</sub> + (x<sub>n</sub> − x̄<sub>n−1</sub>)/n &nbsp;&nbsp;&nbsp; M<sub>2,n</sub> = M<sub>2,n−1</sub> + (x<sub>n</sub> − x̄<sub>n−1</sub>)·(x<sub>n</sub> − x̄<sub>n</sub>) &nbsp;&nbsp;&nbsp; s² = M<sub>2,N</sub>/(N − 1)</p>
+<ul>
+  <li><b>Ein Durchgang, kein Speichern aller Läufe:</b> Jeder Lauf wird sofort eingerechnet. Statt N voller Zeit-Größe-Matrizen werden nur drei gehalten (Lauf 1, Mittelwert, Varianz).</li>
+  <li><b>Numerisch stabil:</b> Die Lehrbuchformel s² = (Σx² − N·x̄²)/(N − 1) zieht zwei fast gleich große Zahlen voneinander ab (Auslöschung) – genau dann problematisch, wenn die Streuung klein gegenüber dem Mittelwert ist (bei uns typisch: Massenstrom ≈ 10, Streuung ≈ 0,5). Welford vermeidet das.</li>
+  <li><b>Teiler N − 1</b> (Bessel-Korrektur): erwartungstreue Schätzung der Varianz aus einer Stichprobe.</li>
+</ul>
+<h2>10.3 Speicherstrategie</h2>
+<ul>
+  <li>Volle Matrizen nur für Lauf 1 (Einzellauf), Mittelwert und Standardabweichung.</li>
+  <li>Für <b>jeden</b> Lauf nur kleine Kennwerte: ṁ(t), m(d) und Gesamtmasse → daraus werden Streubänder, Perzentile und Einzellauf-Kurven exakt berechnet.</li>
+</ul>
+<h2>10.4 Auswertung und Darstellung</h2>
+<ul>
+  <li>Kurven: Mittelwert mit Band ±1σ (Standard), ±2σ oder 5–95-%-Perzentil; optional Einzelläufe als dünne Linien. Das σ-Band des Massenstroms wird bei 0 abgeschnitten (physikalisch nicht negativ).</li>
+  <li>Perzentile über lineare Interpolation zwischen den sortierten Werten (Typ 7 nach Hyndman &amp; Fan); aussagekräftig erst ab etwa N ≥ 20.</li>
+  <li>Heatmap umschaltbar: Einzellauf, Mittelwert, Standardabweichung je Zelle.</li>
+  <li><b>Wichtiges Detail:</b> Die Randverteilungen der σ-Heatmap werden <b>nicht</b> als Integral der σ-Matrix berechnet, sondern aus den Kennwerten der Einzelläufe. Die Streuung eines Integrals ist nicht das Integral der Streuungen, weil die Größenklassen untereinander korreliert sind (Kovarianzen).</li>
+</ul>
+
+<h1>11 Validierung gegen eine analytische Lösung</h1>
+<div class="kasten">
+<p><b>Idee:</b> Für einen einfachen Fall lässt sich die Streuung exakt ausrechnen. Stimmt die Simulation innerhalb der statistischen Unsicherheit damit überein, ist das ein starker Nachweis, dass OU-Fortschreibung, Zufallszahlen, Seeds, Zeitintegration und Statistik zusammen korrekt arbeiten (Verifikation).</p>
+</div>
+<ul>
+  <li><span class="label">Testfall (ohne Rückführung):</span> Inlet mit konstantem Zulauf ṁ = 10 kg/s → Splitter mit 2 Ausgängen, Ausgang 1 stochastisch (μ = 0,3, σ = 0,05, τ = 2 s) → Outlet A; Ausgang 2 (Rest) → Outlet B. Betrachtet wird die Masse M, die in T = 40 s bei Outlet A ankommt.</li>
+  <li><span class="label">Masse am Ausgang:</span> Der Massenstrom bei A ist Zulauf mal aktueller Anteil, ṁ<sub>A</sub>(t) = ṁ·g(t); die Masse ist das Integral über die Zeit: M = ṁ · ∫<sub>0</sub><sup>T</sup> g(t) dt.</li>
+  <li><span class="label">Erwartungswert:</span></li>
+</ul>
+<p class="formel">E[M] = μ · ṁ · T</p>
+<ul>
+  <li><span class="label">Varianz:</span> Mit der Kovarianz des OU-Prozesses Cov(g(t), g(s)) = σ²·e<sup>−|t−s|/τ</sup> folgt</li>
+</ul>
+<p class="formel">Var[M] = ṁ²σ² ∫<sub>0</sub><sup>T</sup>∫<sub>0</sub><sup>T</sup> e<sup>−|t−s|/τ</sup> ds dt = 2·ṁ²·σ²·τ·( T − τ·(1 − e<sup>−T/τ</sup>) )</p>
+<ul>
+  <li><span class="label">Herleitung in Worten:</span> Die Abweichung der Masse vom Mittelwert ist ṁ·∫(g(t) − μ) dt. Quadriert man ein Integral, entsteht ein Doppelintegral über alle Zeitpaare (t, s); dessen Mittelwert ist die Kovarianz σ²·e<sup>−|t−s|/τ</sup> – sie beschreibt, wie stark der Anteil zu zwei Zeitpunkten „im Gleichtakt“ daneben liegt (gleicher Zeitpunkt: σ², weit auseinander: 0). Das Doppelintegral lässt sich geschlossen ausrechnen.</li>
+  <li><span class="label">Bedeutung der Größen:</span> ṁ Zulauf, μ mittlerer Anteil, σ typische Abweichung des Anteils, τ Korrelationszeit (wie lange eine Abweichung anhält), T Betrachtungsdauer; der Term τ·(1 − e<sup>−T/τ</sup>) ist eine kleine Randkorrektur für Anfang und Ende des Zeitraums. Zahlen: Var[M] = 2·100·0,0025·2·(40 − 2) = 38 kg² → Std = 6,16 kg.</li>
+  <li><span class="label">Interpretation:</span> Für T ≫ τ gilt Var[M] ≈ 2ṁ²σ²τT – die Streuung der Masse wächst nur mit √T. Anschaulich besteht der Zeitraum aus etwa T/(2τ) = 10 „unabhängigen Abschnitten“: Läge der Anteil die ganze Zeit um σ daneben, wäre M um ṁσT = 20 kg falsch; weil sich 10 unabhängige Abschnitte teilweise ausgleichen, sind es nur etwa 20/√10 ≈ 6,3 kg.</li>
+  <li><span class="label">Ergebnis</span> (ṁ = 10, μ = 0,3, σ = 0,05, τ = 2 s, T = 40 s, Δt = 0,1 s, N = 2000 Läufe):</li>
+</ul>
+<table>
+  <tr><th>Größe</th><th>analytisch</th><th>Simulation</th></tr>
+  <tr><td>Mittelwert der Masse</td><td>120,000</td><td>120,058</td></tr>
+  <tr><td>Standardabweichung der Masse</td><td>6,164</td><td>6,094 (−1,1 %)</td></tr>
+  <tr><td>5–95-%-Perzentil</td><td>109,86 … 130,14</td><td>110,04 … 130,07</td></tr>
+  <tr><td>Std des Massenstroms zu einem Zeitpunkt</td><td>ṁ·σ = 0,500</td><td>0,512</td></tr>
+</table>
+<ul>
+  <li><span class="label">Statistische Einordnung:</span> Auch die aus N Läufen geschätzte Standardabweichung ist selbst eine Zufallsgröße – wiederholt man das ganze Experiment mit anderen Seeds, kommt ein etwas anderer Wert heraus. Für normalverteilte Daten gilt Var(s²) ≈ 2σ⁴/(N − 1); die Wurzel halbiert den relativen Fehler, also relative Unsicherheit von s ≈ 1/√(2(N − 1)) = 1,6 % bei N = 2000. Die Abweichung von −1,1 % liegt damit innerhalb des Erwartbaren. Für den Mittelwert entsprechend: Standardfehler σ<sub>M</sub>/√N = 6,16/√2000 = 0,14 kg; gemessen 0,06 kg Abweichung.</li>
+  <li><span class="label">Was ein Fehler im Programm bewirken würde:</span> z. B. falsches Δt in der OU-Formel, korrelierte Seeds oder fehlendes Δd in der Integration verschieben das Ergebnis systematisch – die Abweichung bliebe auch bei großem N bestehen, statt wie 1/√N zu schrumpfen.</li>
+</ul>
+<h2>11.1 Konvergenz mit der Anzahl der Läufe</h2>
+<ul>
+  <li>Für N = 10 … 2000 wurde das Experiment jeweils 40-mal mit verschiedenen Seeds wiederholt und der mittlere (RMS-)Fehler bestimmt.</li>
+  <li>Doppelt-logarithmisch aufgetragen ergibt sich eine Gerade mit Steigung −½, weil Fehler ∝ N<sup>−½</sup>: <b>100-mal mehr Läufe → nur 10-mal kleinerer Fehler.</b> Das ist das typische Konvergenzverhalten jeder Monte-Carlo-Schätzung und zeigt, wie viele Läufe für eine gewünschte Genauigkeit nötig sind.</li>
+  <li>Gemessene Punkte und Theorie (Mittelwert: (σ<sub>M</sub>/E[M])/√N; Standardabweichung: 1/√(2(N − 1))) liegen übereinander. Daten: <code>docs/abbildungen/Konvergenz_MonteCarlo_Daten.csv</code>.</li>
+</ul>
+<p style="text-align: center;"><img src="abbildungen/Konvergenz_MonteCarlo.svg" width="600" alt="Konvergenz der Monte-Carlo-Schaetzung"></p>
+<p class="hinweis">Abbildung: Relativer Fehler von Mittelwert und Standardabweichung der Masse an Outlet A über der Anzahl der Läufe N (RMS über 40 Wiederholungen); gestrichelt: Theorie.</p>
+
+<h1>12 Oberfläche (kurz)</h1>
+<ul>
+  <li><b>Einstellungen und Darstellung getrennt:</b> Einstellungsfenster (Reiter Knoten/Raster) vs. Hauptfenster (Flowsheet, Kurven, Heatmap). „Übernehmen“ schreibt nur Werte; gerechnet wird ausschließlich über „Simulieren“ → bewusste, nachvollziehbare Rechenläufe.</li>
+  <li>Block-Palette mit Drag &amp; Drop, Blöcke löschen/umbenennen, Namen je Typ nummeriert (Inlet1, Splitter1 …).</li>
+  <li>Kabel orthogonal mit runden Ecken; aufgeschnittene Rückführungen orange gestrichelt → die Schnittstelle der Simulation ist sichtbar.</li>
+  <li>Simulationsleiste: Dauer, Seed, Anzahl Läufe (Standard 20); Fortschritt mit Abbrechen.</li>
+  <li><b>Start-Flowsheet</b> (seit 19. Oktober 2026): einfache Rückführung Inlet → Merger → Splitter → Outlet (70 %), die Verzögerung sitzt nur im Rückführstrom: Splitter → Verzögerung → Merger (30 %); vorher Inlet → Verzögerung → Outlet. Anordnung ohne Kabelkreuzung: Der Splitter verzweigt nach oben zum Outlet und nach unten zur Verzögerung, die Rückführung läuft unten herum in den Merger. Der Graph schneidet den Kreis automatisch auf (Kapitel 6). Ein eigener Fall im Regressionstest überwacht es.</li>
+  <li><b>Navigation im Flowsheet</b> (seit 19. Oktober 2026): Das Mausrad zoomt um die Mausposition (Faktor 1,15 je Raste, 20 % bis 400 %, ohne Strg). Ziehen auf freier Fläche oder mit gedrückter mittlerer Maustaste verschiebt die Ansicht (große feste Zeichenfläche, frei verschiebbar). Bis zur ersten eigenen Navigation passt sich die Ansicht an die Fenstergröße an und verkleinert nur, wenn das Flowsheet sonst nicht ganz zu sehen wäre (Start-Flowsheet bei Full HD: 86 %). Rechtsklick auf die freie Fläche: „Ganzes Flowsheet zeigen“ und „Zoom 100 %“. <b>Warum:</b> Größere Flowsheets passen nicht in die Flowsheet-Fläche (bei Full HD etwa 600 px breit; fünf Blöcke nebeneinander bräuchten 760 px).</li>
+  <li>Reiter „Raster“ (seit 19. Oktober 2026): Rasterart, Grenzen in µm und Klassenzahl frei wählbar, Richtwerte für typische Prozesse zum Einsetzen, Prüfung der Inlets gegen das eingegebene Raster (2.5).</li>
+</ul>
+
+<h1>13 Koagulator: Koagulation, Bruch und Wachstum (in Planung)</h1>
+<p class="hinweis">Planungsstand 9. Oktober 2026 – noch nicht implementiert; Entscheidungen siehe 13.7.</p>
+<div class="kasten"><p><b>Zum schnellen Nachlesen:</b> Die Entscheidungen zu MC-Partikeln und zur Koagulationsregel sind mit je einem Satz Begründung in <b>13.16 Kurzfassung</b> zusammengestellt; die Abschnitte 13.8 bis 13.15 enthalten die Herleitungen mit Abbildungen, 13.17 die Formelkarte von Druck und Temperatur bis zum Rauschen.</p></div>
+<h2>13.1 Mechanismen</h2>
+<table>
+  <tr><th>Mechanismus</th><th>Was passiert</th><th>Partikelanzahl</th><th>Masse</th><th>Modellgrößen</th></tr>
+  <tr><td>Koagulation / Agglomeration</td><td>zwei Partikel stoßen zusammen und bilden eines; die <b>Volumina addieren sich</b> (100 µm + 100 µm → ∛(100³+100³) ≈ 126 µm)</td><td>sinkt</td><td>bleibt</td><td>Kernel β(u, v): wie oft Partikel der Volumina u und v zusammenstoßen</td></tr>
+  <tr><td>Bruch</td><td>ein Partikel zerfällt in zwei oder mehr Bruchstücke</td><td>steigt</td><td>bleibt</td><td>Bruchrate S(v), Bruchstückverteilung b(v | w)</td></tr>
+  <tr><td>Wachstum</td><td>Partikel werden durch Material von außen größer (Beschichtung, Kondensation)</td><td>bleibt</td><td><b>steigt</b></td><td>Wachstumsrate G = dd/dt</td></tr>
+  <tr><td>Keimbildung (optional)</td><td>neue Partikel entstehen an der kleinsten Größe (z. B. aus übersättigtem Dampf)</td><td>steigt</td><td>steigt</td><td>Keimbildungsrate J</td></tr>
+</table>
+<ul>
+  <li>Wachstum und Keimbildung brauchen eine <b>Massenquelle</b> (Sprühflüssigkeit, Dampf …). Ohne Materialmodell ist das zunächst ein Parameter; die Massenbilanz lautet dann ṁ<sub>aus</sub> = ṁ<sub>ein</sub> + ṁ<sub>Wachstum</sub> statt ṁ<sub>aus</sub> = ṁ<sub>ein</sub>.</li>
+</ul>
+<h2>13.2 Populationsbilanz</h2>
+<p>Alle Mechanismen zusammen beschreibt die Populationsbilanz (Hulburt &amp; Katz 1964; Ramkrishna 2000) für die Anzahldichte n(v, t) der Partikel im Apparat (v = Partikelvolumen):</p>
+<p class="formel">∂n/∂t = ṅ<sub>ein</sub> − ṅ<sub>aus</sub> + B<sub>agg</sub> − D<sub>agg</sub> + B<sub>br</sub> − D<sub>br</sub> − ∂(G<sub>v</sub>·n)/∂v</p>
+<p class="formel">B<sub>agg</sub>(v) = ½ ∫<sub>0</sub><sup>v</sup> β(u, v−u)·n(u)·n(v−u) du &nbsp;&nbsp;&nbsp; D<sub>agg</sub>(v) = n(v) ∫<sub>0</sub><sup>∞</sup> β(v, u)·n(u) du</p>
+<p class="formel">B<sub>br</sub>(v) = ∫<sub>v</sub><sup>∞</sup> b(v | w)·S(w)·n(w) dw &nbsp;&nbsp;&nbsp; D<sub>br</sub>(v) = S(v)·n(v)</p>
+<ul>
+  <li>B = Geburt (birth), D = Tod (death) von Partikeln der Größe v. Der Faktor ½ verhindert, dass jedes Paar doppelt gezählt wird. Der Koagulationsteil ist die Smoluchowski-Gleichung (1917).</li>
+  <li>Koagulation ist <b>nichtlinear</b> (n·n): Die Stoßrate hängt von der <b>Konzentration</b> ab, also davon, wie viele Partikel sich im Apparatevolumen befinden. Deshalb braucht der Koagulator einen Hold-up und ein Volumen.</li>
+</ul>
+<h2>13.3 Einbettung in StoSiS</h2>
+<ul>
+  <li>Der Koagulator ist eine Unit mit <b>Hold-up</b> als innerem Zustand (wie der Ringpuffer der Verzögerungs-Unit). Je Makroschritt Δt: Zulauf in den Hold-up, Mechanismen über Δt rechnen, Ablauf abziehen.</li>
+  <li>Apparatemodell (entschieden): <b>ideal durchmischter Behälter</b> mit mittlerer Verweilzeit τ<sub>V</sub> (Ablauf = Hold-up/τ<sub>V</sub>, Ablauf hat die Verteilung des Hold-ups) und Volumen V; im stationären Zustand Hold-up = ṁ<sub>ein</sub>·τ<sub>V</sub>. Anfangsfüllung einstellbar: leer oder mit Masse und Größenverteilung. Eine Kette solcher Behälter ergibt das Tanks-in-Series-Modell. Später kann τ<sub>V</sub> = V/Q aus dem Volumenstrom Q des Trägerfluids folgen, statt Parameter zu sein.</li>
+  <li><b>Zum Vergleich Dyssol:</b> Agglomerator und Granulator in Dyssol halten die Hold-up-Masse <b>fest</b> auf dem Anfangswert (Quellcode: Masse merken, Zulauf addieren, Masse zurücksetzen; ṁ<sub>aus</sub> = ṁ<sub>ein</sub>). Das entspricht einem Apparat mit perfekter Füllstandsregelung im Dauerbetrieb, beschreibt aber An- und Abfahren oder Zulaufpausen nicht. Andere Dyssol-Units (z. B. Bunker) haben eine veränderliche Hold-up-Masse.</li>
+  <li>Hier wird <b>Multi-Rate</b> (5.4) konkret: Ein ereignisgesteuerter MC-Koagulator macht innerhalb von Δt beliebig viele eigene Ereignisschritte.</li>
+  <li>Umrechnung Masse ↔ Anzahl: N = m / (ρ·π/6·d³) – braucht die Dichte ρ und eine Einheit der Größenachse (µm).</li>
+</ul>
+<h2>13.4 Lösungsverfahren</h2>
+<table>
+  <tr><th></th><th>Klassenmethode (deterministisch)</th><th>Gewichtete Monte-Carlo-Partikel</th></tr>
+  <tr><td>Prinzip</td><td>Anzahl je Größenklasse; neue Partikel werden auf die zwei benachbarten Stützstellen verteilt, sodass Anzahl und Masse erhalten bleiben (Fixed Pivot, Kumar &amp; Ramkrishna 1996; Cell Average, Kumar et al. 2006 – beide auch in Dyssol)</td><td>Liste von Rechenpartikeln mit freier Größe und Gewicht (= wie viele echte Partikel sie vertreten); Stoß- und Bruchereignisse werden ausgewürfelt (Kruis et al. 2000; Kotalczyk &amp; Kruis 2017)</td></tr>
+  <tr><td>Vorteile</td><td>schnell, rauschfrei, direkt mit Dyssol vergleichbar</td><td>kein Raster nötig, mehrere Eigenschaften je Partikel möglich, gut auf GPU parallelisierbar (Wei &amp; Kruis 2013) – Kern der Dissertation</td></tr>
+  <tr><td>Nachteile</td><td>Rasterabhängig (numerische Diffusion), Raster muss den ganzen Größenbereich abdecken</td><td>statistisches Rauschen ∝ 1/√N<sub>MC</sub>; Zahl der Rechenpartikel muss begrenzt werden (Zulauf bringt ständig neue)</td></tr>
+</table>
+<ul>
+  <li><b>Zwei Arten von Streuung unterscheiden:</b> Prozessschwankung (physikalisch modelliert, z. B. OU-Splitter) und MC-Rauschen (numerisch, verschwindet mit wachsendem N<sub>MC</sub>). Die Statistik über mehrere Läufe (Kapitel 10) enthält beide; für die Auswertung muss das MC-Rauschen klein gegen die Prozessschwankung sein oder getrennt ausgewiesen werden.</li>
+</ul>
+<h2>13.5 Knackpunkte</h2>
+<ul>
+  <li><b>Größenraster:</b> Das lineare Raster 0–200 mit Stützstelle bei d = 0 passt schlecht: Bei d = 0 ist die Partikelzahl je Masse unendlich, Agglomerate wachsen über 200 hinaus, feine Bruchstücke werden grob aufgelöst. Üblich ist ein <b>logarithmisches Raster</b> (z. B. Volumenverhältnis 2 zwischen Klassen) mit d<sub>min</sub> &gt; 0. Masse außerhalb des Rasters muss mindestens gemeldet werden, damit die Massenbilanz sichtbar bleibt. Umgesetzt am 19. Oktober 2026 (2.5, Wahl der Grenzen 2.6).</li>
+  <li><b>Zahl der Rechenpartikel (MC):</b> Entweder verlassen Rechenpartikel den Apparat zufällig (einfach, aber Rauschen im Ablauf) oder alle Gewichte werden um den Ablaufanteil verkleinert und ähnliche Partikel zusammengelegt (Merging, Kotalczyk &amp; Kruis 2017; deterministischer Ablauf, aufwendiger).</li>
+</ul>
+<h2>13.6 Validierungsmöglichkeiten</h2>
+<ul>
+  <li>Konstanter Kernel β<sub>0</sub>, geschlossener Behälter: Gesamtanzahl N(t) = N<sub>0</sub> / (1 + β<sub>0</sub>·N<sub>0</sub>·t/2); für eine exponentielle Startverteilung ist sogar die ganze Verteilung analytisch bekannt (Scott 1968).</li>
+  <li>Konstanter Kernel, durchmischter Behälter im stationären Zustand: Anzahlbilanz 0 = (N<sub>ein</sub> − N)/τ<sub>V</sub> − ½·β<sub>0</sub>·N² (Konzentrationen) → N = (√(1 + 2β<sub>0</sub>τ<sub>V</sub>N<sub>ein</sub>) − 1)/(β<sub>0</sub>τ<sub>V</sub>).</li>
+  <li>Bruch mit linearer Bruchrate und gleichverteilten Bruchstücken: analytische Lösungen nach Ziff &amp; McGrady (1985).</li>
+  <li>Konstantes Wachstum G: Die Verteilung verschiebt sich unverändert um G·t.</li>
+  <li>Massenerhaltung bei Koagulation und Bruch exakt; Vergleich Klassenmethode ↔ MC ↔ Dyssol-Agglomerator (Beispiel-Flowsheet „Agglomerator“ in Dyssol).</li>
+</ul>
+<h2>13.7 Entscheidungen</h2>
+<ul>
+  <li><b>Entschieden (9. Oktober 2026):</b> Reihenfolge Koagulation → Bruch → Wachstum → Keimbildung (Keimbildung gehört dazu). Durchmischter Behälter mit τ<sub>V</sub> und V, Anfangsfüllung einstellbar. Dyssol-Löser als optionale Vergleichslogik; Hauptweg ist eine eigene Logik mit MC-Partikeln. Logarithmisches Größenraster. Vor dem Koagulator kommen die Materialien (Kapitel 14), statt übergangsweise eine Dichte als Parameter einzuführen.</li>
+  <li><b>Kernels:</b> Keine Vorgaben aus der Arbeitsgruppe. Vorschlag: Kernels mit analytischer Lösung (konstant, Summe, Produkt) für die Validierung, dazu die physikalischen Kernels aus der Literatur bzw. aus Dyssol (Brownsche Bewegung, Scherung, Sedimentation …) für die Vergleichbarkeit. Physikalische Kernels brauchen Stoff- und Fluiddaten (Temperatur, Gasviskosität).</li>
+  <li><b>Entschieden (15. Oktober 2026): Koagulationsregel Totalkoagulation</b> – das ganze leichtere Paket koaguliert (stochastische Auflösung s<sub>F</sub> = W<sub>min</sub>, Kotalczyk &amp; Kruis 2017; gleiche Regel wie Zhao, Kruis &amp; Zheng 2009). Die Regel wird austauschbar gebaut, damit sich feinere Auflösungen und SWA zum Vergleich wählen lassen (13.15).</li>
+  <li><b>Entschieden (19. Oktober 2026): Splitter im Partikelmodus</b> verteilen die Karten systematisch mit dem Konto-Verfahren; der Anteil kommt wie bisher aus dem Splittermodell (fest oder OU-Prozess). Kopieren mit Merging höchstens später als Vergleich (13.18).</li>
+  <li><b>Entschieden (15. Oktober 2026):</b> Die Darstellung ist je Simulation wählbar – Kontinuum (heutiger Code) oder MC-Partikel ab dem Inlet; keine Mischform innerhalb eines Stroms. Wer irgendwo Partikel einführt, braucht sie in der ganzen Anlage.</li>
+  <li><b>Offen:</b> Details der MC-Logik – Koagulationsereignis siehe 13.9; Splitter im Partikelmodus und Partikelzahl siehe 13.8.</li>
+</ul>
+
+<h2>13.8 Mehrere Stoffe in einem Partikel: Kontinuum oder MC-Partikel (Diskussion 13. Oktober 2026)</h2>
+<ul>
+  <li><b>Heute (Merger, Splitter, Verzögerung):</b> Der Strom speichert die Masse je Stoff und Größenklasse. Jedes Partikel besteht aus genau einem Stoff – gemischt wie Salz und Pfeffer im Streuer, aber jedes Korn bleibt Salz oder Pfeffer. Solange keine Unit Partikel verbindet, ist „Masse von Stoff c bei Größe d“ eine vollständige Beschreibung. Die Temperatur ist je Strom gemeinsam (sofortiger Wärmeausgleich beim Mischen), der Druck ebenfalls.</li>
+  <li><b>Koagulation zweier Stoffe:</b> Sand 100 µm + Kohle 100 µm → ein Partikel mit ∛(100³ + 100³) ≈ 126 µm (bei unporösen Partikeln addieren sich die Volumina V = Σ m<sub>c</sub>/ρ<sub>c</sub>), das Sand <b>und</b> Kohle enthält. Trägt man dessen Sand- und Kohlemasse einfach in die Klasse 126 µm ein, sieht das Ergebnis genauso aus wie reine Sand- und reine Kohlepartikel von 126 µm. Die Information „diese Massen kleben aneinander“ geht verloren. Folgen z. B.: Ein Dichtesichter würde Sand und Kohle des Agglomerats trennen, obwohl sie fest verbunden sind; Dichte und Wärmekapazität des Einzelpartikels, Haftverhalten oder Abbrand der Kohle hängen von der Zusammensetzung des Partikels ab.<div class="abb"><img src="abbildungen/MC_2_Setzkasten_Karteikarte.svg" width="680" alt="Agglomerat in Setzkasten und Karteikarte"><div class="unterschrift">Abbildung: Agglomerat aus Sand und Kohle – im Setzkasten in zwei Fächer zerlegt (der Zusammenhalt geht verloren), auf der Karteikarte ein Partikel mit beiden Stoffen.</div></div></li>
+  <li><b>Dyssol:</b> Der Agglomerator rechnet auf der Größenverteilung der gesamten Mischung (Quellcode: <code>GetPSD(t, PSD_Number)</code> und <code>SetPSD</code> ohne Stoffangabe). Welche Stoffe in einem Partikel verbunden sind, wird nicht erfasst.</li>
+  <li><b>Kontinuum mit Zusammensetzung:</b> Je Stoff eine eigene Achse, n(v<sub>Sand</sub>, v<sub>Kohle</sub>, t) (bivariate Populationsbilanz). Mit 100 Klassen je Achse: 1 Stoff 100 Zellen, 2 Stoffe 10<sup>4</sup>, 3 Stoffe 10<sup>6</sup>. Koagulation koppelt jede Zelle mit jeder: 10<sup>4</sup>, 10<sup>8</sup>, 10<sup>12</sup> Paare je Zeitschritt. Jede weitere Eigenschaft (Porosität, Feuchte) ist eine weitere Achse – der Aufwand wächst exponentiell mit der Zahl der Eigenschaften („Fluch der Dimensionalität“).</li>
+  <li><b>MC-Partikel:</b> Jedes Rechenpartikel trägt seine Masse je Stoff und ein Gewicht (wie viele echte Partikel es vertritt); Größe und Dichte folgen daraus. Koagulation: Massen je Stoff addieren – die Zusammensetzung bleibt exakt. Eine weitere Eigenschaft ist nur eine weitere Zahl je Partikel; der Aufwand wächst linear.</li>
+  <li><b>Weitere Vorteile der MC-Partikel:</b> freie Größe ohne Rechenraster (keine numerische Diffusion, nichts fällt aus dem Raster, das Raster dient nur noch der Anzeige); Kernel dürfen von beliebigen Partikeleigenschaften abhängen (z. B. Haftung Sand–Kohle ≠ Sand–Sand); Partikel können Alter und Herkunft mitführen (Verweilzeit, Zahl der Rückführungen); dieselbe Rechnung für Millionen Partikel passt zur GPU. Für eine einzige Eigenschaft (Größe) sind gewichtete Partikel im Grunde ein feines, sich selbst anpassendes Raster; der eigentliche Unterschied zeigt sich ab zwei Eigenschaften.</li>
+  <li><b>Kosten:</b> statistisches Rauschen ∝ 1/√N<sub>MC</sub>; Paarsuche für Stöße braucht geschickte Verfahren (Akzeptanz-Verwerfung, Kruis et al. 2000; Wei &amp; Kruis 2013); die Zahl der Rechenpartikel muss begrenzt werden (13.5); für die Anzeige werden Partikel wieder in Klassen gezählt.</li>
+  <li><b>Initialisierung durch Stichprobe, nicht „ein Partikel je Fach“:</b> Rechenpartikel werden zufällig aus der Verteilung gezogen (wie die Befragten einer Umfrage aus der Bevölkerung). Wo viel Material ist, landen viele Partikel; leere Kombinationen kosten nichts. Die Zahl der Rechenpartikel N richtet sich nach der gewünschten Genauigkeit (Fehler ∝ 1/√N), nicht nach der Zahl der Eigenschaften. Die Umwandlung „k Partikel je Größenklasse“ (so im frühen Testcode <code>CParticleEnsemble</code>) wächst dagegen mit der Zahl der Zellen und ist für mehrere Eigenschaften ungeeignet.</li>
+  <li><b>Am Inlet:</b> Stoff, T und p sind feste Werte und werden auf jede Karte geschrieben; nur die Größe ist verteilt und wird aus q<sub>3</sub>(d) gezogen (Inversionsmethode, für RRSB geschlossen: d = d′·(−ln(1−u))<sup>1/n</sup>, für Log-Normal d = d<sub>50</sub>·exp(σ<sub>ln</sub>·z) mit z ~ N(0, 1)). Je Makroschritt bringt der Zulauf die Masse ṁ·Δt, verteilt auf N<sub>ein</sub> Rechenpartikel. Gewicht = Masse des Rechenpartikels / Masse eines echten Partikels; Beispiel 10 g Sand (ρ = 2200 kg/m³): bei 80 µm etwa 1,7·10<sup>7</sup>, bei 120 µm etwa 5·10<sup>6</sup> echte Partikel. Unterschiede in Zusammensetzung, Temperatur usw. entstehen erst im Prozess und werden einfach auf den Karten mitgeführt – der Setzkasten müsste für jede mögliche Kombination vorab ein Fach haben, der Karteikasten schreibt nur Karten für das, was tatsächlich vorkommt.</li>
+  <li><b>Stoßpartner:</b> Ein MC-Verfahren durchsucht nicht alle Paare, sondern lost Paare aus und nimmt sie mit einer Wahrscheinlichkeit proportional zum Kernel an (Akzeptanz-Verwerfung mit einem Majoranten-Kernel); der Aufwand wächst mit N, nicht mit der Zahl der Zellen zum Quadrat.</li>
+  <li><b>Anschauung Raster ↔ Punktwolke (14. Oktober 2026):</b> Mit mehreren Eigenschaften wird das Raster ein mehrdimensionales Gitter, z. B. Größe × Porosität × fraktale Dimension; jede Größenklasse wird nach Porosität unterteilt, jede dieser Zellen nach fraktaler Dimension (4 × 4 × 4 = 64 Zellen, mit je 150 Klassen 3,4·10<sup>6</sup>). Darstellbar als gestapelte Schnitt-Heatmaps: Jede Ebene ist eine Klasse der dritten Eigenschaft, die Farbe die Menge je Zelle – auch leere Zellen existieren und belegen Speicher. Die MC-Darstellung entspricht einem 3D-Streudiagramm: Jeder Punkt ist ein Rechenpartikel an seinen exakten Eigenschaftswerten; die Häufung von Punkten (mal Gewicht) zeigt, wo viel Material ist, und die Farbe bleibt frei für eine vierte Eigenschaft (z. B. Zusammensetzung oder Temperatur). Für die Heatmap werden die Punkte nachträglich in Klassen gezählt, nur für die Achsen, die man sehen will.<div class="abb"><img src="abbildungen/MC_3_Raster_Punktwolke.svg" width="680" alt="Raster und Punktwolke"><div class="unterschrift">Abbildung: Dieselben 75 Rechenpartikel links in ein 10 × 10-Raster gezählt (80 Fächer bleiben leer), rechts als Punktwolke; eine dritte Achse verzehnfacht die Fächer, nicht die Karten.</div></div></li>
+  <li><b>Art des Fehlers:</b> Rechenpartikel sind <b>Punkte</b> im Eigenschaftsraum, keine Kugeln, die einen Bereich abdecken; jeder Punkt trägt exakte Werte. Das Raster verschmiert innerhalb einer Klasse (alle Partikel einer Zelle gelten als gleich, Diskretisierungsfehler), die Stichprobe rauscht (statistischer Fehler ∝ 1/√N). Beide sind Näherungen – mit wachsender Zahl der Eigenschaften bleibt nur die Stichprobe bezahlbar.</li>
+  <li><b>Fraktale Dimension als mögliche Partikeleigenschaft:</b> Zusammenhang Masse ↔ Gyrationsradius eines Agglomerats, m ∝ (R<sub>g</sub>/a)<sup>D<sub>f</sub></sup> mit Primärpartikelradius a; kompakte Kugel D<sub>f</sub> = 3, Agglomerate aus Stoßprozessen typisch etwa 1,8–2,2 (Literatur prüfen). Bestimmt den Stoßdurchmesser und damit den Koagulationskernel. Porosität und D<sub>f</sub> hängen zusammen; viele Zellen eines Gitters blieben deshalb physikalisch unmöglich und leer.</li>
+  <li><b>Stellschraube (offen):</b> gleiche Masse je Rechenpartikel (Masse gut aufgelöst, wenige große Partikel) oder gleiche Anzahl (Feinanteil gut aufgelöst); dazu Kotalczyk &amp; Kruis (2017), „stochastic resolution“.</li>
+  <li><b>Gewicht als „Paket“:</b> Ein Rechenpartikel fasst viele echte Partikel mit (nahezu) gleichen Eigenschaften zusammen; innerhalb des Pakets gelten sie als identisch. Anders als eine Rasterzelle hat das Paket keine festen Grenzen und sitzt dort, wo Material ist. Das nachträgliche Zusammenlegen ähnlicher Rechenpartikel (Merging, Kotalczyk &amp; Kruis 2017) ist genau dieses Bündeln.</li>
+  <li><b>Wo Partikel nötig sind (Diskussion 14. Oktober 2026):</b> Nur wo etwas auf <i>einzelne</i> Partikel mit mehr als einer Eigenschaft wirkt – Koagulation mehrerer Stoffe, Bruch eines Agglomerats, Beschichtung, Porosität/fraktale Dimension. Mahlen oder Agglomerieren eines einzigen Stoffs nach Größe allein geht auch im Kontinuum (so rechnet Dyssol).</li>
+  <li><b>Nach der Unit nicht zurückwandeln:</b> Zurück ins Raster zu zählen wirft genau die Information weg, für die die Partikel da sind (Zusammensetzung, Porosität …), und fügt bei jeder Umwandlung Verschmieren und Rauschen hinzu – in einem Kreislauf bei jedem Durchlauf erneut. Einmal Partikel, bleiben sie Partikel bis zum Outlet; erst die Anzeige zählt sie in Klassen.</li>
+  <li><b>Zwei Varianten für den Beginn:</b> (I) Mischform: Verteilung bis zur ersten partikelverändernden Unit, ab dort Partikel – jede Unit muss beide Formen gleichzeitig in einem Strom verarbeiten können (z. B. Merger mit Verteilung an Eingang 1 und Partikeln an Eingang 2). (II) Darstellung je Simulation wählbar: „Kontinuum“ (heutiger Code, rauschfrei, Dyssol-Vergleich) oder „Partikel“ (ab dem Inlet). Jede Unit hat dann zwei getrennte, einfache Rechenwege, die nie gemischt werden; derselbe Flowsheet lässt sich in beiden Darstellungen rechnen und vergleichen (Validierung). <b>Vorschlag: (II).</b></li>
+  <li><b>Inlet im Partikelmodus:</b> Partikel direkt aus der analytischen Verteilung (Normal, Log-Normal, RRSB), nicht aus den 150 Rasterwerten. Statt zufälliger Ziehung Platzierung an Quantilen u<sub>i</sub> = (i − ½)/N, d<sub>i</sub> = Q<sub>3</sub><sup>−1</sup>(u<sub>i</sub>): deterministisch, nahezu rauschfrei, jedes Partikel trägt die gleiche Masse (mit Q<sub>0</sub> statt Q<sub>3</sub> die gleiche Anzahl). Normalverteilung bei d &lt; 0 abschneiden (Anteil Φ(−4) = 3·10<sup>−5</sup> beim Startprofil). Beispiel N = 5, Normalverteilung d<sub>0</sub> = 100, σ = 25, 1 kg Sand (ρ = 2200 kg/m³) je Schritt: Die Masse wird in fünf Portionen zu je 20 % geteilt, jedes Partikel sitzt in der Mitte seiner Portion (u = 10, 30, 50, 70, 90 %) bei d = 68,0 / 86,9 / 100,0 / 113,1 / 132,0 µm, trägt 0,2 kg und vertritt 5,5·10<sup>8</sup> / 2,6·10<sup>8</sup> / 1,7·10<sup>8</sup> / 1,2·10<sup>8</sup> / 7,5·10<sup>7</sup> echte Partikel. Zufällige Ziehung könnte dagegen z. B. alle fünf zwischen 90 und 110 µm legen. Variante „geschichtete Stichprobe“: u<sub>i</sub> = (i − 1 + U<sub>i</sub>)/N mit U<sub>i</sub> ~ U(0, 1) – je Portion genau ein Partikel, aber nicht in jedem Schritt an derselben Stelle.<div class="abb"><img src="abbildungen/MC_4_Quantile_Inlet.svg" width="680" alt="Quantil-Platzierung"><div class="unterschrift">Abbildung: Quantil-Platzierung am Inlet – fünf gleich schwere Massenportionen (Bänder), je ein Rechenpartikel in der Mitte jeder Portion (Normalverteilung d<sub>0</sub> = 100 µm, σ = 25 µm).</div></div></li>
+  <li><b>Offen für den Partikelmodus:</b> Splitter und Siebe – jedes Partikel mit geteiltem Gewicht in beide Ausgänge kopieren (exakt, aber die Partikelzahl verdoppelt sich je Teilung, im Kreislauf ohne Ende) oder jedes Partikel als Ganzes einem Ausgang zulosen (Zahl bleibt, dafür Rauschen); Begrenzung der Partikelzahl in Hold-ups und Kreisläufen. Diskussion und Vorschlag in 13.18.</li>
+</ul>
+
+<h2>13.9 Koagulationsereignis mit gewichteten Partikeln (Diskussion 15. Oktober 2026)</h2>
+<ul>
+  <li><b>Vorschlag aus der Diskussion:</b> Zwei Pakete (z. B. Sand, Gewicht 10 000, und Kohle, Gewicht 10 000) koagulieren; ein zufälliger Koagulationsgrad f (z. B. 0,2) bestimmt, welcher Anteil des leichteren Pakets koaguliert; diese Zahl wird beiden Paketen abgezogen und bildet ein neues Paket mit der summierten Zusammensetzung.</li>
+  <li><b>Richtig daran:</b> Jedes Paar verbraucht ein echtes Partikel aus jedem Paket – beiden Paketen wird dieselbe Zahl abgezogen; das leichtere Paket begrenzt die Zahl der Paare; die Zusammensetzung des Agglomerats ist die Summe beider Partner.</li>
+  <li><b>Gewicht des neuen Pakets = Zahl der Paare</b>, nicht deren Summe: 2000 Sand + 2000 Kohle ergeben 2000 Agglomerate. Massenprobe: vorher 10 000 m<sub>S</sub> + 10 000 m<sub>K</sub>, nachher 8000 m<sub>S</sub> + 8000 m<sub>K</sub> + 2000 (m<sub>S</sub> + m<sub>K</sub>) – gleich. Die Zahl echter Partikel sinkt um 2000 = Zahl der Stöße.</li>
+  <li><b>Zusammensetzung als Masse je Stoff, nicht als Stückverhältnis:</b> Sand 100 µm (ρ = 2200) wiegt 1,15·10<sup>−9</sup> kg, Kohle 100 µm (ρ = 1400) 0,73·10<sup>−9</sup> kg; das Agglomerat „1 Sand + 1 Kohle“ ist zu 61 % Sand (nach Masse), „2 Sand + 1 Kohle“ zu 76 %. Die Zahl der Primärpartikel kann zusätzlich auf der Karte stehen (Detailstufe 1, Kapitel 15).</li>
+  <li><b>Wie viel koaguliert, folgt aus der Physik, nicht aus einem frei gewählten Anteil:</b> Erwartete Zahl der Stöße zwischen den Paketen i und j im Zeitschritt: ΔN<sub>ij</sub> = β<sub>ij</sub>·w<sub>i</sub>·w<sub>j</sub>·Δt / V (Kernel β, Gewichte w, Apparatevolumen V). Sie hängt von Größe und Stoff (Kernel), von der Konzentration (doppelt so viel Kohle → doppelt so viele Stöße je Sandkorn) und von Δt ab. Ein fester Anteil je Schritt macht das Ergebnis von Δt abhängig: 1 s mit Δt = 0,1 s → 0,8<sup>10</sup> = 11 % bleiben unkoaguliert, mit Δt = 0,05 s → 0,8<sup>20</sup> = 1,2 %.</li>
+  <li><b>Kartenzahl:</b> Erzeugt jedes Ereignis eine neue Karte, wächst die Zahl der Rechenpartikel ständig; rechnet man den Anteil für jedes Paar und jeden Schritt, entstehen bei 1000 Karten rund 500 000 neue je Schritt.</li>
+  <li><b>Bekanntes Verfahren mit konstanter Kartenzahl</b> (differenziell gewichtete Partikel, Zhao, Kruis &amp; Zheng 2009, Gl. 17 – am Original geprüft am 15. Oktober 2026; dort „probabilistic coagulation rule“ genannt: im Mittel koagulieren min(w<sub>i</sub>, w<sub>j</sub>) Paare. Ihre „full coagulation rule“ meint dagegen, dass alle echten Partikel beider Pakete koagulieren – nur bei gleichen Gewichten widerspruchsfrei): Bei einem Ereignis koaguliert das <i>ganze</i> leichtere Paket. Seine Karte wird zum Agglomerat (Gewicht w<sub>min</sub>, Massen addiert), das schwerere Paket verliert w<sub>min</sub>. Bei gleichen Gewichten wird das Agglomerat auf beide Karten mit je w/2 verteilt. Damit die mittlere Stoßrate stimmt, tritt das Ereignis für das Paar (i, j) mit der Rate r<sub>ij</sub> = β<sub>ij</sub>·max(w<sub>i</sub>, w<sub>j</sub>)/V auf (je Ereignis werden w<sub>min</sub> echte Stöße umgesetzt). Der Zufall steckt im <b>Zeitpunkt</b> (τ = −ln(u)/R, R = Σ r<sub>ij</sub>, siehe 5.4) und in der <b>Wahl des Paares</b> (Wahrscheinlichkeit r<sub>ij</sub>/R, praktisch per Akzeptanz-Verwerfung).</li>
+  <li><b>Beispiel mit diesem Verfahren:</b> Sand (10 000) + Kohle (10 000), gleiche Gewichte → zwei Karten „Sand + Kohle“ mit je 5000. Weiter mit einer Sandkarte (10 000): Sand (10 000) + „Sand + Kohle“ (5000) → die leichtere Karte wird „2 Sand + 1 Kohle“ (5000), die Sandkarte behält 5000. Massenprobe: 15 000 m<sub>S</sub> + 5000 m<sub>K</sub> vorher wie nachher; echte Partikel 15 000 → 10 000 (5000 Stöße); Kartenzahl unverändert 2.</li>
+</ul>
+
+<h2>13.10 Zufall im Koagulationsgrad, Teil-Koagulation und Begrenzung der Partikelzahl (Diskussion 15. Oktober 2026)</h2>
+<ul>
+  <li><b>Koagulationsgrad zufällig um den Kernel-Wert:</b> Physikalisch begründet, aber die Breite ist nicht frei wählbar. Stöße sind zufällige Einzelereignisse; ihre Zahl im Zeitschritt ist Poisson-verteilt mit Mittelwert ΔN = β·w<sub>i</sub>·w<sub>j</sub>·Δt/V und Standardabweichung √ΔN (für großes ΔN annähernd normalverteilt; für kleines ΔN Poisson, da die Normalverteilung negative Werte liefern kann). Relative Schwankung 1/√ΔN: 10 % bei ΔN = 100, 1 % bei 10<sup>4</sup>, 0,1 % bei 10<sup>6</sup>. In der chemischen Kinetik heißt dieses Vorgehen τ-Leaping (Gillespie 2001), die Normalnäherung chemische Langevin-Gleichung (Gillespie 2000). Die Smoluchowski-Gleichung beschreibt den Mittelwert, das Marcus-Lushnikov-Modell den stochastischen Prozess mit endlich vielen Partikeln; der Unterschied zählt nur bei kleinen Partikelzahlen (z. B. Nanopartikel in kleinen Volumina, seltene große Agglomerate).</li>
+  <li><b>Physikalisches Rauschen ↔ MC-Rauschen:</b> Bei gewichteten Partikeln setzt ein MC-Ereignis w<sub>min</sub> echte Stöße auf einmal um; die relative Streuung der umgesetzten Stöße ist √(w/ΔN) statt 1/√ΔN, also um √w größer als die physikalische. Beispiel w = 10<sup>6</sup>, ΔN = 10<sup>8</sup>: MC-Rauschen 10 %, physikalisch 0,01 %. Bei Pulvern (10 g Sand mit 100 µm sind 8,7·10<sup>6</sup> Körner) ist die physikalische Stoßstreuung praktisch vernachlässigbar; ein frei gewählter Streuparameter würde Rauschen ohne physikalische Grundlage hinzufügen.</li>
+  <li><b>Teil-Koagulation (nicht das ganze leichtere Paket):</b> Kleinere Sprünge, weniger Rauschen je Ereignis; aber wird in jedem Schritt für jedes Paar ein Anteil umgesetzt, entsteht je Paar eine neue Karte (bei 1000 Karten rund 500 000 je Schritt). Das läuft auf ein deterministisches Partikelverfahren hinaus, das in jedem Schritt stark reduziert werden muss. Zwischenwege mit konstanter Kartenzahl, bei denen nur eine Karte verändert wird und die andere bleibt: Mass-Flow-Algorithmus (Eibeck &amp; Wagner 2001) und stochastische gewichtete Algorithmen (SWA = Stochastic Weighted Algorithm, durchnummeriert SWA1 bis SWA4; Patterson, Wagner &amp; Kraft 2011, am Original geprüft: Karte i wird zu (x<sub>i</sub> + x<sub>j</sub>) mit neuem Gewicht c, Karte j bleibt unverändert; SWA1 c = u·v/(u + v), SWA2 c = u/2, SWA3 c = u·m<sub>x</sub>/(m<sub>x</sub> + m<sub>y</sub>), SWA4 mit Wurzelgewichten; erhaltend im Mittel, für jede Erhaltungsgröße gibt es ein Familienmitglied, das sie exakt erhält). Fractional MC time steps: Kotalczyk &amp; Kruis 2018, siehe 5.4 und 13.12.</li>
+  <li><b>Begrenzung der Partikelzahl – Verfahren:</b>
+    <ul>
+      <li><b>Random Removal:</b> zufällig ausgewählte Karten entfernen, Gewichte der übrigen hochskalieren.</li>
+      <li><b>Merging</b> (Kotalczyk &amp; Kruis 2017): ähnliche Karten zusammenlegen; Masse und Anzahl exakt, Eigenschaften werden gemittelt.</li>
+      <li><b>Russisches Roulette und Splitting</b> (Gewichtsfenster, aus dem Neutronen- und Strahlungstransport, Kahn &amp; Harris 1951): Karten mit sehr kleinem Gewicht überleben mit Wahrscheinlichkeit p und erhalten das Gewicht w/p, sonst werden sie entfernt; sehr schwere Karten werden in mehrere aufgeteilt. Erwartungstreu, Eigenschaften bleiben exakt, hält alle Gewichte in einem Fenster.</li>
+      <li><b>Resampling aus Partikelfiltern</b> (multinomial, stratifiziert, systematisch; Kitagawa 1996): aus N Karten M neue ziehen, Wahrscheinlichkeit proportional zum Gewicht, danach alle mit gleichem Gewicht. Systematisches Resampling ist die Quantil-Idee vom Inlet, angewandt auf die Gewichte. Eigenschaften bleiben exakt (Kopien), häufige Karten werden vervielfacht, seltene verschwinden („Verarmung“).</li>
+      <li><b>Konstante Kartenzahl</b> (Smith &amp; Matsoukas 1998) für die umgekehrte Richtung: Koagulation verringert die Kartenzahl, Karten werden verdoppelt und ihre Gewichte halbiert.</li>
+      <li><b>Natürlicher Austrag:</b> Im durchmischten Behälter verlassen Karten den Apparat (zufällig mit Wahrscheinlichkeit Δt/τ<sub>V</sub> oder durch Verkleinern aller Gewichte); der Zulauf bringt je Schritt N<sub>ein</sub> neue.</li>
+    </ul>
+  </li>
+  <li><b>Idee für einen eigenen Weg:</b> Teil-Koagulation (rauscharm) mit systematischem Resampling oder Gewichtsfenstern kombinieren und gegen gewichtete MC mit Merging an den analytischen Fällen aus 13.6 vergleichen. Vorher Literatur prüfen, ob Resampling und Gewichtsfenster für Populationsbilanzen schon verwendet wurden.</li>
+</ul>
+
+<h2>13.11 Ganzes Paket oder Teil-Koagulation: Rauschen, Restkoagulation, Berechnung der Stöße (Diskussion 15. Oktober 2026)</h2>
+<ul>
+  <li><b>Tendenz:</b> Zunächst die einfache Annahme „das ganze leichtere Paket koaguliert“ (konstante Kartenzahl, die Menge folgt aus dem Gewicht des leichteren Pakets).</li>
+  <li><b>Anschauung:</b> Busse statt einzelner Fahrgäste – sollen im Mittel 20 % der Sandkörner je Schritt ankleben und fahren alle in einem Bus (eine Karte, Gewicht 10 000), dann fährt der ganze Bus etwa in jedem fünften Schritt, sonst keiner: im Mittel richtig, im einzelnen Lauf ruckelig. Viele kleine Busse (viele Karten mit kleinem Gewicht) ergeben je Schritt nahezu gleichmäßig 20 %. Die Stoßzahl selbst schwankt wie die Kundenzahl an einer Kasse (im Mittel 100 je Stunde, tatsächlich etwa 90 bis 110, Streuung √100 = 10); wie viele Stöße zu erwarten sind, hängt wie das Gedränge auf einer Party davon ab, wie viele gerade im Raum sind, wie groß der Raum ist, wie wild sie sich bewegen, wie groß und wie klebrig sie sind.</li>
+  <li><b>Geht dabei Information verloren?</b> Nicht systematisch: Das Ereignis „alles oder nichts“ tritt entsprechend seltener auf, im Mittel stimmt die Zahl der Stöße zu jedem Zeitpunkt. Was entsteht, ist Rauschen. Relative Streuung der umgesetzten Stöße je Schritt √(w/ΔN) (w = Gewicht der Pakete, ΔN = erwartete Stöße). Beispiel ΔN = 2000 je Schritt: w = 10 000 → 224 % (ein Ereignis in etwa jedem fünften Schritt), w = 100 → 22 %, w = 10 → 7 %, w = 1 → 2,2 % (= physikalische Poisson-Streuung). Mehr Karten je Teilpopulation verringern das Rauschen.</li>
+  <li><b>„Mit der Zeit koaguliert ohnehin alles“ gilt nicht:</b> Im Flowsheet verlässt Material den Apparat vorher; wie weit es koaguliert ist, ist gerade das Ergebnis. Durchmischter Behälter, konstanter Kernel, stationär: N/N<sub>ein</sub> = (√(1 + 2x) − 1)/x mit x = β<sub>0</sub>·τ<sub>V</sub>·N<sub>ein</sub> – für x = 1 bleiben 73 % der Partikel, für x = 10 36 %.</li>
+  <li><b>Wann die Ganz-oder-gar-nicht-Annahme stört:</b> nicht bei wenigen echten Partikeln (dann ist w klein bis 1, jede Karte ist ein echtes Partikel, das ohnehin nur ganz koagulieren kann), sondern wenn eine wichtige Teilpopulation durch wenige Karten mit großem Gewicht vertreten ist: Spurenstoff, grobes Ende der Verteilung, Beginn der Keimbildung. Dagegen helfen Gewichtungen, die dort mehr Karten ansetzen (Mass-Flow-Algorithmus, stochastische Auflösung).</li>
+  <li><b>Streuung nur aus ΔN?</b> Für die Stoßstatistik ja: Poisson mit Varianz = ΔN; mit Haftwahrscheinlichkeit α weiterhin Poisson mit Mittel α·ΔN. Andere Streuquellen sind eigene Modelle: schwankende Bedingungen (Scherrate, Turbulenz, Feuchte) als Prozessschwankung, z. B. ein OU-Prozess auf einem Kernel-Parameter wie beim Splitter; dazu das numerische MC-Rauschen.</li>
+  <li><b>Berechnung von ΔN:</b> Kette Zulaufströme → Hold-up im Apparat → Anzahlkonzentration c = w/V → Kernel β → ΔN<sub>ij</sub> = β<sub>ij</sub>·c<sub>i</sub>·c<sub>j</sub>·V·Δt. Die Ströme füllen den Hold-up, entscheidend ist, was gerade im Apparat ist. Der Kernel hängt vom Mechanismus ab: konstant (Validierung), Brownsch (T, Gasviskosität, mittlere freie Weglänge aus der Materialdatei), Scherung β = (4/3)·G·(r<sub>i</sub> + r<sub>j</sub>)³ (Scherrate G des Apparats), turbulent (Dissipationsrate ε, kinematische Viskosität ν), Sedimentation (Dichten); dazu die Haftwahrscheinlichkeit α, die vom Stoffpaar abhängen kann. Beispiel Scherung: 1 kg Sand mit 100 µm in V = 10 L, G = 100 s<sup>−1</sup>: β = 1,3·10<sup>−10</sup> m³/s, c = 8,7·10<sup>10</sup> m<sup>−3</sup>, jedes Korn stößt etwa 12-mal je Sekunde, insgesamt ½·β·c²·V ≈ 5·10<sup>9</sup> Stöße je Sekunde; in Δt = 0,1 s also 5·10<sup>8</sup>, physikalische Streuung 0,005 % (α = 1, nur zur Veranschaulichung).</li>
+</ul>
+
+<h2>13.12 Literaturrecherche gewichtete MC-Verfahren (15. Oktober 2026)</h2>
+<ul>
+  <li><b>Umfang:</b> Websuche, Abstracts und Literaturlisten; vollständig gelesen nur das Preprint Patterson &amp; Kraft (Cambridge c4e-Preprint 47). Nicht zugänglich: Volltexte Zhao, Kruis &amp; Zheng (2009, 2010), Kotalczyk &amp; Kruis (2018); Dissertation Kotalczyk (über 10 MB, nicht geladen).</li>
+  <li><b>Verfahren mit kleinerem Agglomeratgewicht und konstanter Kartenzahl sind etabliert</b> (genauer: einseitige Koagulation, siehe 13.13): Stochastic Weighted Particle Method (Rjasanow &amp; Wagner 1996), Mass-Flow-Algorithmus (Eibeck &amp; Wagner 2001), gewichtete Algorithmen mit Gewichtsübertragung (Patterson &amp; Kraft, Preprint; Patterson, Wagner &amp; Kraft 2011): Bei einem Stoß wird eine Karte durch das Agglomerat mit verkleinertem Gewicht ersetzt, der Partner bleibt. Zwei Regeln: w1 mit 1/w = 1/u + 1/v (harmonisch) und w2 mit w = u/2 (Halbieren); im Flammentest lag die Varianz des zweiten Moments bei w2 mehr als zehnmal höher als bei w1. Erweitert auf Bruch und räumlich verteilte Systeme mit Transport zwischen Zellen (Lee, Patterson, Wagner &amp; Kraft 2015) – vergleichbar mit Units im Flowsheet.</li>
+  <li><b>Zwei und mehr Stoffe:</b> Zhao, Kruis &amp; Zheng (2010): differenziell gewichtete MC für Zweikomponenten-Koagulation; Zhao, Kruis &amp; Zheng (2011): aggregatives Mischen von Nanopartikeln in Zweikomponentensystemen; Liu &amp; Chan (2018): Mehrkomponenten-Aerosoldynamik mit differenziell gewichtetem Operator-Splitting. Direkt relevant für Sand + Kohle.</li>
+  <li><b>Flowsheets:</b> Kotalczyk &amp; Kruis (2018), „Fractional Monte Carlo time steps for the simulation of coagulation for parallelized flowsheet simulations“ (Zitat bestätigt, Inhalt nicht gelesen); Dissertation Kotalczyk, „Parallel Monte Carlo Algorithms for Flowsheet Simulations based on the Population Balance Equation“ (Universität Duisburg-Essen).</li>
+  <li><b>Partikelzahl begrenzen:</b> Resampling auf konstante Zahl (Smith &amp; Matsoukas 1998; Lin, Lee &amp; Matsoukas 2002), Verdoppeln (Liffman 1992; Maisels, Kruis &amp; Fissan 2004), konservative Reduktion der Partikelzahl (Vikhansky &amp; Kraft 2005), globale Rekonstruktion bzw. Resampling gewichteter Populationen für Koagulation und Bruch (Chemical Engineering Science 2023; Powder Technology 2022, 2024 – Autoren noch nachtragen). Russisches Roulette und Gewichtsfenster sind Standard im Strahlungstransport. Korrektur nach Lektüre von Zhao, Kruis &amp; Zheng (2009, Abschnitt 3.1): Deren „shift action“ wendet dasselbe Prinzip auf Größenintervalle an – liegen in einem Intervall weniger als N<sub>min</sub> Karten (dort 100), wird jede Karte in gleich schwere Teile geteilt; liegen mehr als N<sub>max</sub> (dort 600) darin, wird jede Karte mit Wahrscheinlichkeit (N − N<sub>max</sub>)/N entfernt und die übrigen werden im Gewicht korrigiert.</li>
+  <li><b>Quantil-Idee während der Rechnung:</b> Quasi-Monte-Carlo für die Smoluchowski-Gleichung (Lécot &amp; Wagner 2004): Partikel in jedem Schritt nach Masse sortiert, quasi-zufällige Zahlen statt Zufallszahlen, kleinerer Fehler als MC; erweitert auf Aerosoldynamik (Lécot &amp; Tarhini 2007) und Koagulation mit Bruch (Lécot, L'Ecuyer, El Haddad &amp; Tarhini 2019); dazu eine geschichtete MC-Variante (Winter Simulation Conference 2012).</li>
+  <li><b>τ-Leaping für Koagulation:</b> In dieser Suche keine direkte Anwendung gefunden; verwandt sind die zeitgesteuerten (statt ereignisgesteuerten) gewichteten MC-Verfahren.</li>
+  <li><b>Dissertation Kotalczyk (Kap. 4, gelesen 15. Oktober 2026):</b> (a) Konstante-Kartenzahl-Verfahren im Vergleich: Fictitious Particle (FP) und die eigene „stochastische Auflösung“ (SR) setzen die Regel „das ganze leichtere Paket koaguliert“ um – je Paar gedachtes Systemvolumen 1/W<sub>min</sub>, Rate R<sub>ij</sub> = β<sub>ij</sub>·max(W<sub>i</sub>, W<sub>j</sub>); bei gleichen Gewichten wird das Agglomerat auf zwei Karten mit halbem Gewicht verteilt. Die SWA-Varianten (Teil-Koagulation, Partner bleibt) erhalten das Gesamtvolumen nur im Mittel. Rauschen der Anzahlkonzentration σ<sub>N</sub>/N mit 1000 Karten (freimolekularer Bereich, ein Stoff): SR 0,011, Constant-Number mit gleichen Gewichten 0,016, SWA1/3 0,039, SWA4 0,043, SWA2 0,187; SR erreicht mit 1000 Karten die Genauigkeit, für die SWA 10 000 Karten braucht. (b) Fractional MC time steps (Kap. 4.2, siehe 5.4). (c) Transport zwischen Units (Kap. 4.6): deterministischer Austrag (Gewichte exakt aufteilen, neue Karten mit gleichen Eigenschaften in der Ziel-Unit, danach Merging oder Random Removal) oder stochastischer Austrag (jede Karte wechselt mit Wahrscheinlichkeit P, weniger Karten zu verschmelzen) – genau die offene Splitter-Frage aus 13.8. (d) Merging mit erlaubtem Merging-Fehler, auf der GPU parallel (Kap. 4.4).</li>
+  <li><b>Lesereihenfolge (Vorschlag):</b> (1) Dissertation Kotalczyk, Kapitel zu Gewichtung, Merging und Zeitschritten; (2) Zhao, Kruis &amp; Zheng 2010 (zwei Stoffe); (3) Patterson, Wagner &amp; Kraft 2011 (Regel w1); (4) Lécot &amp; Wagner 2004 (Quasi-MC).</li>
+</ul>
+
+<h2>13.13 Wann lohnt sich Teil-Koagulation? (Diskussion 15. Oktober 2026)</h2>
+<ul>
+  <li><b>Frage:</b> Wenn Rauschen nur in Sonderfällen stört (wichtige Gruppe auf wenigen Karten, wenige Stöße bei kurzer Verweilzeit), ist dann die Regel „ganzes leichteres Paket“ nicht fast immer im Vorteil?</li>
+  <li><b>Befund aus der Literatur:</b> Ja, bei gleicher Kartenzahl rauscht sie weniger. Dissertation Kotalczyk (Tab. 4.5, ein Stoff, freimolekularer Bereich): Ganz-Paket-Regel (SR) mit 1000 Karten σ<sub>N</sub>/N = 0,011 in 7,5 s; SWA1/3 braucht 10 000 Karten für 0,013 in 160 s – rund 20-mal mehr Rechenzeit für etwas schlechtere Genauigkeit. Ursache: Die Ganz-Paket-Regel erhält die Masse bei jedem Ereignis exakt; SWA lässt den Partner unverändert und erhält die Masse nur im Mittel, was zusätzliches Rauschen bringt. Teil-Koagulation mit neuer Karte je Paar und Schritt wächst dagegen mit N<sup>2</sup>.</li>
+  <li><b>Die kritischen Fälle löst man gezielter:</b> Statt jede Koagulation feiner aufzulösen, bekommt die kritische Gruppe mehr Karten – Mindest- und Höchstzahl an Karten je Größenintervall (Zhao, Kruis &amp; Zheng 2009: Teilen, wo zu wenige, Zulosen-Entfernen, wo zu viele), bei mehreren Stoffen sinngemäß auch je Stoff- oder Agglomerattyp. Das kostet nur dort Rechenzeit, wo sie gebraucht wird.</li>
+  <li><b>Wie oft sind die kritischen Fälle?</b> Allgemein nicht angebbar, es hängt an der Frage, die man stellt. Für Gesamtmasse, mittlere Größe und den Hauptteil der Verteilung reicht die Ganz-Paket-Regel mit genug Karten. Kritisch sind seltene, aber wichtige Dinge: Spurenstoffe, die größten Agglomerate (Grobgut für ein Sieb), der Beginn der Koagulation, Anfahrvorgänge, sehr kurze Verweilzeiten. Bei schwacher Koagulation ist zwar das relative Rauschen der koagulierten Menge groß, ihr Anteil an der Verteilung aber klein; es zählt nur, wenn gerade diese Agglomerate das Ergebnis sind.</li>
+  <li><b>Rauschen messen statt raten:</b> Die Mehrfachläufe (Kapitel 10) liefern die Standardabweichung jeder Ergebnisgröße. Ist sie für die interessierende Größe zu hoch, bekommt die zugehörige Gruppe mehr Karten.</li>
+  <li><b>„Nicht alles koaguliert“ spricht nicht für Teil-Koagulation:</b> Die Aussage betrifft die echten Partikel. „Ganzes Paket“ bezieht sich auf eine Karte, nicht auf alle Partikel im Apparat. Dass nur ein Teil koaguliert, bildet die Ganz-Paket-Regel über den <i>Anteil der Karten</i> ab (von 100 Sandkarten sind beim Austritt etwa 20 zu Agglomeraten geworden, 80 nicht), die Teil-Koagulation über den <i>Anteil des Gewichts</i> jeder Karte. Bild: 30 % Helligkeit in einem Raum entweder durch 3 von 10 Lampen an (Schalter) oder durch 10 Lampen auf 30 % gedimmt (Dimmer) – mit genug Lampen gleich hell. Eine Karte kann ohnehin nicht „teilweise Agglomerat“ sein, da sie gleiche Partikel beschreibt; Teil-Koagulation muss die Karte daher in einen koagulierten und einen unveränderten Teil aufspalten.<div class="abb"><img src="abbildungen/MC_5_Total_Teilkoagulation.svg" width="680" alt="Total- und Teilkoagulation"><div class="unterschrift">Abbildung: Total- und Teilkoagulation bilden dieselben 30 % ab – oben über den Anteil der Karten, unten über den Anteil jeder Karte; die Teilkoagulation spaltet dafür jede Karte auf.</div></div></li>
+  <li><b>SWA einfach erklärt (Diskussion 15. Oktober 2026):</b> SWA ist keine Teil-Koagulation im Sinne von „ein Anteil f bildet eine neue Karte“, sondern eine <b>einseitige</b> Koagulation. Bei einem Ereignis wird nur <i>eine</i> Karte umgeschrieben – sie wird zum Agglomerat mit kleinerem Gewicht (SWA1 bei gleichen Gewichten: w/2); die Partnerkarte bleibt unverändert, als wären ihre Partikel nicht verbraucht worden. Beispiel Sand (10 000) + Kohle (10 000): Fall A – Sandkarte wird „S+K, 5000“, Kohle bleibt 10 000 → Sand 5000, Kohle 15 000; Fall B (gleich wahrscheinlich) – umgekehrt. Erst im Mittel über A und B stimmen beide Stoffmengen. Wie eine Buchung nur auf einem Konto, deren Gegenbuchung irgendwann zufällig folgt. Die Ereignisse sind halb so groß, treten dafür doppelt so oft auf (Rate je geordnetem Paar ∝ β<sub>ij</sub>·w<sub>j</sub>). Auch SWA3, das die Gesamtmasse je Ereignis exakt erhält, verschiebt Masse zwischen den Stoffen. Daher mehr Rauschen und – bei mehreren Stoffen – schwankende Stoffbilanzen. Entwickelt wurde SWA für Ruß (ein Stoff, Interesse an großen Partikeln); Vorteile sind die frei wählbare Gewichtsfunktion, mit der sich die Auflösung zu großen Partikeln verschieben lässt, und die einfache Buchführung.<div class="abb"><img src="abbildungen/MC_6_Total_SWA.svg" width="680" alt="Totalkoagulation und SWA"><div class="unterschrift">Abbildung: Ein Ereignis zwischen einer Sand- und einer Kohlekarte – Totalkoagulation verrechnet beide Karten (Bilanz stimmt immer), SWA schreibt nur eine Karte um (Bilanz stimmt nur im Mittel über die Fälle A und B).</div></div></li>
+  <li><b>Vorteile der Ganz-Paket-Regel im Einzelnen:</b> (1) Kartenzahl bleibt konstant; Teil-Koagulation verdoppelt sie bei jeder Aufspaltung (10 → 20 → 40 → 80 nach drei Schritten), und die nötige Reduktion bringt entweder wieder Rauschen (Random Removal) oder Mittelung (Merging). (2) Bei mehreren Stoffen mittelt Merging Zusammensetzungen: aus „1 Sand + 1 Kohle“ und „2 Sand + 1 Kohle“ wird eine Karte „1,5 Sand + 1 Kohle“, die es physikalisch nicht gibt – genau die Information, für die die Partikel da sind. Bei der Ganz-Paket-Regel beschreibt jede Karte stets eine tatsächlich entstandene Zusammensetzung. (3) Masse bei jedem Ereignis exakt erhalten. (4) Gemessen weniger Rauschen bei gleichem Aufwand (Kotalczyk, Tab. 4.5). (5) Einfach: keine zusätzlichen Regeln für Anteile und Zusammenlegen, passt zur ereignisgesteuerten Rechnung und zur GPU.</li>
+  <li><b>Wo Teil-Koagulation im Prinzip besser ist:</b> Wenn eine Gruppe nur sehr wenige Karten hat und man keine weiteren spendieren kann, sind ihre Sprünge kleiner. Diesen Fall löst das Teilen von Karten (13.12, „shift action“) aber gezielter.</li>
+  <li><b>Tendenz:</b> Ganz-Paket-Regel (Zhao, Kruis &amp; Zheng 2009 bzw. stochastische Auflösung nach Kotalczyk &amp; Kruis 2017) plus Mindest-/Höchstzahl an Karten je Gruppe; Teil-Koagulation höchstens später als Vergleich, falls ein konkreter Fall Probleme zeigt.</li>
+</ul>
+
+<p class="label">Übersicht: Total- und Teilkoagulation mit Formeln</p>
+<div class="formel">ΔN<sub>ij</sub> = β<sub>ij</sub> · w<sub>i</sub> · w<sub>j</sub> · Δt / V &nbsp;&nbsp;&nbsp; (erwartete Stöße zwischen den Paketen i und j in Δt; w = Zahl der echten Partikel je Karte, V = Apparatevolumen)</div>
+<div class="formel">physikalische Streuung σ = √ΔN, relativ 1/√ΔN &nbsp;&nbsp;·&nbsp;&nbsp; Fehler eines geschätzten Mittelwerts ∝ 1/√N<sub>MC</sub> (Karten) bzw. ∝ 1/√(Zahl der Läufe)</div>
+<table>
+  <tr><th></th><th>Totalkoagulation (ganzes leichteres Paket)</th><th>Teilkoagulation mit neuer Karte</th><th>Einseitige Koagulation SWA (Partner bleibt)</th></tr>
+  <tr><td>Regel je Ereignis</td><td>leichtere Karte → (x<sub>i</sub> + x<sub>j</sub>, w<sub>min</sub>), schwerere behält x mit w<sub>max</sub> − w<sub>min</sub>; bei w<sub>i</sub> = w<sub>j</sub> beide → (x<sub>i</sub> + x<sub>j</sub>, w/2)</td><td>Anteil f koaguliert: neue Karte (x<sub>i</sub> + x<sub>j</sub>, f·w<sub>min</sub>), beide verlieren f·w<sub>min</sub></td><td>Karte i → (x<sub>i</sub> + x<sub>j</sub>, c), z. B. c = u·v/(u + v) (SWA1) oder u/2 (SWA2); Karte j unverändert</td></tr>
+  <tr><td>Wie viel und wann</td><td>Ereignisrate r<sub>ij</sub> = β<sub>ij</sub>·max(w<sub>i</sub>, w<sub>j</sub>)/V; Wartezeit τ = −ln(u)/R mit R = Σ r<sub>ij</sub>; im Mittel ΔN<sub>ij</sub> Stöße je Schritt</td><td>f = ΔN<sub>ij</sub>/w<sub>min</sub> je Schritt (deterministisch) oder Stoßzahl zufällig mit σ = √ΔN<sub>ij</sub></td><td>Ereignisrate aus Kernel und Gewichten (Patterson, Wagner &amp; Kraft 2011)</td></tr>
+  <tr><td>Kartenzahl</td><td>konstant N</td><td>+1 je Paar und Schritt (bis N(N−1)/2); bei wiederholter Aufspaltung N·2<sup>k</sup> (10 → 20 → 40 → 80)</td><td>konstant N</td></tr>
+  <tr><td>Masse</td><td>exakt je Ereignis</td><td>exakt je Ereignis</td><td>nur im Mittel</td></tr>
+  <tr><td>Rauschen der koagulierten Menge je Schritt</td><td>relativ √(w/ΔN): bei ΔN = 2000 und w = 10 000 → 224 %, w = 100 → 22 %, w = 1 → 2,2 %</td><td>aus der Koagulation selbst ≈ 0 (deterministisch) bzw. 1/√ΔN (Poisson); Rauschen oder Mittelung kommt über die nötige Reduktion zurück</td><td>höher als Total bei gleicher Kartenzahl: σ<sub>N</sub>/N = 0,039 gegen 0,011 mit 1000 Karten (Kotalczyk, Tab. 4.5)</td></tr>
+  <tr><td>Rechenaufwand</td><td>wenige Schritte je Ereignis (Paarauswahl per Akzeptanz-Verwerfung); Zahl der Ereignisse ≈ Σ ΔN<sub>ij</sub>/w<sub>min</sub>; 1000 Karten: 7,5 s</td><td>alle Paare in jedem Schritt (∝ N<sup>2</sup>) plus Merging</td><td>wie Total, braucht aber rund 10-mal so viele Karten für ähnliche Genauigkeit: 160 s</td></tr>
+  <tr><td>Mehrere Stoffe</td><td>jede Karte ist eine tatsächlich entstandene Zusammensetzung</td><td>Merging mittelt Zusammensetzungen; nur Gleiches zusammenlegen → Nischen vermehren sich</td><td>wie Total, Masse aber nur im Mittel</td></tr>
+  <tr><td>Schwäche</td><td>Gruppen mit wenigen Karten springen (ganz oder gar nicht) → Karten teilen (N<sub>min</sub> ≤ N<sub>k</sub> ≤ N<sub>max</sub>, Zhao et al. 2009)</td><td>wachsende Kartenzahl, Reduktion nötig</td><td>mehr Rauschen</td></tr>
+  <tr><td>Literatur</td><td>Zhao, Kruis &amp; Zheng 2009; Kotalczyk &amp; Kruis 2017 (stochastische Auflösung)</td><td>eigener Ansatz; verwandt mit deterministischen Partikelverfahren</td><td>Patterson, Wagner &amp; Kraft 2011</td></tr>
+</table>
+<ul>
+  <li><b>Merging nur bei gleicher Zusammensetzung (Diskussion 15. Oktober 2026):</b> Vermeidet große Mittelungen wie „1,5 Kohle“. Exakt gleiche Karten gibt es aber praktisch nie, weil die Körner verschieden groß sind (Sand 68 µm + Kohle 132 µm hat eine andere Zusammensetzung als Sand 100 µm + Kohle 100 µm); Merging braucht deshalb eine Toleranz (Kotalczyk: erlaubter Merging-Fehler ε<sub>merge</sub>, z. B. 10<sup>−4</sup>). Die Toleranz wirkt wie eine lokale Rasterweite: Je kleiner, desto mehr Nischen bleiben getrennt.</li>
+  <li><b>Nischen und Raster-Explosion:</b> Teil-Koagulation mit strengem Merging erzeugt mit jedem Schritt neue Typen; ungebremst führt das zurück zur Lage des Kontinuums mit einer Karte je möglicher Kombination – nur auf die tatsächlich entstandenen Kombinationen beschränkt. Die Totalkoagulation verhindert das: Bei fester Kartenzahl N kann es nie mehr als N Nischen geben; seltene Nischen sind durch wenige Karten vertreten (mal vorhanden, mal nicht) – das ist Rauschen, kein Speicherproblem. Merging bleibt im Flowsheet dennoch für Zuläufe und Transport zwischen Units nötig (Kotalczyk, Kap. 4.6), dann mit Toleranz und nur innerhalb gleicher Stoffkombination.</li>
+</ul>
+
+<h2>13.14 Stochastische Auflösung nach Kotalczyk &amp; Kruis (2017) – einfach erklärt</h2>
+<ul>
+  <li><b>Problem:</b> Wie stellt man sich einen Stoß zwischen zwei Karten vor, die verschieden viele echte Partikel vertreten (z. B. Sand 10 000, Kohle 2000)?</li>
+  <li><b>Idee „Lupe“:</b> Für jedes Kartenpaar denkt man sich beide Karten in gleich schwere Punkte zerlegt; jeder Punkt steht für s<sub>F</sub> echte Partikel. Die stochastische Auflösung ist 1/s<sub>F</sub>: je kleiner s<sub>F</sub>, desto feiner die Lupe. In diesem Bild stoßen zwei <i>gleich schwere</i> Punkte – ein gewöhnliches, gut verstandenes MC-Ereignis. Danach wird zurückübersetzt: Es entsteht eine Karte mit dem Gewicht s<sub>F</sub>, und beide Partner verlieren s<sub>F</sub> (Paper I, Gl. 7). Die Ereignisrate des Paares ist β<sub>ij</sub>·W<sub>i</sub>·W<sub>j</sub>/s<sub>F</sub> (Gl. 6).</li>
+  <li><b>Die Lupe entscheidet über die Methode:</b> s<sub>F</sub> &lt; W<sub>min</sub> – es bleibt von beiden Karten etwas übrig, das Agglomerat braucht eine <b>neue Karte</b> (Teilkoagulation, Ereignisse häufiger und kleiner). s<sub>F</sub> = W<sub>min</sub> – die leichtere Karte wird ganz verbraucht und nimmt das Agglomerat auf, <b>keine neue Karte</b> (Totalkoagulation, konstante Kartenzahl, Rate β<sub>ij</sub>·W<sub>max</sub>, Gl. 9 und 10); bei gleichen Gewichten wird das Agglomerat auf beide Karten mit W/2 verteilt. s<sub>F</sub> &gt; W<sub>min</sub> – nicht möglich, die leichtere Karte wäre nur ein Bruchteil eines Punkts. Die Totalkoagulation ist also die gröbste Lupe, die ohne neue Karten auskommt.<div class="abb"><img src="abbildungen/MC_7_Stochastische_Aufloesung.svg" width="680" alt="Stochastische Aufloesung"><div class="unterschrift">Abbildung: Dasselbe Kartenpaar mit zwei Lupen – mit s<sub>F</sub> = W<sub>min</sub> (Totalkoagulation) bleibt die Kartenzahl gleich, mit feinerer Lupe (Teilkoagulation) entsteht eine neue Karte; eine gröbere Lupe ist nicht möglich.</div></div></li>
+  <li><b>Was das Konzept bringt:</b> dieselbe Regel wie Zhao, Kruis &amp; Zheng (2009), aber mit symmetrischer Rate (dieselbe für i–j und j–i) und anschaulicher Herleitung; es erklärt, warum SWA stärker rauscht (Dissertation Kotalczyk, Anhang C), und lässt sich auf Keimbildung und Transport übertragen. s<sub>F</sub> darf für jedes Paar anders gewählt werden (Paper I, Fußnote 1); daraus lässt sich eine ganze Familie von Verfahren bauen.</li>
+  <li><b>Anwendung in StoSiS:</b> (1) Die Totalkoagulation wird genau so umgesetzt: Rate β<sub>ij</sub>·W<sub>max</sub>, Ereignis nach Gl. 7–9, Massen je Stoff werden addiert – bei mehreren Stoffen ändert sich an der Regel nichts. (2) Die Lupe ist der Schalter zwischen Total- und Teilkoagulation: s<sub>F</sub> = W<sub>min</sub>/k mit k = 1 als Standard; k &gt; 1 gibt eine feinere Auflösung mit neuen Karten (dann ist Merging nötig). (3) Idee: eine feinere Lupe nur für kritische Gruppen (13.15) – vorher prüfen, ob das in der Literatur schon so gemacht wurde.</li>
+  <li><b>s<sub>F</sub> genauer – Einheiten (Diskussion 15. Oktober 2026):</b> Paper I rechnet mit Konzentrationen: Gewichte W und s<sub>F</sub> in echten Partikeln je m³ Apparat. Die Auflösung 1/s<sub>F</sub> hat die Einheit m³ und lässt sich als gedachtes Probevolumen V<sub>sys</sub> lesen, in dem jeder Punkt genau ein echtes Partikel ist; bei der Totalkoagulation V<sub>sys</sub> = 1/W<sub>min</sub> – das Volumen, in dem von der selteneren Karte genau ein Partikel steckt (Dissertation Kotalczyk, Gl. 4.2). In der StoSiS-Schreibweise mit Anzahlen im Apparat (w = W·V, s = s<sub>F</sub>·V): Punkte je Karte n<sub>i</sub> = w<sub>i</sub>/s; Ereignisrate r<sub>ij</sub> = β<sub>ij</sub>·w<sub>i</sub>·w<sub>j</sub>/(s·V); je Ereignis s echte Stöße; Ergebnis neue Karte mit s, beide Partner verlieren s.</li>
+  <li><b>In welchem Bereich liegt s<sub>F</sub>?</b> Kein fester Wert: Bei der Totalkoagulation ist s<sub>F</sub> für jedes Paar das Gewicht der leichteren Karte und liegt damit im Bereich der Kartengewichte. Faustwert: s ≈ (Zahl der echten Partikel im Apparat)/N<sub>MC</sub>. Beispiel 1 kg Sand mit 100 µm in 10 L (8,7·10<sup>8</sup> Körner), 10 000 Karten: s ≈ 8,7·10<sup>4</sup> Körner je Punkt bzw. s<sub>F</sub> ≈ 8,7·10<sup>6</sup> m<sup>−3</sup>. Gregors Aerosolbeispiel: Gewichte 10<sup>8</sup> bis 10<sup>10</sup> cm<sup>−3</sup> (10<sup>14</sup> bis 10<sup>16</sup> m<sup>−3</sup>). Bei Karten gleicher Masse ist das Gewicht ∝ 1/d³: zwischen 68 und 132 µm Faktor 7,3; mit Agglomeraten bis 300 µm Faktor 86.</li>
+  <li><b>Wie wird s<sub>F</sub> bestimmt?</b> Bei der Totalkoagulation wird es nicht gewählt, sondern folgt aus den Gewichten (s<sub>F</sub> = W<sub>min</sub>). Die Gewichte folgen aus der Kartenzahl N<sub>MC</sub>, aus der Aufteilung am Inlet (gleiche Masse oder gleiche Anzahl je Karte: w = m<sub>Karte</sub>/m(d)) und aus der Vorgeschichte (Koagulation: W<sub>max</sub> − W<sub>min</sub> bzw. W/2; Merging: Summe; Austrag). Die eigentliche Stellschraube ist N<sub>MC</sub>; nur bei gewollter Teilkoagulation kommt der Faktor k hinzu: s<sub>F</sub> = W<sub>min</sub>/k.</li>
+  <li><b>Was s<sub>F</sub> beeinflusst</b> (Beispiel: W<sub>min</sub> = 1000, ΔN = 100 000 erwartete Stöße im Schritt):
+    <table>
+      <tr><th>Variante</th><th>s</th><th>Ereignisse je Schritt = ΔN/s</th><th>Rauschen je Schritt = √(s/ΔN)</th><th>neue Karten je Schritt</th><th>Speicher</th></tr>
+      <tr><td>Totalkoagulation, k = 1</td><td>1000</td><td>100</td><td>10 %</td><td>0</td><td>konstant</td></tr>
+      <tr><td>feinere Lupe, k = 4</td><td>250</td><td>400</td><td>5 %</td><td>400</td><td>wächst, Merging nötig</td></tr>
+      <tr><td>feinere Lupe, k = 16</td><td>62,5</td><td>1600</td><td>2,5 %</td><td>1600</td><td>wächst stark</td></tr>
+      <tr><td>4-mal mehr Karten, k = 1</td><td>250 (Gewichte 4-mal kleiner)</td><td>400</td><td>5 %</td><td>0</td><td>4-fach, aber konstant</td></tr>
+    </table>
+    Rechenzeit ∝ Zahl der Ereignisse ∝ 1/s. Dasselbe Rauschen lässt sich also über eine feinere Lupe (Karten wachsen ständig) oder über mehr Karten (Speicher fest) erreichen; mehr Karten verbessern zusätzlich die Abbildung der ganzen Verteilung.</li>
+  <li><b>Bewertung für StoSiS (15. Oktober 2026):</b> Die Lupe ist nur Gregors Herleitung dafür, dass die Rate β·w<sub>max</sub>/V stimmt; als Stellschraube wird sie nicht gebraucht und macht die Beschreibung unnötig kompliziert. Für StoSiS genügt: Bei einem Stoß koaguliert das ganze leichtere Paket, das schwerere verliert dieselbe Zahl; Ereignisrate β·w<sub>max</sub>/V. Das Rauschen wird über die Kartenzahl gesteuert (letzte Zeile der Tabelle: gleiche Wirkung ohne neue Karten). Zur Klarstellung: Der Fall, in dem die leichtere Karte nur ein Bruchteil eines Punkts wäre (s<sub>F</sub> &gt; W<sub>min</sub>), ist bei Gregor ausdrücklich ausgeschlossen.</li>
+
+</ul>
+
+<h2>13.15 Kritische Fälle erkennen, Warnung und wählbare Koagulationsregel (Diskussion 15. Oktober 2026)</h2>
+<ul>
+  <li><b>Faustformel:</b> n<sub>g</sub> ≈ N<sub>g</sub> · P<sub>g</sub> – erwartete Zahl der Koagulationsereignisse einer Gruppe g (Stoff, Größenbereich, Agglomerattyp) je Verweilzeit, mit N<sub>g</sub> = Zahl ihrer Karten und P<sub>g</sub> = Anteil, der in der Verweilzeit koaguliert. Rauschen der koagulierten Menge ≈ 1/√n<sub>g</sub> (Zählstatistik der Ereignisse). Vorschlag für Grenzen: unter 100 Ereignissen gelb (über 10 %), unter 25 rot (über 20 %).<div class="abb"><img src="abbildungen/MC_8_Rauschen_Ampel.svg" width="680" alt="Rauschen nach Ereigniszahl"><div class="unterschrift">Abbildung: Rauschen der koagulierten Menge einer Gruppe abhängig von der Zahl ihrer Koagulationsereignisse je Verweilzeit; Beispiele mit 10 000 Karten gleicher Masse.</div></div></li>
+  <li><b>Woher die Größen kommen:</b> P<sub>g</sub> folgt aus dem Kernel (Temperatur, Gasviskosität und freie Weglänge aus T und p, Dichten, Partikelgrößen), aus der Konzentration im Apparat (Massenstrom, Dichte, Größenverteilung, Volumen) und aus der Verweilzeit; N<sub>g</sub> aus der Kartenverteilung. Eine Schätzung vor der Rechnung ist also möglich. Einfacher und zuverlässiger ist es, während der Rechnung die Ereignisse je Apparat und Gruppe zu <b>zählen</b> und nach der Simulation eine Warnung auszugeben, z. B. „Koagulator 1, Kohle: 18 Koagulationsereignisse je Verweilzeit, Rauschen etwa ±24 %“ – wie die heutigen Hinweise zu Stoffen. Die Mehrfachläufe (Kapitel 10) bestätigen das tatsächliche Rauschen.</li>
+  <li><b>Abhilfe:</b> mehr Karten für die Gruppe (Mindestzahl, „shift action“ nach Zhao et al. 2009), oder mehr Läufe. Teilkoagulation für alle Paare ist nicht nötig.</li>
+  <li><b>Wählbare Koagulationsregel:</b> Die Ereignisregel wird als austauschbarer Baustein gebaut (wie die Transportmodelle): <b>Standard Totalkoagulation</b> (k = 1); Optionen Teilkoagulation mit festem Anteil (mit Merging) und SWA1, beide nur zum Vergleich. Alle teilen Paarauswahl, Zeitschritte und Kernel; sie unterscheiden sich nur in Rate und Ereignis. Nutzen: Die Wahl lässt sich in der Dissertation durch direkten Vergleich an Fällen mit analytischer Lösung (13.6) belegen.</li>
+</ul>
+
+<h2>13.16 Kurzfassung: MC-Partikel und Koagulation – Entscheidungen und Begründungen (Stand 15. Oktober 2026)</h2>
+<table>
+  <tr><th>Frage</th><th>Entscheidung</th><th>Begründung in einem Satz</th><th>Details</th></tr>
+  <tr><td>Warum MC-Partikel?</td><td>Für Agglomerate aus mehreren Stoffen (und später Porosität, fraktale Dimension)</td><td>Ein Raster braucht für jede weitere Eigenschaft eine Achse (100<sup>k</sup> Zellen), Karten nur eine Zahl mehr.</td><td>13.8, Abb. Setzkasten/Karteikarte, Raster/Punktwolke</td></tr>
+  <tr><td>Wo leben die Partikel?</td><td>Darstellung je Simulation wählbar: Kontinuum oder Partikel ab dem Inlet</td><td>Einmal Partikel heißt überall Partikel; eine Mischform müsste jede Unit doppelt können.</td><td>13.7, 13.8</td></tr>
+  <tr><td>Wie entstehen die Partikel am Inlet?</td><td>Platzierung an Quantilen der Verteilung</td><td>Rauschfrei, alle Bereiche der Verteilung sicher abgedeckt.</td><td>13.8, Abb. Quantile</td></tr>
+  <tr><td>Welche Koagulationsregel?</td><td>Totalkoagulation (ganzes leichteres Paket, s<sub>F</sub> = W<sub>min</sub>)</td><td>Konstante Kartenzahl, Masse je Stoff bei jedem Ereignis exakt, keine erfundenen Zusammensetzungen, gemessen weniger Rauschen (SWA brauchte rund 20-mal mehr Rechenzeit).</td><td>13.9, 13.13, 13.14, Abb. Schalter/Dimmer, Total/SWA, Lupe</td></tr>
+  <tr><td>Wie viel koaguliert?</td><td>Aus Kernel und Konzentration; Zufall nur im Zeitpunkt und in der Paarwahl</td><td>Ein frei gewählter Anteil je Schritt hängt vom Zeitschritt ab und hat keine Physik.</td><td>13.9, 13.11</td></tr>
+  <tr><td>Zufälliger Koagulationsgrad?</td><td>Nein</td><td>Die echte Stoßstreuung (√ΔN) ist bei Pulvern winzig und vom MC-Rauschen überdeckt.</td><td>13.10</td></tr>
+  <tr><td>Teilkoagulation?</td><td>Nicht als Standard</td><td>Die scheinbar feinere Auflösung muss später mit Rauschen (Entfernen) oder Mittelung (Merging) bezahlt werden.</td><td>13.13</td></tr>
+  <tr><td>Kritische Fälle?</td><td>Ereignisse je Gruppe zählen, Warnung bei n &lt; 100; Abhilfe gezielt für die Gruppe</td><td>Rauschen ≈ 1/√n; mehr Karten nur dort, wo es nötig ist.</td><td>13.15, Abb. Ampel</td></tr>
+  <tr><td>Logik wählbar?</td><td>Ja, Ereignisregel austauschbar; Standard Totalkoagulation</td><td>Erlaubt den Vergleich, mit dem sich die Wahl begründen lässt.</td><td>13.15</td></tr>
+  <tr><td>Stochastische Auflösung?</td><td>Nur als Herleitung der Rate β·w<sub>max</sub>/V, keine eigene Stellschraube</td><td>Eine feinere Auflösung wirkt wie mehr Karten, erzeugt aber ständig neue Karten; die einfache Beschreibung „ganzes leichteres Paket“ genügt.</td><td>13.14</td></tr>
+  <tr><td>Welche Formeln und Parameter?</td><td>Kette von T, p, Stoffwerten, Zulauf und Apparat bis zum Rauschen</td><td>Zeigt, was gemessen, vorgegeben oder berechnet wird.</td><td>13.17, Abb. Eingaben → Rauschen</td></tr>
+  <tr><td>Splitter im Partikelmodus?</td><td>Entschieden: Karten systematisch verteilen (Konto-Verfahren) – als Umsetzung des (OU-)Anteils, nicht als Ersatz dafür</td><td>Kartenzahl bleibt konstant, kaum Rauschen, Eigenschaften exakt, kein Merging durch Splitter.</td><td>13.18, Abb. Splitter</td></tr>
+  <tr><td>Offen</td><td colspan="3">Gewichtung (gleiche Masse oder gleiche Anzahl je Karte), Begrenzung der Kartenzahl im Flowsheet (Merging mit Toleranz bei Zuläufen).</td></tr>
+</table>
+
+<h2>13.17 Formelkarte: von Druck und Temperatur zum Rauschen (Diskussion 15. Oktober 2026)</h2>
+<div class="abb"><img src="abbildungen/MC_9_Eingaben_Rauschen.svg" width="680" alt="Von den Eingaben zum Rauschen"><div class="unterschrift">Abbildung: Welche Eingaben über welche berechneten Größen in den Kernel, die Stoßzahl und das Rauschen eingehen.</div></div>
+<p>Art der Größe: <span class="tag vor">vorgegeben/gemessen</span> <span class="tag stoff">Stoffwert</span> <span class="tag ber">berechnet</span> <span class="tag emp">empirisch angepasst</span> <span class="tag erg">Ergebnis</span>. Beispielwerte nur zur Größenordnung: Luft bei 20 °C und 1 atm; 0,1 kg/s Sand mit 100 µm, τ<sub>V</sub> = 10 s, V = 10 L; Scherrate 100 s<sup>−1</sup>.</p>
+<table>
+  <tr><th>Größe</th><th>Formel</th><th>Einheit</th><th>Art</th><th>Beispiel</th></tr>
+  <tr class="gruppe"><td colspan="5">Gas</td></tr>
+  <tr><td>Temperatur T</td><td>am Inlet; im Merger aus der Energiebilanz (14.3)</td><td>K</td><td><span class="tag vor">vorgegeben</span></td><td>293,15 K</td></tr>
+  <tr><td>Druck p</td><td>am Inlet; im Merger kleinster Druck</td><td>Pa</td><td><span class="tag vor">vorgegeben</span></td><td>101 325 Pa</td></tr>
+  <tr><td>Molmasse M des Gases</td><td>–</td><td>kg/mol</td><td><span class="tag stoff">Stoffwert</span></td><td>Luft 0,028951</td></tr>
+  <tr><td>Gasviskosität μ</td><td>Sutherland: μ = μ<sub>ref</sub>·(T<sub>ref</sub> + S)/(T + S)·(T/T<sub>ref</sub>)<sup>1,5</sup>; N2: μ<sub>ref</sub> = 1,663·10<sup>−5</sup> Pa·s, T<sub>ref</sub> = 273 K, S = 107 K; Luft: Messtabelle. Druck praktisch ohne Einfluss (14.6)</td><td>Pa·s</td><td><span class="tag ber">berechnet</span> aus T, Parameter <span class="tag stoff">Stoffwert</span></td><td>N2 1,757·10<sup>−5</sup>; Luft 1,82·10<sup>−5</sup></td></tr>
+  <tr><td>Gasdichte ρ<sub>g</sub></td><td>ρ<sub>g</sub> = p·M/(R·T)</td><td>kg/m³</td><td><span class="tag ber">berechnet</span></td><td>1,204</td></tr>
+  <tr><td>Kinematische Viskosität ν</td><td>ν = μ/ρ<sub>g</sub></td><td>m²/s</td><td><span class="tag ber">berechnet</span></td><td>1,51·10<sup>−5</sup></td></tr>
+  <tr><td>Freie Weglänge λ</td><td>λ = (μ/p)·√(π·R·T/(2·M))</td><td>m</td><td><span class="tag ber">berechnet</span></td><td>65 nm</td></tr>
+  <tr><td>Knudsen-Zahl, Cunningham-Faktor</td><td>Kn = 2λ/d; C = 1 + Kn·(1,257 + 0,4·exp(−1,1/Kn))</td><td>–</td><td><span class="tag ber">berechnet</span></td><td>100 µm: Kn = 0,0013, C ≈ 1 – wichtig nur für feine Partikel</td></tr>
+  <tr class="gruppe"><td colspan="5">Partikel, Apparat und Hold-up</td></tr>
+  <tr><td>Partikeldichte ρ<sub>p</sub></td><td>–</td><td>kg/m³</td><td><span class="tag stoff">Stoffwert</span></td><td>Sand 2200</td></tr>
+  <tr><td>Massenstrom ṁ(t), Größenverteilung q<sub>3</sub>(d)</td><td>Zeitprofil und Verteilung am Inlet</td><td>kg/s; 1/m</td><td><span class="tag vor">vorgegeben/gemessen</span></td><td>0,1 kg/s; 100 µm</td></tr>
+  <tr><td>Partikelmasse m(d)</td><td>m = ρ<sub>p</sub>·π·d³/6</td><td>kg</td><td><span class="tag ber">berechnet</span></td><td>1,15·10<sup>−9</sup></td></tr>
+  <tr><td>Volumen V, Verweilzeit τ<sub>V</sub></td><td>τ<sub>V</sub> vorgegeben oder τ<sub>V</sub> = V/Q (Q = Volumenstrom des Trägerfluids)</td><td>m³; s</td><td><span class="tag vor">vorgegeben</span> bzw. <span class="tag ber">berechnet</span></td><td>10 L; 10 s</td></tr>
+  <tr><td>Hold-up-Masse M</td><td>dM/dt = ṁ<sub>ein</sub> − M/τ<sub>V</sub>; stationär M = ṁ·τ<sub>V</sub></td><td>kg</td><td><span class="tag ber">berechnet</span></td><td>1 kg</td></tr>
+  <tr><td>Anzahlkonzentration c</td><td>c(d) = M·q<sub>3</sub>(d)/(m(d)·V); je Karte c<sub>i</sub> = w<sub>i</sub>/V</td><td>m<sup>−3</sup></td><td><span class="tag ber">berechnet</span></td><td>8,7·10<sup>10</sup> (Volumenanteil 4,5 %)</td></tr>
+  <tr class="gruppe"><td colspan="5">Kernel</td></tr>
+  <tr><td>Scherrate G, Dissipationsrate ε</td><td>G = √(P/(μ<sub>f</sub>·V)) (Camp &amp; Stein 1943); ε = P/(ρ·V); P = Leistungseintrag</td><td>1/s; W/kg</td><td><span class="tag vor">vorgegeben</span> oder <span class="tag ber">berechnet</span> aus P</td><td>G = 100 s<sup>−1</sup>; ε = 1 W/kg</td></tr>
+  <tr><td>Haftwahrscheinlichkeit α</td><td>Anteil der Stöße, die zum Ankleben führen; je Stoffpaar</td><td>–</td><td><span class="tag emp">empirisch</span></td><td>0,001 (angenommen)</td></tr>
+  <tr><td>Kernel Brownsch</td><td>β = (2·k<sub>B</sub>·T/(3·μ))·(C<sub>i</sub>/d<sub>i</sub> + C<sub>j</sub>/d<sub>j</sub>)·(d<sub>i</sub> + d<sub>j</sub>)</td><td>m³/s</td><td><span class="tag ber">berechnet</span></td><td>5,9·10<sup>−16</sup> (bei 100 µm vernachlässigbar)</td></tr>
+  <tr><td>Kernel Scherung</td><td>β = (G/6)·(d<sub>i</sub> + d<sub>j</sub>)³</td><td>m³/s</td><td><span class="tag ber">berechnet</span></td><td>1,3·10<sup>−10</sup></td></tr>
+  <tr><td>Kernel turbulent</td><td>β = 1,294·√(ε/ν)·(r<sub>i</sub> + r<sub>j</sub>)³ (Saffman &amp; Turner 1956)</td><td>m³/s</td><td><span class="tag ber">berechnet</span></td><td>3,3·10<sup>−10</sup> (in Luft)</td></tr>
+  <tr class="gruppe"><td colspan="5">Stöße, Karten und Rauschen</td></tr>
+  <tr><td>Erwartete Stöße im Schritt</td><td>ΔN<sub>ij</sub> = α·β<sub>ij</sub>·c<sub>i</sub>·c<sub>j</sub>·V·Δt (für i = j mit Faktor ½)</td><td>–</td><td><span class="tag ber">berechnet</span></td><td></td></tr>
+  <tr><td>Koagulierter Anteil je Verweilzeit</td><td>P ≈ 1 − exp(−α·β·c·τ<sub>V</sub>)</td><td>–</td><td><span class="tag ber">berechnet</span> (Schätzung)</td><td>α = 1: 116 Stöße je Korn, P ≈ 1; α = 0,001: P ≈ 11 %</td></tr>
+  <tr><td>Kartenzahl N<sub>MC</sub></td><td>–</td><td>–</td><td><span class="tag vor">vorgegeben</span> (Simulation)</td><td>10 000</td></tr>
+  <tr><td>Gewicht w, Lupe s</td><td>w = m<sub>Karte</sub>/m(d); s = w<sub>min</sub> ≈ (echte Partikel im Apparat)/N<sub>MC</sub></td><td>–</td><td><span class="tag ber">berechnet</span></td><td>≈ 8,7·10<sup>4</sup> Körner je Karte</td></tr>
+  <tr><td>Rauschen</td><td>je Schritt ≈ √(s/ΔN); je Verweilzeit ≈ 1/√(N<sub>g</sub>·P<sub>g</sub>)</td><td>–</td><td><span class="tag erg">Ergebnis</span></td><td>10 000 × 11 % ≈ 1 100 Ereignisse → ±3 %</td></tr>
+</table>
+<ul>
+  <li><b>Was gemessen werden muss:</b> Stoffwerte (Dichte, Viskositätsparameter, Molmasse – in der Materialdatei), Zulauf (Massenstrom, Größenverteilung, T, p), Apparat (Volumen, Verweilzeit oder Volumenstrom, Leistungseintrag). Die Haftwahrscheinlichkeit α ist meist nicht direkt messbar und wird an Versuche angepasst; sie verändert das Ergebnis am stärksten (im Beispiel von P ≈ 1 auf 11 %).</li>
+  <li><b>Wo T und p eingehen:</b> nur über das Gas (Viskosität, Dichte, freie Weglänge) und damit über den Kernel. Für grobe Pulver (100 µm) bestimmen Scherung oder Turbulenz den Kernel; T und p wirken dann vor allem über die Viskosität. Für Nanopartikel ist der Brownsche Kernel mit Cunningham-Faktor entscheidend, dort zählen T und p direkt.</li>
+</ul>
+
+<h2>13.18 Splitter und Siebe im Partikelmodus (Diskussion 15. Oktober 2026)</h2>
+<ul>
+  <li><b>Aufgabe:</b> Ein Splitter teilt einen Strom im Verhältnis f : (1 − f), ein Sieb nach der Größe mit der Trennkurve T(d). Im Kontinuum wird jede Zahl der Verteilung mit f bzw. T(d) multipliziert. Im Partikelmodus besteht der Strom aus Karten – wie werden sie auf die Ausgänge verteilt?</li>
+  <li><b>Drei Varianten:</b> (1) <b>Kopieren</b> – jede Karte wird zu zwei Karten mit den Gewichten f·w und (1 − f)·w (bei Kotalczyk „deterministic outflow“). (2) <b>Zulosen</b> – jede Karte geht ganz mit der Wahrscheinlichkeit f nach A, sonst nach B („stochastic outflow“). (3) <b>Systematisch verteilen</b> – die Karten der Größe nach durchgehen und ganz so auf A und B verteilen, dass A möglichst genau den Anteil f bekommt (wie Karten austeilen); zufälliger Startpunkt in jedem Schritt, die Restabweichung wird in den nächsten Schritt übertragen. Das entspricht dem systematischen Resampling bei Partikelfiltern (Kitagawa 1996).<div class="abb"><img src="abbildungen/MC_10_Splitter_Varianten.svg" width="680" alt="Splitter im Partikelmodus"><div class="unterschrift">Abbildung: Drei Varianten, zehn Karten auf die Ausgänge A (30 %) und B (70 %) zu verteilen; die Punktgröße zeigt die Partikelgröße, die Blässe beim Kopieren das verkleinerte Gewicht.</div></div></li>
+</ul>
+<table>
+  <tr><th></th><th>Kopieren</th><th>Zulosen</th><th>Systematisch verteilen</th></tr>
+  <tr><td>Masse in A je Schritt</td><td>genau f</td><td>zufällig; relative Streuung √((1 − f)/(f·N)): N = 1000, f = 0,3 → 4,8 %; N = 200 → 11 %</td><td>genau bis auf eine Karte (bei gleicher Masse höchstens 1/(f·N): N = 200 → 1,7 %); der Rest wird im nächsten Schritt ausgeglichen</td></tr>
+  <tr><td>Größenverteilung in A</td><td>identisch mit dem Eingang</td><td>zufällige Auswahl</td><td>gleichmäßige (geschichtete) Auswahl</td></tr>
+  <tr><td>Kartenzahl</td><td>2N nach dem Splitter; wo Zweige wieder zusammenkommen (Merger, Kreislauf), wächst sie → Merging nötig</td><td>bleibt N</td><td>bleibt N</td></tr>
+  <tr><td>Eigenschaften der Karten</td><td>exakt; späteres Merging mittelt</td><td>exakt</td><td>exakt</td></tr>
+  <tr><td>Beim schwankenden Splitter (OU)</td><td>kein zusätzliches Rauschen</td><td>MC-Rauschen kann die echte Schwankung überdecken</td><td>sehr wenig zusätzliches Rauschen</td></tr>
+  <tr><td>Kreislauf (Rückführung)</td><td>Karten vervielfachen sich bei jedem Umlauf, ohne Merging unbegrenzt</td><td>unkritisch</td><td>unkritisch</td></tr>
+  <tr><td>Dissertation Kotalczyk (Kap. 4.6)</td><td>mit Merging das geringste Rauschen; mit Random Removal falsche Ergebnisse</td><td>deutlich mehr Rauschen; ebenfalls nur mit Merging korrekt</td><td>nicht untersucht (soweit gelesen)</td></tr>
+</table>
+<ul>
+  <li><b>Gregors Testfall (Kap. 4.6.2):</b> Flowsheet mit drei Zuläufen (log-normal um 50, 10 und 3 nm), zwei Mischern, einem Sieb mit größenabhängiger Trennfunktion und Rückführungen, verglichen mit der Pivot-Methode (deterministische Klassenmethode). Beide Austragsvarianten liefern nur zusammen mit Merging richtige Verteilungen; der deterministische Austrag mit Merging rauscht am wenigsten.</li>
+  <li><b>Merging-Regel</b> (Dissertation Kotalczyk, Gl. 4.9 und 4.10): W<sub>neu</sub> = W<sub>i</sub> + W<sub>j</sub>; jede additive Eigenschaft (Volumen, Masse je Stoff) p<sub>neu</sub> = (W<sub>i</sub>·p<sub>i</sub> + W<sub>j</sub>·p<sub>j</sub>)/(W<sub>i</sub> + W<sub>j</sub>); Merging-Fehler E<sub>m</sub> = Σ<sub>k</sub> ω<sub>k</sub>·((p<sub>i</sub> − p<sub>j</sub>)/min(p<sub>i</sub>, p<sub>j</sub>))², zusammengelegt wird bei E<sub>m</sub> &lt; ε<sub>merge</sub>.</li>
+  <li><b>Siebe:</b> Karten weit vom Trennschnitt gehen ganz (T ≈ 0 oder 1). Kopieren betrifft nur Karten im Übergangsbereich (0 &lt; T &lt; 1), die Kartenzahl wächst dort nur wenig. Beim systematischen Verteilen wird je schmalem Größenbereich mit dessen T(d) verteilt.</li>
+  <li><b>Besonderheit StoSiS:</b> Die Quantil-Platzierung am Inlet erzeugt in jedem Schritt Karten mit identischen Größen. Kopien, die später wieder zusammentreffen, ohne dass dazwischen etwas mit ihnen passiert ist, lassen sich deshalb exakt (ohne Mittelung) zusammenlegen.</li>
+  <li><b>OU-Splitter und Kartenverteilung: das Was und das Wie (Diskussion 19. Oktober 2026):</b> Der stochastische Splitter (Kapitel 9) bestimmt mit dem OU-Prozess den Anteil f(t) – das ist das physikalische Modell. Die drei Varianten oben sind dagegen die Umsetzung dieses Anteils mit Karten. Im Kontinuum genügt der OU-Prozess (jede Zahl × f(t)); im Partikelmodus braucht jeder Splitter – fester oder schwankender Anteil – zusätzlich eine Kartenverteilung. Diese soll f(t) nur umsetzen und selbst keine Schwankung hinzufügen.<div class="abb"><img src="abbildungen/MC_11_OU_Splitter_Was_Wie.svg" width="680" alt="Was und Wie beim stochastischen Splitter"><div class="unterschrift">Abbildung: Der OU-Prozess bestimmt den Anteil f(t) (Was), Kontinuum und Partikelmodus setzen ihn unterschiedlich um (Wie).</div></div>
+    Beispiel mit 10 Karten je Schritt:
+    <table>
+      <tr><th>Schritt</th><th>OU-Anteil f</th><th>Ziel (Karten nach A)</th><th>systematisch verteilt</th><th>zugelost (Beispiel)</th></tr>
+      <tr><td>1</td><td>0,34</td><td>3,4</td><td>3 (Rest 0,4)</td><td>2</td></tr>
+      <tr><td>2</td><td>0,27</td><td>2,7 + 0,4 = 3,1</td><td>3 (Rest 0,1)</td><td>5</td></tr>
+      <tr><td>3</td><td>0,31</td><td>3,1 + 0,1 = 3,2</td><td>3 (Rest 0,2)</td><td>3</td></tr>
+      <tr><td>Summe</td><td></td><td>9,2</td><td>9 (0,2 folgen)</td><td>10</td></tr>
+    </table>
+    Beim Zulosen schwankt die Kartenzahl je Schritt um √(N·f·(1 − f)) = 1,4 Karten – mehr als die OU-Schwankung selbst (hier 0,4 Karten). Allgemein addiert Zulosen zur OU-Streuung σ die Streuung √(f·(1 − f)/N): mit σ = 0,05 und f = 0,3 wächst die gemessene Streuung bei N = 1000 Karten um 4 %, bei 200 um 19 %, bei 50 um 64 % – das Verfahren würde das Modell verfälschen. Systematisches Verteilen weicht höchstens um 1/N ab und gleicht das im nächsten Schritt aus.</li>
+  <li><b>Gleicher Zufall in beiden Darstellungen:</b> Der Startpunkt der systematischen Verteilung bekommt einen eigenen Zufallsstrom (Kapitel 8). Dann bleibt der OU-Verlauf bei gleichem Seed in Kontinuum und Partikelmodus identisch, und beide Rechnungen lassen sich Lauf für Lauf vergleichen.</li>
+  <li><b>Entschieden (19. Oktober 2026):</b> Variante 3 – systematisch verteilen mit dem Konto-Verfahren – als Umsetzung für alle Splitter im Partikelmodus (fester und schwankender Anteil).</li>
+  <li><b>Konkreter Ablauf – Konto-Verfahren (Diskussion 19. Oktober 2026):</b>
+    <ol>
+      <li>Am Splitter kommen in jedem Zeitschritt die <i>Karten</i> des Stroms an, nicht die echten Partikel. Beispiel: 1 000 000 echte Partikel in 10 s sind bei Δt = 0,1 s und 200 Karten je Schritt 20 000 Karten mit je 50 Partikeln.</li>
+      <li>Die Karten des Schritts werden der Größe nach sortiert (bei gleicher Größe nach Zusammensetzung).</li>
+      <li>Eine zufällige Startposition in der sortierten Liste wird gewählt; die Liste wird von dort einmal ringsum durchgegangen.</li>
+      <li>Für jede Karte k wird f(t)·m<sub>k</sub> auf ein A-Konto eingezahlt. Ist das Konto danach mindestens m<sub>k</sub>/2, geht die Karte ganz nach A und das Konto wird um m<sub>k</sub> belastet; sonst geht sie nach B. Bei Karten gleicher Masse: +f je Karte, Grenze 0,5, Belastung 1.</li>
+      <li>Der Kontostand wird in den nächsten Schritt übernommen; f(t) darf sich von Schritt zu Schritt ändern (OU-Prozess).</li>
+    </ol>
+    Eigenschaften: Das Konto bleibt zwischen −½ und +½ Karte; die Masse in A weicht deshalb in jedem Schritt und über die ganze Simulation höchstens um eine halbe Karte vom Soll ab. A bekommt etwa jede (1/f)-te Karte, gleichmäßig über alle Größen. Zufall steckt nur im Anfangswert des Kontos (einmal) und in der Startposition (je Schritt), beides aus einem eigenen Zufallsstrom.<div class="abb"><img src="abbildungen/MC_12_Konto_Verfahren.svg" width="680" alt="Konto-Verfahren"><div class="unterschrift">Abbildung: Konto-Verfahren mit f = 27 % für 15 Karten eines Zeitschritts – vier Karten gehen nach A, der Rest von 0,35 wird in den nächsten Schritt übernommen.</div></div></li>
+  <li><b>Mehrere Ausgänge:</b> je Ausgang i ein Konto; jede Karte zahlt f<sub>i</sub>·m<sub>k</sub> auf jedes Konto ein und geht in den Ausgang mit dem höchsten Kontostand, dessen Konto um m<sub>k</sub> belastet wird (Prinzip des größten Rests).</li>
+  <li><b>Variante „genaue Anzahl, zufällige Auswahl“</b> (Idee aus der Diskussion: von 100 Karten 27 auslosen): Die Masse stimmt genauso, aber welche Größen nach A gehen, ist Zufall – nach A können zufällig mehr kleine oder mehr große Partikel gelangen. Das Konto-Verfahren verteilt gleichmäßiger und braucht keine Gruppen.</li>
+
+  <li><b>Begründung und Optionen (entschieden 19. Oktober 2026):</b>
+ (3) Systematisch verteilen als Standard – konstante Kartenzahl wie bei der Totalkoagulation, kaum Rauschen, Eigenschaften exakt, kein Merging durch Splitter. (1) Kopieren mit Merging als Option (Gregors Weg, zum Vergleich), (2) Zulosen nur als einfache Referenz. Prüfung an einem Kreislauf mit bekannter stationärer Lösung (6.3) und durch Vergleich mit dem Kontinuum.</li>
+</ul>
+
+<h2>13.19 Gewichtung der Karten und Begrenzung der Kartenzahl (Diskussion 20. Oktober 2026)</h2>
+<ul>
+  <li><b>Frage A – wie schwer ist eine Karte?</b> Beispiel Log-Normal d<sub>50</sub> = 100 µm, σ<sub>ln</sub> = 0,4, 200 Karten je Schritt: Feingut unter 50 µm ist 4,2 % der Masse, aber 30 % der Partikel; Grobgut über 200 µm ist 4,2 % der Masse, aber 0,17 % der Partikel. Gleiche Masse je Karte: je 8 Karten für Fein- und Grobgut. Gleiche Anzahl je Karte: 59 Karten Feingut, 0,3 Karten Grobgut.</li>
+  <li><b>Vorteile einheitlicher Regeln:</b> Gleiche Masse – Massenbilanz und Massenverteilung (was Dyssol und die Heatmap zeigen) rauschen überall gleich, das Inlet erzeugt sie direkt über die Quantile von Q<sub>3</sub>. Gleiche Anzahl – klassisches Verfahren für Koagulation (Stoßhäufigkeit hängt an der Anzahl), einfache Statistik. Beide Regeln gelten aber nur beim Erzeugen: Schon das erste Koagulationsereignis (Totalkoagulation, 13.13) macht Masse und Gewicht der Karten ungleich. Die eigentliche Frage ist deshalb, wie Karten entstehen (Inlet, später Keimbildung, Bruch) und worauf Teilen und Zusammenlegen sie später wieder ausrichten – Frage A und B hängen zusammen.</li>
+  <li><b>Wo eine einheitliche Regel scheitert:</b> Keimbildung. 10<sup>12</sup> Silberkeime mit 2 nm wiegen 4·10<sup>−11</sup> kg; neben 1 kg Sand bekämen sie bei gleicher Masse keine einzige Karte, obwohl sie die Koagulation bestimmen. Umgekehrt verliert gleiche Anzahl die groben Agglomerate, die die Masse tragen.</li>
+  <li><b>Mittlere Lösung (Vorschlag):</b> Erzeugen nach Masse (Quantile), aber mit einer <b>Mindestzahl an Karten je Größenbereich</b> (z. B. Bereiche mit Faktor 2 im Durchmesser, also etwa 3 je Dekade); innerhalb eines Bereichs gleiche Masse je Karte, das Gewicht folgt aus Masse und Partikelgröße. Im Lauf der Simulation hält Teilen (zu wenige Karten) und Zusammenlegen (zu viele) jeden Bereich zwischen einer Unter- und Obergrenze – wie die „shift action“ bei Zhao, Kruis &amp; Zheng (2009) mit 100 bis 600 Karten je Größenintervall. Offen: Breite der Bereiche, Unter- und Obergrenze.</li>
+  <li><b>Entschieden im Grundsatz (20. Oktober 2026):</b> Mittelweg mit Mindest- und Höchstzahl an Karten je Größenbereich. Ablauf: (1) Bereiche festlegen (Vorschlag Faktor 2 im Durchmesser); (2) beim Erzeugen bekommt jeder Bereich mit Material (mindestens 0,1 % der Masse <i>oder</i> der Anzahl) zuerst die Mindestzahl, die übrigen Karten werden nach Masse verteilt; innerhalb eines Bereichs tragen alle Karten dieselbe Masse (Quantile), das Gewicht folgt aus Masse und Partikelgröße; (3) im Lauf wird geteilt, wenn ein Bereich unter die Untergrenze fällt (1 Karte mit Gewicht 1000 → 2 Karten mit je 500, gleiche Größe und Zusammensetzung), und zusammengelegt, wenn er über die Obergrenze steigt (Gewichte addiert, Größe massengewichtet gemittelt, nur gleiche Stoffkombination). Beispiel mit 200 Karten, Mindestzahl 10: 10 / 16 / 79 / 79 / 16 Karten für 12,5–25 / 25–50 / 50–100 / 100–200 / 200–400 µm statt 0,1 / 8 / 92 / 92 / 8 (gleiche Masse) oder 2 / 57 / 118 / 23 / 0,3 (gleiche Anzahl). Zahlenwerte der Grenzen noch offen.<div class="abb"><img src="abbildungen/MC_13_Karten_je_Bereich.svg" width="680" alt="Karten je Größenbereich"><div class="unterschrift">Abbildung: Kartenzahl je Größenbereich für gleiche Masse, gleiche Anzahl und den Mittelweg mit Mindestzahl (Log-Normal d<sub>50</sub> = 100 µm, σ<sub>ln</sub> = 0,4, 200 Karten je Schritt); darunter Teilen und Zusammenlegen im Lauf.</div></div></li>
+  <li><b>Frage B – wo sammeln sich Karten?</b> Ansatz aus der Diskussion: zuerst die Orte finden, an denen sich Karten stauen können; Units mit Hold-up sind Kandidaten, weil Zu- und Ablauf zeitweise verschieden sind.</li>
+  <li><b>Einschätzung:</b>
+    <ul>
+      <li>In einer Unit mit Hold-up liegen im Mittel Kartenrate × Verweilzeit Karten (Little'sches Gesetz): 2000 Karten/s (200 je Schritt bei Δt = 0,1 s) und τ = 10 s ergeben 20 000 Karten. Schwankt der Zulauf, schwankt die Zahl im selben Verhältnis mit – zeitweise doppelter Zulauf heißt zeitweise doppelt so viele Karten, aber kein Wachsen ohne Ende.</li>
+      <li>Rückführungen vervielfachen: Bei Rückführanteil R durchläuft eine Karte im Mittel 1/(1 − R) mal den Kreis – R = 0,3: 1,4-fach, R = 0,9: 10-fach, R = 0,99: 100-fach.</li>
+      <li>Quellen erzeugen dauerhaft neue Karten: Inlets, später Bruch (Bruchstücke) und Keimbildung. Totalkoagulation lässt die Kartenzahl gleich. Merger addieren nur die Raten.</li>
+      <li>Auch das Gegenteil ist ein Problem: Ein Splitterausgang mit 1 % bekommt nur 2 Karten je Schritt – dort rauscht es stark, dort muss geteilt werden.</li>
+    </ul>
+  </li>
+  <li><b>Vorschlag zur Begrenzung:</b> an zwei Stellen regeln, unabhängig von der Form des Flowsheets: (1) in Units mit Hold-up beim Zulauf – neue Karten mit ähnlichen Karten im Inhalt zusammenlegen, solange ein Budget überschritten ist (Kotalczyk, Kap. 4.6: deterministischer Ablauf und Merging rauschen am wenigsten); (2) je Stromscheibe nach Mergern und Splittern – Grenzen je Größenbereich aus Frage A. Zusammengelegt wird nur bei gleicher Stoffkombination und innerhalb einer Toleranz. Noch zu entscheiden.</li>
+</ul>
+
+<h1>14 Materialien</h1>
+<p class="hinweis">Schritte 1–3 umgesetzt (12. Oktober 2026, siehe 14.4); offen ist Schritt 4 (Bearbeiten in der Oberfläche).</p>
+<h2>14.1 Materialdatenbank von Dyssol</h2>
+<ul>
+  <li>Datei <code>Materials.dmdb</code>: reiner Text, also direkt einlesbar. Der Quellcode zum Format liegt im Dyssol-SDK (<code>ModelsCreatorSDK/MaterialsDatabase</code>).</li>
+  <li>18 Stoffe: Air, Al2O3, CaCO3, CaO, Cellets, Coal, CO2, FCC, H2O, H2O_gas, Lactose, Milk, N2, NaCl, O2, Sand, SO2, Urea.</li>
+  <li><b>Konstante Eigenschaften</b> (z. B. Molmasse, kritische Temperatur und kritischer Druck, Schmelz- und Siedepunkt, Bond-Arbeitsindex) und <b>temperatur-/druckabhängige Eigenschaften</b> (z. B. Dichte, Wärmekapazität, Viskosität, Wärmeleitfähigkeit, Dampfdruck). Letztere sind als Korrelationen y(T, p) mit Gültigkeitsbereich hinterlegt: konstant, linear, Polynome, Wertetabelle über T, Sutherland, ideales Gas u. a.</li>
+  <li><b>Datenqualität prüfen:</b> Übernommene Werte als „Quelle: Dyssol-Datenbank“ kennzeichnen und vor der Verwendung in der Dissertation prüfen. Für StoSiS am wichtigsten sind Dichte (Masse ↔ Anzahl) und Wärmekapazität bzw. Enthalpie (Mischtemperatur):</li>
+</ul>
+<table>
+  <tr><th>Stoff</th><th>Dichte [kg/m³]</th><th>c<sub>p</sub> [J/(kg·K)]</th><th>Enthalpie h(T)</th><th>Auffälligkeiten</th></tr>
+  <tr><td>Air (Gas)</td><td>ideales Gas</td><td>1006</td><td>linear</td><td></td></tr>
+  <tr><td>CO2, N2, O2, SO2 (Gase)</td><td>Tabelle über T</td><td>N2: 1041; CO2, O2, SO2 aus h abgeleitet</td><td>ja</td><td>CO2: abgeleitetes c<sub>p</sub> 947 statt etwa 843 J/(kg·K) (+12 %)</td></tr>
+  <tr><td>H2O</td><td>Tabelle über T</td><td>4185</td><td>linear</td><td>Aggregatzustand nicht angegeben</td></tr>
+  <tr><td>H2O_gas (Gas)</td><td>Tabelle über T</td><td>1906</td><td>ja</td><td>Viskosität 9,6·10⁻⁸ Pa·s – Wasserdampf hat etwa 10⁻⁵ Pa·s</td></tr>
+  <tr><td>Sand</td><td>2200</td><td>830</td><td>Polynom</td><td>Viskosität 1 Pa·s (für Feststoff ohne Bedeutung)</td></tr>
+  <tr><td>CaCO3</td><td>2711</td><td>1436 (aus h)</td><td>Tabelle</td><td>Literatur etwa 834 J/(kg·K) (+72 %)</td></tr>
+  <tr><td>CaO</td><td>3340</td><td>818 (aus h)</td><td>Tabelle</td><td>Literatur etwa 750 J/(kg·K) (+9 %)</td></tr>
+  <tr><td>NaCl</td><td>2170</td><td>–</td><td>nur Gasphase, 2500–6000 K</td><td>c<sub>p</sub> des Feststoffs fehlt (Literatur etwa 864 J/(kg·K))</td></tr>
+  <tr><td>Coal</td><td>1400</td><td>–</td><td><b>konstant</b> (46 105 J/kg)</td><td>Enthalpie hängt nicht von T ab, das hieße c<sub>p</sub> = 0 → Mischtemperatur nicht berechenbar; c<sub>p</sub> aus der Literatur ergänzen (trockene Kohle etwa 1,0–1,3 kJ/(kg·K), z. B. Merrick 1983 – prüfen)</td></tr>
+  <tr><td>Urea</td><td>1320</td><td>1544,7</td><td>–</td><td></td></tr>
+  <tr><td>Lactose</td><td>1525</td><td>1220</td><td>–</td><td></td></tr>
+  <tr><td>FCC</td><td>1632,5</td><td>1014</td><td>unbrauchbar¹</td><td>poröser Katalysator: Partikel- statt Feststoffdichte?</td></tr>
+  <tr><td>Al2O3</td><td>1045</td><td>900 (aus h)</td><td>linear</td><td>kompaktes Al2O3 hat etwa 3950 → vermutlich Partikeldichte poröser Teilchen; c<sub>p</sub>-Literatur etwa 775 J/(kg·K) (+16 %)</td></tr>
+  <tr><td>Cellets</td><td>1114</td><td>–</td><td>unbrauchbar¹</td><td>keine Molmasse, keine Wärmekapazität</td></tr>
+  <tr><td>Milk</td><td>751</td><td>2000</td><td>unbrauchbar¹</td><td>vermutlich Milchpulver: 751 liegt nahe der gerüttelten Schüttdichte von Magermilchpulver (≈ 737 kg/m³), ist also eine <b>Schüttdichte</b> (mit Luft zwischen den Partikeln). Feststoffdichte von Milchpulver etwa 1300 (Vollmilch) bis 1460 kg/m³ (Magermilch) – eigene Recherche, noch zu prüfen</td></tr>
+</table>
+<p class="hinweis">¹ Die Parameter sind die NIST-Shomate-Koeffizienten von flüssigem Wasser, ohne Umrechnung T/1000 und mol → kg; dh/dT wäre etwa 6,5·10¹⁰ J/(kg·K). „aus h“: c<sub>p</sub> = dh/dT bei 298,15 K aus der Dyssol-Enthalpie abgeleitet.</p>
+<ul>
+  <li><b>Welche Dichte?</b> Es gibt drei: <b>Feststoffdichte</b> (nur das Material, ohne jede Luft), <b>Partikeldichte</b> (einschließlich der Poren im Partikel) und <b>Schüttdichte</b> (einschließlich der Luft zwischen den Partikeln). Die Dyssol-Datenbank mischt diese ohne Kennzeichnung (Milk: Schüttdichte, Al2O3: vermutlich Partikeldichte). <b>Entschieden (12. Oktober 2026):</b> Zunächst gelten alle Partikel als unporös; „Dichte“ in der Materialdatei ist die <b>Feststoffdichte</b> ρ<sub>s</sub>. Porosität ist keine Stoff-, sondern eine Partikeleigenschaft und kommt später an den Inlet: Partikeldichte = (1 − ε)·ρ<sub>s</sub>.</li>
+  <li><b>Enthalpie und Wärmekapazität:</b> Die (spezifische) Enthalpie h(T) ist der Wärmeinhalt von 1 kg gegenüber einem Bezugszustand. Die Wärmekapazität ist ihre Steigung: c<sub>p</sub> = dh/dT, also wie viel Energie 1 kg je Kelvin Erwärmung aufnimmt. Für die Mischtemperatur zählen nur <b>Differenzen</b> von h; ein konstanter Anteil kürzt sich heraus. Die Bildungsenthalpie (Energie bei der Entstehung aus den Elementen) braucht man nur, wenn Stoffe ineinander umgewandelt werden (Verbrennung, Pyrolyse, Vergasung) – in StoSiS bisher nicht.</li>
+  <li><b>Plausibilitätsprüfung an Sand:</b> Die Steigung des Dyssol-Enthalpiepolynoms bei 298 K beträgt 789 J/(kg·K), der eingetragene konstante Wert c<sub>p</sub> = 830 J/(kg·K) – 5 % Unterschied. Dyssol speichert h und c<sub>p</sub> also unabhängig voneinander, und sie passen nicht exakt zusammen. <b>Entschieden (12. Oktober 2026):</b> In der StoSiS-Datei nur c<sub>p</sub>(T) speichern und h(T) = ∫ c<sub>p</sub> dT daraus berechnen; bei Stoffen, für die Dyssol nur h(T) hat, beim Übernehmen c<sub>p</sub> = dh/dT bilden. Dann gibt es eine einzige Quelle, und beide Größen sind immer konsistent.</li>
+</ul>
+<h2>14.2 Konzept für StoSiS</h2>
+<ul>
+  <li><b>Katalog und aktive Stoffe trennen:</b> Der Katalog ist immer geladen und sichtbar. In Dyssol wählt man vorher die Stoffe eines Flowsheets aus, weil jeder Strom zu jedem Zeitpunkt und in jeder Größenklasse einen Anteil je Stoff speichert; jeder zusätzliche Stoff vervielfacht Speicher und Rechenaufwand. Vorschlag: kein eigener Auswahlschritt, der Stoff wird direkt am Inlet aus dem Katalog gewählt, und die aktiven Stoffe des Flowsheets ergeben sich automatisch daraus.</li>
+  <li><b>Vorteil MC-Partikel:</b> Jedes Rechenpartikel trägt seine eigene Zusammensetzung. Ein Agglomerat aus Kohle und Sand hat einfach zwei Massenanteile. In der Klassenmethode braucht man dafür eine zusätzliche Dimension je Stoff (Dyssol: mehrdimensionale Verteilungen und Transformationsmatrizen).</li>
+  <li><b>Einheiten:</b> intern SI wie Dyssol (m, kg, s, K, Pa), weil die Korrelationen und .dflw-Dateien SI verwenden; Anzeige der Partikelgröße in µm.</li>
+  <li><b>Entschieden (12. Oktober 2026): eigene Materialdatei</b> statt der Dyssol-Datei, Startinhalt aus Dyssol kopiert, jeder Wert mit Quelle und Prüfstatus (14.4). <b>Warum:</b> Jeder Stoffwert soll einzeln kontrolliert und mit Quelle belegt werden können; die Dyssol-Datei kennzeichnet weder Quellen noch die Art der Dichte.</li>
+  <li><b>Entschieden (12. Oktober 2026): ein Stoff je Inlet.</b> Mischungen entstehen über mehrere Inlets und Merger. <b>Warum:</b> So lässt sich der zeitliche Verlauf des Mischungsverhältnisses über die Zulaufprofile der einzelnen Inlets steuern. Folge: Die Ströme selbst müssen trotzdem mehrere Stoffe tragen können (hinter einem Merger, in Agglomeraten).</li>
+  <li><b>Entschieden:</b> Temperatur und Druck werden gleich mit eingebaut (14.3).</li>
+</ul>
+<h2>14.3 Temperatur und Druck im Flowsheet</h2>
+<ul>
+  <li><b>Keine globalen Werte:</b> Temperatur T und Druck p sind Eigenschaften <b>jedes einzelnen Stroms</b> (in StoSiS: je Makroschritt, wie der Massenstrom) und jedes Hold-ups – genau wie in Dyssol. Es gibt keine „Umgebungstemperatur“, auf die der Rest des Flowsheets gesetzt wird.</li>
+  <li><b>Am Inlet eingestellt</b>, dann <b>wandern T und p mit dem Material</b> durch das Flowsheet. Entschieden (12. Oktober 2026): Eingabe in <b>Kelvin und Pascal</b>, darunter zur Orientierung °C und bar; Startwerte Raumbedingungen 293,15 K (20 °C) und 101 325 Pa (1,013 bar). (Dyssols Standardbedingungen wären 298,15 K.)</li>
+  <li><b>Jede Unit legt fest, was sie mit T und p macht.</b> Einfache Units (Splitter, Verzögerung, Sieb) reichen T und p unverändert weiter; in Dyssol kopiert z. B. der Splitter den Eingangsstrom samt T und p in beide Ausgänge. Nur Units, die es physikalisch modellieren, ändern T oder p (Wärmeübertrager, Druckverlust, Trockner …). Hold-ups haben eine eigene Anfangstemperatur und einen eigenen Anfangsdruck (Anfangsfüllung).</li>
+  <li><b>Treffen Ströme aufeinander</b> (Merger, Zulauf in einen Hold-up), gilt die <b>Energiebilanz</b>: Die Mischtemperatur ist die, bei der die Enthalpie der Mischung gleich der Summe der Einzelenthalpien ist. Bei konstanter Wärmekapazität c<sub>p</sub>:</li>
+</ul>
+<p class="formel">T<sub>Misch</sub> = Σ ṁ<sub>i</sub>·c<sub>p,i</sub>·T<sub>i</sub> / Σ ṁ<sub>i</sub>·c<sub>p,i</sub></p>
+<ul>
+  <li>Beispiel gleicher Stoff: 10 kg/s Sand bei 20 °C + 5 kg/s Sand bei 80 °C → (10·20 + 5·80)/15 = 40 °C. Verschiedene Stoffe: 10 kg/s Sand (c<sub>p</sub> = 830 J/(kg·K)) bei 20 °C + 5 kg/s Harnstoff (c<sub>p</sub> = 1545 J/(kg·K)) bei 80 °C → ≈ 49 °C, weil der Harnstoff mehr Wärme je Kelvin mitbringt. Bei temperaturabhängigem c<sub>p</sub> wird die Gleichung H<sub>Misch</sub>(T) = Σ ṁ<sub>i</sub>·h<sub>i</sub>(T<sub>i</sub>) nach T aufgelöst (Dyssol: Enthalpie-Tabellen).</li>
+  <li><b>Druck nach dem Mischen:</b> Dyssol nimmt den <b>kleinsten</b> Eingangsdruck. Begründung: An der Zusammenführung (T-Stück) herrscht nur <b>ein</b> Druck, und Material strömt nur vom höheren zum niedrigeren Druck. Beispiel: Strom 1 kommt mit 2 bar, Strom 2 mit 1 bar. Läge die Zusammenführung bei 1,5 bar, würde Strom 2 zurückgedrückt. Damit beide vorwärts fließen, darf der Druck dort höchstens 1 bar sein; Strom 1 verliert seinen Überdruck an einer Drossel oder in der Leitung. Höher käme der Druck nur mit Pumpe oder Verdichter – das wäre eine eigene Unit. Ohne Leitungsmodell (Widerstände, Pumpen) ist „kleinster Eingangsdruck“ eine physikalisch begründete Konvention, keine Berechnung; ein massengewichteter Mittelwert wäre dagegen falsch, weil er den Niederdruckstrom ohne Energiezufuhr verdichten würde. Vorschlag: übernehmen, dabei Eingänge ohne Massenstrom nicht mitzählen.</li>
+  <li><b>Wofür T und p gebraucht werden:</b> Stoffwerte sind Funktionen y(T, p) (14.1). Für die meisten Feststoffe ist die Dichte in der Datenbank konstant, T und p ändern dort also wenig. Wichtig werden sie mit Trägergas (Gasdichte nach idealem Gas, Viskosität nach Sutherland), mit physikalischen Kernels (Brownsche Koagulation hängt von T und der Gasviskosität ab) und mit Wachstum/Keimbildung (Dampfdruck).</li>
+</ul>
+<h2>14.4 Umsetzungsplan (Stand 12. Oktober 2026)</h2>
+<p>Entscheidung: zuerst eine <b>eigene Materialdatei</b>, die sich Wert für Wert prüfen lässt; Startinhalt aus Dyssol kopiert (BSD-3-Lizenz erlaubt Weitergabe und Änderung mit Lizenzhinweis). Reihenfolge:</p>
+<table>
+  <tr><th>Schritt</th><th>Inhalt</th><th>Prüfung</th></tr>
+  <tr><td><b>1 Materialdatei</b></td><td>Eigene, von Hand lesbare Datei im Repository im <b>JSON-Format</b> (entschieden 12. Oktober 2026; Gründe siehe unten). Je Wert: Zahl, Einheit, Art (Konstante, Formel mit Parametern oder Messpunkt-Tabelle), Gültigkeitsbereich, <b>Quelle</b> und <b>Prüfstatus</b> („aus Dyssol, ungeprüft“ → „geprüft, Quelle …“). Dichte = Feststoffdichte; Wärme über c<sub>p</sub>(T). Dyssols Stoff-Schlüssel bleiben erhalten, weil .dflw-Flowsheets die Stoffe darüber ansprechen.</td><td>alle 18 Stoffe übernommen; Stichproben gegen die Dyssol-Datei</td></tr>
+  <tr><td><b>2 Lesen und Anzeigen</b> (früher A)</td><td>Kern (ohne Qt) liest die Datei und wertet jede Eigenschaft bei T und p aus; Warnung außerhalb des Gültigkeitsbereichs. Reiter „Materialien“ im Einstellungsfenster zum Ansehen: Stoffliste, Eigenschaften mit Einheit, Quelle, Prüfstatus und Wert bei wählbarem T und p.</td><td>Luftdichte bei 293,15 K und 101 325 Pa = M·p/(R·T) ≈ 1,204 kg/m³; Interpolation in Tabellen</td></tr>
+  <tr><td><b>3 Ströme</b> (früher B)</td><td>Strom je Makroschritt = Massenstromdichte je <b>Stoff und Größenklasse</b> + T + p; aktive Stoffe automatisch aus den Inlets. Inlet: Stoff, T [K], p [Pa] (darunter °C/bar), Start 293,15 K und 101 325 Pa. Splitter: gleicher Anteil für alle Stoffe, T/p durchreichen. Merger: Summe je Stoff, T aus Energiebilanz, p = kleinster Eingangsdruck mit Massenstrom. Verzögerung: T und p wandern mit dem Material. Ergebnisse: Gesamtmenge wie bisher, zusätzlich je Stoff sowie T(t), p(t); Heatmap/Kurven mit Auswahl „Stoff“, Kurven zusätzlich T und p.</td><td>Flowsheet mit einem Stoff bitgleich wie vorher; Massenbilanz je Stoff exakt; Mischbeispiele 40 °C und ≈ 48,9 °C</td></tr>
+  <tr><td><b>4 Bearbeiten</b> (früher C)</td><td>Werte in der Oberfläche ändern, Stoffe anlegen, Prüfstatus setzen; Export ins Dyssol-Format (.dmdb), damit Dyssol die geprüften Daten ebenfalls nutzen kann. Bis dahin lässt sich die Datei mit einem Texteditor bearbeiten.</td><td>Speichern → Laden ergibt dieselben Werte; Export in Dyssol öffnen</td></tr>
+</table>
+<ul>
+  <li><b>Ergebnis Schritt 1 (12. Oktober 2026):</b> <code>data/Materialien.json</code> mit allen 18 Stoffen, Anleitung in <code>data/README.md</code>, Lizenzhinweis <code>data/LICENSE_Dyssol.txt</code>. Erzeugt mit <code>tools/dmdb_to_json.pl</code>; das Skript liest die erzeugte Datei wieder ein und vergleicht: 105 Konstanten, 93 Korrelationen, insgesamt 2000 Zahlen identisch mit der Dyssol-Datei. c<sub>p</sub> = dh/dT abgeleitet für CaCO3, CaO, CO2, O2, SO2 und Al2O3; keine Wärmekapazität für Coal, NaCl und Cellets. 24 Warnungen markieren die Stellen, die zuerst zu prüfen sind (Tabelle in 14.1). Alle Werte stehen auf „unchecked“, bis sie einzeln geprüft sind.</li>
+  <li><b>Ergebnis Schritt 2 (12. Oktober 2026):</b> Der Rechenkern liest die Datei (<code>core/include/Materials.h</code>, <code>core/src/MaterialDatabase.cpp</code>; JSON-Bibliothek nlohmann/json 3.12.0, MIT-Lizenz, aus dem Dyssol-SDK kopiert nach <code>core/third_party</code>). Auswertung wie in Dyssol: Gibt es mehrere Einträge, gilt zuerst einer mit T und p im Bereich, dann einer mit T im Bereich, sonst der mit der nächstgelegenen T-Grenze; außerhalb des Bereichs gilt der Randwert. Zusätzlich markiert StoSiS solche Werte, auch wenn T zwar im Gültigkeitsbereich, aber jenseits der Messpunkte liegt (Beispiel Wasserdichte: Bereich bis 1973 K, Punkte nur bis 372,76 K). Gaskonstante R = 8,314462618 J/(mol·K) (CODATA 2018; Dyssol: 8,314459848, Unterschied 3·10<sup>−7</sup>). Fehlerhafte Dateien werden mit Ortsangabe gemeldet (Syntaxfehler mit Zeile und Spalte, sonst Stoff, Eigenschaft und Feld); der vorherige Stand bleibt dann erhalten. Oberfläche: Reiter „Materialien“ (Menü Flowsheet → Materialien anzeigen) mit Stoffauswahl, Auffälligkeiten, Werten bei wählbarem T und p, Konstanten, Details (Formel, Bereich, Quelle, Status) und Fortschrittsanzeige „x von 203 Werten geprüft“. Die Datei wird direkt aus dem Projektordner gelesen; nach Änderungen genügt „Neu laden“, ohne neu zu bauen.</li>
+  <li><b>Prüfung Schritt 2:</b> Konsolentest mit 25 Prüfungen, alle bestanden, u. a.: Luftdichte bei 293,15 K und 101 325 Pa = 1,20353 kg/m³ (ideales Gas); N2-Viskosität bei 373,15 K = 2,103·10<sup>−5</sup> Pa·s (Sutherland); Wasserdampfdruck bei 350 K = 41,78 kPa (Antoine; Tabellenwert etwa 41,7 kPa); bei 373,15 K liegt T zwischen den beiden Dyssol-Bereichen (bis 373 K, ab 379 K) → nächster Eintrag, 99,2 kPa, markiert; CO2-Dichte linear zwischen zwei Messpunkten interpoliert; abgeleitetes CO2-c<sub>p</sub> = 947 J/(kg·K) wie im Umwandler; fehlendes Komma, fehlendes Feld, unbekannter Typ und fehlende Datei werden verständlich gemeldet.</li>
+  <li><b>Ergebnis Schritt 3 (12. Oktober 2026):</b> Ein Strom (<code>CStreamSlice</code>) trägt je Makroschritt die Massenstromdichte <b>je Stoff und Größenklasse</b> sowie Temperatur und Druck. Die aktiven Stoffe sind die Stoffe aller Inlets, sortiert in der Reihenfolge der Materialdatei – unabhängig davon, in welcher Reihenfolge die Knoten angelegt wurden. Inlet: Stoff, T [K], p [Pa] (darunter °C und bar), Start Sand bei 293,15 K und 101 325 Pa. Splitter: gleicher Anteil für alle Stoffe, T und p unverändert. Merger: Summe je Stoff, T und p aus <code>MixConditions</code> (siehe unten). Verzögerung: Jeder Platz im Ringpuffer merkt sich T und p seines Materials; kommt Material aus mehreren Zeitpunkten gleichzeitig an (verschiedene Größen sind verschieden lang unterwegs), wird es wie im Merger gemischt. Ergebnisse: Gesamtmenge wie bisher, je Stoff (nur wenn es mehr als einen gibt – sonst ist Stoff 1 die Gesamtmenge) sowie T(t) und p(t) je Lauf. Kurvenfenster: Auswahl „Größe“ (Massenstrom, Temperatur, Druck) und „Stoff“; die Achse von T und p zeigt nur den belegten Bereich. Heatmap: Auswahl „Stoff“, sichtbar ab zwei Stoffen. Hinweise der Units (z. B. Stoff ohne Wärmekapazität) erscheinen nach der Simulation in einem Meldungsfenster.</li>
+  <li><b>Mischtemperatur (<code>MixConditions</code>):</b> Energiebilanz Σ<sub>c</sub> W<sub>c</sub>·h<sub>c</sub>(T) = Σ<sub>i</sub> Σ<sub>c</sub> w<sub>ic</sub>·h<sub>c</sub>(T<sub>i</sub>), mit h<sub>c</sub>(T) = ∫ c<sub>p,c</sub> dT ab 298,15 K (Simpson-Regel, 64 Teilintervalle – exakt für konstantes bis kubisches c<sub>p</sub>). Gelöst mit dem Newton-Verfahren (Ableitung = Σ W<sub>c</sub>·c<sub>p,c</sub>), abgesichert durch Bisektion zwischen kältester und wärmster Eintrittstemperatur. Haben alle Beiträge mit Material dieselbe Temperatur, wird sie unverändert übernommen (keine Rundungsfehler). Fehlt einem beteiligten Stoff die Wärmekapazität (Coal, NaCl, Cellets) oder fehlt die Materialdatei, wird nach Masse gemittelt und ein Hinweis ausgegeben. Druck: kleinster Druck der Beiträge mit Material; ohne Material (z. B. Zulauf gerade null) gelten Mittel der Temperaturen und kleinster Druck aller Beiträge, oder bei der Verzögerung die Werte des Eingangs.</li>
+  <li><b>Speicher:</b> Ergebnisse je Stoff liegen in einer <code>std::deque</code>, die nie schrumpft. So bleiben Zeiger der Anzeigen (z. B. der Heatmap) gültig, auch wenn sich die Zahl der Stoffe zwischen zwei Simulationen ändert und die Anzeige während der Rechnung neu zeichnet.</li>
+  <li><b>Prüfung Schritt 3:</b> (1) <b>Bitgleichheit:</b> Zwei Flowsheets (Start-Flowsheet; zwei Inlets, Merger, stochastischer 3er-Splitter, Rückführung über eine Verzögerung; je 20 Läufe) mit altem und neuem Kern gerechnet – alle 9,2 MB Ergebnisse (Einzellauf, Mittelwert, Standardabweichung, Kennwerte je Lauf) bitgleich. (2) Konsolentest mit 17 Prüfungen, alle bestanden: Massenbilanz je Stoff (Sand + Coal → Merger → Splitter 30/70 → zwei Outlets) auf 10<sup>−15</sup> genau; jedes Inlet liefert nur seinen Stoff; Sand 20 °C + Sand 80 °C (10 : 5 kg/s) → 40,000000 °C; Sand 20 °C + Harnstoff 80 °C → 48,9206 °C = geschlossene Lösung für konstantes c<sub>p</sub>; 2 bar + 1 bar → 1 bar, Eingang ohne Massenstrom zählt nicht; Coal ohne c<sub>p</sub> → Hinweis und Massenmittel; ohne Materialdatei rechnet das Flowsheet weiter; Temperatur am Austritt einer Verzögerung (2 s, für alle Größen gleich) = Eintrittstemperatur 2 s früher, Abweichung 0. (3) Oberfläche über Bildschirmfotos geprüft (Inlet-Editor, Kurven für T und p, Heatmap je Stoff).</li>
+  <li><b>Warum JSON?</b> Alternativen für strukturierte Textdaten sind CSV (Tabelle), INI/TOML (einfache Einstellungen), XML (sehr wortreich), YAML (lesbar, aber Einrückung trägt Bedeutung) oder ein eigenes Format wie Dyssols <code>.dmdb</code> (Zahlencodes: „27 234 2 …“ heißt Dichte, konstant). Binär wäre HDF5 (Dyssols <code>.dflw</code>), im Texteditor aber nicht lesbar. JSON trägt Namen statt Codes, kann verschachteln (Stoff → Eigenschaft → Messpunkte; mit CSV bräuchte man mehrere Tabellen), ist von Python, MATLAB und C++ aus lesbar und wird auch für das Speichern von Flowsheets genutzt. Nachteile: keine Kommentare, strenge Syntax (ein fehlendes Komma → Fehlermeldung mit Zeilennummer).</li>
+  <li><b>Bewusst noch nicht enthalten:</b> Trägergasphase (kommt mit dem Brownschen Kernel) und die Umstellung der Größenachse auf SI-Einheiten (kommt zusammen mit dem logarithmischen Raster, weil beide die Rastereinstellungen betreffen; umgesetzt am 19. Oktober 2026, Kapitel 2.5).</li>
+  <li><b>Darstellung je Stoff:</b> Heatmap und Kurven zeigen heute eine Zeit-Größe-Matrix je Port. Pro Stoff wird künftig eine weitere Matrix gleicher Form gespeichert; die Zeichenroutinen bleiben unverändert, die Fenster bekommen nur eine Auswahl, welche Matrix gezeigt wird. Mehraufwand liegt in der Aufzeichnung und der Statistik je Stoff (Speicher wächst mit der Zahl der aktiven Stoffe, bei 5 Stoffen und 10 Ports einige zehn MB).</li>
+</ul>
+<h2>14.5 Wie Stoffwerte von Temperatur und Druck abhängen</h2>
+<ul>
+  <li>Es gibt beides: <b>Formeln</b> (aus der Theorie, Konstanten an Messungen angepasst) und <b>Messpunkt-Tabellen</b>. Jeder Eintrag sagt, welche Art er ist und in welchem T- und p-Bereich er gilt.</li>
+  <li><b>Gasdichte:</b> ideales Gas, ρ = p·M/(R·T) – hängt von T <b>und</b> p ab. Luft bei 293,15 K und 101 325 Pa: 1,204 kg/m³. <b>Feststoffe:</b> Wärmeausdehnung etwa 10<sup>−5</sup> je Kelvin, Dichte praktisch konstant. <b>Flüssigkeiten:</b> schwach von T abhängig (Wasser: Tabelle).</li>
+  <li><b>Gasviskosität</b> steigt mit T (bei Flüssigkeiten fällt sie) und hängt bei üblichen Drücken praktisch nicht von p ab – ein Ergebnis der kinetischen Gastheorie; erst bei hohen Drücken oder nahe am kritischen Punkt spielt p eine Rolle. Formel nach Sutherland (1893):</li>
+</ul>
+<p class="formel">μ(T) = μ<sub>ref</sub> · (T/T<sub>ref</sub>)<sup>3/2</sup> · (T<sub>ref</sub> + S)/(T + S)</p>
+<ul>
+  <li>S = Sutherland-Konstante des Gases. Beispiel N2 aus der Dyssol-Datei: μ<sub>ref</sub> = 1,663·10<sup>−5</sup> Pa·s bei T<sub>ref</sub> = 273 K, S = 107 K → bei 373 K: 1,663·10<sup>−5</sup> · 1,597 · 0,792 ≈ 2,10·10<sup>−5</sup> Pa·s. Für Wasserdampf ist Sutherland nur eine Näherung (polares Molekül); Referenz ist die IAPWS-Formulierung (Huber et al. 2009). Größenordnung: etwa 1,2·10<sup>−5</sup> Pa·s bei 373 K – der Dyssol-Wert 9,6·10<sup>−8</sup> ist etwa 100-fach zu klein. Bei Gasgemischen (Luft + Wasserdampf) hängt die Viskosität zusätzlich von der Zusammensetzung ab.</li>
+  <li><b>Zwischen Messpunkten</b> interpoliert Dyssol linear, außerhalb nimmt es den Randwert (kein Extrapolieren). Für glatte Verläufe wie die Gasviskosität (etwa ∝ T<sup>0,7</sup>) ist der Fehler linearer Interpolation zwischen Punkten im Abstand von 100 K klein: zwischen 400 und 500 K etwa 0,1 %. Vorschlag: wie Dyssol, aber mit Warnung, sobald außerhalb des Gültigkeitsbereichs gerechnet wird; wo möglich eine Formel an die Messpunkte anpassen.</li>
+</ul>
+
+<h2>14.6 Prüfquelle für Gasviskositäten: Lemmon &amp; Jacobsen (2004)</h2>
+<ul>
+  <li><b>Inhalt:</b> Referenzgleichungen des NIST für Viskosität und Wärmeleitfähigkeit von Stickstoff, Sauerstoff, Argon und Luft (Luft als Pseudo-Reinstoff), gültig für Gas und Flüssigkeit. Viskosität η = η<sub>0</sub>(T) + η<sub>r</sub>(τ, δ): Verdünntes-Gas-Anteil nach Chapman-Enskog, η<sub>0</sub> = 0,0266958·√(M·T)/(σ²·Ω(T*)) in µPa·s mit Lennard-Jones-Parametern σ, ε/k und angepasstem Stoßintegral Ω(T*) = exp(Σ b<sub>i</sub>·(ln T*)<sup>i</sup>), T* = T/(ε/k); dazu ein Restanteil, der von der Dichte abhängt (δ = ρ/ρ<sub>c</sub>, τ = T<sub>c</sub>/T). Die Gleichungen brauchen Temperatur und <b>Dichte</b>, die Dichte kommt aus einer Zustandsgleichung.</li>
+  <li><b>Unsicherheit laut Paper:</b> Viskosität im verdünnten Gas 0,5 % (N2, Ar) bzw. 1 % (Luft, O2 oberhalb 200 K); allgemein 2 % (N2, Ar) bzw. 5 % (O2, Luft), höher am kritischen Punkt. Wärmeleitfähigkeit im verdünnten Gas 2 %.</li>
+  <li><b>Nachgerechnet (12. Oktober 2026), verdünntes Gas, Viskosität in µPa·s:</b></li>
+</ul>
+<table>
+  <tr><th>T [K]</th><th>N2 Paper</th><th>N2 Dyssol (Sutherland)</th><th>Abw.</th><th>O2 Paper</th><th>O2 Dyssol</th><th>Abw.</th><th>Luft Paper</th><th>Luft Dyssol (Tabelle)</th><th>Abw.</th></tr>
+  <tr><td>273,15</td><td>16,61</td><td>16,64</td><td>+0,1 %</td><td>19,12</td><td>19,20</td><td>+0,4 %</td><td>17,20</td><td>17,10</td><td>−0,6 %</td></tr>
+  <tr><td>293,15</td><td>17,56</td><td>17,57</td><td>+0,1 %</td><td>20,25</td><td>20,36</td><td>+0,5 %</td><td>18,19</td><td>18,20</td><td>±0,0 %</td></tr>
+  <tr><td>373,15</td><td>21,09</td><td>21,03</td><td>−0,3 %</td><td>24,49</td><td>24,67</td><td>+0,7 %</td><td>21,88</td><td>21,70</td><td>−0,8 %</td></tr>
+  <tr><td>500</td><td>26,06</td><td>25,81</td><td>−1,0 %</td><td>30,47</td><td>30,67</td><td>+0,6 %</td><td>27,08</td><td>–</td><td></td></tr>
+  <tr><td>800</td><td>35,88</td><td>34,95</td><td>−2,6 %</td><td>42,32</td><td>42,24</td><td>−0,2 %</td><td>37,36</td><td>–</td><td></td></tr>
+  <tr><td>1200</td><td>46,76</td><td>44,56</td><td>−4,7 %</td><td>55,34</td><td>54,42</td><td>−1,7 %</td><td>48,72</td><td>–</td><td></td></tr>
+</table>
+<ul>
+  <li><b>Ergebnis:</b> Bis etwa 500 K liegen die Dyssol-Werte für N2, O2 und Luft innerhalb von 1 % am Paper – im Rahmen der dort angegebenen Unsicherheit. Darüber wächst die Abweichung des Sutherland-Gesetzes für N2 auf 2,6 % (800 K) und 4,7 % (1200 K). Die Luft-Tabelle reicht nur bis 373 K. Der dichteabhängige Restanteil ist bei Normaldruck vernachlässigbar: N2 bei 300 K und 1 atm hat δ = 0,0036, der Restanteil beträgt 0,07 % von η<sub>0</sub>.</li>
+  <li><b>Nutzen für StoSiS:</b> (a) Belegquelle, um die Viskositäten von N2, O2 und Luft in der Materialdatei als geprüft zu markieren (bis 500 K). (b) Für Aerosol-Kernels bei hohen Temperaturen (z. B. Gasphasensynthese) ließe sich ein eigener Eintragstyp „Chapman-Enskog“ (σ, ε/k, Stoßintegral) ergänzen; er ist physikalisch begründet und extrapoliert besser als Sutherland. Wichtig ist das später für den Brownschen Kernel und den Cunningham-Faktor, die über die mittlere freie Weglänge λ = (μ/p)·√(π·R·T/(2·M)) direkt von der Viskosität abhängen. Für Wasserdampf ist das Gegenstück die IAPWS-Formulierung (Huber et al. 2009), für Gasgemische (Luft + Wasserdampf) braucht es Mischungsregeln (z. B. Wilke).</li>
+</ul>
+
+<h1>15 Ausblick und offene Punkte</h1>
+<div class="abb"><img src="abbildungen/Roadmap_2026-10-20.svg" width="680" alt="Roadmap"><div class="unterschrift">Abbildung: Roadmap (Stand 20. Oktober 2026) – Materialien und logarithmisches Größenraster sind fertig; als Nächstes die offenen MC-Fragen (Gewichtung der Karten, Begrenzung der Kartenzahl), dann Partikelmodus, Koagulator, Validierung, Bruch und Wachstum. Die Fassung vom 19. Oktober liegt als Roadmap_2026-10-19.svg daneben.</div></div>
+<ul>
+  <li>Läufe parallel rechnen (CPU-Threads mit je einer Kopie des Flowsheets, später GPU/amplitUDE); CUDA-Zielarchitektur der H100 (sm_90) ergänzen.</li>
+  <li>Gewichtete Monte-Carlo-Partikel als zweite Stromdarstellung (Diskussion in 13.8); Multi-Rate mit ereignisgesteuertem MC.</li>
+  <li><b>Nebenstrecke Agglomeratstruktur:</b> Wie genau Agglomerate aufgebaut sind (welcher Stoff an welchem hängt, Kontaktpunkte auf der Primärpartikeloberfläche, Winkel zwischen drei verbundenen Partikeln). Abstufung der Detailtiefe je Rechenpartikel: (0) nur Masse/Volumen (Kugel); (1) zusätzlich Zahl und Größe der Primärpartikel, mit fraktaler Dimension D<sub>f</sub> und Vorfaktor k<sub>f</sub> folgt der Stoßradius aus R<sub>g</sub> = a·(n<sub>p</sub>/k<sub>f</sub>)<sup>1/D<sub>f</sub></sup>; (2) zusätzlich Masse je Stoff; (3) vollständige Struktur mit Lage jedes Primärpartikels. Stufe 3 ist für Millionen Rechenpartikel zu teuer, eignet sich aber als getrennte Detailsimulation, deren Ergebnisse (z. B. Porosität und D<sub>f</sub> abhängig von n<sub>p</sub>) als Zusammenhänge in Stufe 1–2 einfließen.</li>
+  <li>Prozessmodelle: Koagulator mit Koagulation, Bruch, Wachstum, Keimbildung (Planung in Kapitel 13); Crusher.</li>
+  <li>Realistische Transportmodelle über Verweilzeitverteilungen (Tanks-in-Series, Dispersion, Markov-Ketten).</li>
+  <li>Flowsheets speichern/laden (geplant JSON) und Import von Dyssol-Dateien (.dflw = HDF5).</li>
+  <li>Logarithmisches Größenraster mit SI-Einheiten (Anzeige in µm): umgesetzt am 19. Oktober 2026 (2.5, 2.6). Zurückgestellt: Fächer statt Stützstellen, Anzeige je Dekade, Normierung am Rand, Randwächter nach der Simulation (sobald es Koagulation gibt), Anzeige nach Anzahl (q<sub>0</sub>).</li>
+  <li>Materialien: Schritte 1–3 umgesetzt (Kapitel 14.4). Offen sind Schritt 4 (Werte in der Oberfläche bearbeiten, Export ins Dyssol-Format .dmdb), die Prüfung aller Stoffwerte (bisher alle „unchecked“), Trägergas und Porosität.</li>
+  <li><b>3D-Darstellung der Heatmap</b> (angefragt am 12. Oktober 2026): Umschalter 2D ↔ 3D im Heatmap-Fenster, Fläche über Zeit und Größe, mit der Maus drehbar. Möglichkeiten: Qt-Modul „Qt Graphs“ (3D-Flächendiagramme mit Licht und Drehen; in der installierten Qt-Version noch nicht vorhanden, nachinstallierbar) oder eigenes Zeichnen mit QPainter wie die bisherige Heatmap (Vierecke von hinten nach vorn projiziert, gleiche Farbskala und Modi, keine neue Abhängigkeit). <b>Tendenz (12. Oktober 2026): Qt Graphs</b>, weil weitere 3D-Darstellungen absehbar sind – z. B. MC-Partikel als 3D-Punktwolke im Eigenschaftsraum (Größe × Zusammensetzung × Feuchte). Qt Graphs rechnet auf der Grafikkarte und bringt Achsen, Zoom und Werteanzeige beim Anklicken mit. Nachteile: zusätzliches Modul (Installation über das Qt Maintenance Tool; Voraussetzungen Qt Quick 3D und Shader Tools sind vorhanden), braucht einen funktionierenden Grafiktreiber (Remote-Desktop prüfen), Bilder nur als Pixelgrafik (für Veröffentlichungen besser die Daten exportieren). Vor dem Einbau ein kleiner Probelauf.</li>
+</ul>
+
+<h2>Validierungsstrategie (Diskussion 20. Oktober 2026)</h2>
+<ul>
+  <li><b>Anlass:</b> Im Arbeitsgruppentreffen wurde die Validierung angesprochen. Ideen: experimentelle Studien zu einzelnen Elementen (Splitter, Merger, Koagulator …) suchen; das Validierungsvorgehen von Dyssol untersuchen; einen großen Vergleich an einem experimentell untersuchten Flowsheet mit Dyssol, PharmaPy und StoSiS.</li>
+  <li><b>Drei Ebenen, die getrennt nachgewiesen werden:</b>
+    <ol>
+      <li><b>Verifikation</b> – rechnet das Programm seine Gleichungen richtig? Analytische Lösungen und Erhaltungssätze (bisher: Massenbilanzen, OU-Statistik in Kap. 11, Größenraster in 2.5; später Koagulation mit konstantem, Summen- und Produktkern), Konvergenz mit Raster, Kartenzahl und Zahl der Läufe.</li>
+      <li><b>Code-zu-Code-Vergleich</b> – gleiches Flowsheet in Dyssol und PharmaPy. Zeigt, dass gleiche Modelle gleich umgesetzt sind; beweist aber nichts über die Wirklichkeit.</li>
+      <li><b>Validierung gegen Experimente</b> – beschreibt das <i>Modell</i> (Kernel, Verweilzeitverhalten, Bruchfunktion) die Messung? Geprüft wird das Modell in der Software, nicht die Software allein.</li>
+    </ol>
+  </li>
+  <li><b>Einschätzung zu Einzelelementen:</b> Ideale Splitter und Merger sind Definitionen (Massenbilanz) – dafür braucht es keine Experimente, die Tests reichen. Experimentell interessant ist der <b>schwankende</b> Anteil (OU-Splitter): Daten zu Dosier- und Teilungsschwankungen kontinuierlicher Anlagen (z. B. Differentialdosierwaagen in der kontinuierlichen Pharmaproduktion) – zu recherchieren. Sinnvolle Einzel-Experimente gibt es für Koagulation (Aerosol: Größenverteilung über die Zeit in Kammer oder Rohr; eigene Daten der Arbeitsgruppe prüfen), Agglomeration/Granulation (Wirbelschicht), Verweilzeit (Tracer) sowie Mahlen und Sieben.</li>
+  <li><b>Besonderheit dieser Arbeit:</b> StoSiS rechnet Streuung. Zur Validierung gehören deshalb auch Messreihen mit Wiederholungen oder zeitlichem Verlauf, an denen sich die Schwankung prüfen lässt – nicht nur Mittelwerte.</li>
+  <li><b>Anpassen und Vorhersagen trennen:</b> Modellparameter (z. B. Vorfaktor eines Kernels) an einem Datensatz anpassen, an einem anderen prüfen.</li>
+  <li><b>Dyssol:</b> Validierungsvorgehen noch nachzulesen (Skorych et al. 2020; Heinrich 2020; Hilfe der lokalen Installation).</li>
+  <li><b>Dreiervergleich Dyssol – PharmaPy – StoSiS:</b> PharmaPy (Casas-Orozco et al. 2021) ist auf pharmazeutische Prozesse ausgerichtet (u. a. Kristallisation, Filtration, Trocknung, Reaktoren). Ein gemeinsamer Fall braucht Units, die alle drei Programme können. Vorgehen: (1) Unit-Listen von Dyssol und PharmaPy vergleichen und mit der StoSiS-Roadmap abgleichen (heute kann StoSiS Transport, Splitter, Merger; Koagulation, Wachstum, Keimbildung folgen); (2) für die Schnittmenge ein experimentell untersuchtes Flowsheet suchen – Kandidaten: kontinuierliche Kristallisation mit Rückführung (braucht Keimbildung und Wachstum) oder Agglomeration; (3) den Vergleich danach in die Roadmap einplanen.</li>
+</ul>
+
+
+<h1>16 Literatur (vor dem Zitieren prüfen)</h1>
+<ul>
+  <li>Friedlander, S. K. (2000): Smoke, Dust, and Haze – Fundamentals of Aerosol Dynamics, 2. Aufl. Oxford University Press (Keimbildung, Kelvin-Gleichung).</li>
+  <li>Seinfeld, J. H.; Pandis, S. N. (2016): Atmospheric Chemistry and Physics, 3. Aufl. Wiley (Kapitel Keimbildung).</li>
+  <li>Casas-Orozco, D.; Laky, D.; Wang, V.; Abdi, M.; Feng, X.; Wood, E.; Laird, C.; Reklaitis, G. V.; Nagy, Z. K. (2021): PharmaPy: An object-oriented tool for the development of hybrid pharmaceutical flowsheets. Computers &amp; Chemical Engineering 153, 107408.</li>
+  <li>Uhlenbeck, G. E.; Ornstein, L. S. (1930): On the theory of the Brownian motion. Physical Review 36, 823–841.</li>
+  <li>Gillespie, D. T. (1996): Exact numerical simulation of the Ornstein-Uhlenbeck process and its integral. Physical Review E 54, 2084–2091.</li>
+  <li>Gillespie, D. T. (1977): Exact stochastic simulation of coupled chemical reactions. Journal of Physical Chemistry 81, 2340–2361.</li>
+  <li>Welford, B. P. (1962): Note on a method for calculating corrected sums of squares and products. Technometrics 4, 419–420.</li>
+  <li>Marsaglia, G.; Bray, T. A. (1964): A convenient method for generating normal variables. SIAM Review 6, 260–264.</li>
+  <li>Matsumoto, M.; Nishimura, T. (1998): Mersenne Twister: a 623-dimensionally equidistributed uniform pseudo-random number generator. ACM Transactions on Modeling and Computer Simulation 8, 3–30.</li>
+  <li>Steele, G. L.; Lea, D.; Flood, C. H. (2014): Fast splittable pseudorandom number generators. Proceedings OOPSLA 2014 (Ursprung von SplitMix64).</li>
+  <li>Kahn, A. B. (1962): Topological sorting of large networks. Communications of the ACM 5, 558–562.</li>
+  <li>Hyndman, R. J.; Fan, Y. (1996): Sample quantiles in statistical packages. The American Statistician 50, 361–365.</li>
+  <li>Skorych, V.; Dosta, M.; Heinrich, S. (2020): Dyssol – an open-source flowsheet simulation framework for particulate materials. SoftwareX 12, 100572.</li>
+  <li>Heinrich, S. (Hrsg.) (2020): Dynamic Flowsheet Simulation of Solids Processes. Springer.</li>
+  <li>Levenspiel, O. (1999): Chemical Reaction Engineering, 3. Aufl. Wiley.</li>
+  <li>Danckwerts, P. V. (1953): Continuous flow systems: Distribution of residence times. Chemical Engineering Science 2, 1–13.</li>
+  <li>Berthiaux, H.; Mizonov, V.; Zhukov, V. (2005): Application of the theory of Markov chains to model different processes in particle technology. Powder Technology 157, 128–137.</li>
+  <li>Gillespie, D. T. (2000): The chemical Langevin equation. Journal of Chemical Physics 113, 297–306.</li>
+  <li>Gillespie, D. T. (2001): Approximate accelerated stochastic simulation of chemically reacting systems. Journal of Chemical Physics 115, 1716–1733.</li>
+  <li>Kahn, H.; Harris, T. E. (1951): Estimation of particle transmission by random sampling. National Bureau of Standards, Applied Mathematics Series 12, 27–30.</li>
+  <li>Kitagawa, G. (1996): Monte Carlo filter and smoother for non-Gaussian nonlinear state space models. Journal of Computational and Graphical Statistics 5, 1–25.</li>
+  <li>Smith, M.; Matsoukas, T. (1998): Constant-number Monte Carlo simulation of population balances. Chemical Engineering Science 53, 1777–1786.</li>
+  <li>Patterson, R. I. A.; Wagner, W.; Kraft, M. (2011): Stochastic weighted particle methods for population balance equations. Journal of Computational Physics 230, 7456–7472.</li>
+  <li>Rjasanow, S.; Wagner, W. (1996): A stochastic weighted particle method for the Boltzmann equation. Journal of Computational Physics 124, 243–253.</li>
+  <li>Eibeck, A.; Wagner, W. (2001): Stochastic particle approximations for Smoluchowski's coagulation equation. Annals of Applied Probability 11, 1137–1165.</li>
+  <li>Patterson, R. I. A.; Kraft, M.: Weighted particle methods for the Smoluchowski coagulation equation. Preprint 47, Cambridge Centre for Computational Chemical Engineering.</li>
+  <li>Lee, K. F.; Patterson, R. I. A.; Wagner, W.; Kraft, M. (2015): Stochastic weighted particle methods for population balance equations with coagulation, fragmentation and spatial inhomogeneity. Journal of Computational Physics 303, 1–18.</li>
+  <li>Zhao, H.; Kruis, F. E.; Zheng, C. (2010): A differentially weighted Monte Carlo method for two-component coagulation. Journal of Computational Physics 229, 6931–6945.</li>
+  <li>Zhao, H.; Kruis, F. E.; Zheng, C. (2011): Monte Carlo simulation for aggregative mixing of nanoparticles in two-component systems. Industrial &amp; Engineering Chemistry Research 50, 10652–10664.</li>
+  <li>Liu, S.; Chan, T. L. (2018): Differentially weighted operator splitting Monte Carlo method for multi-component aerosol dynamics. Applied Mathematical Modelling (Band und Seiten nachtragen).</li>
+  <li>Kotalczyk, G.; Kruis, F. E. (2018): Fractional Monte Carlo time steps for the simulation of coagulation for parallelized flowsheet simulations. Chemical Engineering Research and Design 136, 71–82.</li>
+  <li>Kotalczyk, G.: Parallel Monte Carlo Algorithms for Flowsheet Simulations based on the Population Balance Equation. Dissertation, Universität Duisburg-Essen.</li>
+  <li>Liffman, K. (1992): A direct simulation Monte-Carlo method for cluster coagulation. Journal of Computational Physics 100, 116–127.</li>
+  <li>Lin, Y.; Lee, K.; Matsoukas, T. (2002): Solution of the population balance equation using constant-number Monte Carlo. Chemical Engineering Science 57, 2241–2252.</li>
+  <li>Maisels, A.; Kruis, F. E.; Fissan, H. (2004): Direct simulation Monte Carlo for simultaneous nucleation, coagulation and surface growth in dispersed systems. Chemical Engineering Science 59, 2231–2239.</li>
+  <li>Vikhansky, A.; Kraft, M. (2005): Conservative method for the reduction of the number of particles in the Monte Carlo simulation method for kinetic equations. Journal of Computational Physics 203, 371–378.</li>
+  <li>Lécot, C.; Wagner, W. (2004): A quasi-Monte Carlo scheme for Smoluchowski's coagulation equation. Mathematics of Computation 73, 1953–1966.</li>
+  <li>Lécot, C.; Tarhini, A. (2007): A quasi-stochastic simulation of the general dynamics equation for aerosols. Monte Carlo Methods and Applications 13, 369–388 (doi:10.1515/mcma.2007.020).</li>
+  <li>Lécot, C.; L'Ecuyer, P.; El Haddad, R.; Tarhini, A. (2019): Quasi-Monte Carlo simulation of coagulation-fragmentation. Mathematics and Computers in Simulation 161, 113–124.</li>
+  <li>Smoluchowski, M. v. (1917): Versuch einer mathematischen Theorie der Koagulationskinetik kolloider Lösungen. Zeitschrift für physikalische Chemie 92, 129–168.</li>
+  <li>Hulburt, H. M.; Katz, S. (1964): Some problems in particle technology: A statistical mechanical formulation. Chemical Engineering Science 19, 555–574.</li>
+  <li>Ramkrishna, D. (2000): Population Balances: Theory and Applications to Particulate Systems in Engineering. Academic Press.</li>
+  <li>Kumar, S.; Ramkrishna, D. (1996): On the solution of population balance equations by discretization – I. A fixed pivot technique. Chemical Engineering Science 51, 1311–1332.</li>
+  <li>Kumar, J.; Peglow, M.; Warnecke, G.; Heinrich, S.; Mörl, L. (2006): Improved accuracy and convergence of discretized population balance for aggregation: The cell average technique. Chemical Engineering Science 61, 3327–3342.</li>
+  <li>Scott, W. T. (1968): Analytic studies of cloud droplet coalescence I. Journal of the Atmospheric Sciences 25, 54–65.</li>
+  <li>Ziff, R. M.; McGrady, E. D. (1985): The kinetics of cluster fragmentation and depolymerisation. Journal of Physics A 18, 3027–3037.</li>
+  <li>Kruis, F. E.; Maisels, A.; Fissan, H. (2000): Direct simulation Monte Carlo method for particle coagulation and aggregation. AIChE Journal 46, 1735–1742.</li>
+  <li>Wei, J.; Kruis, F. E. (2013): GPU-accelerated Monte Carlo simulation of particle coagulation based on the inverse method. Journal of Computational Physics 249, 67–79.</li>
+  <li>Zhao, H.; Kruis, F. E.; Zheng, C. (2009): Reducing statistical noise and extending the size spectrum by applying weighted simulation particles in Monte Carlo simulation of coagulation. Aerosol Science and Technology 43, 781–793.</li>
+  <li>Kotalczyk, G.; Kruis, F. E. (2017): A Monte Carlo method for the simulation of coagulation and nucleation based on weighted particles and the concepts of stochastic resolution and merging. Journal of Computational Physics 340, 276–296.</li>
+  <li>Camp, T. R.; Stein, P. C. (1943): Velocity gradients and internal work in fluid motion. Journal of the Boston Society of Civil Engineers 30, 219–237.</li>
+  <li>Davies, C. N. (1945): Definitive equations for the fluid resistance of spheres. Proceedings of the Physical Society 57, 259–270.</li>
+  <li>Saffman, P. G.; Turner, J. S. (1956): On the collision of drops in turbulent clouds. Journal of Fluid Mechanics 1, 16–30.</li>
+  <li>Sutherland, W. (1893): The viscosity of gases and molecular force. Philosophical Magazine 36, 507–531.</li>
+  <li>Huber, M. L.; Perkins, R. A.; Laesecke, A.; Friend, D. G.; Sengers, J. V.; Assael, M. J.; Metaxa, I. N.; Vogel, E.; Mareš, R.; Miyagawa, K. (2009): New international formulation for the viscosity of H2O. Journal of Physical and Chemical Reference Data 38, 101–125.</li>
+  <li>Lemmon, E. W.; Jacobsen, R. T (2004): Viscosity and thermal conductivity equations for nitrogen, oxygen, argon, and air. International Journal of Thermophysics 25, 21–69.</li>
+  <li>Merrick, D. (1983): Mathematical models of the thermal decomposition of coal: 2. Specific heats and heats of reaction. Fuel 62, 540–546.</li>
+  <li>Poling, B. E.; Prausnitz, J. M.; O'Connell, J. P. (2001): The Properties of Gases and Liquids, 5. Aufl. McGraw-Hill.</li>
+  <li>Skorych, V.; Dosta, M.; Hartge, E.-U.; Heinrich, S.; Ahrens, R.; Le Borne, S. (2019): Investigation of an FFT-based solver applied to dynamic flowsheet simulation of agglomeration processes. Advanced Powder Technology 30, 555–564.</li>
+</ul>
+
+<script>
+  // Inhaltsverzeichnis aus den Ueberschriften aufbauen (auch fuer den PDF-Druck).
+  (function () {
+    var root = document.createElement("ul");
+    var currentSub = null;
+    document.querySelectorAll("h1, h2").forEach(function (h, i) {
+      h.id = h.id || ("abschnitt" + i);
+      var li = document.createElement("li");
+      var a = document.createElement("a");
+      a.href = "#" + h.id;
+      a.textContent = h.textContent;
+      li.appendChild(a);
+      if (h.tagName === "H1") { root.appendChild(li); currentSub = document.createElement("ul"); li.appendChild(currentSub); }
+      else if (currentSub) { currentSub.appendChild(li); }
+    });
+    document.getElementById("inhalt").appendChild(root);
+  })();
+</script>
+</body>
+</html>

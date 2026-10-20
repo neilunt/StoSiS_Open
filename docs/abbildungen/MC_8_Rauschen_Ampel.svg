@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="305" viewBox="0 0 680 305">
+<title>Rauschen der Koagulation einer Gruppe</title>
+<style>
+text { font-family: Calibri, Arial, sans-serif; }
+.t { font-size: 14px; fill: #222222; }
+.ts { font-size: 12px; fill: #595959; }
+.th { font-size: 14px; font-weight: bold; fill: #222222; }
+.c-amber rect, .c-amber circle, rect.c-amber, circle.c-amber { fill: #FAEEDA; stroke: #854F0B; }
+.c-amber text { fill: #633806; }
+.c-gray rect, .c-gray circle, rect.c-gray, circle.c-gray { fill: #F1EFE8; stroke: #5F5E5A; }
+.c-gray text { fill: #444441; }
+.box { fill: #F7F6F2; stroke: #B4B2A9; }
+.arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
+.c-red rect, rect.c-red { fill: #FCEBEB; stroke: #A32D2D; }
+.c-red text { fill: #791F1F; }
+.c-green rect, rect.c-green { fill: #EAF3DE; stroke: #3B6D11; }
+.c-green text { fill: #27500A; }
+.c-purple rect, rect.c-purple { fill: #EEEDFE; stroke: #534AB7; }
+.c-purple text { fill: #3C3489; }
+.c-teal rect, rect.c-teal { fill: #E1F5EE; stroke: #0F6E56; }
+.c-teal text { fill: #085041; }
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="th" x="40" y="30">Wie stark rauscht die Koagulation einer Gruppe?</text>
+<text class="ts" x="40" y="50">n = erwartete Koagulationsereignisse der Gruppe je Verweilzeit · Rauschen ≈ 1/√n</text>
+<g class="c-red"><rect x="60" y="80" width="196" height="36" stroke-width="0.5"/><text class="ts" x="158" y="98" text-anchor="middle" dominant-baseline="central">Rauschen über 20 %</text></g>
+<g class="c-amber"><rect x="256" y="80" width="84" height="36" stroke-width="0.5"/><text class="ts" x="298" y="98" text-anchor="middle" dominant-baseline="central">10–20 %</text></g>
+<g class="c-green"><rect x="340" y="80" width="280" height="36" stroke-width="0.5"/><text class="ts" x="480" y="98" text-anchor="middle" dominant-baseline="central">Rauschen unter 10 %</text></g>
+<circle class="box" cx="102" cy="80" r="10" stroke-width="0.8"/><text class="th" x="102" y="80" text-anchor="middle" dominant-baseline="central">1</text>
+<circle class="box" cx="242" cy="80" r="10" stroke-width="0.8"/><text class="th" x="242" y="80" text-anchor="middle" dominant-baseline="central">2</text>
+<circle class="box" cx="522" cy="80" r="10" stroke-width="0.8"/><text class="th" x="522" y="80" text-anchor="middle" dominant-baseline="central">3</text>
+<line x1="60" y1="116" x2="60" y2="122" stroke="#888780" stroke-width="0.5"/><line x1="200" y1="116" x2="200" y2="122" stroke="#888780" stroke-width="0.5"/><line x1="340" y1="116" x2="340" y2="122" stroke="#888780" stroke-width="0.5"/><line x1="480" y1="116" x2="480" y2="122" stroke="#888780" stroke-width="0.5"/><line x1="620" y1="116" x2="620" y2="122" stroke="#888780" stroke-width="0.5"/>
+<text class="ts" x="40" y="138" text-anchor="end">n</text>
+<text class="t" x="60" y="138" text-anchor="middle">1</text><text class="t" x="200" y="138" text-anchor="middle">10</text><text class="t" x="340" y="138" text-anchor="middle">100</text><text class="t" x="480" y="138" text-anchor="middle">1 000</text><text class="t" x="620" y="138" text-anchor="middle">10 000</text>
+<text class="ts" x="40" y="158" text-anchor="end">±</text>
+<text class="ts" x="60" y="158" text-anchor="middle">100 %</text><text class="ts" x="200" y="158" text-anchor="middle">32 %</text><text class="ts" x="340" y="158" text-anchor="middle">10 %</text><text class="ts" x="480" y="158" text-anchor="middle">3 %</text><text class="ts" x="620" y="158" text-anchor="middle">1 %</text>
+<text class="t" x="60" y="196">1  Kohle als Spur (1 % der Masse = 100 Karten), nur 2 % koagulieren: n ≈ 2 → ± 71 %</text>
+<text class="t" x="60" y="220">2  Kohle als Spur (100 Karten), 20 % koagulieren: n ≈ 20 → ± 22 %</text>
+<text class="t" x="60" y="244">3  Sand (99 % der Masse = 9 900 Karten), 20 % koagulieren: n ≈ 2 000 → ± 2 %</text>
+<text class="ts" x="60" y="274">Annahme: 10 000 Karten gleicher Masse; n ≈ Kartenzahl der Gruppe × koagulierter Anteil.</text>
+<text class="ts" x="60" y="292">Abhilfe bei Gelb/Rot: mehr Karten für diese Gruppe oder mehr Läufe.</text>
+</svg>
