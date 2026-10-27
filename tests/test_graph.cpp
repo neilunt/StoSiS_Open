@@ -82,5 +82,46 @@ int main()
         Check(cutA == cutB, "Schnitt unabhaengig davon, welcher Merger zuerst angelegt wurde");
     }
 
+    // Zeitraster aus Dauer und Schrittweite: Zahl der Zeitpunkte folgt aus dt,
+    // das Groessenraster bleibt; eine neue Dauer aendert dt nicht.
+    {
+        CFlowsheetGraph g;
+        g.ConfigureGrid(30, 1e-6, 1e-3, 200, 40.0);
+        g.ConfigureTime(1800.0, 0.1);
+        Check(g.GetGrid().numTimeSteps == 18001 && NearAbs(g.GetGrid().GetDt(), 0.1, 1e-12)
+            && g.GetGrid().numSizeClasses == 30, "Dauer 1800 s, dt 0,1 s: 18001 Zeitpunkte, Groessenraster bleibt");
+        g.ConfigureTime(40.0, 0.1);
+        Check(g.GetGrid().numTimeSteps == 401 && NearAbs(g.GetGrid().GetDt(), 0.1, 1e-12), "Dauer 40 s: dt bleibt 0,1 s");
+        g.ConfigureTime(40.0, 0.3);
+        Check(g.GetGrid().numTimeSteps == 134 && NearAbs(g.GetGrid().GetDt(), 40.0 / 133.0, 1e-12),
+            "dt 0,3 s bei 40 s: 134 Zeitpunkte, dt angepasst auf 0,30075 s");
+        Check(SSimulationGrid::TimePointsFor(1.0, 1e-9) == SSimulationGrid::kMaxTimePoints
+            && SSimulationGrid::TimePointsFor(1.0, 5.0) == 2, "Grenzen: hoechstens 1 000 000, mindestens 2 Zeitpunkte");
+    }
+
+    // Welche Stroeme haengen vom Zufall ab (Fenster "Auswertung")? Inlet ->
+    // Merger -> Splitter (stochastisch) -> Outlet, Rueckfuehrung zum Merger;
+    // daneben ein zweites Inlet direkt auf ein Outlet.
+    {
+        CFlowsheetGraph g;
+        const std::string in = g.AddInletNode("Inlet1", 0, 0);
+        const std::string mg = g.AddMergerNode("Merger1", 2, 1, 0);
+        const std::string sp = g.AddSplitterNode("Splitter1", 2, 2, 0);
+        const std::string out = g.AddOutletNode("Outlet1", 3, 0);
+        const std::string in2 = g.AddInletNode("Inlet2", 0, 1);
+        const std::string out2 = g.AddOutletNode("Outlet2", 1, 1);
+        g.AddConnection(in, 0, mg, 0);
+        g.AddConnection(mg, 0, sp, 0);
+        g.AddConnection(sp, 0, out, 0);
+        g.AddConnection(sp, 1, mg, 1);
+        g.AddConnection(in2, out2);
+        Check(!g.IsAffectedByRandomness(out) && !g.IsAffectedByRandomness(sp), "Splitter fest: kein Strom haengt vom Zufall ab");
+        g.GetSplitter(sp)->SetStochastic(true);
+        Check(g.IsAffectedByRandomness(sp) && g.IsAffectedByRandomness(out) && g.IsAffectedByRandomness(mg),
+            "Splitter stochastisch: Splitter, Outlet dahinter und Merger (ueber die Rueckfuehrung) haengen vom Zufall ab");
+        Check(!g.IsAffectedByRandomness(in) && !g.IsAffectedByRandomness(in2) && !g.IsAffectedByRandomness(out2),
+            "Inlets und der Zweig ohne Splitter haengen nicht vom Zufall ab");
+    }
+
     return Summary();
 }

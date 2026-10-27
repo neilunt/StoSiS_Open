@@ -5,7 +5,7 @@
 
 namespace stosis
 {
-	// Trägt alle eingebauten StreamProzessoren in die Registry ein
+	// Traegt alle eingebauten StreamProzessoren in die Registry ein
 	// Analog zu RegisterBuiltinTransportUnits.
 	inline void RegisterBuiltinStreamProcessors(CStreamProcessorRegistry& registry)
 	{

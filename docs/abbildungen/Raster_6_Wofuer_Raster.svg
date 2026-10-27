@@ -21,10 +21,10 @@ text { font-family: Calibri, Arial, sans-serif; }
 .c-teal text { fill: #085041; }
 </style>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
-<text class="th" x="20" y="24">Wofür das Größenraster gebraucht wird</text>
+<text class="th" x="20" y="24">① Wofür das Größenraster gebraucht wird</text>
 <text class="ts" x="20" y="44">Am Inlet steht in beiden Fällen eine Formel (Normal, Log-Normal, RRSB). Danach trennen sich die Wege.</text>
-<text class="th" x="175" y="74" text-anchor="middle">Kontinuum (heute)</text>
-<text class="th" x="505" y="74" text-anchor="middle">Partikelmodus (geplant)</text>
+<text class="th" x="175" y="74" text-anchor="middle">Kontinuum</text>
+<text class="th" x="505" y="74" text-anchor="middle">Partikelmodus</text>
 <g class="c-gray"><rect x="60" y="88" width="230" height="46" rx="6" stroke-width="0.6"/><text class="th" x="175" y="105" text-anchor="middle" style="font-size:13px">Inlet: Formel q3(d)</text><text class="ts" x="175" y="122" text-anchor="middle">wird an den Stützstellen ausgewertet</text></g>
 <line x1="175" y1="134" x2="175" y2="152" class="arr" marker-end="url(#arrow)"/>
 <g class="c-purple"><rect x="60" y="154" width="230" height="46" rx="6" stroke-width="0.6"/><text class="th" x="175" y="171" text-anchor="middle" style="font-size:13px">Strom = Werte auf dem Raster</text><text class="ts" x="175" y="188" text-anchor="middle">das Raster IST der Strom (Setzkasten)</text></g>

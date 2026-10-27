@@ -8,7 +8,7 @@
 
 namespace stosis
 {
-	// Registry für verfügbare Streamprozessoren, 
+	// Registry fuer verfuegbare Streamprozessoren, 
 	// analog zu CTransportUnitRegistry
 	class CStreamProcessorRegistry
 	{

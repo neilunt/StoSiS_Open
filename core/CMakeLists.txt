@@ -45,6 +45,11 @@ include/SizeDistribution.h
 include/SplitterUnit.h
 include/MergerUnit.h
 include/StreamSlice.h
+include/CardProjection.h
+include/CardSettings.h
+include/CardPlacement.h
+include/CardHistory.h
+include/SimulationLog.h
 include/FlowsheetUnit.h
 include/Random.h
 include/EnsembleStatistics.h
@@ -81,3 +86,12 @@ target_include_directories(stosis_cuda PUBLIC
 )
 
 target_link_libraries(stosis_core PUBLIC stosis_cuda)
+
+# NVIDIAs statische CUDA-Laufzeit (cudart_static.lib, cudadevrt.lib) fordert
+# die statische C-Laufzeit LIBCMT an, alles andere hier nutzt die DLL-Laufzeit
+# (/MD). Ohne diesen Ausschluss warnt der Linker (LNK4098); so loest auch
+# die CUDA-Laufzeit gegen die DLL-Laufzeit auf. Gilt fuer alle, die
+# stosis_cuda einbinden (Oberflaeche, Tests).
+if(MSVC)
+    target_link_options(stosis_cuda INTERFACE /NODEFAULTLIB:LIBCMT)
+endif()

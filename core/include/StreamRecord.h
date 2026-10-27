@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include "FlowsheetUnit.h"
+#include "CardProjection.h"
 #include "SimulationResults.h"
 #include "EnsembleStatistics.h"
 
@@ -34,10 +35,20 @@ namespace stosis
             m_compoundNames = grid.compounds;
             m_temperature.assign(grid.numTimeSteps, kRoomTemperature);
             m_pressure.assign(grid.numTimeSteps, kRoomPressure);
+            m_sizes = grid.GetSizeGrid();
+            m_sizeWeights = m_sizes.GetWeights();
         }
 
+        // Im Partikelmodus werden die Karten vorher aufs Groessenraster
+        // umgerechnet (ProjectCards) - gespeichert wird immer die Dichte.
         void Record(size_t timeIdx, const CStreamSlice& slice)
         {
+            if (slice.HasCards())
+            {
+                ProjectCards(slice, m_sizes, m_sizeWeights, m_projected);
+                Record(timeIdx, m_projected);
+                return;
+            }
             if (timeIdx >= m_total.GetNumTimeSteps())
                 return;
             const size_t numS = std::min(m_total.GetNumSizeClasses(), slice.GetNumSizeClasses());
@@ -65,6 +76,9 @@ namespace stosis
         std::vector<std::string> m_compoundNames;
         std::vector<double> m_temperature;
         std::vector<double> m_pressure;
+        SSizeGrid m_sizes;
+        std::vector<double> m_sizeWeights; // Trapezgewichte von m_sizes
+        CStreamSlice m_projected;          // Karten aufs Raster umgerechnet (wiederverwendet)
     };
 
     // Statistik eines Stroms ueber mehrere Laeufe: fuer die Gesamtmenge und

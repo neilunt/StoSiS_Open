@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="804" viewBox="0 0 680 804">
+<title>Vom Kontinuum zu Karten und zurück</title>
+<style>
+text { font-family: Calibri, Arial, sans-serif; }
+.t { font-size: 14px; fill: #222222; }
+.ts { font-size: 12px; fill: #595959; }
+.th { font-size: 14px; font-weight: bold; fill: #222222; }
+.c-amber rect, .c-amber circle, rect.c-amber, circle.c-amber { fill: #FAEEDA; stroke: #854F0B; }
+.c-amber text { fill: #633806; }
+.c-gray rect, .c-gray circle, rect.c-gray, circle.c-gray { fill: #F1EFE8; stroke: #5F5E5A; }
+.c-gray text { fill: #444441; }
+.box { fill: #F7F6F2; stroke: #B4B2A9; }
+.arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
+.c-red rect, rect.c-red { fill: #FCEBEB; stroke: #A32D2D; }
+.c-red text { fill: #791F1F; }
+.c-green rect, rect.c-green { fill: #EAF3DE; stroke: #3B6D11; }
+.c-green text { fill: #27500A; }
+.c-purple rect, rect.c-purple { fill: #EEEDFE; stroke: #534AB7; }
+.c-purple text { fill: #3C3489; }
+.c-teal rect, rect.c-teal { fill: #E1F5EE; stroke: #0F6E56; }
+.c-teal text { fill: #085041; }
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<view id="teil1" viewBox="0 0 680 182"/>
+<view id="teil2" viewBox="0 182 680 272"/>
+<view id="teil3" viewBox="0 454 680 110"/>
+<view id="teil4" viewBox="0 564 680 240"/>
+<text class="th" x="20" y="22">④ Inlet: stetige Verteilung – Standard Log-Normal, d50 = 100 µm, σln = 0,25</text>
+<line x1="157.9" y1="36" x2="157.9" y2="140" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="3 3"/>
+<line x1="287.4" y1="36" x2="287.4" y2="140" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="3 3"/>
+<line x1="417.0" y1="36" x2="417.0" y2="140" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="3 3"/>
+<line x1="546.6" y1="36" x2="546.6" y2="140" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="3 3"/>
+<polygon points="70.0,140 71.4,140.0 75.7,140.0 80.1,140.0 84.4,140.0 88.7,140.0 93.0,140.0 97.3,140.0 101.7,140.0 106.0,140.0 110.3,140.0 114.6,140.0 118.9,140.0 123.3,140.0 127.6,140.0 131.9,140.0 136.2,140.0 140.5,140.0 144.8,140.0 149.2,140.0 153.5,140.0 157.8,140.0 162.1,140.0 166.4,140.0 170.8,140.0 175.1,140.0 179.4,140.0 183.7,140.0 188.0,140.0 192.4,140.0 196.7,139.9 201.0,139.9 205.3,139.9 209.6,139.9 213.9,139.8 218.3,139.7 222.6,139.6 226.9,139.5 231.2,139.4 235.5,139.2 239.9,138.9 244.2,138.6 248.5,138.2 252.8,137.7 257.1,137.2 261.4,136.4 265.8,135.6 270.1,134.6 274.4,133.5 278.7,132.1 283.0,130.6 287.4,128.8 291.7,126.9 296.0,124.7 300.3,122.4 304.6,119.8 309.0,117.1 313.3,114.2 317.6,111.3 321.9,108.2 326.2,105.1 330.5,102.1 334.9,99.1 339.2,96.3 343.5,93.6 347.8,91.3 352.1,89.2 356.5,87.5 360.8,86.2 365.1,85.4 369.4,85.0 373.7,85.1 378.1,85.6 382.4,86.6 386.7,88.0 391.0,89.9 395.3,92.0 399.6,94.5 404.0,97.2 408.3,100.1 412.6,103.1 416.9,106.1 421.2,109.2 425.6,112.3 429.9,115.2 434.2,118.0 438.5,120.7 442.8,123.2 447.2,125.5 451.5,127.6 455.8,129.4 460.1,131.1 464.4,132.6 468.7,133.9 473.1,135.0 477.4,135.9 481.7,136.7 486.0,137.4 490.3,137.9 494.7,138.4 499.0,138.7 503.3,139.0 507.6,139.2 511.9,139.4 516.3,139.6 520.6,139.7 524.9,139.8 529.2,139.8 533.5,139.9 537.8,139.9 542.2,139.9 546.5,140.0 550.8,140.0 555.1,140.0 559.4,140.0 563.8,140.0 568.1,140.0 572.4,140.0 576.7,140.0 581.0,140.0 585.4,140.0 589.7,140.0 594.0,140.0 598.3,140.0 602.6,140.0 606.9,140.0 611.3,140.0 615.6,140.0 619.9,140.0 624.2,140.0 628.5,140.0 630.0,140" fill="#EEEDFE" stroke="none"/>
+<polyline points="71.4,140.0 75.7,140.0 80.1,140.0 84.4,140.0 88.7,140.0 93.0,140.0 97.3,140.0 101.7,140.0 106.0,140.0 110.3,140.0 114.6,140.0 118.9,140.0 123.3,140.0 127.6,140.0 131.9,140.0 136.2,140.0 140.5,140.0 144.8,140.0 149.2,140.0 153.5,140.0 157.8,140.0 162.1,140.0 166.4,140.0 170.8,140.0 175.1,140.0 179.4,140.0 183.7,140.0 188.0,140.0 192.4,140.0 196.7,139.9 201.0,139.9 205.3,139.9 209.6,139.9 213.9,139.8 218.3,139.7 222.6,139.6 226.9,139.5 231.2,139.4 235.5,139.2 239.9,138.9 244.2,138.6 248.5,138.2 252.8,137.7 257.1,137.2 261.4,136.4 265.8,135.6 270.1,134.6 274.4,133.5 278.7,132.1 283.0,130.6 287.4,128.8 291.7,126.9 296.0,124.7 300.3,122.4 304.6,119.8 309.0,117.1 313.3,114.2 317.6,111.3 321.9,108.2 326.2,105.1 330.5,102.1 334.9,99.1 339.2,96.3 343.5,93.6 347.8,91.3 352.1,89.2 356.5,87.5 360.8,86.2 365.1,85.4 369.4,85.0 373.7,85.1 378.1,85.6 382.4,86.6 386.7,88.0 391.0,89.9 395.3,92.0 399.6,94.5 404.0,97.2 408.3,100.1 412.6,103.1 416.9,106.1 421.2,109.2 425.6,112.3 429.9,115.2 434.2,118.0 438.5,120.7 442.8,123.2 447.2,125.5 451.5,127.6 455.8,129.4 460.1,131.1 464.4,132.6 468.7,133.9 473.1,135.0 477.4,135.9 481.7,136.7 486.0,137.4 490.3,137.9 494.7,138.4 499.0,138.7 503.3,139.0 507.6,139.2 511.9,139.4 516.3,139.6 520.6,139.7 524.9,139.8 529.2,139.8 533.5,139.9 537.8,139.9 542.2,139.9 546.5,140.0 550.8,140.0 555.1,140.0 559.4,140.0 563.8,140.0 568.1,140.0 572.4,140.0 576.7,140.0 581.0,140.0 585.4,140.0 589.7,140.0 594.0,140.0 598.3,140.0 602.6,140.0 606.9,140.0 611.3,140.0 615.6,140.0 619.9,140.0 624.2,140.0 628.5,140.0" fill="none" stroke="#534AB7" stroke-width="2"/>
+<text class="ts" x="222.6" y="48" text-anchor="middle" style="fill:#854F0B;font-weight:bold">3,7 %</text>
+<text class="ts" x="352.2" y="48" text-anchor="middle" style="fill:#854F0B;font-weight:bold">80,1 %</text>
+<text class="ts" x="481.8" y="48" text-anchor="middle" style="fill:#854F0B;font-weight:bold">16,2 %</text>
+<line x1="70" y1="140" x2="630" y2="140" stroke="#B4B2A9"/>
+<text class="ts" x="70.0" y="153" text-anchor="middle">20</text>
+<text class="ts" x="157.9" y="153" text-anchor="middle" style="fill:#854F0B">32</text>
+<text class="ts" x="241.3" y="153" text-anchor="middle">50</text>
+<text class="ts" x="287.4" y="153" text-anchor="middle" style="fill:#854F0B">64</text>
+<text class="ts" x="370.9" y="153" text-anchor="middle">100</text>
+<text class="ts" x="417.0" y="153" text-anchor="middle" style="fill:#854F0B">128</text>
+<text class="ts" x="500.4" y="153" text-anchor="middle">200</text>
+<text class="ts" x="546.6" y="153" text-anchor="middle" style="fill:#854F0B">256</text>
+<text class="ts" x="630.0" y="153" text-anchor="middle">400</text>
+<text class="ts" x="630" y="166" text-anchor="end">Größe d [µm], logarithmisch; gestrichelt: Siebsatz 1 µm · 2^k</text>
+<text class="ts" x="20" y="166" style="fill:#7A7870">SizeDistribution.h: Dichte, Q3, Quantil</text>
+<text class="th" x="20" y="200">⑤ Karten verteilen – zur Anschauung 20 statt 2000 Karten</text>
+<text class="ts" x="20" y="220" style="font-weight:bold">Bereich</text>
+<text class="ts" x="260" y="220" style="font-weight:bold">32–64 µm</text>
+<text class="ts" x="360" y="220" style="font-weight:bold">64–128 µm</text>
+<text class="ts" x="460" y="220" style="font-weight:bold">128–256 µm</text>
+<text class="ts" x="570" y="220" style="font-weight:bold">Summe</text>
+<text class="ts" x="20" y="236">Massenanteil</text>
+<text class="ts" x="260" y="236">3,7 %</text>
+<text class="ts" x="360" y="236">80,1 %</text>
+<text class="ts" x="460" y="236">16,2 %</text>
+<text class="ts" x="570" y="236">100 %</text>
+<text class="ts" x="20" y="252">Mindestzahl ⌈20 % · 20 / 3⌉</text>
+<text class="ts" x="260" y="252">2</text>
+<text class="ts" x="360" y="252">2</text>
+<text class="ts" x="460" y="252">2</text>
+<text class="ts" x="570" y="252">6</text>
+<text class="ts" x="20" y="268">+ Rest 14 nach Masse</text>
+<text class="ts" x="260" y="268">+ 0,5</text>
+<text class="ts" x="360" y="268">+ 11,2</text>
+<text class="ts" x="460" y="268">+ 2,3</text>
+<text class="ts" x="570" y="268">14</text>
+<text class="ts" x="20" y="284" style="font-weight:bold">= Karten (ganze, größter Rest)</text>
+<text class="ts" x="260" y="284" style="fill:#534AB7;font-weight:bold">3</text>
+<text class="ts" x="360" y="284" style="fill:#534AB7;font-weight:bold">13</text>
+<text class="ts" x="460" y="284" style="fill:#534AB7;font-weight:bold">4</text>
+<text class="ts" x="570" y="284" style="fill:#534AB7;font-weight:bold">20</text>
+<text class="ts" x="20" y="300">Masse je Karte</text>
+<text class="ts" x="260" y="300">1,24 %</text>
+<text class="ts" x="360" y="300">6,16 %</text>
+<text class="ts" x="460" y="300">4,04 %</text>
+<text class="ts" x="570" y="300"></text>
+<line x1="157.9" y1="320" x2="157.9" y2="414" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="3 3"/>
+<line x1="287.4" y1="320" x2="287.4" y2="414" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="3 3"/>
+<line x1="417.0" y1="320" x2="417.0" y2="414" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="3 3"/>
+<line x1="546.6" y1="320" x2="546.6" y2="414" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="3 3"/>
+<line x1="254.0" y1="414" x2="254.0" y2="398.1" stroke="#534AB7" stroke-width="3"/><circle cx="254.0" cy="398.1" r="3" fill="#534AB7"/>
+<line x1="273.4" y1="414" x2="273.4" y2="398.1" stroke="#534AB7" stroke-width="3"/><circle cx="273.4" cy="398.1" r="3" fill="#534AB7"/>
+<line x1="283.6" y1="414" x2="283.6" y2="398.1" stroke="#534AB7" stroke-width="3"/><circle cx="283.6" cy="398.1" r="3" fill="#534AB7"/>
+<line x1="301.2" y1="414" x2="301.2" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="301.2" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="318.1" y1="414" x2="318.1" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="318.1" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="330.0" y1="414" x2="330.0" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="330.0" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="339.7" y1="414" x2="339.7" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="339.7" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="348.3" y1="414" x2="348.3" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="348.3" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="356.1" y1="414" x2="356.1" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="356.1" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="363.5" y1="414" x2="363.5" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="363.5" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="370.8" y1="414" x2="370.8" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="370.8" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="378.0" y1="414" x2="378.0" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="378.0" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="385.5" y1="414" x2="385.5" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="385.5" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="393.3" y1="414" x2="393.3" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="393.3" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="401.8" y1="414" x2="401.8" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="401.8" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="411.4" y1="414" x2="411.4" y2="334.8" stroke="#534AB7" stroke-width="3"/><circle cx="411.4" cy="334.8" r="3" fill="#534AB7"/>
+<line x1="421.0" y1="414" x2="421.0" y2="362.0" stroke="#534AB7" stroke-width="3"/><circle cx="421.0" cy="362.0" r="3" fill="#534AB7"/>
+<line x1="430.5" y1="414" x2="430.5" y2="362.0" stroke="#534AB7" stroke-width="3"/><circle cx="430.5" cy="362.0" r="3" fill="#534AB7"/>
+<line x1="443.2" y1="414" x2="443.2" y2="362.0" stroke="#534AB7" stroke-width="3"/><circle cx="443.2" cy="362.0" r="3" fill="#534AB7"/>
+<line x1="466.6" y1="414" x2="466.6" y2="362.0" stroke="#534AB7" stroke-width="3"/><circle cx="466.6" cy="362.0" r="3" fill="#534AB7"/>
+<text class="ts" x="64" y="332" text-anchor="end">Masse</text><text class="ts" x="64" y="345" text-anchor="end">je Karte</text>
+<line x1="70" y1="414" x2="630" y2="414" stroke="#B4B2A9"/>
+<text class="ts" x="70.0" y="427" text-anchor="middle">20</text>
+<text class="ts" x="157.9" y="427" text-anchor="middle" style="fill:#854F0B">32</text>
+<text class="ts" x="241.3" y="427" text-anchor="middle">50</text>
+<text class="ts" x="287.4" y="427" text-anchor="middle" style="fill:#854F0B">64</text>
+<text class="ts" x="370.9" y="427" text-anchor="middle">100</text>
+<text class="ts" x="417.0" y="427" text-anchor="middle" style="fill:#854F0B">128</text>
+<text class="ts" x="500.4" y="427" text-anchor="middle">200</text>
+<text class="ts" x="546.6" y="427" text-anchor="middle" style="fill:#854F0B">256</text>
+<text class="ts" x="630.0" y="427" text-anchor="middle">400</text>
+<text class="ts" x="630" y="440" text-anchor="end">jede Karte an ihrem Quantil (Abb. 13.21.2), Höhe = Masse je Karte</text>
+<text class="ts" x="20" y="440" style="fill:#7A7870">CardSettings.h, CardPlacement.h, InletUnit.h</text>
+<text class="th" x="20" y="472">⑥ Durch die Units: Karten bleiben Karten</text>
+<g class="c-green"><rect x="30" y="484" width="150" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="105" y="503" text-anchor="middle">Inlet</text></g>
+<g class="c-purple"><rect x="250" y="484" width="150" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="325" y="503" text-anchor="middle">Splitter</text></g>
+<g class="c-amber"><rect x="470" y="484" width="150" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="545" y="503" text-anchor="middle">Outlet</text></g>
+<line x1="180" y1="499" x2="248" y2="499" class="arr" marker-end="url(#arrow)"/>
+<line x1="400" y1="499" x2="468" y2="499" class="arr" marker-end="url(#arrow)"/>
+<circle cx="196" cy="491" r="2.5" fill="#534AB7"/>
+<circle cx="416" cy="491" r="2.5" fill="#534AB7"/>
+<circle cx="205" cy="491" r="2.5" fill="#534AB7"/>
+<circle cx="425" cy="491" r="2.5" fill="#534AB7"/>
+<circle cx="214" cy="491" r="2.5" fill="#534AB7"/>
+<circle cx="434" cy="491" r="2.5" fill="#534AB7"/>
+<circle cx="223" cy="491" r="2.5" fill="#534AB7"/>
+<circle cx="443" cy="491" r="2.5" fill="#534AB7"/>
+<circle cx="232" cy="491" r="2.5" fill="#534AB7"/>
+<circle cx="241" cy="491" r="2.5" fill="#534AB7"/>
+<text class="ts" x="20" y="532">Im Strom wandern die Karten selbst (Größe + Massenstrom je Stoff); der Splitter verteilt ganze Karten (Konto-Verfahren, 13.22).</text>
+<text class="ts" x="20" y="548" style="fill:#7A7870">StreamSlice.h (Karten im Strom), FlowsheetGraph.h (reicht die Scheiben weiter, prüft, ob jede Unit Karten kann)</text>
+<text class="th" x="20" y="582">⑦ Für die Anzeige: Karten zurück aufs Raster (jeder Ausgang, jeder Zeitschritt)</text>
+<rect x="30" y="604" width="190" height="104" rx="5" fill="#F7F6F2" stroke="#B4B2A9"/>
+<line x1="40" y1="682" x2="210" y2="682" stroke="#B4B2A9"/>
+<line x1="60" y1="640" x2="60" y2="682" stroke="#0F6E56" stroke-width="5"/>
+<line x1="190" y1="664" x2="190" y2="682" stroke="#0F6E56" stroke-width="5"/>
+<circle cx="99" cy="626" r="5" fill="#534AB7"/><line x1="99" y1="632" x2="99" y2="682" stroke="#534AB7" stroke-dasharray="2 2"/>
+<text class="ts" x="99" y="618" text-anchor="middle" style="fill:#534AB7">Karte bei 30 %</text>
+<text class="ts" x="60" y="695" text-anchor="middle">d_i: 70 %</text><text class="ts" x="190" y="695" text-anchor="middle">d_i+1: 30 %</text>
+<line x1="250" y1="708" x2="650" y2="708" stroke="#B4B2A9"/>
+<line x1="380.6" y1="708" x2="380.6" y2="693.9" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="383.7" y1="708" x2="383.7" y2="702.9" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="392.9" y1="708" x2="392.9" y2="703.7" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="396.0" y1="708" x2="396.0" y2="693.1" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="402.2" y1="708" x2="402.2" y2="691.2" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="405.3" y1="708" x2="405.3" y2="705.6" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="414.5" y1="708" x2="414.5" y2="631.0" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="417.6" y1="708" x2="417.6" y2="689.3" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="426.9" y1="708" x2="426.9" y2="624.0" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="429.9" y1="708" x2="429.9" y2="696.3" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="433.0" y1="708" x2="433.0" y2="696.6" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="436.1" y1="708" x2="436.1" y2="623.7" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="442.3" y1="708" x2="442.3" y2="624.8" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="445.4" y1="708" x2="445.4" y2="695.5" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="448.4" y1="708" x2="448.4" y2="622.2" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="451.5" y1="708" x2="451.5" y2="690.0" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="454.6" y1="708" x2="454.6" y2="620.4" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="457.7" y1="708" x2="457.7" y2="673.2" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="460.8" y1="708" x2="460.8" y2="647.1" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="463.9" y1="708" x2="463.9" y2="642.5" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="467.0" y1="708" x2="467.0" y2="677.2" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="470.0" y1="708" x2="470.0" y2="613.0" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="473.1" y1="708" x2="473.1" y2="680.5" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="476.2" y1="708" x2="476.2" y2="639.8" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="479.3" y1="708" x2="479.3" y2="662.3" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="482.4" y1="708" x2="482.4" y2="658.0" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="485.5" y1="708" x2="485.5" y2="659.3" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="488.5" y1="708" x2="488.5" y2="661.0" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="491.6" y1="708" x2="491.6" y2="682.4" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="494.7" y1="708" x2="494.7" y2="637.9" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="497.8" y1="708" x2="497.8" y2="704.9" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="500.9" y1="708" x2="500.9" y2="648.3" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="507.1" y1="708" x2="507.1" y2="653.6" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="510.1" y1="708" x2="510.1" y2="699.6" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="516.3" y1="708" x2="516.3" y2="651.2" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="519.4" y1="708" x2="519.4" y2="702.0" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="531.7" y1="708" x2="531.7" y2="676.2" stroke="#B4B2A9" stroke-width="1.2"/>
+<line x1="534.8" y1="708" x2="534.8" y2="677.0" stroke="#B4B2A9" stroke-width="1.2"/>
+<polyline points="251.0,708.0 254.1,708.0 257.2,708.0 260.3,708.0 263.4,708.0 266.4,708.0 269.5,708.0 272.6,708.0 275.7,708.0 278.8,708.0 281.9,708.0 285.0,708.0 288.0,708.0 291.1,708.0 294.2,708.0 297.3,708.0 300.4,708.0 303.5,708.0 306.5,708.0 309.6,708.0 312.7,708.0 315.8,708.0 318.9,708.0 322.0,708.0 325.1,708.0 328.1,708.0 331.2,708.0 334.3,708.0 337.4,708.0 340.5,707.7 343.6,708.0 346.6,708.0 349.7,707.7 352.8,707.9 355.9,707.7 359.0,707.6 362.1,707.5 365.2,707.3 368.2,707.1 371.3,706.9 374.4,706.5 377.5,706.1 380.6,705.6 383.7,705.0 386.7,704.3 389.8,703.4 392.9,702.4 396.0,701.2 399.1,699.8 402.2,698.2 405.3,696.4 408.3,694.4 411.4,692.1 414.5,689.7 417.6,687.0 420.7,684.2 423.8,681.2 426.9,678.1 429.9,674.9 433.0,671.7 436.1,668.6 439.2,665.5 442.3,662.5 445.4,659.8 448.4,657.3 451.5,655.2 454.6,653.5 457.7,652.1 460.8,651.2 463.9,650.8 467.0,650.9 470.0,651.5 473.1,652.5 476.2,654.0 479.3,655.9 482.4,658.1 485.5,660.7 488.5,663.5 491.6,666.5 494.7,669.6 497.8,672.8 500.9,676.0 504.0,679.1 507.1,682.2 510.1,685.1 513.2,687.9 516.3,690.5 519.4,692.9 522.5,695.0 525.6,697.0 528.6,698.7 531.7,700.3 534.8,701.6 537.9,702.7 541.0,703.7 544.1,704.6 547.2,705.2 550.2,705.8 553.3,706.3 556.4,706.7 559.5,706.9 562.6,707.2 565.7,707.4 568.8,707.7 571.8,707.4 574.9,708.0 578.0,707.7 581.1,707.6 584.2,708.0 587.3,708.0 590.3,708.0 593.4,708.0 596.5,708.0 599.6,708.0 602.7,708.0 605.8,708.0 608.9,708.0 611.9,708.0 615.0,708.0 618.1,708.0 621.2,708.0 624.3,708.0 627.4,708.0 630.4,708.0 633.5,708.0 636.6,708.0 639.7,708.0 642.8,708.0 645.9,708.0 649.0,708.0" fill="none" stroke="#534AB7" stroke-width="1.6"/>
+<polyline points="251.0,708.0 254.1,708.0 257.2,708.0 260.3,708.0 263.4,708.0 266.4,708.0 269.5,708.0 272.6,708.0 275.7,708.0 278.8,708.0 281.9,708.0 285.0,708.0 288.0,708.0 291.1,708.0 294.2,708.0 297.3,708.0 300.4,708.0 303.5,708.0 306.5,708.0 309.6,708.0 312.7,708.0 315.8,708.0 318.9,708.0 322.0,708.0 325.1,708.0 328.1,708.0 331.2,708.0 334.3,708.0 337.4,708.0 340.5,707.9 343.6,707.9 346.6,707.9 349.7,707.9 352.8,707.8 355.9,707.7 359.0,707.6 362.1,707.5 365.2,707.3 368.2,707.1 371.3,706.9 374.4,706.5 377.5,706.1 380.6,705.6 383.7,705.0 386.7,704.3 389.8,703.4 392.9,702.4 396.0,701.2 399.1,699.8 402.2,698.2 405.3,696.4 408.3,694.4 411.4,692.1 414.5,689.7 417.6,687.0 420.7,684.2 423.8,681.2 426.9,678.1 429.9,674.9 433.0,671.7 436.1,668.5 439.2,665.5 442.3,662.5 445.4,659.8 448.4,657.3 451.5,655.2 454.6,653.4 457.7,652.1 460.8,651.2 463.9,650.8 467.0,650.9 470.0,651.4 473.1,652.5 476.2,654.0 479.3,655.9 482.4,658.1 485.5,660.7 488.5,663.5 491.6,666.5 494.7,669.6 497.8,672.8 500.9,676.0 504.0,679.2 507.1,682.2 510.1,685.2 513.2,687.9 516.3,690.5 519.4,692.9 522.5,695.1 525.6,697.0 528.6,698.8 531.7,700.3 534.8,701.6 537.9,702.8 541.0,703.7 544.1,704.6 547.2,705.3 550.2,705.8 553.3,706.3 556.4,706.7 559.5,707.0 562.6,707.2 565.7,707.4 568.8,707.5 571.8,707.7 574.9,707.7 578.0,707.8 581.1,707.9 584.2,707.9 587.3,707.9 590.3,708.0 593.4,708.0 596.5,708.0 599.6,708.0 602.7,708.0 605.8,708.0 608.9,708.0 611.9,708.0 615.0,708.0 618.1,708.0 621.2,708.0 624.3,708.0 627.4,708.0 630.4,708.0 633.5,708.0 636.6,708.0 639.7,708.0 642.8,708.0 645.9,708.0 649.0,708.0" fill="none" stroke="#5F5E5A" stroke-width="1.2" stroke-dasharray="5 3"/>
+<text class="ts" x="250.0" y="721" text-anchor="middle">20</text>
+<text class="ts" x="372.3" y="721" text-anchor="middle">50</text>
+<text class="ts" x="464.9" y="721" text-anchor="middle">100</text>
+<text class="ts" x="557.4" y="721" text-anchor="middle">200</text>
+<text class="ts" x="650.0" y="721" text-anchor="middle">400</text>
+<line x1="500" y1="608" x2="518" y2="608" stroke="#B4B2A9" stroke-width="2"/><text class="ts" x="524" y="612">20 Karten (Zacken)</text>
+<line x1="500" y1="624" x2="518" y2="624" stroke="#534AB7" stroke-width="2"/><text class="ts" x="524" y="628">2000 Karten</text>
+<line x1="500" y1="640" x2="518" y2="640" stroke="#5F5E5A" stroke-width="1.2" stroke-dasharray="5 3"/><text class="ts" x="524" y="644">Kontinuum</text>
+<text class="ts" x="450" y="735" text-anchor="middle">Größe d [µm], Raster 300 Klassen, 1 µm – 1 mm</text>
+<text class="ts" x="20" y="756">• Masse bleibt exakt; gespeichert wird nur dieses „Foto“ auf dem Raster – Heatmap, Kurven und Auswertung zeigen es.</text>
+<text class="ts" x="20" y="771">• Die Karten selbst laufen weiter und werden nicht zurückverwandelt. Wenige Karten ergeben Zacken, viele die glatte Kurve.</text>
+<text class="ts" x="20" y="789" style="fill:#7A7870">CardProjection.h (Karten → Raster), StreamRecord.h (ruft es beim Aufzeichnen auf)</text>
+</svg>

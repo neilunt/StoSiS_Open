@@ -2,10 +2,10 @@
 # (Fenster, Menues, Darstellung) und linkt gegen stosis_core fuer
 # alles Rechenrelevante.
 
-# WICHTIG: Passe diesen Pfad an deine lokale Qt-Installation an, z.B.:
+# WICHTIG: Diesen Pfad an die lokale Qt-Installation anpassen, z.B.:
 #   set(CMAKE_PREFIX_PATH "C:/Qt/6.7.0/msvc2019_64")
-# Falls die Umgebungsvariable Qt6_DIR bereits gesetzt ist, kannst du die
-# Zeile auch weglassen - dann findet find_package() Qt automatisch.
+# Ist die Umgebungsvariable Qt6_DIR bereits gesetzt, kann die Zeile
+# auch entfallen - dann findet find_package() Qt automatisch.
 #
 set(CMAKE_PREFIX_PATH "C:/Qt/6.11.1/msvc2022_64")
 
@@ -13,7 +13,7 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 # Qt-typisch: MOC (Meta-Object Compiler) muss automatisch fuer alle
 # Klassen mit Q_OBJECT-Makro laufen. Diese drei Zeilen erledigen das,
-# sonst muesstest du das manuell pflegen.
+# sonst muesste man das von Hand pflegen.
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -54,6 +54,18 @@ src/CurveWidget.cpp
 src/CurveWidget.h
 src/ResultsCurveWindow.cpp
 src/ResultsCurveWindow.h
+src/AnalysisWindow.cpp
+src/AnalysisWindow.h
+src/AnalysisPlotWidget.cpp
+src/AnalysisPlotWidget.h
+src/SimulationLogWindow.cpp
+src/SimulationLogWindow.h
+src/CardWindow.cpp
+src/CardWindow.h
+src/CardPlotWidget.cpp
+src/CardPlotWidget.h
+src/SieveGridWidget.cpp
+src/SieveGridWidget.h
 src/ProcessNodeEditorWidget.cpp
 src/ProcessNodeEditorWidget.h
 src/ResultsHeatmapWindow.cpp
@@ -87,14 +99,18 @@ target_compile_definitions(stosis_gui PRIVATE STOSIS_DATA_DIR="${CMAKE_SOURCE_DI
 # als Startprojekt erkannt wird.
 set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT stosis_gui)
 
-# Kopiert die benoetigten Qt-DLLs automatisch neben die .exe, damit du
-# das Programm auch ausserhalb von Visual Studio starten kannst (Windows
-# findet sonst z.B. Qt6Widgets.dll nicht).
+# Kopiert die benoetigten Qt-DLLs automatisch neben die .exe, damit sich
+# das Programm auch ausserhalb von Visual Studio starten laesst (Windows
+# findet sonst z.B. Qt6Widgets.dll nicht). Ohne C++-Laufzeit: Die ist mit
+# Visual Studio installiert; windeployqt wuerde sonst nur das Installations-
+# programm vc_redist danebenlegen und ausserhalb der VS-Eingabeaufforderung
+# warnen (VCINSTALLDIR). Fuer die Weitergabe an Rechner ohne Visual Studio
+# dort einmal das "Microsoft Visual C++ Redistributable" installieren.
 if(WIN32)
     find_program(WINDEPLOYQT_EXE windeployqt HINTS "${Qt6_DIR}/../../../bin")
     if(WINDEPLOYQT_EXE)
         add_custom_command(TARGET stosis_gui POST_BUILD
-            COMMAND "${WINDEPLOYQT_EXE}" "$<TARGET_FILE:stosis_gui>"
+            COMMAND "${WINDEPLOYQT_EXE}" --no-compiler-runtime "$<TARGET_FILE:stosis_gui>"
         )
     endif()
 endif()

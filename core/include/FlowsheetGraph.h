@@ -11,6 +11,8 @@
 #include "EnsembleStatistics.h"
 #include "SimulationResults.h"
 #include "StreamRecord.h"
+#include "SimulationLog.h"
+#include "CardHistory.h"
 #include "Materials.h"
 #include "InletUnit.h"
 #include "OutletUnit.h"
@@ -379,6 +381,15 @@ namespace stosis
             m_grid.totalTime = totalTime;
         }
 
+        // Nur das Zeitraster setzen: Dauer und gewuenschte Schrittweite dt; die
+        // Zahl der Zeitpunkte folgt daraus (SSimulationGrid::TimePointsFor), das
+        // Groessenraster bleibt. So aendert eine neue Dauer das dt nicht mehr.
+        void ConfigureTime(double totalTime, double dt)
+        {
+            m_grid.totalTime = totalTime;
+            m_grid.numTimeSteps = SSimulationGrid::TimePointsFor(totalTime, dt);
+        }
+
         // Passt ein (noch nicht uebernommenes) Groessenraster zu den Units?
         // Je Hinweis "Knotenname: Text" (z.B. Inlet-Verteilung ragt hinaus).
         std::vector<std::string> CheckSizeGrid(const SSizeGrid& sizes) const
@@ -399,6 +410,31 @@ namespace stosis
 
         void SetRandomSeed(std::uint64_t seed) { m_grid.randomSeed = seed; }
 
+        // Kontinuum oder Partikel fuer alle Stroeme der naechsten Simulation.
+        void SetRepresentation(ERepresentation representation) { m_grid.representation = representation; }
+        ERepresentation GetRepresentation() const { return m_grid.representation; }
+
+        // Kartenzahl je Stromscheibe, Mindestzahl, Groessenbereiche (Partikelmodus).
+        void SetCardSettings(const SCardSettings& cards) { m_grid.cards = cards; }
+        const SCardSettings& GetCardSettings() const { return m_grid.cards; }
+
+        // Units, die im Partikelmodus noch nicht rechnen koennen, als
+        // "Knotenname (Typ)" in der Reihenfolge der Knoten. Leer = alles
+        // bereit (im Kontinuum immer leer); sonst startet keine Simulation.
+        std::vector<std::string> GetUnitsWithoutParticleSupport() const
+        {
+            std::vector<std::string> names;
+            if (m_grid.representation != ERepresentation::Particles)
+                return names;
+            for (const SFlowsheetNode& node : m_nodes)
+            {
+                auto it = m_units.find(node.id);
+                if (it != m_units.end() && it->second && !it->second->SupportsParticles())
+                    names.push_back(node.name + " (" + GetNodeTypeLabel(node.type) + ")");
+            }
+            return names;
+        }
+
         // Eigener Seed einer Unit: haengt nur vom globalen Seed und der
         // Knoten-ID ab - nicht von der Reihenfolge der Knoten. Fuegt man
         // irgendwo einen Block hinzu, aendern sich die Zufallszahlen der
@@ -417,17 +453,61 @@ namespace stosis
             return false;
         }
 
+        // Haengt das, was ein Knoten liefert, vom Zufall ab? Ja, wenn seine
+        // Unit selbst oder irgendeine davor (auch ueber Rueckfuehrungen)
+        // stochastisch ist - heute ein Splitter im stochastischen Modus. Nur
+        // dort hat das Fenster "Auswertung" Schwankungen zu zeigen.
+        bool IsAffectedByRandomness(const std::string& nodeId) const
+        {
+            std::set<std::string> visited;
+            std::vector<std::string> stack = { nodeId };
+            while (!stack.empty())
+            {
+                const std::string current = stack.back();
+                stack.pop_back();
+                if (!visited.insert(current).second)
+                    continue;
+                auto it = m_units.find(current);
+                if (it != m_units.end() && it->second && it->second->IsStochastic())
+                    return true;
+                for (const SFlowsheetConnection& conn : m_connections)
+                    if (conn.targetNodeId == current)
+                        stack.push_back(conn.sourceNodeId);
+            }
+            return false;
+        }
+
         // Rueckmeldung waehrend mehrerer Laeufe: (fertige Laeufe, Gesamtzahl).
         // Liefert false, wenn abgebrochen werden soll.
         using ProgressCallback = std::function<bool(size_t, size_t)>;
+        // Rueckmeldung je Zeitschritt (SSimulationProgress); false = abbrechen.
+        using StepProgressCallback = std::function<bool(const SSimulationProgress&)>;
+
+        // Hoechstens so oft (in s) meldet sich der Fortschritt innerhalb eines
+        // Laufs (Standard 0,05 s; 0 = nach jedem Zeitschritt, fuer Tests).
+        void SetProgressInterval(double seconds) { m_progressInterval = seconds; }
 
         // Rechnet das Flowsheet numRuns-mal mit verschiedenen Seeds (Lauf 1
         // mit genau dem eingestellten Seed) und sammelt fuer jedes Ergebnis
         // die Statistik. Ein deterministisches Flowsheet wird nur einmal
         // gerechnet. Rueckgabe: Anzahl tatsaechlich gerechneter Laeufe
         // (weniger, wenn abgebrochen wurde - die Statistik umfasst dann die
-        // fertigen Laeufe).
+        // fertigen Laeufe). progress meldet sich am Ende jedes Laufs.
         size_t RunSimulations(size_t numRuns, const ProgressCallback& progress = ProgressCallback())
+        {
+            if (!progress)
+                return RunSimulations(numRuns, StepProgressCallback());
+            return RunSimulations(numRuns, StepProgressCallback([&progress](const SSimulationProgress& state)
+                {
+                    return !state.runFinished || progress(state.runsDone, state.runs);
+                }));
+        }
+
+        // Wie oben, aber mit Rueckmeldung auch waehrend eines Laufs (im Abstand
+        // von SetProgressInterval und am Ende jedes Laufs). Liefert sie
+        // false, bricht die Rechnung sofort ab, auch mitten in einem Lauf; der
+        // angefangene Lauf zaehlt dann nicht zur Statistik.
+        size_t RunSimulations(size_t numRuns, const StepProgressCallback& progress)
         {
             if (m_grid.numTimeSteps < 2 || m_grid.numSizeClasses < 1)
                 return 0;
@@ -435,31 +515,65 @@ namespace stosis
 
             PrepareMaterials();
             m_warnings.clear();
+            BeginLog(runs);
+            if (!CheckParticleSupportOrWarn())
+            {
+                for (const std::string& warning : m_warnings)
+                    m_log.Add("Nicht gestartet: " + warning);
+                return 0; // alte Ergebnisse bleiben stehen
+            }
             m_inEnsemble = true;
             for (auto& entry : m_statistics)
                 for (CStreamStatistics& stats : entry.second)
                     stats.Reset(m_grid);
+            ResetCardHistories();
 
+            SSimulationProgress state;
+            state.runs = runs;
+            state.steps = m_grid.numTimeSteps;
             const std::uint64_t baseSeed = m_grid.randomSeed;
             size_t done = 0;
             for (size_t r = 0; r < runs; ++r)
             {
                 m_grid.randomSeed = MakeRunSeed(baseSeed, r);
-                RunSimulation();
+                m_runIndex = r;
+                state.runsDone = done;
+                state.stepsDone = 0;
+                state.runFinished = false;
+                if (!RunOne(progress ? &progress : nullptr, state))
+                {
+                    m_timing.cancelled = true;
+                    m_log.Add("Lauf " + std::to_string(r + 1) + " abgebrochen - er zaehlt nicht zur Statistik");
+                    break;
+                }
+                CStopwatch statisticsClock;
                 for (auto& entry : m_statistics)
                     for (size_t port = 0; port < entry.second.size(); ++port)
                         if (const CStreamRecord* record = GetDisplayRecord(entry.first, port))
                             entry.second[port].AddRun(*record);
+                m_timing.statisticsSeconds += statisticsClock.GetSeconds();
                 ++done;
-                if (progress && !progress(done, runs))
+                state.runsDone = done;
+                state.stepsDone = 0;
+                state.runFinished = true;
+                state.elapsedSeconds = m_log.GetElapsedSeconds();
+                if (progress && !progress(state))
+                {
+                    m_timing.cancelled = done < runs;
+                    if (m_timing.cancelled)
+                        m_log.Add("Abgebrochen nach Lauf " + std::to_string(done));
                     break;
+                }
             }
             m_grid.randomSeed = baseSeed;
             m_inEnsemble = false;
 
+            CStopwatch statisticsClock;
             for (auto& entry : m_statistics)
                 for (CStreamStatistics& stats : entry.second)
                     stats.Finalize();
+            m_timing.statisticsSeconds += statisticsClock.GetSeconds();
+            EndLog(done, runs);
             return done;
         }
 
@@ -486,29 +600,123 @@ namespace stosis
         // GetOutputResults/GetDisplayResults (ohne Statistik).
         void RunSimulation()
         {
+            if (m_grid.numTimeSteps < 2 || m_grid.numSizeClasses < 1)
+                return;
+            PrepareMaterials();
+            m_warnings.clear();
+            BeginLog(1);
+            if (!CheckParticleSupportOrWarn())
+            {
+                for (const std::string& warning : m_warnings)
+                    m_log.Add("Nicht gestartet: " + warning);
+                return;
+            }
+            ResetCardHistories();
+            m_runIndex = 0;
+            SSimulationProgress state;
+            state.runs = 1;
+            state.steps = m_grid.numTimeSteps;
+            RunOne(nullptr, state);
+            EndLog(1, 1);
+        }
+
+        // Textprotokoll und Laufzeiten der letzten Simulation (Methoden Kap. 12).
+        const CSimulationLog& GetSimulationLog() const { return m_log; }
+        const SSimulationTiming& GetSimulationTiming() const { return m_timing; }
+        // Eine Zeile von aussen anhaengen, z.B. die Zeit fuers Neuzeichnen.
+        void AddLogLine(const std::string& text) { m_log.Add(text); }
+        // Ausfuehrlich: in Lauf 1 jede Unit in jedem Zeitschritt (Start und Ende).
+        void SetDetailedLog(bool detailed) { m_detailedLog = detailed; }
+        bool IsDetailedLog() const { return m_detailedLog; }
+
+        // Karten eines Eintrags aus GetResultsEntries() in Lauf 1 (nur im
+        // Partikelmodus; beim Outlet die ankommenden Karten). nullptr, wenn
+        // es keine gibt.
+        const CCardHistory* GetCardHistory(const std::string& nodeId, size_t port) const
+        {
+            auto it = m_cardHistories.find(nodeId);
+            if (it == m_cardHistories.end() || port >= it->second.size())
+                return nullptr;
+            return &it->second[port];
+        }
+
+    private:
+        // Ein Lauf mit dem aktuellen Seed (m_runIndex = Nummer im Ensemble).
+        // false, wenn progress abgebrochen hat.
+        bool RunOne(const StepProgressCallback* progress, SSimulationProgress& state)
+        {
             const size_t numT = m_grid.numTimeSteps;
             const size_t numS = m_grid.numSizeClasses;
-            if (numT < 2 || numS < 1)
-                return;
             const double dt = m_grid.GetDt();
+            const bool firstRun = m_runIndex == 0;
+            const bool particles = m_grid.representation == ERepresentation::Particles;
+            const bool detailed = m_detailedLog && firstRun;
+            CStopwatch runClock;
+            if (!firstRun)
+                m_log.Add("Lauf " + std::to_string(m_runIndex + 1) + " von " + std::to_string(state.runs) + " gestartet");
 
             // 1) Aktive Stoffe bestimmen, alle Units zuruecksetzen,
             //    Ergebnis-Speicher vorbereiten.
             PrepareMaterials();
-            if (!m_inEnsemble)
-                m_warnings.clear();
             const size_t numC = m_grid.GetNumCompounds();
-            for (auto& entry : m_units)
-                if (entry.second)
-                    entry.second->Initialize(m_grid, GetUnitSeed(entry.first));
-            for (auto& entry : m_outputRecords)
-                for (CStreamRecord& record : entry.second)
-                    record.Configure(m_grid);
+            const ERepresentation representation = m_grid.representation;
 
             // 2) Reihenfolge pro Schritt + aufgeschnittene Verbindungen.
             std::vector<std::string> order;
             std::set<std::string> lagged;
             BuildExecutionPlan(order, lagged);
+            if (firstRun)
+            {
+                m_timing.units.clear();
+                m_timingIndex.clear();
+                std::string plan;
+                for (const std::string& id : order)
+                {
+                    const SFlowsheetNode* node = FindNode(id);
+                    m_timingIndex[id] = m_timing.units.size();
+                    SUnitTiming timing;
+                    timing.nodeId = id;
+                    timing.name = node ? node->name : id;
+                    timing.type = node ? GetNodeTypeLabel(node->type) : "?";
+                    m_timing.units.push_back(timing);
+                    plan += (plan.empty() ? "" : " -> ") + timing.name;
+                }
+                m_log.Add("Reihenfolge je Zeitschritt: " + plan);
+                for (const SFlowsheetConnection& conn : m_connections)
+                    if (lagged.count(conn.id))
+                    {
+                        const SFlowsheetNode* source = FindNode(conn.sourceNodeId);
+                        const SFlowsheetNode* target = FindNode(conn.targetNodeId);
+                        m_log.Add("Rueckfuehrung aufgeschnitten: " + (source ? source->name : conn.sourceNodeId)
+                            + " -> " + (target ? target->name : conn.targetNodeId) + " (Wert aus dem vorigen Schritt)");
+                    }
+                m_log.Add("Lauf 1 von " + std::to_string(state.runs) + " gestartet");
+            }
+
+            for (const std::string& id : order)
+            {
+                auto unitIt = m_units.find(id);
+                if (unitIt == m_units.end() || !unitIt->second)
+                    continue;
+                SUnitTiming& timing = m_timing.units[m_timingIndex[id]];
+                if (firstRun)
+                    m_log.Add(timing.name + " (" + timing.type + "): Initialisierung gestartet");
+                CStopwatch initClock;
+                unitIt->second->Initialize(m_grid, GetUnitSeed(id));
+                const double seconds = initClock.GetSeconds();
+                timing.initSeconds += seconds;
+                if (firstRun)
+                {
+                    const std::string info = unitIt->second->DescribeForLog();
+                    m_log.Add(timing.name + ": initialisiert in " + FormatDuration(seconds) + (info.empty() ? "" : " - " + info));
+                }
+            }
+            for (auto& entry : m_units)
+                if (entry.second && !m_timingIndex.count(entry.first))
+                    entry.second->Initialize(m_grid, GetUnitSeed(entry.first)); // nicht im Plan (sollte nicht vorkommen)
+            for (auto& entry : m_outputRecords)
+                for (CStreamRecord& record : entry.second)
+                    record.Configure(m_grid);
 
             // 3) Laufzeit-Daten in Ausfuehrungsreihenfolge vorbereiten, damit
             // in der Zeitschleife keine Suche mehr noetig ist.
@@ -527,6 +735,8 @@ namespace stosis
                 std::vector<CStreamSlice> previous; // Ausgaenge im vorherigen Schritt
                 std::vector<SInputLink> links;
                 std::vector<const CStreamSlice*> inputs;
+                SUnitTiming* timing = nullptr;
+                std::vector<CCardHistory>* cardHistories = nullptr; // nur Lauf 1 im Partikelmodus
             };
 
             std::vector<SRuntimeNode> runtime(order.size());
@@ -534,6 +744,7 @@ namespace stosis
             for (size_t i = 0; i < order.size(); ++i)
                 indexOf[order[i]] = i;
 
+            const bool recordCards = firstRun && particles;
             for (size_t i = 0; i < order.size(); ++i)
             {
                 const SFlowsheetNode* node = FindNode(order[i]);
@@ -545,10 +756,14 @@ namespace stosis
                 rn.previous.resize(node->numOutputs);
                 for (size_t p = 0; p < node->numOutputs; ++p)
                 {
-                    rn.current[p].Resize(numS, numC);
-                    rn.previous[p].Resize(numS, numC); // vor t=0 ist nichts unterwegs
+                    rn.current[p].Resize(numS, numC, representation);
+                    rn.previous[p].Resize(numS, numC, representation); // vor t=0 ist nichts unterwegs
                 }
                 rn.inputs.assign(node->numInputs, nullptr);
+                rn.timing = &m_timing.units[m_timingIndex[order[i]]];
+                auto historyIt = m_cardHistories.find(order[i]);
+                if (recordCards && historyIt != m_cardHistories.end())
+                    rn.cardHistories = &historyIt->second;
             }
             for (const SFlowsheetConnection& conn : m_connections)
             {
@@ -564,7 +779,10 @@ namespace stosis
                 runtime[tgt->second].links.push_back(link);
             }
 
-            // 4) Zeitschleife: Makroschritt fuer Makroschritt.
+            // 4) Zeitschleife: Makroschritt fuer Makroschritt. Die Uhr misst je
+            // Unit das Rechnen (Step) und das Aufzeichnen der Ausgaenge.
+            CStopwatch clock;
+            double lastReport = 0.0;
             for (size_t k = 0; k < numT; ++k)
             {
                 SStepContext context;
@@ -586,17 +804,67 @@ namespace stosis
 
                     for (CStreamSlice& out : rn.current)
                         out.Clear();
+                    if (detailed)
+                        m_log.Add("t = " + FormatNumber(context.time, 6) + " s: " + rn.timing->name + " startet");
+                    const double t0 = clock.GetSeconds();
                     if (rn.unit)
                         rn.unit->Step(context, rn.inputs, rn.current);
-
+                    const double t1 = clock.GetSeconds();
                     for (size_t p = 0; p < rn.current.size() && p < rn.records->size(); ++p)
                         (*rn.records)[p].Record(k, rn.current[p]);
+                    const double t2 = clock.GetSeconds();
+
+                    rn.timing->stepSeconds += t1 - t0;
+                    rn.timing->recordSeconds += t2 - t1;
+                    ++rn.timing->steps;
+                    size_t cards = 0;
+                    if (particles)
+                    {
+                        if (!rn.current.empty())
+                            for (const CStreamSlice& out : rn.current)
+                                cards += out.GetNumCards();
+                        else
+                            for (const CStreamSlice* in : rn.inputs)
+                                cards += in ? in->GetNumCards() : 0;
+                        rn.timing->cards += static_cast<double>(cards);
+                    }
+                    if (rn.cardHistories)
+                    {
+                        // Karten fuer die Kartenansicht: Ausgaenge, beim Outlet der Eingang.
+                        static const CStreamSlice kEmpty;
+                        if (!rn.current.empty())
+                        {
+                            for (size_t p = 0; p < rn.current.size() && p < rn.cardHistories->size(); ++p)
+                                (*rn.cardHistories)[p].Record(k, rn.current[p]);
+                        }
+                        else if (!rn.cardHistories->empty())
+                            (*rn.cardHistories)[0].Record(k, !rn.inputs.empty() && rn.inputs[0] ? *rn.inputs[0] : kEmpty);
+                        m_timing.historySeconds += clock.GetSeconds() - t2;
+                    }
+                    if (detailed)
+                    {
+                        // Beide Zeiten in derselben Einheit (us oder ms).
+                        const ETimeUnit unit = ChooseTimeUnit(std::max(t1 - t0, t2 - t1));
+                        m_log.Add("t = " + FormatNumber(context.time, 6) + " s: " + rn.timing->name + " fertig nach "
+                            + FormatDurationIn(t1 - t0, unit) + " Rechnen + " + FormatDurationIn(t2 - t1, unit) + " Aufzeichnen"
+                            + (particles ? " (" + std::to_string(cards) + " Karten)" : ""));
+                    }
                 }
 
                 // Ausgaenge dieses Schritts werden zum "vorherigen" Schritt
                 // fuer die aufgeschnittenen Verbindungen.
                 for (SRuntimeNode& rn : runtime)
                     rn.previous.swap(rn.current);
+
+                if (progress && k + 1 < numT && clock.GetSeconds() - lastReport >= m_progressInterval)
+                {
+                    lastReport = clock.GetSeconds();
+                    state.stepsDone = k + 1;
+                    state.runFinished = false;
+                    state.elapsedSeconds = m_log.GetElapsedSeconds();
+                    if (!(*progress)(state))
+                        return false;
+                }
             }
 
             // 5) Hinweise der Units mit Knotennamen einsammeln.
@@ -608,8 +876,87 @@ namespace stosis
                 for (const std::string& warning : entry.second->GetWarnings())
                     m_warnings.insert((node ? node->name : entry.first) + ": " + warning);
             }
+
+            if (firstRun)
+                for (const SRuntimeNode& rn : runtime)
+                {
+                    const SUnitTiming& t = *rn.timing;
+                    const ETimeUnit unit = ChooseTimeUnit(std::max(t.stepSeconds, t.recordSeconds));
+                    std::string line = t.name + ": " + std::to_string(numT) + " Zeitschritte fertig - Rechnen "
+                        + FormatDurationIn(t.stepSeconds, unit) + ", Aufzeichnen " + FormatDurationIn(t.recordSeconds, unit);
+                    if (particles)
+                        line += ", im Mittel " + FormatDecimal(t.GetCardsPerStep(), 0) + " Karten je Schritt";
+                    m_log.Add(line);
+                }
+            m_log.Add("Lauf " + std::to_string(m_runIndex + 1) + " fertig nach " + FormatDuration(runClock.GetSeconds()));
+            return true;
         }
 
+        // Protokoll und Zeiten fuer eine neue Simulation beginnen.
+        void BeginLog(size_t runs)
+        {
+            m_log.Start();
+            m_timing = SSimulationTiming();
+            m_timing.steps = m_grid.numTimeSteps;
+            m_timing.particles = m_grid.representation == ERepresentation::Particles;
+            std::string line = "Simulation gestartet: " + std::to_string(runs) + (runs == 1 ? " Lauf, " : " Laeufe, ")
+                + std::to_string(m_grid.numTimeSteps) + " Zeitpunkte (0 bis " + FormatNumber(m_grid.totalTime, 6)
+                + " s, dt = " + FormatNumber(m_grid.GetDt(), 6) + " s), Raster " + std::to_string(m_grid.numSizeClasses) + " Klassen, ";
+            line += m_timing.particles
+                ? "Partikelmodus mit " + std::to_string(m_grid.cards.cardsPerSlice) + " Karten je Zeitschritt und Inlet"
+                : std::string("Kontinuum");
+            m_log.Add(line);
+            if (IsDebugBuild())
+                m_log.Add("Debug-Fassung: Rechenzeiten etwa sechsmal laenger als in der Release-Fassung");
+        }
+
+        void EndLog(size_t done, size_t runs)
+        {
+            m_timing.runs = done;
+            for (const std::string& warning : m_warnings)
+                m_log.Add("Hinweis: " + warning);
+            if (runs > 1)
+                m_log.Add("Statistik ueber " + std::to_string(done) + " Laeufe gesammelt in " + FormatDuration(m_timing.statisticsSeconds));
+            if (m_timing.historySeconds > 0.0)
+                m_log.Add("Karten fuer die Kartenansicht gespeichert in " + FormatDuration(m_timing.historySeconds)
+                    + " (" + FormatDecimal(static_cast<double>(GetCardHistoryBytes()) / 1048576.0, 1) + " MB)");
+            m_timing.totalSeconds = m_log.GetElapsedSeconds();
+            if (m_timing.cancelled)
+                m_log.Add("Simulation abgebrochen: " + std::to_string(done) + (done == 1 ? " fertiger Lauf in " : " fertige Laeufe in ")
+                    + FormatDuration(m_timing.totalSeconds));
+            else
+                m_log.Add("Simulation fertig: " + std::to_string(done) + (done == 1 ? " Lauf in " : " Laeufe in ")
+                    + FormatDuration(m_timing.totalSeconds));
+        }
+
+        // Kartenspeicher fuer alle Eintraege aus GetResultsEntries() leeren
+        // (nur im Partikelmodus); die Speichergrenze teilen sie sich.
+        void ResetCardHistories()
+        {
+            m_cardHistories.clear();
+            if (m_grid.representation != ERepresentation::Particles)
+                return;
+            const std::vector<SResultsEntry> entries = GetResultsEntries();
+            const size_t budget = m_grid.cards.historyBudgetBytes / std::max<size_t>(entries.size(), 1);
+            for (const SResultsEntry& entry : entries)
+            {
+                std::vector<CCardHistory>& histories = m_cardHistories[entry.nodeId];
+                if (histories.size() <= entry.port)
+                    histories.resize(entry.port + 1);
+                histories[entry.port].Reset(m_grid.numTimeSteps, m_grid.GetNumCompounds(), budget, m_grid.GetDt());
+            }
+        }
+
+        size_t GetCardHistoryBytes() const
+        {
+            size_t bytes = 0;
+            for (const auto& entry : m_cardHistories)
+                for (const CCardHistory& history : entry.second)
+                    bytes += history.GetStoredBytes();
+            return bytes;
+        }
+
+    public:
         void SetNodePosition(const std::string& nodeId, double posX, double posY)
         {
             for (SFlowsheetNode& node : m_nodes)
@@ -626,6 +973,22 @@ namespace stosis
     private:
         std::string MakeNodeId() { return "node_" + std::to_string(m_nextNodeId++); }
         std::string MakeConnectionId() { return "conn_" + std::to_string(m_nextConnectionId++); }
+
+        // false (und ein Hinweis in m_warnings), wenn im Partikelmodus
+        // eine Unit noch keine Karten kann.
+        bool CheckParticleSupportOrWarn()
+        {
+            const std::vector<std::string> names = GetUnitsWithoutParticleSupport();
+            if (names.empty())
+                return true;
+            std::string list;
+            for (const std::string& name : names)
+                list += (list.empty() ? "" : ", ") + name;
+            m_warnings.insert("Partikelmodus: Simulation nicht gestartet. Noch ohne Karten: " + list +
+                ". Die Units lernen Karten schrittweise (Methoden-Dokument Kap. 15); "
+                "bis dahin Darstellung \"Kontinuum\" waehlen.");
+            return false;
+        }
 
         std::string AddNode(const std::string& name, ENodeType type, size_t numInputs, size_t numOutputs,
             double posX, double posY, std::unique_ptr<IFlowsheetUnit> unit)
@@ -852,6 +1215,16 @@ namespace stosis
         const CMaterialDatabase* m_materials = nullptr;
         std::set<std::string> m_warnings;
         bool m_inEnsemble = false; // RunSimulation laeuft innerhalb von RunSimulations
+
+        // Laufzeitprotokoll und Rechenzeiten der letzten Simulation
+        CSimulationLog m_log;
+        SSimulationTiming m_timing;
+        std::map<std::string, size_t> m_timingIndex; // Knoten-ID -> Eintrag in m_timing.units
+        size_t m_runIndex = 0;      // laufender Lauf im Ensemble (0 = Lauf 1)
+        bool m_detailedLog = false; // Lauf 1: jede Unit in jedem Zeitschritt protokollieren
+        double m_progressInterval = 0.05; // s zwischen zwei Fortschrittsmeldungen
+        // Karten von Lauf 1 je Eintrag aus GetResultsEntries() (Partikelmodus)
+        std::map<std::string, std::vector<CCardHistory>> m_cardHistories;
 
         int m_nextNodeId = 0;
         int m_nextConnectionId = 0;

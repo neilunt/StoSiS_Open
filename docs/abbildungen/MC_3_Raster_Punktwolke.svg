@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="680" height="400" viewBox="0 0 680 400">
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="430" viewBox="0 0 680 430">
 <title>Raster und Punktwolke im Vergleich</title>
 <style>
 text { font-family: Calibri, Arial, sans-serif; }
@@ -13,6 +13,8 @@ text { font-family: Calibri, Arial, sans-serif; }
 .arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
 </style>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">② Raster gegen Punktwolke: dieselben 75 Rechenpartikel</text>
+<g transform="translate(0,30)">
 <text class="th" x="210" y="34" text-anchor="middle">Raster: 10 × 10 = 100 Fächer</text>
 <text class="ts" x="210" y="52" text-anchor="middle">20 belegt, 80 leer</text>
 <text class="th" x="520" y="34" text-anchor="middle">Rechenpartikel: 75 Karten</text>
@@ -35,4 +37,5 @@ text { font-family: Calibri, Arial, sans-serif; }
 <circle cx="406" cy="354" r="3" fill="#7F77DD"/>
 <text class="ts" x="416" y="358">ein Rechenpartikel (Karte)</text>
 <text class="ts" x="340" y="388" text-anchor="middle">Dritte Achse mit 10 Klassen: 1000 Fächer – weiterhin 75 Karten</text>
+</g>
 </svg>

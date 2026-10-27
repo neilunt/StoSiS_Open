@@ -16,12 +16,10 @@ namespace stosis
     // fuer beide Vorzeichen von v) und zentralen Differenzen fuer die
     // Diffusion. Raender: c=0 (absorbierend).
     //
-    // Genau wie bei deinen echten Dyssol-Units: Simulate() wird vom
-    // Flowsheet nur EINMAL aufgerufen (lineares Flowsheet ohne
-    // Rueckfuehrung), die Unit iteriert deshalb selbst ueber ihr
-    // eigenes feines Zeitgitter und schreibt bei jedem Sub-Schritt in
-    // die Ergebnis-Matrix - genau das Muster, das du schon von deiner
-    // Gate-Unit kennst.
+    // Wie bei Dyssol-Units: Simulate() wird vom Flowsheet nur EINMAL
+    // aufgerufen (lineares Flowsheet ohne Rueckfuehrung), die Unit iteriert
+    // deshalb selbst ueber ihr eigenes feines Zeitgitter und schreibt bei
+    // jedem Sub-Schritt in die Ergebnis-Matrix.
     class CDiffusionDriftUnit : public ITransportUnit
     {
     public:

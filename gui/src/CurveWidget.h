@@ -16,7 +16,7 @@ struct SCurveSeries
 };
 
 // Zeichnet mehrere Zeitreihen gemeinsam in einem Koordinatensystem, jede
-// in eigener Farbe mit Legende - auf Wunsch mit halbtransparentem
+// in eigener Farbe mit Legende - wahlweise mit halbtransparentem
 // Streuband und duennen Einzellauf-Linien darunter. Rechnet selbst
 // nichts, bekommt fertige Werte uebergeben.
 class CurveWidget : public QWidget

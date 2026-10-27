@@ -6,8 +6,8 @@
 FlowsheetGraphicsView::FlowsheetGraphicsView(QGraphicsScene* scene, QWidget* parent)
 	:QGraphicsView(scene, parent)
 {
-	// Ohne die Folgende Zeile kommen mouseMoveEvent()s nur bei gedrückter Maustaste an, 
-	// wir brauchen sie aber ständig fürs Gummiband
+	// Ohne die Folgende Zeile kommen mouseMoveEvent()s nur bei gedrueckter Maustaste an, 
+	// das Gummiband braucht sie aber staendig
 	setMouseTracking(true);
 }
 
@@ -28,9 +28,9 @@ void FlowsheetGraphicsView::mousePressEvent(QMouseEvent* event)
 	if (!hitPort && m_onEmptyClick)
 		m_onEmptyClick(scenePos);
 
-	// Normale Verarbeitung läuft in jedem Fall weier, dadurch funktionieren Node
-	// Verschiebungen, Selektion und der eigentliche Portklick (der über FlowsheetPortItem::mousePressEvent
-	// reinkommt) unverändert weiter.
+	// Normale Verarbeitung laeuft in jedem Fall weier, dadurch funktionieren Node
+	// Verschiebungen, Selektion und der eigentliche Portklick (der ueber FlowsheetPortItem::mousePressEvent
+	// reinkommt) unveraendert weiter.
 	QGraphicsView::mousePressEvent(event);
 
 }

@@ -12,7 +12,8 @@ namespace stosis
     // Groessenklasse in jedem Schritt; Temperatur aus der Energiebilanz,
     // Druck = kleinster Eingangsdruck (MixConditions). Nicht verbundene
     // Eingaenge zaehlen als 0. Kein Hold-up. Ein Merger ist typischerweise
-    // die Stelle, an der eine Rueckfuehrung wieder einmuendet.
+    // die Stelle, an der eine Rueckfuehrung wieder einmuendet. Im
+    // Partikelmodus haengt er die Karten aller Eingaenge aneinander.
     class CMergerUnit : public IFlowsheetUnit
     {
     public:
@@ -42,13 +43,19 @@ namespace stosis
             {
                 if (!input)
                     continue;
-                out.Add(*input);
+                // Partikelmodus: Karten aneinanderhaengen (zusammengelegt wird
+                // erst mit den Grenzen je Stromscheibe, Methoden-Dokument 13.19).
+                if (out.HasCards())
+                    out.AppendCards(*input);
+                else
+                    out.Add(*input);
                 SMixPart part;
                 part.temperature = input->GetTemperature();
                 part.pressure = input->GetPressure();
                 part.compoundWeights.resize(input->GetNumCompounds());
                 for (size_t c = 0; c < part.compoundWeights.size(); ++c)
-                    part.compoundWeights[c] = input->GetCompoundWeight(c, m_sizeWeights);
+                    part.compoundWeights[c] = input->HasCards() ? input->GetCardsMassFlow(c)
+                                                                : input->GetCompoundWeight(c, m_sizeWeights);
                 m_parts.push_back(std::move(part));
             }
             if (m_parts.empty())
@@ -59,6 +66,8 @@ namespace stosis
             out.SetPressure(mix.pressure);
             m_missingHeatCapacity.insert(mix.missingHeatCapacity.begin(), mix.missingHeatCapacity.end());
         }
+
+        bool SupportsParticles() const override { return true; }
 
         std::vector<std::string> GetWarnings() const override
         {

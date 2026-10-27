@@ -10,6 +10,16 @@
 using namespace stosis;
 using namespace stosis_test;
 
+// Dichte an den Stuetzstellen, Trapezregel mit den Gewichten des Rasters
+// (so integrieren Anzeige und Statistik eine Dichte).
+static double TrapezoidOfDensity(const SSizeDistribution& distribution, const SSizeGrid& sizes)
+{
+    double sum = 0.0;
+    for (size_t s = 0; s < sizes.numClasses; ++s)
+        sum += sizes.GetWeight(s) * distribution.Density(sizes.GetSizeAt(s));
+    return sum;
+}
+
 int main()
 {
     // 1) Lage der Stuetzstellen im Standardraster (1 um bis 1 mm, 300 Stuetzstellen).
@@ -51,7 +61,7 @@ int main()
         for (const SCase& c : cases)
         {
             const double exact = c.distribution.Cumulative(grid.sizeMax) - c.distribution.Cumulative(grid.sizeMin);
-            const double captured = c.distribution.CapturedFraction(grid);
+            const double captured = TrapezoidOfDensity(c.distribution, grid);
             std::printf("      %-22s erfasst %.8f | exakt %.8f | Abweichung %.1e\n", c.name, captured, exact, captured - exact);
             worst = std::max(worst, std::abs(captured - exact));
         }
@@ -69,7 +79,7 @@ int main()
         const SSizeGrid fine = SSizeGrid::Linear(200001, 0.0, 150e-6);
         double worst = 0.0;
         for (const SSizeDistribution* d : { &normal, &logNormal, &rrsb })
-            worst = std::max(worst, std::abs(d->CapturedFraction(fine) - (d->Cumulative(150e-6) - d->Cumulative(0.0))));
+            worst = std::max(worst, std::abs(TrapezoidOfDensity(*d, fine) - (d->Cumulative(150e-6) - d->Cumulative(0.0))));
         std::printf("      Q3 gegen Integral der Dichte bis 150 um (200001 Punkte): Abweichung hoechstens %.1e\n", worst);
         Check(worst < 1e-6, "Q3 stimmt mit dem Integral der Dichte ueberein");
     }
@@ -77,7 +87,7 @@ int main()
     // 4) Das Inlet meldet, wenn seine Verteilung aus dem Raster ragt.
     {
         CFlowsheetGraph graph;
-        graph.AddInletNode("Inlet1", 0, 0); // Standard: Normal 100 um / 25 um
+        graph.AddInletNode("Inlet1", 0, 0); // Standard: Log-Normal d50 = 100 um, sigma_ln = 0,25
         const std::vector<std::string> inside = graph.CheckSizeGrid(SSizeGrid());
         const std::vector<std::string> below = graph.CheckSizeGrid(SSizeGrid::Logarithmic(300, 120e-6, 1e-3));
         const std::vector<std::string> above = graph.CheckSizeGrid(SSizeGrid::Logarithmic(300, 1e-6, 150e-6));
@@ -85,11 +95,11 @@ int main()
             std::printf("      d_min = 120 um: %s\n", text.c_str());
         for (const std::string& text : above)
             std::printf("      d_max = 150 um: %s\n", text.c_str());
-        Check(inside.empty(), "Standard-Inlet im Standardraster: keine Meldung (0,004 % ausserhalb)");
-        Check(below.size() == 1 && below[0].rfind("Inlet1: 79 %", 0) == 0 && below[0].find("unter d_min") != std::string::npos,
-            "d_min = 120 um: Meldung '79 % unter d_min'");
-        Check(above.size() == 1 && above[0].rfind("Inlet1: 2.3 %", 0) == 0 && above[0].find("ueber d_max") != std::string::npos,
-            "d_max = 150 um: Meldung '2,3 % ueber d_max'");
+        Check(inside.empty(), "Standard-Inlet im Standardraster: keine Meldung (unter 1e-15 ausserhalb)");
+        Check(below.size() == 1 && below[0].rfind("Inlet1: 77 %", 0) == 0 && below[0].find("unter d_min") != std::string::npos,
+            "d_min = 120 um: Meldung '77 % unter d_min' (Q3(120 um) = Phi(ln 1,2 / 0,25))");
+        Check(above.size() == 1 && above[0].rfind("Inlet1: 5.2 %", 0) == 0 && above[0].find("ueber d_max") != std::string::npos,
+            "d_max = 150 um: Meldung '5,2 % ueber d_max' (1 - Phi(ln 1,5 / 0,25))");
     }
 
     // 5) Massenbilanz auf dem log. Raster: Inlet -> Verzoegerung (p = 1) ->

@@ -21,7 +21,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 .c-teal text { fill: #085041; }
 </style>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
-<text class="th" x="40" y="24">Systematisch verteilen mit einem Konto: f = 27 %, 15 Karten eines Zeitschritts</text>
+<text class="th" x="40" y="24">③ Systematisch verteilen mit einem Konto: f = 27 %, 15 Karten eines Zeitschritts</text>
 <text class="ts" x="40" y="44">Jede Karte zahlt 0,27 auf das A-Konto ein. Ab 0,5 geht die Karte ganz nach A, das Konto wird um 1 belastet.</text>
 <g class="c-teal"><rect x="40" y="70" width="36" height="36" rx="4" stroke-width="0.8"/></g><text class="th" x="58" y="62" text-anchor="middle">A</text><circle cx="58" cy="88" r="3.0" fill="#7F77DD"/><text class="ts" x="58" y="124" text-anchor="middle">0,57</text>
 <rect class="box" x="81" y="70" width="36" height="36" rx="4" stroke-width="0.5"/><circle cx="99" cy="88" r="3.7" fill="#7F77DD"/><text class="ts" x="99" y="124" text-anchor="middle">−0,16</text>
@@ -38,8 +38,8 @@ text { font-family: Calibri, Arial, sans-serif; }
 <rect class="box" x="532" y="70" width="36" height="36" rx="4" stroke-width="0.5"/><circle cx="550" cy="88" r="11.4" fill="#7F77DD"/><text class="ts" x="550" y="124" text-anchor="middle">−0,19</text>
 <rect class="box" x="573" y="70" width="36" height="36" rx="4" stroke-width="0.5"/><circle cx="591" cy="88" r="12.1" fill="#7F77DD"/><text class="ts" x="591" y="124" text-anchor="middle">0,08</text>
 <rect class="box" x="614" y="70" width="36" height="36" rx="4" stroke-width="0.5"/><circle cx="632" cy="88" r="12.8" fill="#7F77DD"/><text class="ts" x="632" y="124" text-anchor="middle">0,35</text>
-<text class="ts" x="40" y="150">Zahlen: Kontostand nach der Einzahlung (Start 0,30) · grün = Karte geht ganz nach A · Karten der Größe nach sortiert</text>
+<text class="ts" x="40" y="150">Zahlen: Kontostand nach der Einzahlung (Übertrag 0,30) · grün = Karte geht ganz nach A · Karten der Größe nach sortiert</text>
 <text class="t" x="40" y="180">Ergebnis: 4 von 15 Karten nach A (26,7 %, Ziel 4,05) – Rest 0,35 bleibt für den nächsten Schritt.</text>
 <text class="t" x="40" y="206">Über 100 Schritte mit je 200 Karten: A bekommt 5 400 von 20 000 Karten, genau bis auf eine Karte.</text>
-<text class="t" x="40" y="232">Zufall nur beim Start: Anfangswert des Kontos (einmal) und Startposition in der sortierten Liste (je Schritt).</text>
+<text class="t" x="40" y="232">Zufall nur in der Startposition in der sortierten Liste (je Schritt); das Konto beginnt bei 0.</text>
 </svg>

@@ -6,6 +6,7 @@
 #include <cstdio>
 #include "FlowsheetUnit.h"
 #include "SizeDistribution.h"
+#include "CardPlacement.h"
 
 namespace stosis
 {
@@ -48,6 +49,12 @@ namespace stosis
     // fester Temperatur und festem Druck - Mischungen entstehen ueber mehrere
     // Inlets und Merger (so laesst sich das Mischverhaeltnis zeitlich
     // steuern). Kein Eingang, ein Ausgang.
+    //
+    // Im Partikelmodus liefert das Inlet in jedem Schritt N Karten an den
+    // Quantilen der Verteilung mit Mindestzahl je Groessenbereich
+    // (PlaceCardsAtQuantiles, Methoden-Dokument 13.21). Groessen und
+    // Massenanteile stehen einmal fest, jeder Schritt skaliert nur mit dem
+    // Massenstrom - die Karten tragen ihn exakt.
     class CInletUnit : public IFlowsheetUnit
     {
     public:
@@ -59,6 +66,7 @@ namespace stosis
         const std::vector<SInletTimePoint>& GetTimeProfile() const { return m_timePoints; }
 
         // Kurzform fuer eine Normalverteilung (Mittelwert d0, Breite sigma0, beide in m).
+        // Fuer Partikelgroessen meist ungeeignet (GetDistributionWarning); genutzt in Tests.
         void SetSizeDistribution(double d0, double sigma0)
         {
             m_distribution = { EDistributionType::Normal, d0, sigma0 };
@@ -107,12 +115,66 @@ namespace stosis
         void Initialize(const SSimulationGrid& grid, std::uint64_t /*unitSeed*/) override
         {
             // Form der Verteilung ist zeitlich konstant -> einmal pro
-            // Groessenklasse auswerten statt in jedem Schritt.
-            m_shape.resize(grid.numSizeClasses);
-            for (size_t s = 0; s < grid.numSizeClasses; ++s)
-                m_shape[s] = m_distribution.Density(grid.GetSizeAt(s));
+            // Groessenklasse auswerten statt in jedem Schritt. Masse je
+            // Stuetzstelle exakt aus Q3 (MassesAtNodes), geteilt durch das
+            // Trapezgewicht: So traegt der Strom genau Q3(d_max) - Q3(d_min)
+            // des Massenstroms, auch bei Spruengen der Dichte (GGS, Tabelle).
+            const SSizeGrid sizes = grid.GetSizeGrid();
+            const std::vector<double> masses = m_distribution.MassesAtNodes(sizes);
+            m_shape.assign(grid.numSizeClasses, 0.0);
+            for (size_t s = 0; s < grid.numSizeClasses && s < masses.size(); ++s)
+                m_shape[s] = masses[s] / sizes.GetWeight(s);
             m_compound = grid.FindCompound(m_material);
+
+            // Karten: Partikelzahl wird im Bereich des Rasters gezaehlt (ab der
+            // kleinsten positiven Stuetzstelle), siehe PlaceCardsAtQuantiles.
+            m_particles = grid.representation == ERepresentation::Particles;
+            m_cards = SCardPlacement();
+            m_cardSettings = grid.cards;
+            if (m_particles)
+            {
+                const double countMin = (grid.sizeMin > 0.0 || grid.numSizeClasses < 2) ? grid.sizeMin : grid.GetSizeAt(1);
+                m_cards = PlaceCardsAtQuantiles(m_distribution, grid.cards, countMin, grid.sizeMax);
+            }
         }
+
+        bool SupportsParticles() const override { return true; }
+
+        // Karten der letzten Initialisierung im Partikelmodus (sonst leer).
+        const SCardPlacement& GetCardPlacement() const { return m_cards; }
+
+        std::vector<std::string> GetWarnings() const override
+        {
+            std::vector<std::string> warnings;
+            if (!m_particles)
+                return warnings;
+            char text[260];
+            if (m_cards.sizes.empty())
+                warnings.push_back("Keine Karten erzeugt - Groessenverteilung oder Karteneinstellungen ungueltig.");
+            else if (m_cards.minPerRange < kMinCardsPerRange)
+            {
+                std::snprintf(text, sizeof(text), "Nur %zu Karten je belegtem Groessenbereich (%zu Karten je Zeitschritt, "
+                    "%zu belegte Bereiche) - zu wenig fuer eine brauchbare Statistik. Karten je Zeitschritt erhoehen.",
+                    m_cards.minPerRange, m_cardSettings.cardsPerSlice, m_cards.numOccupied);
+                warnings.push_back(text);
+            }
+            return warnings;
+        }
+
+        std::string DescribeForLog() const override
+        {
+            char text[200];
+            const char* type = GetDistributionParameterInfo(m_distribution.type).typeName;
+            if (m_particles)
+                std::snprintf(text, sizeof(text), "%s, %zu Karten je Zeitschritt in %zu Groessenbereichen (Mindestzahl %zu)",
+                    type, m_cards.sizes.size(), m_cards.numOccupied, m_cards.minPerRange);
+            else
+                std::snprintf(text, sizeof(text), "%s auf dem Groessenraster", type);
+            return text;
+        }
+
+        // Darunter warnt das Inlet (Unsicherheit eines Bereichs etwa 1/sqrt(n), 13.19).
+        static constexpr size_t kMinCardsPerRange = 10;
 
         // Meldet, wenn mehr als 0,1 % der Verteilung unter d_min oder ueber
         // d_max liegen (exakt aus der Verteilungssumme Q3).
@@ -146,20 +208,31 @@ namespace stosis
                 return;
             const double massFlow = GetMassFlowAtTime(context.time);
             CStreamSlice& out = outputs[0];
-            for (size_t s = 0; s < m_shape.size() && s < out.GetNumSizeClasses(); ++s)
-                out.SetValue(m_compound, s, massFlow * m_shape[s]);
             out.SetTemperature(m_temperature);
             out.SetPressure(m_pressure);
+            if (out.HasCards())
+            {
+                if (massFlow != 0.0)
+                    for (size_t k = 0; k < m_cards.sizes.size(); ++k)
+                        out.AddCard(m_cards.sizes[k], m_compound, massFlow * m_cards.massFractions[k]);
+                return;
+            }
+            for (size_t s = 0; s < m_shape.size() && s < out.GetNumSizeClasses(); ++s)
+                out.SetValue(m_compound, s, massFlow * m_shape[s]);
         }
 
     private:
         std::vector<SInletTimePoint> m_timePoints = GetDefaultInletTimeProfile();
-        SSizeDistribution m_distribution; // Standard: Normal, d0 = 100 um, sigma = 25 um
+        SSizeDistribution m_distribution; // Standard: Log-Normal, d50 = 100 um, sigma_ln = 0,25
         std::string m_material = kDefaultInletMaterial;
         double m_temperature = kRoomTemperature; // K
         double m_pressure = kRoomPressure;       // Pa
         size_t m_compound = 0; // Index in SSimulationGrid::compounds
 
         std::vector<double> m_shape; // Verteilungsdichte pro Groessenklasse
+
+        bool m_particles = false;     // Partikelmodus in der letzten Initialisierung
+        SCardSettings m_cardSettings;
+        SCardPlacement m_cards;       // Groessen und Massenanteile der Karten
     };
 }

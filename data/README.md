@@ -5,9 +5,9 @@ Quelle (`source`) und einen Prüfstatus (`status`). Ziel: Jede Zahl, die in eine
 eingeht, ist belegt.
 
 Der Startinhalt stammt aus der Materialdatenbank von Dyssol (`Materials.dmdb`, BSD-3-Lizenz,
-siehe `LICENSE_Dyssol.txt`). Umgewandelt wurde er am 12.10.2026 mit
-`tools/dmdb_to_json.pl`. Seitdem wird die JSON-Datei von Hand gepflegt; das Skript dient nur
-noch der Nachvollziehbarkeit.
+siehe `LICENSE_Dyssol.txt`). Umgewandelt wurde er mit
+`tools/dmdb_to_json.pl`. Die JSON-Datei wird von Hand gepflegt; das Skript dient der
+Nachvollziehbarkeit.
 
 ## Aufbau
 
@@ -41,7 +41,7 @@ Ausnahme: `bond_work_index` in kWh/t.
 | `polynomial` | y = a0 + a1·T + a2·T² + … (`coefficients`) |
 | `polynomial_cp` | y = a + b·T + c·T² + d·T³ + e/T² (`coefficients`) |
 
-## Festlegungen (12.10.2026)
+## Festlegungen
 
 - **Dichte** (`density`) ist die Feststoffdichte. Partikel gelten zunächst als unporös; die
   Porosität kommt später als Partikeleigenschaft an den Inlet.

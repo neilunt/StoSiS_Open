@@ -8,18 +8,18 @@ namespace stosis
 {
     // Verwaltet eine Sammlung von Partikeln. Aktuell nur zustaendig
     // fuer die Initialisierung aus einem bin-basierten CStream heraus -
-    // die Startverteilung selbst kommt weiterhin aus deiner
-    // Source-Einheit als Werte pro Groessenklasse, aber ab hier
-    // existiert jedes Partikel als eigenstaendiges Objekt mit freier
-    // Groesse, nicht mehr als Bin-Index.
+    // die Startverteilung selbst kommt aus der
+    // Source-Einheit als Werte pro Groessenklasse, ab hier existiert
+    // jedes Partikel als eigenstaendiges Objekt mit freier Groesse statt
+    // als Bin-Index.
     class CParticleEnsemble
     {
     public:
         // Erzeugt particlesPerClass Partikel pro Groessenklasse, deren
         // Groesse auf das Zentrum der jeweiligen Klasse gesetzt wird
         // und deren Gewicht sich aus dem Amplitudenwert dieser Klasse
-        // ergibt (amplitude / particlesPerClass), analog zu deinen
-        // bestehenden stochastischen Einheiten. Klassen mit Amplitude
+        // ergibt (amplitude / particlesPerClass), analog zu den
+        // uebrigen stochastischen Einheiten. Klassen mit Amplitude
         // <= 0 werden uebersprungen, spart Rechenzeit.
         void InitializeFromStream(const CStream& input,
             double sizeMin, double sizeMax, size_t numSizeClasses,

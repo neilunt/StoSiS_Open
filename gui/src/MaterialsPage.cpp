@@ -194,7 +194,7 @@ MaterialsPage::MaterialsPage(QWidget* parent)
     m_fileLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     fileRow->addWidget(m_fileLabel, 1);
     auto* reloadButton = new QPushButton("Neu laden", content);
-    reloadButton->setToolTip("Liest die Datei erneut ein, z.B. nachdem du sie im Editor geaendert hast.");
+    reloadButton->setToolTip("Liest die Datei erneut ein, z.B. nach einer Aenderung im Editor.");
     connect(reloadButton, &QPushButton::clicked, this, &MaterialsPage::OnReload);
     fileRow->addWidget(reloadButton);
     layout->addLayout(fileRow);

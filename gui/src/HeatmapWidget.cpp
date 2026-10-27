@@ -12,7 +12,7 @@ HeatmapWidget::HeatmapWidget(QWidget* parent)
 {
     setMinimumSize(400, 300);
     // Ohne MouseTracking kaemen mouseMoveEvents nur bei gedrueckter
-    // Maustaste - fuer die Hover-Anzeige brauchen wir sie immer.
+    // Maustaste - die Hover-Anzeige braucht sie immer.
     setMouseTracking(true);
 }
 
@@ -333,7 +333,7 @@ QColor HeatmapWidget::ValueToColor(double normalizedValue) const
         }
     }
 
-    // Sequential (bisherige Viridis-artige Skala, unveraendert)
+    // Sequential (Viridis-artige Skala)
     normalizedValue = std::clamp(normalizedValue, 0.0, 1.0);
 
     struct Stop { double pos; int r, g, b; };
@@ -405,10 +405,8 @@ void HeatmapWidget::paintEvent(QPaintEvent* /*event*/)
     const QRect plotRect = PlotRect();
 
     // FastTransformation = kein Weichzeichnen -> jede Zelle bleibt
-    // ein sichtbares Rechteck. Bei sehr feinen Gittern (dein
-    // "beliebig dicht einstellen") kannst du hier spaeter auf
-    // SmoothTransformation umstellen, wenn Zellen kleiner als 1 Pixel
-    // werden.
+    // ein sichtbares Rechteck. Bei sehr feinen Gittern (Zellen kleiner
+    // als 1 Pixel) waere SmoothTransformation die Alternative.
     painter.drawImage(plotRect, image);
     painter.setPen(Qt::black);
     painter.drawRect(plotRect);

@@ -9,33 +9,39 @@ Methoden, Designentscheidungen und Validierungen stehen ausführlich in
 [`docs/StoSiS_Methoden.html`](docs/StoSiS_Methoden.html). Diese Datei gibt nur
 einen Überblick.
 
-## Stand (14. Oktober 2026)
+## Funktionsumfang
 
 Umgesetzt:
 
 - **Flowsheet-Editor:** Block-Palette mit Drag & Drop, Ports, orthogonale
-  Kabel, Einstellungsfenster je Block, Ergebnisse als Kurven und Heatmap
-  (mit Randverteilungen, je Stoff umschaltbar).
-- **Units:** Inlet (Zeitprofil, Größenverteilung Normal/Log-Normal/RRSB,
-  Stoff, T, p), Outlet, Splitter (2 oder 3 Ausgänge, deterministisch oder
-  stochastisch nach Ornstein-Uhlenbeck), Merger (2 oder 3 Eingänge),
-  größenabhängige Verzögerung als Platzhalter-Prozess.
+  Kabel, Zoom und Verschieben, Einstellungsfenster je Block, Ergebnisse als
+  Kurven und Heatmap (mit Randverteilungen, je Stoff umschaltbar).
+- **Units:** Inlet (Zeitprofil; Größenverteilung Log-Normal, RRSB, GGS,
+  Tabelle oder Normal; Stoff, T, p), Outlet, Splitter (2 oder 3 Ausgänge,
+  deterministisch oder stochastisch nach Ornstein-Uhlenbeck), Merger (2 oder
+  3 Eingänge), größenabhängige Verzögerung als Platzhalter-Prozess.
+- **Größenraster:** logarithmisch (Standard 1 µm – 1 mm, 300 Klassen) oder
+  linear; intern SI-Einheiten, Anzeige in µm.
 - **Rechenablauf:** Makroschritte, Units der Reihe nach (Gauß-Seidel),
   Rückführungen werden an einer Verbindung aufgeschnitten.
 - **Mehrere Läufe:** globaler Seed mit eigenem Zufallsstrom je Unit,
   Mittelwert und Streuung nach Welford, Bänder und Perzentile; validiert
   gegen eine analytische Lösung.
+- **Auswertung schwankender Ströme:** Fenstermittel, Ausreißerfilter,
+  Histogramm, Wahrscheinlichkeitsnetz und Zeitverlauf; Vergleich mit
+  Messdaten einer Dosierwaage.
 - **Materialien:** eigene Materialdatei [`data/Materialien.json`](data/README.md)
   (18 Stoffe, Startinhalt aus Dyssol, jeder Wert mit Quelle und Prüfstatus).
   Ströme tragen je Stoff und Größenklasse eine Massenstromdichte sowie T
   und p; beim Mischen gilt die Energiebilanz.
+- **Partikelmodus (im Aufbau):** Ströme tragen gewichtete MC-Partikel
+  („Karten“); das Inlet erzeugt sie an Quantilen mit Mindestzahl je
+  Größenbereich, für die Anzeige werden sie aufs Raster umgerechnet.
 
 Noch nicht umgesetzt (Planung in Kapitel 13 bis 15 des Methoden-Dokuments):
 
-- logarithmisches Größenraster mit SI-Einheiten (heute linear, 150 Punkte
-  von 0 bis 200)
-- gewichtete MC-Partikel im Flowsheet; Koagulator mit Koagulation, Bruch,
-  Wachstum und Keimbildung
+- Partikelmodus für Merger, Splitter und Units mit Hold-up; Koagulator mit
+  Koagulation, Bruch, Wachstum und Keimbildung
 - Flowsheets speichern und laden (geplant JSON); Import von Dyssol-Dateien
   (`.dflw`, Format HDF5)
 - Materialien bearbeiten in der Oberfläche, Export ins Dyssol-Format

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="680" height="395" viewBox="0 0 680 395">
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="425" viewBox="0 0 680 425">
 <title>Quantil-Platzierung von fünf Rechenpartikeln</title>
 <style>
 text { font-family: Calibri, Arial, sans-serif; }
@@ -13,6 +13,8 @@ text { font-family: Calibri, Arial, sans-serif; }
 .arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
 </style>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">③ Quantil-Platzierung am Inlet: fünf Rechenpartikel in gleich schweren Massenbändern</text>
+<g transform="translate(0,30)">
 <rect x="80" y="252" width="520" height="48" fill="#7F77DD" fill-opacity="0.1"/>
 <rect x="80" y="156" width="520" height="48" fill="#7F77DD" fill-opacity="0.1"/>
 <rect x="80" y="60" width="520" height="48" fill="#7F77DD" fill-opacity="0.1"/>
@@ -43,4 +45,5 @@ text { font-family: Calibri, Arial, sans-serif; }
 <text class="ts" x="340" y="344" text-anchor="middle">Größe d [µm]</text>
 <rect x="80" y="364" width="14" height="14" fill="#7F77DD" fill-opacity="0.1" stroke="#D3D1C7" stroke-width="0.5"/>
 <text class="ts" x="102" y="371" dominant-baseline="central">je Band 20 % der Masse – ein Rechenpartikel in der Bandmitte</text>
+</g>
 </svg>

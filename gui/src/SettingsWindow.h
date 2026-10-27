@@ -14,6 +14,7 @@ class InletEditorWidget;
 class ProcessNodeEditorWidget;
 class SplitterEditorWidget;
 class MaterialsPage;
+class SieveGridWidget;
 
 // Einstellungsfenster (Einstellungsebene, getrennt von der Darstellung
 // im Hauptfenster). Reiter:
@@ -95,7 +96,7 @@ private:
     QSpinBox* m_numClassesSpin = nullptr;
     QDoubleSpinBox* m_sizeMinSpin = nullptr; // um
     QDoubleSpinBox* m_sizeMaxSpin = nullptr; // um
-    QSpinBox* m_numTimeStepsSpin = nullptr;
     QLabel* m_gridInfoLabel = nullptr;   // Klassen je Dekade bzw. Delta d
     QLabel* m_gridCheckLabel = nullptr;  // Meldungen der Units zum Raster
+    SieveGridWidget* m_sieveWidget = nullptr; // Raster und Siebsatz nebeneinander
 };

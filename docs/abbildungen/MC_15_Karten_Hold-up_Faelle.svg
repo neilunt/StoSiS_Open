@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="578" viewBox="0 0 680 578">
+<title>Karten im Hold-up</title>
+<style>
+text { font-family: Calibri, Arial, sans-serif; }
+.t { font-size: 14px; fill: #222222; }
+.ts { font-size: 12px; fill: #595959; }
+.th { font-size: 14px; font-weight: bold; fill: #222222; }
+.c-amber rect, .c-amber circle, rect.c-amber, circle.c-amber { fill: #FAEEDA; stroke: #854F0B; }
+.c-amber text { fill: #633806; }
+.c-gray rect, .c-gray circle, rect.c-gray, circle.c-gray { fill: #F1EFE8; stroke: #5F5E5A; }
+.c-gray text { fill: #444441; }
+.box { fill: #F7F6F2; stroke: #B4B2A9; }
+.arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
+.c-red rect, rect.c-red { fill: #FCEBEB; stroke: #A32D2D; }
+.c-red text { fill: #791F1F; }
+.c-green rect, rect.c-green { fill: #EAF3DE; stroke: #3B6D11; }
+.c-green text { fill: #27500A; }
+.c-purple rect, rect.c-purple { fill: #EEEDFE; stroke: #534AB7; }
+.c-purple text { fill: #3C3489; }
+.c-teal rect, rect.c-teal { fill: #E1F5EE; stroke: #0F6E56; }
+.c-teal text { fill: #085041; }
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<view id="teil1" viewBox="0 52 680 158"/>
+<view id="teil2" viewBox="0 210 680 152"/>
+<view id="teil3" viewBox="0 362 680 174"/>
+<text class="th" x="20" y="24">Wo sich Karten sammeln – drei Fälle (Frage B)</text>
+<text class="ts" x="20" y="42">Little'sches Gesetz: Karten im Inneren einer Unit = Kartenrate × Verweilzeit τ (im Dauerzustand, Zulauf = Ablauf).</text>
+
+<text class="th" x="20" y="70">④ Durchmischt (Rührkessel, Wirbelschicht, Agglomerator): ein Vorrat</text>
+<rect x="70" y="85" width="140" height="105" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+<g fill="#0F6E56" fill-opacity="0.45"><circle cx="119" cy="153" r="3.3"/><circle cx="103" cy="138" r="3.4"/><circle cx="106" cy="156" r="2.5"/><circle cx="99" cy="161" r="5.2"/><circle cx="150" cy="169" r="3.4"/><circle cx="136" cy="101" r="2.7"/><circle cx="129" cy="137" r="4.4"/><circle cx="184" cy="160" r="4.5"/><circle cx="101" cy="148" r="2.6"/><circle cx="109" cy="107" r="4.7"/><circle cx="125" cy="176" r="2.5"/><circle cx="125" cy="122" r="4.1"/><circle cx="166" cy="125" r="4.9"/><circle cx="158" cy="163" r="3.2"/><circle cx="160" cy="136" r="4.7"/><circle cx="123" cy="160" r="2.7"/><circle cx="88" cy="144" r="3.1"/><circle cx="157" cy="118" r="3.4"/><circle cx="161" cy="164" r="4.6"/><circle cx="118" cy="109" r="2.6"/><circle cx="88" cy="157" r="3.0"/><circle cx="182" cy="143" r="5.3"/></g>
+<text class="ts" x="140" y="200" text-anchor="middle" style="fill:#085041">Vorrat (gut gemischt)</text>
+<line x1="22" y1="110" x2="68" y2="110" class="arr" marker-end="url(#arrow)"/><text class="ts" x="22" y="103">Zulauf</text>
+<line x1="212" y1="170" x2="248" y2="170" class="arr" marker-end="url(#arrow)"/><text class="ts" x="212" y="163">Ablauf</text>
+<text class="ts" x="262" y="96">• Zulauf mischt sich mit dem Vorrat, Ablauf zieht Karten heraus</text>
+<text class="ts" x="262" y="113">• ohne Grenze: Rate × τ, z. B. 2000 Karten/s × 1 h = 7,2 Mio.</text>
+<text class="ts" x="270" y="129">(Dauerzustand mit gleich viel Zu- und Ablauf, kein Aufstauen)</text>
+<text class="ts" x="262" y="146" style="font-weight:bold">• Grenze: 10 × Karten je Stromscheibe (2000 → 20 000)</text>
+<text class="ts" x="262" y="163">• voll? neue Karten mit ähnlichen zusammenlegen</text>
+<text class="ts" x="270" y="179">(gleiche Stoffe, ähnliche Größe; Bereichsgrenzen aus Frage A)</text>
+
+<text class="th" x="20" y="228">⑤ Ohne Durchmischung (Rohr, Verzögerung, Band): Vorrat mit Alter</text>
+<path d="M150,252 L150,246 L210,246 L210,252" fill="none" stroke="#854F0B" stroke-width="1.2"/>
+<text class="ts" x="180" y="241" text-anchor="middle" style="fill:#633806">Altersfenster, z. B. 0,5 s</text>
+<g stroke="#FFFFFF" stroke-width="1.5">
+<rect x="60" y="256" width="30" height="50" fill="#E8F7F1"/><rect x="90" y="256" width="30" height="50" fill="#D9F2E8"/><rect x="120" y="256" width="30" height="50" fill="#CAEDDF"/><rect x="150" y="256" width="30" height="50" fill="#BBE8D6"/><rect x="180" y="256" width="30" height="50" fill="#ACE3CD"/><rect x="210" y="256" width="30" height="50" fill="#9DDEC4"/><rect x="240" y="256" width="30" height="50" fill="#8ED9BB"/><rect x="270" y="256" width="30" height="50" fill="#7FD4B2"/>
+</g>
+<rect x="60" y="256" width="240" height="50" fill="none" stroke="#0F6E56" stroke-width="0.8"/>
+<g fill="#0F6E56" fill-opacity="0.5"><circle cx="70" cy="268" r="3"/><circle cx="79" cy="292" r="3.5"/><circle cx="101" cy="275" r="4"/><circle cx="110" cy="296" r="2.5"/><circle cx="130" cy="266" r="3"/><circle cx="139" cy="288" r="4.5"/><circle cx="160" cy="279" r="3"/><circle cx="171" cy="296" r="3.5"/><circle cx="190" cy="268" r="4"/><circle cx="199" cy="289" r="3"/><circle cx="220" cy="277" r="3.5"/><circle cx="231" cy="297" r="2.5"/><circle cx="249" cy="267" r="4"/><circle cx="261" cy="290" r="3"/><circle cx="280" cy="275" r="3.5"/><circle cx="291" cy="296" r="3"/></g>
+<line x1="22" y1="281" x2="58" y2="281" class="arr" marker-end="url(#arrow)"/><text class="ts" x="22" y="274">Zulauf</text>
+<line x1="302" y1="281" x2="338" y2="281" class="arr" marker-end="url(#arrow)"/><text class="ts" x="302" y="274">Ablauf</text>
+<text class="ts" x="60" y="322">jung (gerade eingetreten)</text><text class="ts" x="300" y="322" text-anchor="end">alt → zuerst hinaus</text>
+<text class="ts" x="362" y="258">• Karten merken sich ihr Eintrittsalter</text>
+<text class="ts" x="362" y="274">• Ablauf: wer τ erreicht hat, geht hinaus</text>
+<text class="ts" x="362" y="290" style="font-weight:bold">• zusammenlegen nur im selben Altersfenster</text>
+<text class="ts" x="362" y="306">• alles zusammenlegen wie in A wäre falsch:</text>
+<text class="ts" x="370" y="321">alt und jung kämen gemischt heraus</text>
+<text class="ts" x="362" y="337">• dazwischen: Tanks in Reihe (TIS) =</text>
+<text class="ts" x="370" y="352">Rohr mit etwas Rückvermischung</text>
+
+<text class="th" x="20" y="380">⑥ Rückführung: keine Sonderregel</text>
+<g class="c-green"><rect x="30" y="395" width="64" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="62" y="414" text-anchor="middle">Inlet</text></g>
+<g class="c-teal"><rect x="124" y="395" width="70" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="159" y="414" text-anchor="middle">Merger</text></g>
+<g class="c-gray"><rect x="224" y="395" width="84" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="266" y="414" text-anchor="middle">Unit (A oder B)</text></g>
+<g class="c-purple"><rect x="338" y="395" width="72" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="374" y="414" text-anchor="middle">Splitter</text></g>
+<g class="c-amber"><rect x="440" y="395" width="64" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="472" y="414" text-anchor="middle">Outlet</text></g>
+<line x1="94" y1="410" x2="122" y2="410" class="arr" marker-end="url(#arrow)"/>
+<line x1="194" y1="410" x2="222" y2="410" class="arr" marker-end="url(#arrow)"/>
+<line x1="308" y1="410" x2="336" y2="410" class="arr" marker-end="url(#arrow)"/>
+<line x1="410" y1="410" x2="438" y2="410" class="arr" marker-end="url(#arrow)"/>
+<polyline points="374,425 374,448 159,448 159,428" fill="none" stroke="#854F0B" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrow)"/>
+<text class="ts" x="266" y="462" text-anchor="middle" style="fill:#633806">Rückführung, Anteil R</text>
+<text class="ts" x="522" y="404">Masse im Kreis:</text>
+<text class="ts" x="522" y="419">1/(1 − R)-fach</text>
+<text class="ts" x="522" y="434">(R = 0,9 → 10-fach)</text>
+<text class="ts" x="20" y="486">• Die Kartenzahl je Stromscheibe bleibt durch die Grenzen aus Frage A gedeckelt – egal, wie viel Masse im Kreis läuft.</text>
+<g class="c-red"><rect x="20" y="497" width="640" height="26" rx="4" stroke-width="0.8"/><text class="ts" x="30" y="514">Echte Wachstumsgefahr: Bruch im Kreis – aus 1 Karte werden mehrere, Runde um Runde → dort zusammenlegen.</text></g>
+<text class="ts" x="20" y="548">Festlegung: A = ein Vorrat mit 10 × Karten je Scheibe; B = Vorrat mit Alter (Zusammenlegen nur im Altersfenster);</text>
+<text class="ts" x="20" y="564">Warnung bei großem Speicherbedarf.</text>
+</svg>

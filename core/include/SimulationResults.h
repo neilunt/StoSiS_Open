@@ -32,7 +32,7 @@ namespace stosis
             m_data.assign(numTimeSteps * m_numSizeClasses, 0.0);
         }
 
-        // Lineares Raster (alte Vergleichsansicht der Transportmodelle).
+        // Lineares Raster (Vergleichsansicht der Transportmodelle).
         void Configure(size_t numTimeSteps, double dt,
                         size_t numSizeClasses, double sizeMin, double sizeMax)
         {
@@ -61,7 +61,7 @@ namespace stosis
         }
 
         // Abstand zweier benachbarter Gitterpunkte Delta d - nur beim
-        // linearen Raster sinnvoll (alte Transportmodelle). Das Raster ist
+        // linearen Raster sinnvoll (Transportmodelle der Vergleichsansicht). Das Raster ist
         // knotenbasiert: Index 0 liegt genau auf sizeMin, der letzte Index
         // genau auf sizeMax.
         double GetSizeStep() const
@@ -114,8 +114,7 @@ namespace stosis
                 return GetValue(timeIdx, 0);
             if (!m_sizes.IsLogarithmic())
             {
-                // Linear: wie bisher erst summieren, dann mit Delta d malnehmen
-                // (gleiche Rundung wie vor der Umstellung).
+                // Linear: erst summieren, dann mit Delta d malnehmen.
                 double sum = 0.5 * (GetValue(timeIdx, 0) + GetValue(timeIdx, m_numSizeClasses - 1));
                 for (size_t s = 1; s + 1 < m_numSizeClasses; ++s)
                     sum += GetValue(timeIdx, s);
@@ -179,7 +178,7 @@ namespace stosis
         // linear driftet (mean(t) = d0 + driftVelocity*t) und deren
         // Varianz linear mit der Zeit waechst (sigma^2 = sigma0^2 +
         // 2*D*t). Das ist exakt ein Wiener-Prozess mit Drift - also das
-        // Modell, das du spaeter fuer deine WienerDrift-Unit brauchst
+        // Modell der WienerDrift-Unit
         // (driftVelocity = Drift, diffusionCoeff = Volatilitaet/2).
         // driftVelocity=0 ergibt reine Diffusion ohne Wanderung.
         // NUR zu Demozwecken fuer die Heatmap-Darstellung - hat noch

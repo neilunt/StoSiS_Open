@@ -3,6 +3,7 @@
 #include "ProcessNodeEditorWidget.h"
 #include "SplitterEditorWidget.h"
 #include "MaterialsPage.h"
+#include "SieveGridWidget.h"
 #include <QTabWidget>
 #include <QComboBox>
 #include <QStackedWidget>
@@ -124,11 +125,29 @@ QWidget* SettingsWindow::CreateGridTab()
     m_gridInfoLabel->setWordWrap(true);
     form->addRow("", m_gridInfoLabel);
 
-    m_numTimeStepsSpin = new QSpinBox(tab);
-    m_numTimeStepsSpin->setRange(2, 1000000);
-    form->addRow("Anzahl Zeitschritte:", m_numTimeStepsSpin);
+    // Zeitraster (Dauer und Zeitschritt dt) steht in der
+    // Simulationsleiste des Hauptfensters und im Auswertungsfenster.
+    auto* timeHint = new QLabel("Dauer und Zeitschritt dt: in der Simulationsleiste des Hauptfensters\n"
+                                "(oder im Fenster \"Auswertung\").", tab);
+    timeHint->setStyleSheet("color: gray;");
+    form->addRow("Zeitraster:", timeHint);
 
     layout->addLayout(form);
+
+    // Groessenraster und Siebsatz auf derselben Achse (Methoden-Dokument 13.23).
+    auto* sieveGroup = new QGroupBox("Groessenraster und Siebsatz", tab);
+    auto* sieveLayout = new QVBoxLayout(sieveGroup);
+    m_sieveWidget = new SieveGridWidget(sieveGroup);
+    sieveLayout->addWidget(m_sieveWidget);
+    auto* sieveHint = new QLabel(QString("Raster: Stuetzstellen, auf denen das Kontinuum rechnet und alle Ergebnisse "
+                                         "angezeigt werden - bestimmt die Aufloesung. Siebsatz: Groessenbereiche 1 %1 * 2^k, "
+                                         "nach denen im Partikelmodus jeder belegte Bereich eine Mindestzahl an Karten bekommt. "
+                                         "Beide sind unabhaengig: Ein anderes Raster aendert die Karten nicht.").arg(unit),
+                                 sieveGroup);
+    sieveHint->setWordWrap(true);
+    sieveHint->setStyleSheet("color: gray;");
+    sieveLayout->addWidget(sieveHint);
+    layout->addWidget(sieveGroup);
 
     // Richtwerte (Methoden-Dokument 2.6). "Einsetzen" fuellt nur die Felder,
     // uebernommen wird wie immer erst mit "Uebernehmen".
@@ -182,7 +201,7 @@ QWidget* SettingsWindow::CreateGridTab()
     grid->addWidget(rules, row, 0, 1, 4);
     layout->addWidget(suggestionGroup);
 
-    // Pruefung: Passen die Units (bisher: die Inlet-Verteilungen) ins Raster?
+    // Pruefung: Passen die Units (geprueft werden die Inlet-Verteilungen) ins Raster?
     auto* checkGroup = new QGroupBox("Pruefung des eingegebenen Rasters", tab);
     auto* checkLayout = new QVBoxLayout(checkGroup);
     m_gridCheckLabel = new QLabel(checkGroup);
@@ -224,6 +243,8 @@ void SettingsWindow::UpdateGridCheck()
         return;
     const stosis::SSizeGrid sizes = EnteredSizeGrid();
     const QString unit = QString::fromUtf8(stosis::kSizeDisplayUnit);
+    if (m_sieveWidget)
+        m_sieveWidget->SetGrid(sizes, m_graph ? m_graph->GetCardSettings() : stosis::SCardSettings());
     if (!sizes.IsValid())
     {
         m_gridInfoLabel->setText(sizes.IsLogarithmic() && sizes.sizeMin <= 0.0
@@ -362,7 +383,6 @@ void SettingsWindow::LoadGridValues()
     m_numClassesSpin->setValue(static_cast<int>(grid.numSizeClasses));
     m_sizeMinSpin->setValue(grid.sizeMin * stosis::kSizeDisplayFactor);
     m_sizeMaxSpin->setValue(grid.sizeMax * stosis::kSizeDisplayFactor);
-    m_numTimeStepsSpin->setValue(static_cast<int>(grid.numTimeSteps));
     UpdateGridCheck();
 }
 
@@ -379,10 +399,10 @@ void SettingsWindow::OnApplyGrid()
         return;
     }
 
-    // Dauer bleibt, wie sie ist - die gehoert zum Hauptfenster.
+    // Zeitraster (Dauer, dt) bleibt, wie es ist - das gehoert zur Simulationsleiste.
     const stosis::SSimulationGrid& grid = m_graph->GetGrid();
     m_graph->ConfigureGrid(sizes.numClasses, sizes.sizeMin, sizes.sizeMax,
-        static_cast<size_t>(m_numTimeStepsSpin->value()), grid.totalTime, sizes.type);
+        grid.numTimeSteps, grid.totalTime, sizes.type);
     // Die Vorschauen zeigen immer das aktuelle Raster.
     RefreshPreviews();
     emit SettingsApplied();
@@ -390,6 +410,7 @@ void SettingsWindow::OnApplyGrid()
 
 void SettingsWindow::RefreshPreviews()
 {
+    UpdateGridCheck();
     m_inletEditor->RefreshGridPreview();
     m_splitterEditor->UpdatePreview();
 }

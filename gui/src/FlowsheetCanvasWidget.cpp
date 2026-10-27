@@ -404,10 +404,10 @@ void FlowsheetCanvasWidget::HandleClick(QPointF scenePos)
     QGraphicsItem* hitItem = nullptr;
     {
         // itemAt() liefert normalerweise das oberste Item an dieser Position.
-        // Waehrend wir gerade eine Verbindung ziehen, liegt dort aber oft nur
-        // unser eigenes Gummiband, das wir bei der Trefferpruefung nicht
-        // wollen. Deshalb pruefen wir alle Items an dieser Position und
-        // ueberspringen die Gummibandlinie gezielt.
+        // Waehrend eine Verbindung gezogen wird, liegt dort aber oft nur
+        // das eigene Gummiband, das bei der Trefferpruefung nicht zaehlen
+        // soll. Deshalb werden alle Items an dieser Position geprueft und
+        // die Gummibandlinie gezielt uebersprungen.
         const QList<QGraphicsItem*> itemsHere = m_scene->items(scenePos, Qt::IntersectsItemShape,
             Qt::DescendingOrder, m_view->transform());
         for (QGraphicsItem* candidate : itemsHere)
@@ -604,7 +604,7 @@ bool FlowsheetCanvasWidget::eventFilter(QObject* watched, QEvent* event)
             // Verschieben: mittlere Maustaste ueberall, linke auf freier
             // Flaeche (nicht waehrend eine Verbindung gezogen wird). Die
             // linke Taste geht trotzdem an die View weiter, damit ein Klick
-            // ins Leere wie bisher die Auswahl aufhebt.
+            // ins Leere die Auswahl aufhebt.
             const bool onEmpty = m_scene->itemAt(m_view->mapToScene(mouseEvent->pos()), m_view->transform()) == nullptr;
             if (mouseEvent->button() == Qt::MiddleButton
                 || (mouseEvent->button() == Qt::LeftButton && onEmpty && !m_isConnecting))
@@ -624,7 +624,7 @@ bool FlowsheetCanvasWidget::eventFilter(QObject* watched, QEvent* event)
                 // Waehrend eines laufenden Verbindungs-Versuchs (oder
                 // wenn der Klick einen Port getroffen hat) soll die
                 // Box selbst NICHT gleichzeitig als Drag interpretiert
-                // werden - wir schlucken das Event in diesem Fall.
+                // werden - das Event wird in diesem Fall verschluckt.
                 QGraphicsItem* hitItem = m_scene->itemAt(scenePos, m_view->transform());
                 if (dynamic_cast<FlowsheetPortItem*>(hitItem) != nullptr || m_isConnecting)
                     return true;

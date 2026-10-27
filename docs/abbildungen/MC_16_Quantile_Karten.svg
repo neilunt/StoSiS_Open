@@ -1,0 +1,376 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="820" viewBox="0 0 680 820">
+<title>Quantilfunktion und Karten an Quantilen</title>
+<style>
+text { font-family: Calibri, Arial, sans-serif; }
+.t { font-size: 14px; fill: #222222; }
+.ts { font-size: 12px; fill: #595959; }
+.th { font-size: 14px; font-weight: bold; fill: #222222; }
+.c-amber rect, .c-amber circle, rect.c-amber, circle.c-amber { fill: #FAEEDA; stroke: #854F0B; }
+.c-amber text { fill: #633806; }
+.c-gray rect, .c-gray circle, rect.c-gray, circle.c-gray { fill: #F1EFE8; stroke: #5F5E5A; }
+.c-gray text { fill: #444441; }
+.box { fill: #F7F6F2; stroke: #B4B2A9; }
+.arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
+.c-red rect, rect.c-red { fill: #FCEBEB; stroke: #A32D2D; }
+.c-red text { fill: #791F1F; }
+.c-green rect, rect.c-green { fill: #EAF3DE; stroke: #3B6D11; }
+.c-green text { fill: #27500A; }
+.c-purple rect, rect.c-purple { fill: #EEEDFE; stroke: #534AB7; }
+.c-purple text { fill: #3C3489; }
+.c-teal rect, rect.c-teal { fill: #E1F5EE; stroke: #0F6E56; }
+.c-teal text { fill: #085041; }
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<view id="teil1" viewBox="0 0 680 272"/>
+<view id="teil2" viewBox="0 272 680 248"/>
+<view id="teil3" viewBox="0 520 680 300"/>
+<defs><marker id="arrowT" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#0F6E56" stroke-width="1.5"/></marker><marker id="arrowP" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#534AB7" stroke-width="1.5"/></marker></defs>
+<text class="th" x="20" y="24">① Summenkurve Q3 und Quantilfunktion: dieselbe Kurve, zwei Leserichtungen</text>
+<text class="ts" x="20" y="42">Beispiel: Normalverteilung d0 = 100 µm, σ = 25 µm (Massenverteilung)</text>
+<line x1="110" y1="232" x2="400.0" y2="232" stroke="#B4B2A9"/>
+<line x1="110" y1="62" x2="110" y2="232" stroke="#B4B2A9"/>
+<text class="ts" x="110.0" y="247" text-anchor="middle">0</text>
+<text class="ts" x="182.5" y="247" text-anchor="middle">50</text>
+<text class="ts" x="255.0" y="247" text-anchor="middle">100</text>
+<text class="ts" x="327.5" y="247" text-anchor="middle">150</text>
+<text class="ts" x="400.0" y="247" text-anchor="middle">200</text>
+<text class="ts" x="255.0" y="262" text-anchor="middle">Größe d [µm]</text>
+<text class="ts" x="104" y="236" text-anchor="end">0 %</text>
+<text class="ts" x="104" y="151" text-anchor="end">50 %</text>
+<line x1="110" y1="147.0" x2="400.0" y2="147.0" stroke="#EEEDE8"/>
+<text class="ts" x="104" y="66" text-anchor="end">100 %</text>
+<line x1="110" y1="62.0" x2="400.0" y2="62.0" stroke="#EEEDE8"/>
+<text class="ts" x="20" y="141">Massen-</text><text class="ts" x="20" y="155">anteil</text><text class="ts" x="20" y="169">unter d</text>
+<polyline points="110.0,232.0 112.9,232.0 115.8,232.0 118.7,232.0 121.6,232.0 124.5,232.0 127.4,232.0 130.3,232.0 133.2,231.9 136.1,231.9 139.0,231.9 141.9,231.8 144.8,231.8 147.7,231.7 150.6,231.7 153.5,231.6 156.4,231.4 159.3,231.3 162.2,231.1 165.1,230.9 168.0,230.6 170.9,230.3 173.8,229.9 176.7,229.4 179.6,228.8 182.5,228.1 185.4,227.3 188.3,226.4 191.2,225.3 194.1,224.1 197.0,222.7 199.9,221.1 202.8,219.3 205.7,217.2 208.6,215.0 211.5,212.4 214.4,209.7 217.3,206.6 220.2,203.4 223.1,199.8 226.0,196.0 228.9,191.9 231.8,187.6 234.7,183.1 237.6,178.3 240.5,173.4 243.4,168.3 246.3,163.1 249.2,157.8 252.1,152.4 255.0,147.0 257.9,141.6 260.8,136.2 263.7,130.9 266.6,125.7 269.5,120.6 272.4,115.7 275.3,110.9 278.2,106.4 281.1,102.1 284.0,98.0 286.9,94.2 289.8,90.6 292.7,87.4 295.6,84.3 298.5,81.6 301.4,79.0 304.3,76.8 307.2,74.7 310.1,72.9 313.0,71.3 315.9,69.9 318.8,68.7 321.7,67.6 324.6,66.7 327.5,65.9 330.4,65.2 333.3,64.6 336.2,64.1 339.1,63.7 342.0,63.4 344.9,63.1 347.8,62.9 350.7,62.7 353.6,62.6 356.5,62.4 359.4,62.3 362.3,62.3 365.2,62.2 368.1,62.2 371.0,62.1 373.9,62.1 376.8,62.1 379.7,62.0 382.6,62.0 385.5,62.0 388.4,62.0 391.3,62.0 394.2,62.0 397.1,62.0 400.0,62.0" fill="none" stroke="#5F5E5A" stroke-width="2"/>
+<polyline points="226.0,232 226.0,196.0 110,196.0" fill="none" stroke="#0F6E56" stroke-width="1.6" marker-end="url(#arrowT)"/>
+<text class="ts" x="226.0" y="247" text-anchor="middle" style="fill:#0F6E56;font-weight:bold">80</text>
+<text class="ts" x="104" y="200" text-anchor="end" style="fill:#0F6E56;font-weight:bold">21 %</text>
+<polyline points="110,104.5 279.5,104.5 279.5,232" fill="none" stroke="#534AB7" stroke-width="1.6" marker-end="url(#arrowP)"/>
+<text class="ts" x="104" y="108.5" text-anchor="end" style="fill:#534AB7;font-weight:bold">75 %</text>
+<text class="ts" x="279.5" y="247" text-anchor="middle" style="fill:#534AB7;font-weight:bold">117</text>
+<text class="th" x="420" y="70" style="fill:#0F6E56">Q3: Größe → Massenanteil</text>
+<text class="ts" x="420" y="86">Q3(80 µm) = 21 %: 21 % der Masse</text>
+<text class="ts" x="420" y="100">liegen bei Größen unter 80 µm.</text>
+<text class="th" x="420" y="124" style="fill:#534AB7">Quantil: Massenanteil → Größe</text>
+<text class="ts" x="420" y="140">Quantil(75 %) = 117 µm: unter welcher</text>
+<text class="ts" x="420" y="154">Größe liegen 75 % der Masse?</text>
+<text class="ts" x="420" y="176">Formeln je Verteilung (exakt, ohne Raster):</text>
+<text class="ts" x="420" y="191">Normal: d = d0 + σ · z(p)</text>
+<text class="ts" x="420" y="205">Log-Normal: d = d50 · exp(σln · z(p))</text>
+<text class="ts" x="420" y="219">RRSB: d = d' · (−ln(1 − p))^(1/n)</text>
+<text class="ts" x="420" y="236">z(p) = Quantil der Standardnormalverteilung –</text>
+<text class="ts" x="420" y="250">dasselbe z wie im Wahrscheinlichkeitsnetz (Kap. 12)</text>
+<text class="th" x="20" y="290">② Wofür? Karten an Quantilen statt zufällig gezogen (10 Karten, je 10 % der Masse)</text>
+<polygon points="110.0,340 110.0,340.0 112.9,340.0 115.8,340.0 118.7,340.0 121.6,340.0 124.5,339.9 127.4,339.9 130.3,339.9 133.2,339.9 136.1,339.8 139.0,339.8 141.9,339.7 144.8,339.6 147.7,339.5 150.6,339.4 153.5,339.3 156.4,339.1 159.3,338.9 162.2,338.6 165.1,338.3 168.0,338.0 170.9,337.6 173.8,337.1 176.7,336.5 179.6,335.9 182.5,335.1 185.4,334.3 188.3,333.4 191.2,332.3 194.1,331.2 197.0,330.0 199.9,328.7 202.8,327.2 205.7,325.7 208.6,324.1 211.5,322.5 214.4,320.8 217.3,319.0 220.2,317.3 223.1,315.6 226.0,313.9 228.9,312.2 231.8,310.7 234.7,309.2 237.6,307.9 240.5,306.8 243.4,305.8 246.3,305.0 249.2,304.5 252.1,304.1 255.0,304.0 257.9,304.1 260.8,304.5 263.7,305.0 266.6,305.8 269.5,306.8 272.4,307.9 275.3,309.2 278.2,310.7 281.1,312.2 284.0,313.9 286.9,315.6 289.8,317.3 292.7,319.0 295.6,320.8 298.5,322.5 301.4,324.1 304.3,325.7 307.2,327.2 310.1,328.7 313.0,330.0 315.9,331.2 318.8,332.3 321.7,333.4 324.6,334.3 327.5,335.1 330.4,335.9 333.3,336.5 336.2,337.1 339.1,337.6 342.0,338.0 344.9,338.3 347.8,338.6 350.7,338.9 353.6,339.1 356.5,339.3 359.4,339.4 362.3,339.5 365.2,339.6 368.1,339.7 371.0,339.8 373.9,339.8 376.8,339.9 379.7,339.9 382.6,339.9 385.5,339.9 388.4,340.0 391.3,340.0 394.2,340.0 397.1,340.0 400.0,340.0 400.0,340" fill="#EEEDFE" stroke="none"/>
+<text class="ts" x="342.0" y="318">Verteilung q3</text>
+<line x1="208.5" y1="302" x2="208.5" y2="340" stroke="#534AB7" stroke-width="0.6" stroke-dasharray="2 2"/>
+<line x1="224.5" y1="302" x2="224.5" y2="340" stroke="#534AB7" stroke-width="0.6" stroke-dasharray="2 2"/>
+<line x1="236.0" y1="302" x2="236.0" y2="340" stroke="#534AB7" stroke-width="0.6" stroke-dasharray="2 2"/>
+<line x1="245.8" y1="302" x2="245.8" y2="340" stroke="#534AB7" stroke-width="0.6" stroke-dasharray="2 2"/>
+<line x1="255.0" y1="302" x2="255.0" y2="340" stroke="#534AB7" stroke-width="0.6" stroke-dasharray="2 2"/>
+<line x1="264.2" y1="302" x2="264.2" y2="340" stroke="#534AB7" stroke-width="0.6" stroke-dasharray="2 2"/>
+<line x1="274.0" y1="302" x2="274.0" y2="340" stroke="#534AB7" stroke-width="0.6" stroke-dasharray="2 2"/>
+<line x1="285.5" y1="302" x2="285.5" y2="340" stroke="#534AB7" stroke-width="0.6" stroke-dasharray="2 2"/>
+<line x1="301.5" y1="302" x2="301.5" y2="340" stroke="#534AB7" stroke-width="0.6" stroke-dasharray="2 2"/>
+<text class="ts" x="20" y="366">Quantile, Schritt 1</text>
+<line x1="110" y1="362" x2="400.0" y2="362" stroke="#E2E0D8"/>
+<circle cx="195.4" cy="362" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="217.4" cy="362" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="230.5" cy="362" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="241.1" cy="362" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="250.5" cy="362" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="259.5" cy="362" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="268.9" cy="362" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="279.5" cy="362" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="292.6" cy="362" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="314.6" cy="362" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<text class="ts" x="410" y="366">Mittel 100,0 µm</text>
+<text class="ts" x="20" y="390">Quantile, Schritt 2</text>
+<line x1="110" y1="386" x2="400.0" y2="386" stroke="#E2E0D8"/>
+<circle cx="195.4" cy="386" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="217.4" cy="386" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="230.5" cy="386" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="241.1" cy="386" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="250.5" cy="386" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="259.5" cy="386" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="268.9" cy="386" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="279.5" cy="386" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="292.6" cy="386" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="314.6" cy="386" r="4" fill="#534AB7" fill-opacity="0.75"/>
+<text class="ts" x="410" y="390">Mittel 100,0 µm</text>
+<text class="ts" x="20" y="422">Zufall, Schritt 1</text>
+<line x1="110" y1="418" x2="400.0" y2="418" stroke="#E2E0D8"/>
+<circle cx="210.1" cy="418" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="244.8" cy="418" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="256.4" cy="418" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="257.9" cy="418" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="259.4" cy="418" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="262.2" cy="418" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="270.9" cy="418" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="284.0" cy="418" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="311.5" cy="418" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="323.1" cy="418" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<text class="ts" x="410" y="422">Mittel 109,0 µm</text>
+<text class="ts" x="20" y="446">Zufall, Schritt 2</text>
+<line x1="110" y1="442" x2="400.0" y2="442" stroke="#E2E0D8"/>
+<circle cx="212.9" cy="442" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="214.4" cy="442" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="218.8" cy="442" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="226.0" cy="442" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="230.3" cy="442" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="231.8" cy="442" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="237.6" cy="442" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="243.4" cy="442" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="308.6" cy="442" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<circle cx="340.5" cy="442" r="4" fill="#854F0B" fill-opacity="0.75"/>
+<text class="ts" x="410" y="446">Mittel 94,1 µm</text>
+<text class="ts" x="110.0" y="456" text-anchor="middle">0</text>
+<text class="ts" x="182.5" y="456" text-anchor="middle">50</text>
+<text class="ts" x="255.0" y="456" text-anchor="middle">100</text>
+<text class="ts" x="327.5" y="456" text-anchor="middle">150</text>
+<text class="ts" x="400.0" y="456" text-anchor="middle">200</text>
+<text class="ts" x="255.0" y="470" text-anchor="middle">Größe d [µm]</text>
+<text class="ts" x="510" y="354" style="fill:#534AB7;font-weight:bold">Quantile:</text>
+<text class="ts" x="510" y="368">jeder Schritt gleich,</text>
+<text class="ts" x="510" y="382">Mittel exakt, keine Lücken</text>
+<text class="ts" x="510" y="408" style="fill:#854F0B;font-weight:bold">Zufall:</text>
+<text class="ts" x="510" y="422">Klumpen und Lücken,</text>
+<text class="ts" x="510" y="436">jeder Schritt anders:</text>
+<text class="ts" x="510" y="450">Mittel schwankt um ±σ/√N</text>
+<text class="ts" x="510" y="464">= ±7,9 µm (hier 109 / 94)</text>
+<text class="ts" x="20" y="490">Jede Karte sitzt am Quantil der Mitte ihres 10-%-Anteils (5 %, 15 %, … 95 %): dicht, wo viel Masse ist.</text>
+<text class="ts" x="20" y="504">Zufälliges Ziehen erzeugt dagegen Rauschen, das nicht aus dem Prozess kommt, sondern nur aus der Darstellung (Methoden 13.8).</text>
+<text class="th" x="20" y="538">③ Quantile je Größenbereich – jeder Bereich hat seine eigene Leiter</text>
+<text class="ts" x="20" y="556">Beispiel 13.19: Log-Normal d50 = 100 µm, σln = 0,4, N = 200 Karten, f = 25 % → N_min = ⌈25 % · 200 / 5⌉ = 10 je belegtem Bereich</text>
+<rect x="30" y="572" width="116" height="76" rx="5" fill="#F7F6F2" stroke="#B4B2A9"/>
+<circle cx="40.0" cy="610.0" r="1.3" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="48.0" cy="610.0" r="1.3" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="56.0" cy="610.0" r="1.3" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="64.0" cy="610.0" r="1.3" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="72.0" cy="610.0" r="1.3" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="80.0" cy="610.0" r="1.3" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="88.0" cy="610.0" r="1.3" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="96.0" cy="610.0" r="1.3" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="104.0" cy="610.0" r="1.3" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="112.0" cy="610.0" r="1.3" fill="#534AB7" fill-opacity="0.75"/>
+<text class="ts" x="88" y="664" text-anchor="middle" style="font-weight:bold">12,5–25 µm</text>
+<text class="ts" x="88" y="678" text-anchor="middle">Masse 0,026 %</text>
+<text class="ts" x="88" y="692" text-anchor="middle">Anzahl 1,2 %</text>
+<text class="ts" x="88" y="706" text-anchor="middle" style="fill:#534AB7;font-weight:bold">10 Karten je 0,003 %</text>
+<text class="ts" x="88" y="720" text-anchor="middle" style="fill:#0F6E56">belegt wegen Anzahl</text>
+<rect x="156" y="572" width="116" height="76" rx="5" fill="#F7F6F2" stroke="#B4B2A9"/>
+<circle cx="166.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="174.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="182.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="190.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="198.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="206.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="214.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="222.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="230.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="238.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="246.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="254.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="262.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="166.0" cy="614.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="174.0" cy="614.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="182.0" cy="614.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<text class="ts" x="214" y="664" text-anchor="middle" style="font-weight:bold">25–50 µm</text>
+<text class="ts" x="214" y="678" text-anchor="middle">Masse 4,1 %</text>
+<text class="ts" x="214" y="692" text-anchor="middle">Anzahl 28,5 %</text>
+<text class="ts" x="214" y="706" text-anchor="middle" style="fill:#534AB7;font-weight:bold">16 Karten je 0,26 %</text>
+<rect x="282" y="572" width="116" height="76" rx="5" fill="#F7F6F2" stroke="#B4B2A9"/>
+<circle cx="292.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="300.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="308.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="316.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="324.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="332.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="340.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="348.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="356.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="364.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="372.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="380.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="388.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="292.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="300.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="308.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="316.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="324.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="332.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="340.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="348.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="356.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="364.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="372.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="380.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="388.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="292.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="300.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="308.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="316.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="324.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="332.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="340.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="348.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="356.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="364.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="372.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="380.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="388.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="292.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="300.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="308.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="316.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="324.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="332.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="340.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="348.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="356.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="364.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="372.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="380.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="388.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="292.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="300.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="308.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="316.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="324.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="332.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="340.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="348.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="356.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="364.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="372.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="380.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="388.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="292.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="300.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="308.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="316.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="324.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="332.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="340.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="348.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="356.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="364.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="372.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="380.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="388.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="292.0" cy="637.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<text class="ts" x="340" y="664" text-anchor="middle" style="font-weight:bold">50–100 µm</text>
+<text class="ts" x="340" y="678" text-anchor="middle">Masse 45,8 %</text>
+<text class="ts" x="340" y="692" text-anchor="middle">Anzahl 58,8 %</text>
+<text class="ts" x="340" y="706" text-anchor="middle" style="fill:#534AB7;font-weight:bold">79 Karten je 0,58 %</text>
+<rect x="408" y="572" width="116" height="76" rx="5" fill="#F7F6F2" stroke="#B4B2A9"/>
+<circle cx="418.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="426.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="434.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="442.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="450.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="458.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="466.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="474.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="482.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="490.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="498.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="506.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="514.0" cy="583.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="418.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="426.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="434.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="442.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="450.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="458.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="466.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="474.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="482.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="490.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="498.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="506.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="514.0" cy="592.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="418.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="426.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="434.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="442.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="450.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="458.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="466.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="474.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="482.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="490.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="498.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="506.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="514.0" cy="601.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="418.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="426.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="434.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="442.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="450.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="458.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="466.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="474.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="482.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="490.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="498.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="506.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="514.0" cy="610.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="418.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="426.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="434.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="442.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="450.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="458.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="466.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="474.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="482.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="490.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="498.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="506.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="514.0" cy="619.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="418.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="426.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="434.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="442.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="450.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="458.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="466.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="474.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="482.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="490.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="498.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="506.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="514.0" cy="628.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="418.0" cy="637.0" r="3.2" fill="#534AB7" fill-opacity="0.75"/>
+<text class="ts" x="466" y="664" text-anchor="middle" style="font-weight:bold">100–200 µm</text>
+<text class="ts" x="466" y="678" text-anchor="middle">Masse 45,8 %</text>
+<text class="ts" x="466" y="692" text-anchor="middle">Anzahl 11,3 %</text>
+<text class="ts" x="466" y="706" text-anchor="middle" style="fill:#534AB7;font-weight:bold">79 Karten je 0,58 %</text>
+<rect x="534" y="572" width="116" height="76" rx="5" fill="#F7F6F2" stroke="#B4B2A9"/>
+<circle cx="544.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="552.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="560.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="568.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="576.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="584.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="592.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="600.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="608.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="616.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="624.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="632.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="640.0" cy="605.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="544.0" cy="614.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="552.0" cy="614.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<circle cx="560.0" cy="614.5" r="2.5" fill="#534AB7" fill-opacity="0.75"/>
+<text class="ts" x="592" y="664" text-anchor="middle" style="font-weight:bold">200–400 µm</text>
+<text class="ts" x="592" y="678" text-anchor="middle">Masse 4,1 %</text>
+<text class="ts" x="592" y="692" text-anchor="middle">Anzahl 0,2 %</text>
+<text class="ts" x="592" y="706" text-anchor="middle" style="fill:#534AB7;font-weight:bold">16 Karten je 0,26 %</text>
+<text class="ts" x="20" y="740">• In jedem Bereich [a, b]: seinen Massenanteil Q3(b) − Q3(a) in n gleiche Teile schneiden, jede Karte ans Quantil der Mitte ihres Teils –</text>
+<text class="ts" x="30" y="754">wie in B, nur je Bereich. Innerhalb eines Bereichs gleiche Masse je Karte; Punktgröße hier ~ Masse je Karte.</text>
+<text class="ts" x="20" y="772">• Nur nach Masse (Quantile über alles) wären es 0 / 8 / 92 / 92 / 8 Karten: der feine Bereich mit 1,2 % der Partikel bekäme keine einzige.</text>
+<text class="ts" x="20" y="790">• Quantile kommen außerdem beim Zählen der Partikel je Bereich vor (Integral über den Massenanteil statt über d,</text>
+<text class="ts" x="30" y="804">auch für sehr schmale Verteilungen genau) und im Wahrscheinlichkeitsnetz der Auswertung (z(p), Kap. 12).</text>
+</svg>

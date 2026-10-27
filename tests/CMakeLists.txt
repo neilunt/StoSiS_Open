@@ -15,6 +15,10 @@ set(STOSIS_TESTS
     test_materials       # Materialdatei (Kapitel 14.4, Schritt 2)
     test_streams         # Stoffe, Temperatur, Druck im Strom (Kapitel 14.4, Schritt 3)
     test_sizegrid        # Logarithmisches Groessenraster, SI-Einheiten (Kapitel 2.5, 2.6)
+    test_signal_analysis # Auswertung schwankender Zeitreihen (Kapitel 12, 15)
+    test_cards           # Karten im Strom, Umrechnung aufs Raster (Kapitel 13.20)
+    test_particle_units  # Merger und Splitter im Partikelmodus (Kapitel 13.22)
+    test_runlog          # Laufzeitprotokoll, Fortschritt, Kartenspeicher (Kapitel 12, 13.23)
     test_regression      # alle Ergebnisse gegen gespeicherte Referenzwerte
 )
 
@@ -30,3 +34,8 @@ endforeach()
 add_executable(analysis_convergence analysis_convergence.cpp)
 target_link_libraries(analysis_convergence PRIVATE stosis_core)
 set_target_properties(analysis_convergence PROPERTIES FOLDER "Tests")
+
+# Auswertung fuer den Vergleich Dosierwaage - StoSiS (Methoden-Dokument Kap. 15, kein Test).
+add_executable(analysis_dosierwaage analysis_dosierwaage.cpp)
+target_link_libraries(analysis_dosierwaage PRIVATE stosis_core)
+set_target_properties(analysis_dosierwaage PROPERTIES FOLDER "Tests")

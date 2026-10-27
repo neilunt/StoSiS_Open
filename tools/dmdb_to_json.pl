@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # Erstuebernahme der Dyssol-Materialdatenbank in die StoSiS-Materialdatei.
 #
-# Einmalig verwendet am 12.10.2026: liest Dyssols Materials.dmdb (Format 3,
+# Einmalig verwendet: liest Dyssols Materials.dmdb (Format 3,
 # BSD-3-Lizenz, siehe data/LICENSE_Dyssol.txt) und schreibt
 # data/Materialien.json. Danach wird die JSON-Datei von Hand gepflegt; das
 # Skript bleibt nur zur Nachvollziehbarkeit im Repository.
@@ -12,7 +12,7 @@
 # Was das Skript tut:
 #   - uebernimmt alle Konstanten und T/p-abhaengigen Eigenschaften woertlich
 #     (Zahlen unveraendert als Text), Status "unchecked";
-#   - speichert keine Enthalpie (Entscheidung 12.10.2026: nur c_p(T)). Fehlt
+#   - speichert keine Enthalpie (nur c_p(T) wird gespeichert). Fehlt
 #     eine Waermekapazitaet, wird c_p = dh/dT aus der Dyssol-Enthalpie
 #     abgeleitet, sofern das bei Raumtemperatur ein plausibler Wert ist;
 #   - markiert Auffaelligkeiten aus der Erstpruefung (warnings);
@@ -69,7 +69,7 @@ my $CP       = 207;
 # Molmasse) - nur als Vergleich fuer abgeleitete Werte, vor Verwendung pruefen.
 my %LIT_CP = (CaCO3 => 834, CaO => 750, CO2 => 843, O2 => 918, SO2 => 622, NaCl => 864, Al2O3 => 775);
 
-# Auffaelligkeiten aus der Erstpruefung (12.10.2026), je Stoff.
+# Auffaelligkeiten aus der Erstpruefung, je Stoff.
 my %WARNINGS = (
     Coal => [
         'Dyssol-Enthalpie ist konstant (46105 J/kg), daraus folgt c_p = 0 - keine Wärmekapazität vorhanden. Literatur für trockene Kohle etwa 1000-1300 J/(kg K), z. B. Merrick (1983) - ergänzen.',
@@ -284,11 +284,11 @@ my $root = Obj(0,
         beschreibung => 'Stoffdaten für StoSiS. Jeder Wert trägt eine Quelle (source) und einen Prüfstatus (status).',
         einheiten    => 'SI: Temperatur T in K, Druck p in Pa, Masse in kg, Länge in m, Energie in J, Zeit in s. Ausnahme: bond_work_index in kWh/t (üblich).',
         status       => 'unchecked = aus Dyssol übernommen bzw. abgeleitet, noch nicht geprüft; checked = geprüft (Beleg in source bzw. reference eintragen).',
-        dichte       => 'density ist die Feststoffdichte: Partikel gelten zunächst als unporös (Entscheidung 12.10.2026). Die Porosität kommt später als Partikeleigenschaft an den Inlet.',
-        waerme       => 'Gespeichert wird nur die Wärmekapazität heat_capacity c_p(T); die Enthalpie h(T) berechnet StoSiS daraus (Entscheidung 12.10.2026).',
+        dichte       => 'density ist die Feststoffdichte: Partikel gelten zunächst als unporös. Die Porosität kommt später als Partikeleigenschaft an den Inlet.',
+        waerme       => 'Gespeichert wird nur die Wärmekapazität heat_capacity c_p(T); die Enthalpie h(T) berechnet StoSiS daraus.',
         bereiche     => 'T_range und p_range: Gültigkeitsbereich. Mehrere Einträge je Eigenschaft gelten für verschiedene Bereiche.',
-        warnungen    => 'warnings: Auffälligkeiten aus der Erstprüfung am 12.10.2026 - dort zuerst nachsehen.',
-        herkunft     => 'Startinhalt aus Dyssol Materials.dmdb (Format 3, BSD-3-Lizenz, siehe LICENSE_Dyssol.txt), umgewandelt mit tools/dmdb_to_json.pl am 12.10.2026. dyssol_key bleibt erhalten, weil Dyssol-Flowsheets (.dflw) Stoffe über diesen Schlüssel ansprechen.',
+        warnungen    => 'warnings: Auffälligkeiten aus der Erstprüfung - dort zuerst nachsehen.',
+        herkunft     => 'Startinhalt aus Dyssol Materials.dmdb (Format 3, BSD-3-Lizenz, siehe LICENSE_Dyssol.txt), umgewandelt mit tools/dmdb_to_json.pl. dyssol_key bleibt erhalten, weil Dyssol-Flowsheets (.dflw) Stoffe über diesen Schlüssel ansprechen.',
     ),
     materials    => \@jsonMaterials,
     interactions => \@jsonInteractions,

@@ -8,13 +8,15 @@ class QPushButton;
 class QComboBox;
 class QDoubleSpinBox;
 class QLabel;
+class QFormLayout;
 class DistributionPreviewWidget;
 
 // Editor-Seite fuer EIN Inlet (im Einstellungsfenster, Reiter "Knoten"):
 //   - Stoff (aus der Materialdatei), Temperatur [K] und Druck [Pa]
 //   - Zeitprofil: editierbare Zeit-Flowrate-Tabelle
-//   - Groessenverteilung: Typ (Normal, Log-Normal, RRSB), zwei Parameter
-//     und eine Live-Vorschau ueber dem aktuellen Groessenraster
+//   - Groessenverteilung: Typ (Log-Normal, RRSB, GGS, Tabelle, Normal mit
+//     Warnung), zwei Parameter oder eine Punkte-Tabelle (d, Q3) und eine
+//     Live-Vorschau ueber dem aktuellen Groessenraster
 // "Uebernehmen" schreibt alles ins zugehoerige CInletUnit. Welches
 // Inlet bearbeitet wird, bestimmt SetNode() - die Auswahl selbst trifft
 // das Einstellungsfenster (Dropdown oder Doppelklick im Flowsheet).
@@ -47,6 +49,10 @@ private slots:
 	void OnRemoveRow();
 	void OnRestoreInitialProfile();
 	void OnDistributionTypeChanged(int index);
+	void OnAddDistributionPoint();
+	void OnRemoveDistributionPoint();
+	// Zwei Spalten (d in um, Q3 in %) aus der Zwischenablage, z.B. aus Excel.
+	void OnPasteDistributionPoints();
 	void OnApply();
 
 private:
@@ -63,6 +69,11 @@ private:
 	// Beschriftung + Bereiche der Parameterfelder an den Typ anpassen.
 	void ApplyDistributionTypeToControls(stosis::EDistributionType type);
 	stosis::SSizeDistribution CurrentDistribution() const;
+	// Punkte-Tabelle der benutzerdefinierten Verteilung (d in um, Q3 in %).
+	void FillDistributionTable(const std::vector<stosis::SDistributionPoint>& points);
+	std::vector<stosis::SDistributionPoint> ReadDistributionTable() const;
+	// Startpunkte der Tabelle (Siebsatz 40 ... 250 um, Q3 der Standardverteilung).
+	static std::vector<stosis::SDistributionPoint> DefaultTablePoints();
 	void UpdatePreview();
 
 	stosis::CFlowsheetGraph* m_graph = nullptr;
@@ -81,6 +92,11 @@ private:
 	QPushButton* m_restoreProfileButton = nullptr;
 
 	QComboBox* m_distTypeCombo = nullptr;
+	QFormLayout* m_distForm = nullptr;
+	QLabel* m_distWarning = nullptr;
+	QWidget* m_distTableBox = nullptr;
+	QTableWidget* m_distTable = nullptr;
+	QLabel* m_distTableStatus = nullptr;
 	QLabel* m_positionLabel = nullptr;
 	QDoubleSpinBox* m_positionSpin = nullptr;
 	QLabel* m_widthLabel = nullptr;

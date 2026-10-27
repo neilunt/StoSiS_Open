@@ -10,8 +10,8 @@ namespace stosis
 	//	Stochastisches Wiener Drift Modell:
 	//	Jedes simulierte Partikel bewegt sich als Random Walk direkt im Groessenraum, angetrieben
 	//	von Drift und Diffusion (Euler-Maruyama-Diskretisierung der SDE dX = v*dt + sqrt(2D)*dW)
-	//	Bei genuegend Partikeln nähert sich das Ergebnis der deterministischen Lösung aus 
-	//	CDiffusionDriftUnit an - gut geeignet für einen direkten Vergleich über die Vergleichsansicht
+	//	Bei genuegend Partikeln naehert sich das Ergebnis der deterministischen Loesung aus 
+	//	CDiffusionDriftUnit an - gut geeignet fuer einen direkten Vergleich ueber die Vergleichsansicht
 	class CWienerDriftStochasticUnit : public ITransportUnit
 	{
 	public:

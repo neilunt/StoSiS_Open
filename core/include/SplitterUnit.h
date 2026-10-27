@@ -2,6 +2,9 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <numeric>
+#include <cstdio>
+#include <string>
 #include "FlowsheetUnit.h"
 #include "Random.h"
 
@@ -20,6 +23,8 @@ namespace stosis
     // Kein Hold-up: was in einem Schritt hereinkommt, geht im selben
     // Schritt wieder hinaus. Die Masse bleibt in jedem Schritt exakt
     // erhalten, auch im stochastischen Modus.
+    // Im Partikelmodus setzt das Konto-Verfahren den Anteil um: ganze
+    // Karten statt skalierter Mengen (DistributeCards).
     //
     // Mittlere Anteile mu_i: fuer die Ausgaenge 1 .. N-1 einstellbar, der
     // letzte Ausgang bekommt den Rest.
@@ -131,6 +136,12 @@ namespace stosis
                 m_state[i] = m_stochastic ? m_fractions[i] + f.sigma * m_random.Normal() : m_fractions[i];
             }
             UpdateCurrentFractions();
+
+            // Partikelmodus: eigener Zufallsstrom fuer die Startposition, damit
+            // der OU-Verlauf bei gleichem Seed derselbe ist wie im Kontinuum.
+            m_cardRandom.Seed(MakeUnitSeed(unitSeed, "Konto-Verfahren"));
+            m_accounts.assign(m_fractions.size(), 0.0);
+            m_particles = grid.representation == ERepresentation::Particles;
         }
 
         void Step(const SStepContext& context, const std::vector<const CStreamSlice*>& inputs,
@@ -152,14 +163,102 @@ namespace stosis
             const CStreamSlice* input = inputs.empty() ? nullptr : inputs[0];
             if (!input)
                 return; // Ausgaenge bleiben 0
+            if (input->HasCards())
+            {
+                DistributeCards(*input, outputs);
+                return;
+            }
             for (size_t i = 0; i < outputs.size() && i < m_currentFractions.size(); ++i)
                 outputs[i].AssignScaled(*input, m_currentFractions[i]);
         }
+
+        bool SupportsParticles() const override { return true; }
+
+        std::string DescribeForLog() const override
+        {
+            std::string text = "Anteile";
+            for (size_t i = 0; i < m_fractions.size(); ++i)
+            {
+                char percent[32];
+                std::snprintf(percent, sizeof(percent), "%g", std::round(m_fractions[i] * 1000.0) / 10.0);
+                for (char* c = percent; *c; ++c)
+                    if (*c == '.')
+                        *c = ',';
+                text += (i == 0 ? " " : " / ") + std::string(percent);
+            }
+            text += m_stochastic ? " %, schwankend (OU-Prozess)" : " %, fest";
+            if (m_particles)
+                text += ", Karten nach dem Konto-Verfahren";
+            return text;
+        }
+
+        // Konten des Konto-Verfahrens (Massenstrom, den jeder Ausgang noch
+        // bekommen soll; Summe 0). Fuer Tests und Anzeige.
+        const std::vector<double>& GetCardAccounts() const { return m_accounts; }
 
         // Tatsaechliche Anteile im zuletzt gerechneten Schritt (Summe = 1).
         const std::vector<double>& GetCurrentFractions() const { return m_currentFractions; }
 
     private:
+        // Konto-Verfahren (Methoden-Dokument 13.18, 13.22): Die Karten eines
+        // Schritts werden nach Stoff und darin nach Groesse geordnet und ab
+        // einer zufaelligen Startposition einmal ringsum durchgegangen. Jede
+        // Karte zahlt f_i * m auf das Konto jedes Ausgangs i ein und geht ganz
+        // in den Ausgang mit dem hoechsten Kontostand, dessen Konto um m
+        // belastet wird. Die Konten laufen ueber die Schritte weiter, ihre
+        // Summe bleibt 0. So bekommt jeder Ausgang seinen Anteil bis auf
+        // weniger als eine Karte, Karten werden nicht kopiert (die Kartenzahl
+        // bleibt), und jeder Stoff und jede Groesse verteilt sich gleichmaessig.
+        // Zuerst nach Stoff: Haetten zwei Inlets dieselben Kartengroessen,
+        // wechselten sich bei reiner Groessenordnung die Stoffe ab, und bei
+        // f = 50 % ginge in einem Schritt ein Stoff ganz nach A, der andere
+        // ganz nach B.
+        void DistributeCards(const CStreamSlice& input, std::vector<CStreamSlice>& outputs)
+        {
+            const size_t numOutputs = std::min(outputs.size(), m_currentFractions.size());
+            for (size_t i = 0; i < numOutputs; ++i)
+            {
+                outputs[i].SetTemperature(input.GetTemperature());
+                outputs[i].SetPressure(input.GetPressure());
+            }
+            const size_t numCards = input.GetNumCards();
+            if (numCards == 0 || numOutputs == 0)
+                return;
+
+            const auto dominantCompound = [&input](size_t card)
+            {
+                size_t best = 0;
+                for (size_t c = 1; c < input.GetNumCompounds(); ++c)
+                    if (input.GetCardMassFlow(card, c) > input.GetCardMassFlow(card, best))
+                        best = c;
+                return best;
+            };
+            m_order.resize(numCards);
+            std::iota(m_order.begin(), m_order.end(), size_t(0));
+            std::stable_sort(m_order.begin(), m_order.end(), [&](size_t a, size_t b)
+                {
+                    const size_t ca = dominantCompound(a);
+                    const size_t cb = dominantCompound(b);
+                    return ca != cb ? ca < cb : input.GetCardSize(a) < input.GetCardSize(b);
+                });
+
+            const size_t start = std::min(static_cast<size_t>(m_cardRandom.Uniform() * static_cast<double>(numCards)), numCards - 1);
+            for (size_t j = 0; j < numCards; ++j)
+            {
+                const size_t card = m_order[(start + j) % numCards];
+                const double mass = input.GetCardMassFlow(card);
+                size_t best = 0;
+                for (size_t i = 0; i < numOutputs; ++i)
+                {
+                    m_accounts[i] += m_currentFractions[i] * mass;
+                    if (m_accounts[i] > m_accounts[best])
+                        best = i;
+                }
+                m_accounts[best] -= mass;
+                outputs[best].AppendCard(input, card);
+            }
+        }
+
         void UpdateCurrentFractions()
         {
             m_currentFractions = m_fractions;
@@ -193,5 +292,11 @@ namespace stosis
         std::vector<double> m_noise;  // sigma_i * sqrt(1 - a_i^2)
         std::vector<double> m_state;  // ungekappter OU-Zustand g_i
         std::vector<double> m_currentFractions;
+
+        // Partikelmodus (Konto-Verfahren)
+        CRandom m_cardRandom;           // eigener Strom: Startposition je Schritt
+        std::vector<double> m_accounts; // Konto je Ausgang, Summe 0
+        std::vector<size_t> m_order;    // Kartenreihenfolge (wiederverwendet)
+        bool m_particles = false;       // Partikelmodus in der letzten Initialisierung
     };
 }

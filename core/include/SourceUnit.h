@@ -6,8 +6,8 @@ namespace stosis
 {
     // Die "Input"-Auswahl im Menue. Erzeugt aktuell einen konstanten
     // Massenstrom. Spaeter koennte es mehrere Source-Typen geben (z.B.
-    // zeitabhaengiger Input, gepulster Input wie bei deinen Dyssol-Gate-
-    // Units) - deshalb schon jetzt als eigene Klasse statt Spezialfall.
+    // zeitabhaengiger oder gepulster Input wie bei Dyssol-Gate-Units) -
+    // deshalb als eigene Klasse statt Spezialfall.
     class CSourceUnit : public CUnit
     {
     public:

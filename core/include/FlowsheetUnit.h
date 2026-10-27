@@ -4,7 +4,9 @@
 #include <cstdint>
 #include <string>
 #include <algorithm>
+#include <cmath>
 #include "StreamSlice.h"
+#include "CardSettings.h"
 #include "SizeGrid.h"
 #include "Materials.h"
 
@@ -28,6 +30,14 @@ namespace stosis
         // Zufallsstrom ab (MakeUnitSeed in Random.h).
         std::uint64_t randomSeed = 1;
 
+        // Kontinuum oder Partikel (Karten) - fuer alle Stroeme dieser
+        // Simulation (Methoden-Dokument 13.16, 13.20). Das Groessenraster
+        // oben gilt auch im Partikelmodus: darauf werden die Karten fuer
+        // Anzeige und Auswertung umgerechnet.
+        ERepresentation representation = ERepresentation::Continuum;
+        // Kartenzahl, Mindestzahl, Groessenbereiche (nur im Partikelmodus).
+        SCardSettings cards;
+
         // Aktive Stoffe des Flowsheets (Namen aus der Materialdatei); die
         // Reihenfolge ist der Stoffindex in CStreamSlice. Der Graph setzt
         // beides vor jeder Simulation aus den Inlets. materials ist nullptr,
@@ -44,6 +54,22 @@ namespace stosis
         {
             const auto it = std::find(compounds.begin(), compounds.end(), name);
             return it != compounds.end() ? static_cast<size_t>(it - compounds.begin()) : 0;
+        }
+
+        // Hoechstzahl an Zeitpunkten (Speicher: je Ergebnis Zeitpunkte mal Groessenklassen).
+        static constexpr size_t kMaxTimePoints = 1000000;
+
+        // Zeitpunkte 0 ... totalTime fuer eine gewuenschte Schrittweite dt:
+        // round(totalTime / dt) + 1, zwischen 2 und kMaxTimePoints. Geht die Dauer
+        // nicht genau auf, wird dt leicht angepasst (GetDt liefert den echten Wert).
+        static size_t TimePointsFor(double totalTime, double dt)
+        {
+            if (!(totalTime > 0.0) || !(dt > 0.0))
+                return 2;
+            const double steps = std::round(totalTime / dt);
+            if (steps >= static_cast<double>(kMaxTimePoints - 1))
+                return kMaxTimePoints;
+            return std::max<size_t>(2, static_cast<size_t>(steps) + 1);
         }
 
         // Laenge eines Makroschritts.
@@ -92,10 +118,18 @@ namespace stosis
         // Ein Makroschritt. inputs[i] gehoert zu Eingangs-Port i und ist
         // nullptr, wenn der Port nicht verbunden ist (zaehlt als leerer
         // Strom). outputs hat bereits die richtige Groesse (ein Eintrag pro
-        // Ausgangs-Port, passend zum Raster, mit 0 gefuellt).
+        // Ausgangs-Port, passend zum Raster, mit 0 gefuellt). Im
+        // Partikelmodus tragen alle Scheiben Karten statt Dichten.
         virtual void Step(const SStepContext& context,
             const std::vector<const CStreamSlice*>& inputs,
             std::vector<CStreamSlice>& outputs) = 0;
+
+        // Kann die Unit im Partikelmodus rechnen, also Karten lesen und
+        // schreiben? Welche Units es koennen, steht im
+        // Methoden-Dokument (Kap. 15). Solange eine Unit im Flowsheet es
+        // nicht kann, startet der Graph keine Simulation im Partikelmodus und
+        // sagt, woran es liegt - statt still falsch zu rechnen.
+        virtual bool SupportsParticles() const { return false; }
 
         // Haengt das Ergebnis vom Zufall ab? Nur dann lohnen sich mehrere
         // Laeufe - ein rein deterministisches Flowsheet rechnet der Graph
@@ -105,6 +139,10 @@ namespace stosis
         // Hinweise aus der letzten Simulation (z.B. fehlende Stoffwerte),
         // je Hinweis ein Satz. Der Graph sammelt sie mit dem Knotennamen ein.
         virtual std::vector<std::string> GetWarnings() const { return {}; }
+
+        // Kurzbeschreibung nach Initialize fuer das Laufzeitprotokoll, z.B.
+        // "2000 Karten je Zeitschritt in 3 Groessenbereichen". Leer = nichts.
+        virtual std::string DescribeForLog() const { return {}; }
 
         // Passt ein Groessenraster zu dieser Unit? Je Problem ein Satz (z.B.
         // Inlet: Teil der Verteilung liegt ausserhalb). Der Reiter "Raster"

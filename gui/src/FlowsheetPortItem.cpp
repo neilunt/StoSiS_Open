@@ -16,15 +16,15 @@ FlowsheetPortItem::FlowsheetPortItem(const std::string& nodeId, stosis::ENodeTyp
 {
 	setBrush(QBrush(Qt::darkGray));
 	setPen(QPen(Qt::black));
-	setZValue(10.0); // über dem Node Rechteck und dem label liegen, damit der Klick sicher hier ankommt.
+	setZValue(10.0); // ueber dem Node Rechteck und dem label liegen, damit der Klick sicher hier ankommt.
 	setAcceptedMouseButtons(Qt::LeftButton);
 	setCursor(Qt::CrossCursor);
 }
 
 void FlowsheetPortItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-	// Event konsumieren, damit der Klick NICHT zusätzlich an die darunterliegene Node weitergereicht wird
-	// Die würde sonst dank ItemIsMovable anfangen sich verschieben zu wollen.
+	// Event konsumieren, damit der Klick NICHT zusaetzlich an die darunterliegene Node weitergereicht wird
+	// Die wuerde sonst dank ItemIsMovable anfangen sich verschieben zu wollen.
 	event->accept();
 
 	if (m_onClicked)

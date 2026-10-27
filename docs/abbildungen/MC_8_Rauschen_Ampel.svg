@@ -21,7 +21,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 .c-teal text { fill: #085041; }
 </style>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
-<text class="th" x="40" y="30">Wie stark rauscht die Koagulation einer Gruppe?</text>
+<text class="th" x="40" y="30">① Wie stark rauscht die Koagulation einer Gruppe?</text>
 <text class="ts" x="40" y="50">n = erwartete Koagulationsereignisse der Gruppe je Verweilzeit · Rauschen ≈ 1/√n</text>
 <g class="c-red"><rect x="60" y="80" width="196" height="36" stroke-width="0.5"/><text class="ts" x="158" y="98" text-anchor="middle" dominant-baseline="central">Rauschen über 20 %</text></g>
 <g class="c-amber"><rect x="256" y="80" width="84" height="36" stroke-width="0.5"/><text class="ts" x="298" y="98" text-anchor="middle" dominant-baseline="central">10–20 %</text></g>

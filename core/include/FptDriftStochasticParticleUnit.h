@@ -102,8 +102,7 @@ namespace stosis
             auto idx = [this](size_t t, size_t s) { return t * m_numClasses + s; };
 
             // --- Eine einzige, flache Schleife ueber ALLE Partikel -------
-            // (statt vorher: aeussere Schleife Groessenklasse, innere
-            // Schleife Partikel-Index)
+            // (keine Schachtelung Groessenklasse / Partikel-Index)
             for (SParticle& particle : ensemble.GetParticles())
             {
                 const double safeSize = std::max(particle.size, 1e-6);

@@ -26,6 +26,9 @@ namespace stosis
             m_record.Record(context.stepIndex, *input);
         }
 
+        // Karten rechnet CStreamRecord fuer die Anzeige aufs Raster um.
+        bool SupportsParticles() const override { return true; }
+
         const CSimulationResults& GetResults() const override { return m_record.GetTotal(); }
         const CStreamRecord& GetRecord() const { return m_record; }
 

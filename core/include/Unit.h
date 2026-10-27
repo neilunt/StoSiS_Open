@@ -4,10 +4,9 @@
 namespace stosis
 {
     // Basisklasse fuer alle Units (Mischer, Transport-Einheiten, etc.).
-    // Bewusst noch sehr minimal - erst mal nur genug, damit Flowsheet
-    // etwas hat, das es verwalten kann. Die eigentliche Simulate()-Logik
-    // und die Partikelgruppen-Anbindung kommen im naechsten Schritt,
-    // wenn wir das lineare Flowsheet (Input -> Unit -> Output) bauen.
+    // Bewusst minimal - genug, damit Flowsheet etwas hat, das es verwalten
+    // kann. Simulate()-Logik und Partikelgruppen sind hier nur Platzhalter;
+    // das Flowsheet des Programms rechnet ueber IFlowsheetUnit (FlowsheetUnit.h).
     class CUnit
     {
     public:
