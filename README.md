@@ -69,14 +69,14 @@ StoSiS/
 
 ## Voraussetzungen
 
-- Windows, Visual Studio 2022 mit „Desktopentwicklung mit C++“
-- CMake ≥ 3.20
+- Windows, Visual Studio 2022 mit „Desktopentwicklung mit C++“(https://visualstudio.microsoft.com/de/vs/older-downloads/)
+- CMake ≥ 3.20 (https://cmake.org/download/)
 - Qt 6 (Modul Widgets, Kit msvc2022_64). Der Pfad steht in
   `gui/CMakeLists.txt` (`CMAKE_PREFIX_PATH`, derzeit
   `C:/Qt/6.11.1/msvc2022_64`) und muss bei anderer Installation angepasst
-  werden.
+  werden.(https://www.qt.io/development/qt-framework/qt6)
 - CUDA Toolkit (11.8 oder 12.x). Die GPU-Architekturen stehen in
-  `core/CMakeLists.txt` (`CUDA_ARCHITECTURES`).
+  `core/CMakeLists.txt` (`CUDA_ARCHITECTURES`).(https://developer.nvidia.com/cuda-toolkit-archive)
 
 ## Bauen
 
