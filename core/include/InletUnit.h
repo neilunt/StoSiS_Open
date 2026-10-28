@@ -161,6 +161,9 @@ namespace stosis
             return warnings;
         }
 
+        // Die Karten entstehen mit Mindestzahl und Sollzahl je Bereich.
+        bool OutputsWithinCardLimits() const override { return true; }
+
         std::string DescribeForLog() const override
         {
             char text[200];

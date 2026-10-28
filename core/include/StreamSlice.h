@@ -201,6 +201,15 @@ namespace stosis
                 AppendCard(from, card);
         }
 
+        // Alle Karten ersetzen (Grenzen je Stromscheibe): Groessen [m] und
+        // Massenstroeme als [Karte * Stoffe + Stoff].
+        void SetCards(std::vector<double> sizes, std::vector<double> massFlows)
+        {
+            m_cardSizes = std::move(sizes);
+            m_cardMassFlows = std::move(massFlows);
+            m_cardMassFlows.resize(m_cardSizes.size() * m_numCompounds, 0.0);
+        }
+
         // Massenstrom eines Stoffs ueber alle Karten.
         double GetCardsMassFlow(size_t compound) const
         {

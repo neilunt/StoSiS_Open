@@ -40,6 +40,9 @@ namespace
             SCardSettings settings = graph.GetCardSettings();
             settings.cardsPerSlice = cards;
             settings.historyBudgetBytes = budgetBytes;
+            // Ohne Grenzen je Stromscheibe: Hier zaehlt, dass die Karten
+            // unveraendert ankommen (Grenzen: test_particle_units, Block 6).
+            settings.sliceLimits = false;
             graph.SetCardSettings(settings);
         }
     };

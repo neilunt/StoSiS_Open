@@ -67,7 +67,24 @@ StoSiS/
 └── CMakeLists.txt
 ```
 
-## Voraussetzungen
+## Installation ohne Entwicklungsumgebung
+
+Unter [Releases](https://github.com/neilunt/StoSiS_Open/releases/latest) liegt
+das Installationsprogramm `StoSiS-<Version>-win64.exe` (Windows 10/11, 64 Bit).
+Herunterladen und ausführen: Es installiert StoSiS mit allen Bibliotheken
+nach `C:\Program Files\StoSiS` (im Explorer „Programme“) und legt
+Verknüpfungen im Startmenü und auf dem Desktop an. Visual Studio, Qt, CUDA
+und CMake sind dafür nicht nötig; nur die GPU-Rechnungen im Menü
+„Entwicklung“ brauchen eine NVIDIA-Grafikkarte. Entfernen über
+Einstellungen → Apps.
+
+Das Installationsprogramm ist nicht signiert. Windows SmartScreen meldet
+deshalb „Der Computer wurde durch Windows geschützt“; über „Weitere
+Informationen“ → „Trotzdem ausführen“ geht es weiter. Die Installation
+braucht Administratorrechte; ohne sie die ZIP-Datei aus demselben Release
+entpacken und `StoSiS.exe` im entpackten Ordner starten.
+
+## Voraussetzungen zum Bauen
 
 - Windows, Visual Studio 2022 mit „Desktopentwicklung mit C++“(https://visualstudio.microsoft.com/de/vs/older-downloads/)
 - CMake ≥ 3.20 (https://cmake.org/download/)

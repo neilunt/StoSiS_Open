@@ -18,6 +18,7 @@
 #include <QPushButton>
 #include <QDoubleSpinBox>
 #include <QSpinBox>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QGridLayout>
 #include <QProgressDialog>
@@ -204,6 +205,22 @@ void MainWindow::SetupCentralArea()
                             "Mindestzahl je belegtem Groessenbereich reserviert, der Rest geht nach Masse.");
     m_cardsSpin->setEnabled(false);
     simulationBar->addWidget(m_cardsSpin, 6, 1);
+    // Grenzen je Stromscheibe (Methoden-Dokument 13.24): an jedem Ausgang
+    // teilen bzw. zusammenlegen; nur im Partikelmodus wirksam.
+    m_limitsCheck = new QCheckBox("Grenzen je Stromscheibe", flowsheetPanel);
+    m_limitsCheck->setChecked(m_graph.GetCardSettings().sliceLimits);
+    m_limitsCheck->setToolTip("An jedem Ausgang haelt jeder Groessenbereich zwischen N_min und 2 x Sollzahl Karten:\n"
+                              "darunter werden Karten geteilt (Masse und Groesse bleiben), darueber aehnliche Karten\n"
+                              "desselben Stoffs zusammengelegt (Masse und Partikelzahl bleiben). Ohne Haken laufen\n"
+                              "die Karten unveraendert weiter.");
+    m_limitsCheck->setEnabled(false);
+    simulationBar->addWidget(m_limitsCheck, 7, 0, 1, 2);
+    connect(m_limitsCheck, &QCheckBox::toggled, this, [this](bool on)
+        {
+            stosis::SCardSettings settings = m_graph.GetCardSettings();
+            settings.sliceLimits = on;
+            m_graph.SetCardSettings(settings);
+        });
     connect(m_cardsSpin, &QSpinBox::valueChanged, this, [this](int cards)
         {
             stosis::SCardSettings settings = m_graph.GetCardSettings();
@@ -217,6 +234,7 @@ void MainWindow::SetupCentralArea()
             const auto representation = static_cast<stosis::ERepresentation>(m_representationCombo->currentData().toInt());
             m_graph.SetRepresentation(representation);
             m_cardsSpin->setEnabled(representation == stosis::ERepresentation::Particles);
+            m_limitsCheck->setEnabled(representation == stosis::ERepresentation::Particles);
             SyncAnalysisSettings();
             if (m_settingsWindow)
                 m_settingsWindow->RefreshPreviews();
@@ -225,7 +243,7 @@ void MainWindow::SetupCentralArea()
     auto* simulateButton = new QPushButton("Simulieren", flowsheetPanel);
     simulateButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(simulateButton, &QPushButton::clicked, this, &MainWindow::OnSimulate);
-    simulationBar->addWidget(simulateButton, 0, 2, 7, 1);
+    simulationBar->addWidget(simulateButton, 0, 2, 8, 1);
     simulationBar->setColumnStretch(2, 1);
     flowsheetLayout->addLayout(simulationBar);
 

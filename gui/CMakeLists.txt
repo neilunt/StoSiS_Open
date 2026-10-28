@@ -90,9 +90,10 @@ target_link_libraries(stosis_gui PRIVATE
 
 set_target_properties(stosis_gui PROPERTIES FOLDER "GUI" OUTPUT_NAME "StoSiS")
 
-# Ort der Materialdatei im Quellordner. Das Programm liest sie direkt von
-# dort, damit Aenderungen an data/Materialien.json ohne neues Bauen wirken
-# (siehe FindMaterialFile in MaterialsPage.cpp).
+# Ort der Materialdatei im Quellordner. Das Programm sucht sie zuerst in
+# data/ neben der .exe (weitergegebenes Programm, siehe unten "install"),
+# sonst hier - so wirken Aenderungen an data/Materialien.json beim
+# Entwickeln ohne neues Bauen (FindMaterialFile in MaterialsPage.cpp).
 target_compile_definitions(stosis_gui PRIVATE STOSIS_DATA_DIR="${CMAKE_SOURCE_DIR}/data")
 
 # Sorgt dafuer, dass beim Debuggen in Visual Studio (F5) das .exe direkt
@@ -113,4 +114,17 @@ if(WIN32)
             COMMAND "${WINDEPLOYQT_EXE}" --no-compiler-runtime "$<TARGET_FILE:stosis_gui>"
         )
     endif()
+endif()
+
+# Weitergabe ohne Entwicklungsumgebung (Paket ueber CPack, siehe
+# CMakeLists.txt im Hauptordner): StoSiS.exe, data/ mit der Materialdatei
+# und deren Lizenz, dazu die Qt-DLLs. windeployqt laeuft dafuer noch einmal
+# auf der eingepackten .exe; ohne Uebersetzungen und ohne Software-OpenGL
+# (die Fenster zeichnen mit QPainter). Die Visual-C++-Laufzeit legt
+# InstallRequiredSystemLibraries im Hauptordner bei.
+install(TARGETS stosis_gui RUNTIME DESTINATION .)
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/data/" DESTINATION data)
+if(WIN32 AND WINDEPLOYQT_EXE)
+    install(CODE "execute_process(COMMAND \"${WINDEPLOYQT_EXE}\" --no-compiler-runtime --no-translations --no-opengl-sw
+        \"\${CMAKE_INSTALL_PREFIX}/StoSiS.exe\" COMMAND_ERROR_IS_FATAL ANY OUTPUT_QUIET)")
 endif()

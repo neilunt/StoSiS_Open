@@ -129,12 +129,17 @@ namespace stosis
         std::string type;
         double initSeconds = 0.0;   // Initialize
         double stepSeconds = 0.0;   // Step (Outlet: Aufzeichnen des Eingangs samt Umrechnung)
+        double limitSeconds = 0.0;  // Grenzen je Stromscheibe an den Ausgaengen (Partikelmodus)
         double recordSeconds = 0.0; // Ausgaenge aufzeichnen (Partikelmodus: Karten aufs Raster)
         size_t steps = 0;
         double cards = 0.0;         // Karten an den Ausgaengen (Outlet: am Eingang), ueber alle Schritte
+        double cardsAdded = 0.0;    // durch Teilen dazugekommen, ueber alle Schritte
+        double cardsRemoved = 0.0;  // durch Zusammenlegen weggefallen, ueber alle Schritte
 
-        double GetTotalSeconds() const { return initSeconds + stepSeconds + recordSeconds; }
+        double GetTotalSeconds() const { return initSeconds + stepSeconds + limitSeconds + recordSeconds; }
         double GetCardsPerStep() const { return steps > 0 ? cards / static_cast<double>(steps) : 0.0; }
+        double GetAddedPerStep() const { return steps > 0 ? cardsAdded / static_cast<double>(steps) : 0.0; }
+        double GetRemovedPerStep() const { return steps > 0 ? cardsRemoved / static_cast<double>(steps) : 0.0; }
     };
 
     // Laufzeiten der letzten Simulation.
@@ -146,6 +151,7 @@ namespace stosis
         size_t runs = 0;                // fertige Laeufe
         size_t steps = 0;               // Zeitpunkte je Lauf
         bool particles = false;
+        bool sliceLimits = false; // Grenzen je Stromscheibe waren an
         bool cancelled = false;
         std::vector<SUnitTiming> units; // in Ausfuehrungsreihenfolge
 

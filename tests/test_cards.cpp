@@ -3,6 +3,7 @@
 // Mindestzahl je Groessenbereich (13.21).
 #include "FlowsheetGraph.h"
 #include "CardProjection.h"
+#include "CardDistribution.h"
 #include <cmath>
 #include <cstdio>
 
@@ -411,6 +412,59 @@ int main()
             placement.numOccupied, placement.minPerRange, placement.sizes.front() * 1e6);
         Check(placement.sizes.size() == 2000 && NearAbs(sum, 1.0, 1e-12) && placement.numOccupied <= 12,
             "RRSB n = 2: 2000 Karten, Masse 1, belegte Bereiche begrenzt");
+    }
+
+    // 14) Verteilung aus den Karten (Kartenansicht A-E): feine Klassen,
+    //     Dichte je ln d, Summenkurve und Quantile.
+    {
+        const SCardSettings settings;
+        const int k32 = GetCardRangeIndex(40e-6, settings); // Bereich 32-64 um
+        const std::vector<double> fine = MakeFineClassBounds(k32, k32 + 2, 4, settings);
+        const double ratio = std::pow(settings.rangeFactor, 0.25);
+        bool geometric = fine.size() == 13;
+        for (size_t i = 1; geometric && i < fine.size(); ++i)
+            geometric = NearAbs(fine[i] / fine[i - 1], ratio, 1e-12);
+        Check(geometric && NearAbs(fine[4], GetCardRangeLower(k32 + 1, settings), 1e-18),
+            "feine Klassen: 3 Bereiche x 4 = 12 Klassen, gleich breit in ln d, Bereichsgrenzen enthalten");
+
+        const std::vector<double> sizes = { 130e-6, 33e-6, 200e-6, 40e-6, 70e-6 };
+        const std::vector<double> masses = { 3.0, 1.0, 3.0, 1.0, 2.0 };
+        const std::vector<SCardClass> classes = BinCards(sizes, masses, MakeFineClassBounds(k32, k32 + 2, 1, settings));
+        std::printf("      Klassen: %zu/%zu/%zu Karten, Anteile %.2f/%.2f/%.2f\n", classes[0].cards, classes[1].cards,
+            classes[2].cards, classes[0].massShare, classes[1].massShare, classes[2].massShare);
+        Check(classes.size() == 3 && classes[0].cards == 2 && classes[1].cards == 1 && classes[2].cards == 2
+            && NearAbs(classes[0].massShare, 0.2, 1e-12) && NearAbs(classes[2].massShare, 0.6, 1e-12),
+            "BinCards: Karten und Massenanteile je Bereich");
+        Check(NearAbs(classes[0].GetDensity(), 0.2 / std::log(settings.rangeFactor), 1e-12),
+            "Dichte q3*(ln d) = Massenanteil / Klassenbreite in ln d");
+
+        const SCardCumulative cumulative = MakeCardCumulative(sizes, masses);
+        Check(cumulative.sizes.front() == 33e-6 && NearAbs(cumulative.q3.back(), 1.0, 1e-12)
+            && GetCardQuantile(cumulative, 0.1) == 33e-6 && GetCardQuantile(cumulative, 0.5) == 130e-6
+            && GetCardQuantile(cumulative, 0.9) == 200e-6,
+            "Summenkurve der Karten: sortiert, endet bei 1, d10/d50/d90 = 33/130/200 um");
+
+        // Gleichverteilt in ln d von 1 bis e^2: Q3 = 0, 1/2, 1 und d50 = e.
+        const std::vector<double> nodes = { 1.0, std::exp(1.0), std::exp(2.0) };
+        const std::vector<double> q = CumulativeFromDensity(nodes, { 0.5, 0.5, 0.5 });
+        Check(NearAbs(q[1], 0.5, 1e-12) && NearAbs(q[2], 1.0, 1e-12)
+            && NearAbs(GetCurveQuantile(nodes, q, 0.5), std::exp(1.0), 1e-12)
+            && NearAbs(GetCurveQuantile(nodes, q, 0.25), std::exp(0.5), 1e-12),
+            "Summenkurve einer Dichte (Trapezregel in ln d) und ihre Quantile");
+
+        // Echte Platzierung (RRSB wie in 13): alle Karten einsortiert, Masse 1.
+        const SCardPlacement placement = PlaceCardsAtQuantiles({ EDistributionType::RRSB, 65e-6, 2.0 }, settings, 1e-6, 1e-3);
+        const int first = GetCardRangeIndex(placement.sizes.front(), settings);
+        const int last = GetCardRangeIndex(placement.sizes.back(), settings);
+        size_t cards = 0;
+        double share = 0.0;
+        for (const SCardClass& c : BinCards(placement.sizes, placement.massFractions, MakeFineClassBounds(first, last, 8, settings)))
+        {
+            cards += c.cards;
+            share += c.massShare;
+        }
+        Check(cards == placement.sizes.size() && NearAbs(share, 1.0, 1e-12),
+            "RRSB-Karten in 8 Klassen je Bereich: alle Karten gezaehlt, Massenanteile ergeben 1");
     }
 
     return Summary();

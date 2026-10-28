@@ -18,7 +18,7 @@ $arguments = @(
     "--headless=new", "--disable-gpu", "--no-first-run",
     "--user-data-dir=`"$profileDir`"",
     "--no-pdf-header-footer",
-    "--virtual-time-budget=3000",      # Zeit fuer das Inhaltsverzeichnis-Skript
+    "--virtual-time-budget=20000",     # Zeit zum Laden aller Abbildungen und fuer das Inhaltsverzeichnis-Skript
     "--print-to-pdf=`"$pdf`"",
     "`"$url`""
 )

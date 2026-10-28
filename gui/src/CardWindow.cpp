@@ -4,13 +4,13 @@
 #include <QComboBox>
 #include <QFile>
 #include <QFileDialog>
-#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLocale>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QSlider>
 #include <QTabWidget>
 #include <QTableWidget>
@@ -37,18 +37,29 @@ namespace
     {
         return c < grid.compounds.size() ? QString::fromStdString(grid.compounds[c]) : QString("Stoff %1").arg(c + 1);
     }
+
+    // Masse jeder Karte ueber alle Stoffe.
+    std::vector<double> CardMasses(const stosis::CCardHistory::SSnapshot& snapshot, size_t numC)
+    {
+        std::vector<double> masses(snapshot.sizes.size(), 0.0);
+        for (size_t k = 0; k < masses.size(); ++k)
+            for (size_t c = 0; c < numC; ++c)
+                masses[k] += snapshot.massFlows[k * numC + c];
+        return masses;
+    }
 }
 
 CardWindow::CardWindow(QWidget* parent)
     : QWidget(parent, Qt::Window)
 {
     setWindowTitle("Kartenansicht");
-    resize(1100, 820);
+    resize(1100, 860);
 
     auto* layout = new QVBoxLayout(this);
     auto* top = new QHBoxLayout();
     top->addWidget(new QLabel("Strom:", this));
     m_entryCombo = new QComboBox(this);
+    m_entryCombo->setObjectName("entryCombo");
     m_entryCombo->setMinimumWidth(260);
     m_entryCombo->setToolTip("Ausgang einer Unit (beim Outlet: was ankommt). Karten gibt es nur nach einer\n"
                              "Simulation im Partikelmodus; gespeichert ist Lauf 1.");
@@ -63,25 +74,59 @@ CardWindow::CardWindow(QWidget* parent)
     top->addWidget(m_stepLabel);
     layout->addLayout(top);
 
+    auto* controls = new QHBoxLayout();
+    controls->addWidget(new QLabel("Klassen je Groessenbereich:", this));
+    m_classCombo = new QComboBox(this);
+    m_classCombo->setObjectName("classCombo");
+    for (int n : { 1, 2, 4, 8, 16 })
+        m_classCombo->addItem(QString::number(n), n);
+    m_classCombo->setCurrentIndex(2);
+    m_classCombo->setToolTip("Jeder Groessenbereich des Siebsatzes wird in so viele gleich breite Klassen (in ln d)\n"
+                             "geteilt; gilt fuer A, C und E. Feinere Klassen zeigen mehr Einzelheiten, aber auch\n"
+                             "mehr Rauschen, weil weniger Karten in jeder Klasse liegen.");
+    controls->addWidget(m_classCombo);
+    controls->addSpacing(16);
+    controls->addWidget(new QLabel("Verteilung:", this));
+    auto* densityRadio = new QRadioButton("Dichte q3* (A)", this);
+    m_cumulativeRadio = new QRadioButton("Summenkurve Q3 (B)", this);
+    densityRadio->setChecked(true);
+    controls->addWidget(densityRadio);
+    controls->addWidget(m_cumulativeRadio);
+    controls->addStretch(1);
+    layout->addLayout(controls);
+
     m_info = new QLabel(this);
     m_info->setWordWrap(true);
     m_info->setStyleSheet("color: gray;");
     layout->addWidget(m_info);
 
+    // Verteilung: A/B, D und C untereinander mit gemeinsamer d-Achse.
     auto* tabs = new QTabWidget(this);
-    auto* plots = new QWidget(tabs);
-    auto* grid = new QGridLayout(plots);
-    m_cloud = new CardPlotWidget(CardPlotWidget::EKind::Cloud, plots);
-    m_ranges = new CardPlotWidget(CardPlotWidget::EKind::Ranges, plots);
-    m_counts = new CardPlotWidget(CardPlotWidget::EKind::Counts, plots);
-    grid->addWidget(m_cloud, 0, 0);
-    grid->addWidget(m_ranges, 0, 1);
-    grid->addWidget(m_counts, 1, 0, 1, 2);
-    grid->setColumnStretch(0, 3);
-    grid->setColumnStretch(1, 2);
-    grid->setRowStretch(0, 3);
-    grid->setRowStretch(1, 2);
-    tabs->addTab(plots, "Diagramme");
+    auto* distributionPage = new QWidget(tabs);
+    auto* distributionLayout = new QVBoxLayout(distributionPage);
+    distributionLayout->setSpacing(0);
+    m_distribution = new CardPlotWidget(CardPlotWidget::EKind::Distribution, distributionPage);
+    m_rug = new CardPlotWidget(CardPlotWidget::EKind::Rug, distributionPage);
+    m_classes = new CardPlotWidget(CardPlotWidget::EKind::Classes, distributionPage);
+    m_classes->setObjectName("classesPlot");
+    distributionLayout->addWidget(m_distribution, 5);
+    distributionLayout->addWidget(m_rug);
+    distributionLayout->addWidget(m_classes, 3);
+    tabs->addTab(distributionPage, "Verteilung (A-D)");
+
+    // Zeitverlauf: E und Kartenzahl untereinander mit gemeinsamer Zeitachse.
+    auto* timePage = new QWidget(tabs);
+    auto* timeLayout = new QVBoxLayout(timePage);
+    timeLayout->setSpacing(0);
+    m_timeMap = new CardPlotWidget(CardPlotWidget::EKind::TimeMap, timePage);
+    m_counts = new CardPlotWidget(CardPlotWidget::EKind::Counts, timePage);
+    m_counts->setObjectName("countsPlot");
+    timeLayout->addWidget(m_timeMap, 3);
+    timeLayout->addWidget(m_counts, 2);
+    tabs->addTab(timePage, "Zeitverlauf (E)");
+
+    m_cloud = new CardPlotWidget(CardPlotWidget::EKind::Cloud, tabs);
+    tabs->addTab(m_cloud, "Gewichte (F)");
 
     auto* tablePage = new QWidget(tabs);
     auto* tableLayout = new QVBoxLayout(tablePage);
@@ -97,6 +142,8 @@ CardWindow::CardWindow(QWidget* parent)
 
     connect(m_entryCombo, &QComboBox::currentIndexChanged, this, &CardWindow::UpdateViews);
     connect(m_stepSlider, &QSlider::valueChanged, this, &CardWindow::UpdateViews);
+    connect(m_classCombo, &QComboBox::currentIndexChanged, this, &CardWindow::UpdateViews);
+    connect(m_cumulativeRadio, &QRadioButton::toggled, m_distribution, &CardPlotWidget::SetCumulativeMode);
 }
 
 void CardWindow::SetGraph(stosis::CFlowsheetGraph* graph)
@@ -117,6 +164,9 @@ void CardWindow::RefreshNodeList()
     const int index = m_entryCombo->findData(previous);
     m_entryCombo->setCurrentIndex(index >= 0 ? index : 0);
     m_entryCombo->blockSignals(false);
+    // Nach einer Simulation koennen die Karten andere sein, auch wenn der
+    // Speicher derselbe ist.
+    m_axisHistory = nullptr;
     UpdateViews();
 }
 
@@ -129,6 +179,11 @@ const stosis::CCardHistory* CardWindow::CurrentHistory() const
     return m_graph->GetCardHistory(nodeId, port);
 }
 
+int CardWindow::GetClassesPerRange() const
+{
+    return std::max(1, m_classCombo->currentData().toInt());
+}
+
 void CardWindow::UpdateViews()
 {
     const stosis::CCardHistory* history = CurrentHistory();
@@ -138,9 +193,9 @@ void CardWindow::UpdateViews()
         const QString message = particles
             ? "Noch keine Karten gespeichert - \"Simulieren\" druecken."
             : "Die Kartenansicht gibt es im Partikelmodus: Darstellung \"Partikel (Karten)\" waehlen und simulieren.";
-        m_cloud->ShowMessage(message);
-        m_ranges->ShowMessage(message);
-        m_counts->ShowMessage(message);
+        for (CardPlotWidget* plot : { m_distribution, m_rug, m_classes, m_timeMap, m_counts, m_cloud })
+            plot->ShowMessage(message);
+        m_axisHistory = nullptr;
         m_info->clear();
         m_stepLabel->clear();
         m_table->setRowCount(0);
@@ -160,6 +215,8 @@ void CardWindow::UpdateViews()
         stepText += QString(", gezeigt: t = %1 s").arg(Num(static_cast<double>(snapshot->step) * dt, 6));
     m_stepLabel->setText(stepText);
 
+    UpdateAxisAndTimeMap(*history);
+
     const stosis::SSimulationGrid& grid = m_graph->GetGrid();
     const size_t numC = history->GetNumCompounds();
     const size_t numCards = snapshot ? snapshot->sizes.size() : 0;
@@ -177,68 +234,146 @@ void CardWindow::UpdateViews()
         times[k] = static_cast<double>(k) * dt;
         counts[k] = static_cast<double>(history->GetCardCounts()[k]);
     }
-    m_counts->SetCounts(std::move(times), std::move(counts), static_cast<double>(step) * dt);
+    m_counts->SetCounts(std::move(times), std::move(counts));
+    m_counts->SetMarkTime(static_cast<double>(step) * dt);
+    m_timeMap->SetMarkTime(static_cast<double>(step) * dt);
 
     if (!snapshot || numCards == 0)
     {
-        m_cloud->ShowMessage("Keine Karten zu diesem Zeitpunkt");
-        m_ranges->ShowMessage("Keine Karten zu diesem Zeitpunkt");
+        for (CardPlotWidget* plot : { m_distribution, m_rug, m_classes, m_cloud })
+            plot->ShowMessage("Keine Karten zu diesem Zeitpunkt");
         m_table->setRowCount(0);
         return;
     }
 
     // Karten: Masse ueber alle Stoffe, Farbe nach dem Stoff mit der groessten Masse.
+    const std::vector<double> masses = CardMasses(*snapshot, numC);
     std::vector<CardPlotWidget::SCard> cards(numCards);
-    double totalMass = 0.0, dMin = snapshot->sizes[0], dMax = dMin;
     for (size_t k = 0; k < numCards; ++k)
     {
         CardPlotWidget::SCard& card = cards[k];
         card.size = snapshot->sizes[k];
+        card.mass = masses[k];
         double best = -1.0;
         for (size_t c = 0; c < numC; ++c)
-        {
-            const double m = snapshot->massFlows[k * numC + c];
-            card.mass += m;
-            if (m > best)
+            if (snapshot->massFlows[k * numC + c] > best)
             {
-                best = m;
+                best = snapshot->massFlows[k * numC + c];
                 card.compound = static_cast<int>(c);
             }
-        }
-        totalMass += card.mass;
-        dMin = std::min(dMin, card.size);
-        dMax = std::max(dMax, card.size);
     }
 
-    // Groessenbereiche des Siebsatzes (1 um * 2^k) von der kleinsten bis zur groessten Karte.
-    const stosis::SCardSettings& settings = m_graph->GetCardSettings();
-    const int kMin = stosis::GetCardRangeIndex(dMin, settings);
-    const int kMax = stosis::GetCardRangeIndex(dMax, settings);
-    std::vector<double> bounds;
-    std::vector<CardPlotWidget::SRange> ranges;
-    for (int k = kMin; k <= kMax + 1; ++k)
-        bounds.push_back(stosis::GetCardRangeLower(k, settings));
-    for (int k = kMin; k <= kMax; ++k)
+    const std::vector<double> bounds =
+        stosis::MakeFineClassBounds(m_firstRange, m_lastRange, GetClassesPerRange(), m_graph->GetCardSettings());
+    std::vector<stosis::SCardClass> classes = stosis::BinCards(snapshot->sizes, masses, bounds);
+    std::vector<double> refSizes, refDensity;
+    QString refLabel;
+    FillReference(snapshot->step, refSizes, refDensity, refLabel);
+    m_distribution->SetDistribution(classes, stosis::MakeCardCumulative(snapshot->sizes, masses),
+                                    std::move(refSizes), std::move(refDensity), refLabel);
+    m_classes->SetClasses(std::move(classes), stosis::CInletUnit::kMinCardsPerRange);
+
+    // Grenzen je Stromscheibe der gezeigten Scheibe, wenn sie in der letzten
+    // Simulation an waren (die Karten sind dann schon geteilt bzw. zusammengelegt).
+    std::vector<stosis::SSliceRange> limitRanges;
+    if (m_graph->GetSimulationTiming().sliceLimits)
     {
-        CardPlotWidget::SRange range;
-        range.lower = stosis::GetCardRangeLower(k, settings);
-        range.upper = stosis::GetCardRangeLower(k + 1, settings);
-        ranges.push_back(range);
+        const stosis::SCardSettings& settings = m_graph->GetCardSettings();
+        const stosis::SSliceLimits limits = stosis::ComputeSliceLimits(snapshot->sizes, masses, settings);
+        limitRanges = limits.ranges;
+        m_info->setText(m_info->text() + QString(" - Grenzen je Stromscheibe: N_min = %1 je belegtem Bereich "
+            "(%2 belegt), Obergrenze %3 x Sollzahl").arg(limits.minPerRange).arg(limits.numOccupied)
+            .arg(QLocale().toString(settings.upperFactor, 'f', 1)));
     }
-    for (const CardPlotWidget::SCard& card : cards)
-    {
-        const int k = std::clamp(stosis::GetCardRangeIndex(card.size, settings), kMin, kMax);
-        CardPlotWidget::SRange& range = ranges[static_cast<size_t>(k - kMin)];
-        ++range.cards;
-        range.massShare += totalMass > 0.0 ? card.mass / totalMass : 0.0;
-    }
+    m_classes->SetRangeLimits(std::move(limitRanges), GetClassesPerRange());
 
     QStringList compounds;
     for (size_t c = 0; c < numC; ++c)
         compounds << CompoundName(grid, c);
-    m_cloud->SetCloud(std::move(cards), std::move(bounds), compounds);
-    m_ranges->SetRanges(std::move(ranges), stosis::CInletUnit::kMinCardsPerRange);
+    m_rug->SetCards(cards, compounds);
+    m_cloud->SetCards(std::move(cards), compounds);
     FillTable(*snapshot, numC);
+}
+
+void CardWindow::UpdateAxisAndTimeMap(const stosis::CCardHistory& history)
+{
+    const int perRange = GetClassesPerRange();
+    const std::vector<stosis::CCardHistory::SSnapshot>& snapshots = history.GetSnapshots();
+    if (&history == m_axisHistory && perRange == m_axisPerRange && snapshots.size() == m_axisSnapshots)
+        return;
+    m_axisHistory = &history;
+    m_axisPerRange = perRange;
+    m_axisSnapshots = snapshots.size();
+
+    // Gemeinsame d-Achse: ganze Groessenbereiche von der kleinsten bis zur
+    // groessten Karte aller gespeicherten Zeitpunkte - so bleibt die Achse
+    // stehen, wenn der Zeitpunkt wechselt.
+    const stosis::SCardSettings& settings = m_graph->GetCardSettings();
+    double dMin = 0.0, dMax = 0.0;
+    for (const stosis::CCardHistory::SSnapshot& snapshot : snapshots)
+        for (double d : snapshot.sizes)
+            if (d > 0.0)
+            {
+                dMin = (dMin > 0.0) ? std::min(dMin, d) : d;
+                dMax = std::max(dMax, d);
+            }
+    if (!(dMin > 0.0))
+        dMin = dMax = 100e-6;
+    m_firstRange = stosis::GetCardRangeIndex(dMin, settings);
+    m_lastRange = stosis::GetCardRangeIndex(dMax, settings);
+    std::vector<double> rangeBounds;
+    for (int k = m_firstRange; k <= m_lastRange + 1; ++k)
+        rangeBounds.push_back(stosis::GetCardRangeLower(k, settings));
+    for (CardPlotWidget* plot : { m_distribution, m_rug, m_classes, m_timeMap, m_cloud })
+        plot->SetSizeAxis(rangeBounds.front(), rangeBounds.back(), rangeBounds);
+
+    // Zeitkarte E: je gespeichertem Zeitpunkt die Dichte je feiner Klasse.
+    const std::vector<double> bounds = stosis::MakeFineClassBounds(m_firstRange, m_lastRange, perRange, settings);
+    const size_t numC = history.GetNumCompounds();
+    const double dt = history.GetDt();
+    std::vector<double> times, values;
+    times.reserve(snapshots.size());
+    values.reserve(snapshots.size() * (bounds.size() - 1));
+    for (const stosis::CCardHistory::SSnapshot& snapshot : snapshots)
+    {
+        times.push_back(static_cast<double>(snapshot.step) * dt);
+        for (const stosis::SCardClass& c : stosis::BinCards(snapshot.sizes, CardMasses(snapshot, numC), bounds))
+            values.push_back(c.GetDensity());
+    }
+    const double endTime = static_cast<double>(history.GetNumSteps() - 1) * dt;
+    m_timeMap->SetTimeMap(std::move(times), static_cast<double>(history.GetStride()) * dt, endTime, bounds,
+                          std::move(values));
+}
+
+void CardWindow::FillReference(size_t step, std::vector<double>& sizes, std::vector<double>& density, QString& label) const
+{
+    std::string nodeId;
+    size_t port = 0;
+    if (!m_graph || !ParseResultsKey(m_entryCombo->currentData().toString(), nodeId, port))
+        return;
+    const stosis::CEnsembleStatistics* statistics = m_graph->GetStatistics(nodeId, port);
+    if (!statistics || statistics->IsEmpty())
+        return;
+    const stosis::CSimulationResults& mean = statistics->GetMean();
+    if (mean.IsEmpty() || mean.GetNumTimeSteps() == 0)
+        return;
+    const size_t t = std::min(step, mean.GetNumTimeSteps() - 1);
+    const double total = mean.IntegrateOverSize(t);
+    if (!(total > 0.0))
+        return;
+    // Gespeichert sind Dichten je m; mal d ergibt die Dichte je ln d.
+    for (size_t s = 0; s < mean.GetNumSizeClasses(); ++s)
+    {
+        const double d = mean.GetSizeAt(s);
+        if (d > 0.0)
+        {
+            sizes.push_back(d);
+            density.push_back(d * mean.GetValue(t, s) / total);
+        }
+    }
+    const size_t runs = statistics->GetNumRuns();
+    label = runs > 1 ? QString("Mittel aus %1 Laeufen (Groessenraster)").arg(runs)
+                     : QString("Lauf 1 auf dem Groessenraster");
 }
 
 void CardWindow::FillTable(const stosis::CCardHistory::SSnapshot& snapshot, size_t numC)

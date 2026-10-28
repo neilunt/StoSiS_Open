@@ -5,6 +5,7 @@
 
 class QDoubleSpinBox;
 class QSpinBox;
+class QCheckBox;
 class QComboBox;
 class QLabel;
 class FlowsheetCanvasWidget;
@@ -71,6 +72,7 @@ private:
     QSpinBox* m_runsSpin = nullptr;
     QComboBox* m_representationCombo = nullptr;
     QSpinBox* m_cardsSpin = nullptr;
+    QCheckBox* m_limitsCheck = nullptr;
     ResultsCurveWindow* m_resultsCurveView = nullptr;
     ResultsHeatmapWindow* m_resultsHeatmapView = nullptr;
 

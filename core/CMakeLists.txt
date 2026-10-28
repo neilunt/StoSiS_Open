@@ -49,6 +49,8 @@ include/CardProjection.h
 include/CardSettings.h
 include/CardPlacement.h
 include/CardHistory.h
+include/CardDistribution.h
+include/CardLimits.h
 include/SimulationLog.h
 include/FlowsheetUnit.h
 include/Random.h

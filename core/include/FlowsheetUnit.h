@@ -144,6 +144,11 @@ namespace stosis
         // "2000 Karten je Zeitschritt in 3 Groessenbereichen". Leer = nichts.
         virtual std::string DescribeForLog() const { return {}; }
 
+        // Liegen die Karten an den Ausgaengen schon auf den Sollzahlen der
+        // Grenzen je Stromscheibe (Inlet: Platzierung nach denselben Regeln)?
+        // Dann prueft der Graph sie nicht noch einmal (CardLimits.h).
+        virtual bool OutputsWithinCardLimits() const { return false; }
+
         // Passt ein Groessenraster zu dieser Unit? Je Problem ein Satz (z.B.
         // Inlet: Teil der Verteilung liegt ausserhalb). Der Reiter "Raster"
         // ruft das schon vor der Simulation mit den eingegebenen Werten auf.

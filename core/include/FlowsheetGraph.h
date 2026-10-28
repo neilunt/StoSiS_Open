@@ -13,6 +13,7 @@
 #include "StreamRecord.h"
 #include "SimulationLog.h"
 #include "CardHistory.h"
+#include "CardLimits.h"
 #include "Materials.h"
 #include "InletUnit.h"
 #include "OutletUnit.h"
@@ -650,6 +651,7 @@ namespace stosis
             const double dt = m_grid.GetDt();
             const bool firstRun = m_runIndex == 0;
             const bool particles = m_grid.representation == ERepresentation::Particles;
+            const bool limits = particles && m_grid.cards.sliceLimits;
             const bool detailed = m_detailedLog && firstRun;
             CStopwatch runClock;
             if (!firstRun)
@@ -810,12 +812,23 @@ namespace stosis
                     if (rn.unit)
                         rn.unit->Step(context, rn.inputs, rn.current);
                     const double t1 = clock.GetSeconds();
+                    // Grenzen je Stromscheibe an jedem Ausgang (13.24): teilen
+                    // bzw. zusammenlegen, bevor der naechste Knoten die Karten sieht.
+                    if (limits && !(rn.unit && rn.unit->OutputsWithinCardLimits()))
+                        for (CStreamSlice& out : rn.current)
+                        {
+                            const SLimitCounts changed = ApplySliceLimits(out, m_grid.cards);
+                            rn.timing->cardsAdded += static_cast<double>(changed.added);
+                            rn.timing->cardsRemoved += static_cast<double>(changed.removed);
+                        }
+                    const double tLimits = clock.GetSeconds();
                     for (size_t p = 0; p < rn.current.size() && p < rn.records->size(); ++p)
                         (*rn.records)[p].Record(k, rn.current[p]);
                     const double t2 = clock.GetSeconds();
 
                     rn.timing->stepSeconds += t1 - t0;
-                    rn.timing->recordSeconds += t2 - t1;
+                    rn.timing->limitSeconds += tLimits - t1;
+                    rn.timing->recordSeconds += t2 - tLimits;
                     ++rn.timing->steps;
                     size_t cards = 0;
                     if (particles)
@@ -843,10 +856,12 @@ namespace stosis
                     }
                     if (detailed)
                     {
-                        // Beide Zeiten in derselben Einheit (us oder ms).
-                        const ETimeUnit unit = ChooseTimeUnit(std::max(t1 - t0, t2 - t1));
+                        // Alle Zeiten der Zeile in derselben Einheit (us oder ms).
+                        const ETimeUnit unit = ChooseTimeUnit(std::max({ t1 - t0, tLimits - t1, t2 - tLimits }));
                         m_log.Add("t = " + FormatNumber(context.time, 6) + " s: " + rn.timing->name + " fertig nach "
-                            + FormatDurationIn(t1 - t0, unit) + " Rechnen + " + FormatDurationIn(t2 - t1, unit) + " Aufzeichnen"
+                            + FormatDurationIn(t1 - t0, unit) + " Rechnen + "
+                            + (limits ? FormatDurationIn(tLimits - t1, unit) + " Grenzen + " : std::string())
+                            + FormatDurationIn(t2 - tLimits, unit) + " Aufzeichnen"
                             + (particles ? " (" + std::to_string(cards) + " Karten)" : ""));
                     }
                 }
@@ -881,11 +896,16 @@ namespace stosis
                 for (const SRuntimeNode& rn : runtime)
                 {
                     const SUnitTiming& t = *rn.timing;
-                    const ETimeUnit unit = ChooseTimeUnit(std::max(t.stepSeconds, t.recordSeconds));
+                    const ETimeUnit unit = ChooseTimeUnit(std::max({ t.stepSeconds, t.limitSeconds, t.recordSeconds }));
                     std::string line = t.name + ": " + std::to_string(numT) + " Zeitschritte fertig - Rechnen "
-                        + FormatDurationIn(t.stepSeconds, unit) + ", Aufzeichnen " + FormatDurationIn(t.recordSeconds, unit);
+                        + FormatDurationIn(t.stepSeconds, unit)
+                        + (limits ? ", Grenzen " + FormatDurationIn(t.limitSeconds, unit) : std::string())
+                        + ", Aufzeichnen " + FormatDurationIn(t.recordSeconds, unit);
                     if (particles)
                         line += ", im Mittel " + FormatDecimal(t.GetCardsPerStep(), 0) + " Karten je Schritt";
+                    if (t.cardsAdded > 0.0 || t.cardsRemoved > 0.0)
+                        line += " (davon +" + FormatDecimal(t.GetAddedPerStep(), 0) + " durch Teilen, -"
+                            + FormatDecimal(t.GetRemovedPerStep(), 0) + " durch Zusammenlegen)";
                     m_log.Add(line);
                 }
             m_log.Add("Lauf " + std::to_string(m_runIndex + 1) + " fertig nach " + FormatDuration(runClock.GetSeconds()));
@@ -899,11 +919,15 @@ namespace stosis
             m_timing = SSimulationTiming();
             m_timing.steps = m_grid.numTimeSteps;
             m_timing.particles = m_grid.representation == ERepresentation::Particles;
+            m_timing.sliceLimits = m_timing.particles && m_grid.cards.sliceLimits;
             std::string line = "Simulation gestartet: " + std::to_string(runs) + (runs == 1 ? " Lauf, " : " Laeufe, ")
                 + std::to_string(m_grid.numTimeSteps) + " Zeitpunkte (0 bis " + FormatNumber(m_grid.totalTime, 6)
                 + " s, dt = " + FormatNumber(m_grid.GetDt(), 6) + " s), Raster " + std::to_string(m_grid.numSizeClasses) + " Klassen, ";
             line += m_timing.particles
                 ? "Partikelmodus mit " + std::to_string(m_grid.cards.cardsPerSlice) + " Karten je Zeitschritt und Inlet"
+                    + (m_grid.cards.sliceLimits
+                        ? ", Grenzen je Stromscheibe: N_min bis " + FormatDecimal(m_grid.cards.upperFactor, 1) + " x Sollzahl"
+                        : std::string(", ohne Grenzen je Stromscheibe"))
                 : std::string("Kontinuum");
             m_log.Add(line);
             if (IsDebugBuild())
