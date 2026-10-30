@@ -1,0 +1,4 @@
+// Programmsymbol von StoSiS.exe (Explorer, Verknuepfungen, Taskleiste).
+// Qt nimmt die Ressource IDI_ICON1 auch als Symbol aller Fenster.
+// StoSiS.ico enthaelt 16 bis 256 px; Quelle ist StoSiS_Symbol.svg.
+IDI_ICON1 ICON "StoSiS.ico"

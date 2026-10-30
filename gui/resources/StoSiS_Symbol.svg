@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+<title>StoSiS</title>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/>
+    <stop offset="1" stop-color="#D9E7F3"/>
+  </linearGradient>
+  <radialGradient id="gT" cx="0.38" cy="0.32" r="0.75" fx="0.32" fy="0.26">
+    <stop offset="0" stop-color="#A6EDD6"/>
+    <stop offset="0.38" stop-color="#2BAE84"/>
+    <stop offset="1" stop-color="#0A4F3C"/>
+  </radialGradient>
+  <radialGradient id="gO" cx="0.38" cy="0.32" r="0.75" fx="0.32" fy="0.26">
+    <stop offset="0" stop-color="#FFE3C0"/>
+    <stop offset="0.38" stop-color="#EE8E3C"/>
+    <stop offset="1" stop-color="#8A4004"/>
+  </radialGradient>
+  <radialGradient id="gS" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="#000000" stop-opacity="0.28"/>
+    <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<rect x="8" y="8" width="240" height="240" rx="54" fill="url(#bg)" stroke="#9DB6CC" stroke-width="3"/>
+<g transform="translate(128 128) scale(1.6) translate(-70 -62)">
+  <ellipse cx="52" cy="116" rx="40" ry="5" fill="url(#gS)"/>
+  <circle cx="44" cy="46" r="10" fill="url(#gT)"/>
+  <circle cx="28" cy="62" r="14" fill="url(#gT)"/>
+  <circle cx="72" cy="66" r="14" fill="url(#gT)"/>
+  <circle cx="30" cy="98" r="13" fill="url(#gT)"/>
+  <circle cx="68" cy="100" r="13" fill="url(#gT)"/>
+  <circle cx="50" cy="80" r="20" fill="url(#gT)"/>
+  <g stroke="#EE8E3C" stroke-width="4.5" stroke-linecap="round" opacity="0.8">
+    <line x1="110.1" y1="17.5" x2="116.8" y2="11.5"/>
+    <line x1="114.7" y1="22.7" x2="121.4" y2="16.7"/>
+    <line x1="119.3" y1="27.9" x2="126" y2="21.9"/>
+  </g>
+  <circle cx="102" cy="34" r="13" fill="url(#gO)"/>
+</g>
+</svg>

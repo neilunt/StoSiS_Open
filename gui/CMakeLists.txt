@@ -90,6 +90,13 @@ target_link_libraries(stosis_gui PRIVATE
 
 set_target_properties(stosis_gui PROPERTIES FOLDER "GUI" OUTPUT_NAME "StoSiS")
 
+# Programmsymbol (Agglomerat auf abgerundeter Kachel) als Windows-Ressource
+# in StoSiS.exe: Explorer, Verknuepfungen und Taskleiste zeigen es, Qt nimmt
+# es als Fenstersymbol. resources/StoSiS.ico entsteht aus StoSiS_Symbol.svg.
+if(WIN32)
+    target_sources(stosis_gui PRIVATE resources/StoSiS.rc)
+endif()
+
 # Ort der Materialdatei im Quellordner. Das Programm sucht sie zuerst in
 # data/ neben der .exe (weitergegebenes Programm, siehe unten "install"),
 # sonst hier - so wirken Aenderungen an data/Materialien.json beim

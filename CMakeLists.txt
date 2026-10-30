@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(StoSiS VERSION 0.1.0 LANGUAGES CXX CUDA)
+project(StoSiS VERSION 0.1.1 LANGUAGES CXX CUDA)
 
 # CUDA ist aktiv: Die GPU-Kernel (z.B. First-Passage-Time-Transport) liegen
 # in der Bibliothek stosis_cuda, GPU-Architekturen siehe core/CMakeLists.txt
@@ -46,7 +46,15 @@ if(STOSIS_ISCC_EXE)
     set(CPACK_INNOSETUP_IGNORE_LICENSE_PAGE ON)
     set(CPACK_INNOSETUP_USE_MODERN_WIZARD ON)
     set(CPACK_INNOSETUP_ARCHITECTURE "x64")
+    # Programmsymbol auch fuer das Installationsprogramm und den Eintrag
+    # unter Einstellungen -> Apps.
+    set(CPACK_INNOSETUP_ICON_FILE "${CMAKE_SOURCE_DIR}/gui/resources/StoSiS.ico")
+    set(CPACK_INNOSETUP_SETUP_UninstallDisplayIcon "{app}\\StoSiS.exe")
 endif()
+# Werte unveraendert an cpack weitergeben: Ohne diese Einstellung landet der
+# Backslash aus "{app}\StoSiS.exe" unmaskiert in CPackConfig.cmake, und
+# cpack bricht beim Lesen ab ("CPack project name not specified").
+set(CPACK_VERBATIM_VARIABLES ON)
 include(CPack)
 
 # Automatische Tests des Rechenkerns (siehe tests/CMakeLists.txt).
