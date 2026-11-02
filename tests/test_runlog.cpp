@@ -208,7 +208,7 @@ int main()
             && NearAbs(timing.units[2].GetCardsPerStep() + timing.units[3].GetCardsPerStep(), 200.0, 1e-9),
             "Karten je Schritt: Inlet 200, Splitter 200, Outlets zusammen 200");
         Check(CountLines(s.graph.GetSimulationLog(), "Karten fuer die Kartenansicht gespeichert") == 1
-            && CountLines(s.graph.GetSimulationLog(), "200 Karten je Zeitschritt in") == 1,
+            && CountLines(s.graph.GetSimulationLog(), "200 Karten je Zeitschritt, Kartendichte") == 1,
             "Partikelmodus im Protokoll: Karten des Inlets und Kartenspeicher");
 
         SSetup continuum(true);
@@ -250,10 +250,11 @@ int main()
         s.UseCards(2000);
         s.graph.RunSimulations(1);
         const CSimulationLog& log = s.graph.GetSimulationLog();
-        Check(CountLines(log, "Anteile 30 / 70 %, fest, Karten nach dem Konto-Verfahren") == 1,
+        Check(CountLines(log, "Anteile 30 / 70 %, fest, Karten nach dem Konto-Verfahren in Kartenanteilen") == 1,
             "Splitter mit festem Anteil im Partikelmodus");
-        Check(CountLines(log, "Log-Normal") == 1 && CountLines(log, "2000 Karten je Zeitschritt in 3 Groessenbereichen") == 1,
-            "Inlet: Verteilung und Karten je Groessenbereich");
+        Check(CountLines(log, "Log-Normal") == 1
+            && CountLines(log, "2000 Karten je Zeitschritt, Kartendichte Summe (f = 0,50, gamma = 0,80)") == 1,
+            "Inlet: Verteilung, Karten je Zeitschritt und Kartendichte");
         Check(CountLines(log, "Simulation gestartet: 1 Lauf,") == 1, "deterministisch: ein Lauf");
     }
 

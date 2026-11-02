@@ -1,6 +1,7 @@
 #include "DistributionPreviewWidget.h"
 #include "CardPlacement.h"
 #include "InletUnit.h"
+#include <QLocale>
 #include <QPainter>
 #include <QPolygonF>
 #include <algorithm>
@@ -70,7 +71,7 @@ void DistributionPreviewWidget::paintEvent(QPaintEvent* /*event*/)
     const double maxVal = *std::max_element(values.begin(), values.end());
 
     // Partikelmodus: Karten zuerst, die Verteilungskurve liegt darueber; oben
-    // bleibt eine Zeile frei fuer die Kartenzahl je Bereich.
+    // bleibt eine Zeile frei fuer die Kennzahlen der Karten.
     if (m_particles)
         PaintCards(painter, plotRect);
     const int headroom = m_particles ? 18 : 4;
@@ -145,10 +146,10 @@ void DistributionPreviewWidget::paintEvent(QPaintEvent* /*event*/)
 void DistributionPreviewWidget::PaintCards(QPainter& painter, const QRect& plotRect)
 {
     // Karten genau wie am Inlet: Partikelzahl ab der kleinsten positiven
-    // Stuetzstelle gezaehlt (CInletUnit::Initialize).
+    // Stuetzstelle gezaehlt (SSimulationGrid::GetCardCountMin).
     const double countMin = (m_sizes.sizeMin > 0.0 || m_sizes.numClasses < 2) ? m_sizes.sizeMin : m_sizes.GetSizeAt(1);
     const stosis::SCardPlacement placement =
-        stosis::PlaceCardsAtQuantiles(m_distribution, m_cardSettings, countMin, m_sizes.sizeMax);
+        stosis::PlaceCardsAtQuantiles(m_distribution, m_cardSettings, countMin);
     const QRect textRect(plotRect.left(), kMarginTop, plotRect.width(), 16);
     if (placement.sizes.empty())
     {
@@ -165,35 +166,9 @@ void DistributionPreviewWidget::PaintCards(QPainter& painter, const QRect& plotR
         return plotRect.left() + f * plotRect.width();
     };
     const QColor cardColor(83, 74, 183);
-    const QColor boundColor(133, 79, 11);
 
     painter.save();
     painter.setClipRect(plotRect);
-
-    // Grenzen der Bereiche mit Karten (gestrichelt) und Kartenzahl je Bereich oben.
-    painter.setPen(QPen(boundColor, 1.0, Qt::DashLine));
-    for (const stosis::SCardRange& range : placement.ranges)
-    {
-        if (range.numCards == 0)
-            continue;
-        for (double bound : { range.lower, range.upper })
-            painter.drawLine(QPointF(X(bound), plotRect.top()), QPointF(X(bound), plotRect.bottom()));
-    }
-    QFont bold = painter.font();
-    bold.setBold(true);
-    painter.setFont(bold);
-    painter.setPen(cardColor);
-    for (const stosis::SCardRange& range : placement.ranges)
-    {
-        if (range.numCards == 0)
-            continue;
-        const double left = std::max<double>(X(range.lower), plotRect.left());
-        const double right = std::min<double>(X(range.upper), plotRect.right());
-        if (right - left >= 22)
-            painter.drawText(QRectF(left, plotRect.top() + 1, right - left, 14), Qt::AlignHCenter | Qt::AlignTop,
-                             QString::number(range.numCards));
-    }
-    painter.setFont(font());
 
     // Jede Karte als Stab an ihrer Groesse; Hoehe = Masse je Karte. Je
     // Bildpunktspalte nur ein Stab (der hoechste): Bei vielen Karten addiert
@@ -219,14 +194,21 @@ void DistributionPreviewWidget::PaintCards(QPainter& painter, const QRect& plotR
         }
     painter.restore();
 
-    // Zusammenfassung ueber dem Diagramm; orange, wenn die Mindestzahl unter
-    // der Warnschwelle des Inlets liegt.
-    const bool few = placement.minPerRange < stosis::CInletUnit::kMinCardsPerRange;
+    // Zusammenfassung ueber dem Diagramm; orange, wenn ein Rand unter der
+    // Warnschwelle des Inlets liegt.
+    const size_t warnBelow = stosis::CInletUnit::kMinCards;
+    const bool few = placement.fineCards < warnBelow || placement.coarseCards < warnBelow;
     painter.setPen(few ? QColor(163, 82, 0) : cardColor);
-    QString text = QString("Partikelmodus: %1 Karten je Zeitschritt in %2 Bereichen (1 %3 * 2^k), Mindestzahl %4")
-        .arg(placement.sizes.size()).arg(placement.numOccupied).arg(QString::fromUtf8(stosis::kSizeDisplayUnit))
-        .arg(placement.minPerRange);
+    const auto percent = [&placement](size_t cards)
+    {
+        const double value = 100.0 * static_cast<double>(cards) / static_cast<double>(placement.sizes.size());
+        return QLocale().toString(value, 'f', value < 1.0 ? 2 : (value < 10.0 ? 1 : 0));
+    };
+    QString text = QString("Partikelmodus, Kartendichte %1: feinste 5 % der Partikel %2 % der Karten, groebste 5 % der "
+                           "Masse %3 % der Karten")
+        .arg(QString(stosis::GetCardDensityRuleName(m_cardSettings.rule)), percent(placement.fineCards),
+             percent(placement.coarseCards));
     if (few)
-        text += " - zu wenig je Bereich";
+        text += QString(" - unter %1 Karten am Rand").arg(warnBelow);
     painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, text);
 }

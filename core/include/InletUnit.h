@@ -7,6 +7,7 @@
 #include "FlowsheetUnit.h"
 #include "SizeDistribution.h"
 #include "CardPlacement.h"
+#include "SimulationLog.h"
 
 namespace stosis
 {
@@ -50,11 +51,11 @@ namespace stosis
     // Inlets und Merger (so laesst sich das Mischverhaeltnis zeitlich
     // steuern). Kein Eingang, ein Ausgang.
     //
-    // Im Partikelmodus liefert das Inlet in jedem Schritt N Karten an den
-    // Quantilen der Verteilung mit Mindestzahl je Groessenbereich
-    // (PlaceCardsAtQuantiles, Methoden-Dokument 13.21). Groessen und
-    // Massenanteile stehen einmal fest, jeder Schritt skaliert nur mit dem
-    // Massenstrom - die Karten tragen ihn exakt.
+    // Im Partikelmodus liefert das Inlet in jedem Schritt N Karten in N
+    // Streifen gleicher Flaeche unter der Kartendichte (PlaceCardsAtQuantiles,
+    // Methoden-Dokument 13.26). Groessen und Massenanteile stehen einmal
+    // fest, jeder Schritt skaliert nur mit dem Massenstrom - die Karten
+    // tragen ihn exakt.
     class CInletUnit : public IFlowsheetUnit
     {
     public:
@@ -126,16 +127,13 @@ namespace stosis
                 m_shape[s] = masses[s] / sizes.GetWeight(s);
             m_compound = grid.FindCompound(m_material);
 
-            // Karten: Partikelzahl wird im Bereich des Rasters gezaehlt (ab der
-            // kleinsten positiven Stuetzstelle), siehe PlaceCardsAtQuantiles.
+            // Karten: Partikel unter der kleinsten positiven Stuetzstelle zaehlen
+            // wie dort, siehe PlaceCardsAtQuantiles.
             m_particles = grid.representation == ERepresentation::Particles;
             m_cards = SCardPlacement();
             m_cardSettings = grid.cards;
             if (m_particles)
-            {
-                const double countMin = (grid.sizeMin > 0.0 || grid.numSizeClasses < 2) ? grid.sizeMin : grid.GetSizeAt(1);
-                m_cards = PlaceCardsAtQuantiles(m_distribution, grid.cards, countMin, grid.sizeMax);
-            }
+                m_cards = PlaceCardsAtQuantiles(m_distribution, grid.cards, grid.GetCardCountMin());
         }
 
         bool SupportsParticles() const override { return true; }
@@ -143,41 +141,73 @@ namespace stosis
         // Karten der letzten Initialisierung im Partikelmodus (sonst leer).
         const SCardPlacement& GetCardPlacement() const { return m_cards; }
 
+        // Hinweis, wenn ein Rand unter kMinCards Karten bekommt: nennt nur
+        // die betroffenen Raender und nur Abhilfen, die dort helfen und mit
+        // den aktuellen Einstellungen noch moeglich sind.
         std::vector<std::string> GetWarnings() const override
         {
             std::vector<std::string> warnings;
             if (!m_particles)
                 return warnings;
-            char text[260];
             if (m_cards.sizes.empty())
-                warnings.push_back("Keine Karten erzeugt - Groessenverteilung oder Karteneinstellungen ungueltig.");
-            else if (m_cards.minPerRange < kMinCardsPerRange)
             {
-                std::snprintf(text, sizeof(text), "Nur %zu Karten je belegtem Groessenbereich (%zu Karten je Zeitschritt, "
-                    "%zu belegte Bereiche) - zu wenig fuer eine brauchbare Statistik. Karten je Zeitschritt erhoehen.",
-                    m_cards.minPerRange, m_cardSettings.cardsPerSlice, m_cards.numOccupied);
-                warnings.push_back(text);
+                warnings.push_back("Keine Karten erzeugt - Groessenverteilung oder Karteneinstellungen ungueltig.");
+                return warnings;
             }
+            const bool fewFine = m_cards.fineCards < kMinCards, fewCoarse = m_cards.coarseCards < kMinCards;
+            if (!fewFine && !fewCoarse)
+                return warnings;
+            const size_t numCards = m_cards.sizes.size();
+            const auto share = [numCards](size_t cards)
+            {
+                return FormatNumber(100.0 * static_cast<double>(cards) / static_cast<double>(numCards), 2) + " % der Karten ("
+                    + std::to_string(cards) + " von " + std::to_string(numCards) + " je Zeitschritt)";
+            };
+            const std::string fine = "die feinsten " + FormatNumber(100.0 * kFineEdgeNumberShare, 2) + " % der Partikel";
+            const std::string coarse = "die groebsten " + FormatNumber(100.0 * kCoarseEdgeMassShare, 2) + " % der Masse";
+            std::string text;
+            if (fewFine && fewCoarse)
+                text = "An beiden Raendern zu wenige Karten: " + fine + " bekommen " + share(m_cards.fineCards) + ", "
+                    + coarse + " " + share(m_cards.coarseCards) + ".";
+            else
+            {
+                text = fewFine ? fine + " bekommen nur " + share(m_cards.fineCards) + "."
+                               : coarse + " bekommen nur " + share(m_cards.coarseCards) + ".";
+                text[0] = 'D';
+            }
+            text += " Unter " + std::to_string(kMinCards) + " Karten wird die Statistik dort unsicher. Abhilfe: ";
+            std::vector<std::string> remedies;
+            const double f = m_cardSettings.numberShare;
+            if (fewCoarse && !fewFine && f > 0.0)
+                remedies.push_back("f kleiner (mehr Gewicht auf die Masse)");
+            if (fewFine && !fewCoarse && f < 1.0)
+                remedies.push_back("f groesser (mehr Gewicht auf die Anzahl)");
+            if (CardDensityExponent(m_cardSettings) > kCardExponentMinUi + 1e-9)
+                remedies.push_back("gamma kleiner (flachere Kartendichte)");
+            remedies.push_back("mehr Karten je Zeitschritt");
+            for (size_t i = 0; i < remedies.size(); ++i)
+                text += (i == 0 ? "" : (i + 1 == remedies.size() ? " oder " : ", ")) + remedies[i];
+            warnings.push_back(text + ".");
             return warnings;
         }
 
-        // Die Karten entstehen mit Mindestzahl und Sollzahl je Bereich.
+        // Die Karten entstehen nach derselben Kartendichte, an der die
+        // Grenzen je Stromscheibe messen.
         bool OutputsWithinCardLimits() const override { return true; }
 
         std::string DescribeForLog() const override
         {
-            char text[200];
-            const char* type = GetDistributionParameterInfo(m_distribution.type).typeName;
-            if (m_particles)
-                std::snprintf(text, sizeof(text), "%s, %zu Karten je Zeitschritt in %zu Groessenbereichen (Mindestzahl %zu)",
-                    type, m_cards.sizes.size(), m_cards.numOccupied, m_cards.minPerRange);
-            else
-                std::snprintf(text, sizeof(text), "%s auf dem Groessenraster", type);
-            return text;
+            const std::string type = GetDistributionParameterInfo(m_distribution.type).typeName;
+            if (!m_particles)
+                return type + " auf dem Groessenraster";
+            return type + ", " + std::to_string(m_cards.sizes.size()) + " Karten je Zeitschritt, Kartendichte "
+                + GetCardDensityRuleName(m_cardSettings.rule) + " (f = " + FormatDecimal(m_cardSettings.numberShare, 2)
+                + ", gamma = " + FormatDecimal(CardDensityExponent(m_cardSettings), 2) + ")";
         }
 
-        // Darunter warnt das Inlet (Unsicherheit eines Bereichs etwa 1/sqrt(n), 13.19).
-        static constexpr size_t kMinCardsPerRange = 10;
+        // Darunter warnen Inlet (Raender) und Kartenansicht (Klassen):
+        // Unsicherheit etwa 1/sqrt(n), 13.19.
+        static constexpr size_t kMinCards = 10;
 
         // Meldet, wenn mehr als 0,1 % der Verteilung unter d_min oder ueber
         // d_max liegen (exakt aus der Verteilungssumme Q3).

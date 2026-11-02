@@ -4,18 +4,17 @@
 #include <QWidget>
 #include <vector>
 #include "CardDistribution.h"
-#include "CardLimits.h"
 
 class QPainter;
 
 // Ein Diagramm der Kartenansicht (CardWindow):
 //   Distribution - Verteilung aus den Karten: Dichte q3*(ln d) je feiner
-//                  Klasse (A) oder Summenkurve Q3 (B), mit Vergleichskurve,
-//   Rug          - Kartenteppich: jede Karte ein Punkt auf der d-Achse (D),
-//   Classes      - Karten je feiner Klasse mit Warnschwelle (C),
-//   TimeMap      - Verteilung ueber der Zeit als Farbbild (E),
+//                  Klasse oder Summenkurve Q3, mit Vergleichskurve,
+//   Rug          - Kartenteppich: jede Karte ein Punkt auf der d-Achse,
+//   Classes      - Karten je feiner Klasse mit Warnschwelle,
+//   TimeMap      - Verteilung ueber der Zeit als Farbbild,
 //   Counts       - Kartenzahl je Zeitschritt,
-//   Cloud        - Groesse gegen Massenstrom jeder Karte (F).
+//   Cloud        - Groesse gegen Massenstrom jeder Karte.
 // Distribution, Rug, Classes und Cloud teilen die d-Achse (SetSizeAxis),
 // TimeMap und Counts die Zeitachse; gleiche Raender links und rechts halten
 // untereinander stehende Diagramme deckungsgleich. Rechnet selbst nur
@@ -49,20 +48,20 @@ public:
     // Gemeinsame d-Achse (m, logarithmisch) und Grenzen der Groessenbereiche
     // des Siebsatzes (Streifen und Beschriftung).
     void SetSizeAxis(double sizeMin, double sizeMax, std::vector<double> rangeBounds);
-    // A/B: Klassen und Summenkurve aus den Karten; Vergleichskurve als Dichte
+    // Distribution: Klassen und Summenkurve aus den Karten; Vergleichskurve als Dichte
     // q3*(ln d) an Stuetzstellen (leer = keine).
     void SetDistribution(std::vector<stosis::SCardClass> classes, stosis::SCardCumulative cumulative,
                          std::vector<double> refSizes, std::vector<double> refDensity, QString refLabel);
-    // B (Summenkurve) statt A (Dichte) zeigen.
+    // Summenkurve statt Dichte zeigen.
     void SetCumulativeMode(bool cumulative);
-    // D und F: die Karten selbst.
+    // Rug und Cloud: die Karten selbst.
     void SetCards(std::vector<SCard> cards, QStringList compounds);
-    // C: Karten je Klasse; Klassen unter warnBelow Karten werden markiert.
+    // Classes: Karten je Klasse; Klassen unter warnBelow Karten werden markiert.
     void SetClasses(std::vector<stosis::SCardClass> classes, size_t warnBelow);
-    // C: Grenzen je Stromscheibe je Groessenbereich (leer = keine Linien);
-    // gezeichnet geteilt durch die Klassen je Bereich.
-    void SetRangeLimits(std::vector<stosis::SSliceRange> limits, int classesPerRange);
-    // E: values[Spalte * Klassen + Klasse] = q3*(ln d); Spalte j gehoert zum
+    // Classes: Soll je Klasse nach der Kartendichte (Kartenzahl x Summe der
+    // Anteile der Karten in der Klasse); leer = keine Linien.
+    void SetClassTargets(std::vector<double> targets);
+    // TimeMap: values[Spalte * Klassen + Klasse] = q3*(ln d); Spalte j gehoert zum
     // Zeitpunkt columnTimes[j] und ist columnWidth s breit; bounds =
     // Klassengrenzen (m); die Zeitachse reicht von 0 bis endTime.
     void SetTimeMap(std::vector<double> columnTimes, double columnWidth, double endTime,
@@ -114,8 +113,7 @@ private:
     QString m_refLabel;
     bool m_cumulativeMode = false;
     size_t m_warnBelow = 10;
-    std::vector<stosis::SSliceRange> m_rangeLimits;
-    int m_classesPerRange = 1;
+    std::vector<double> m_classTargets; // je Klasse, parallel zu m_classes
     std::vector<double> m_mapTimes, m_mapBounds, m_mapValues;
     double m_mapColumnWidth = 0.0, m_mapMax = 0.0, m_timeEnd = 0.0;
     std::vector<double> m_times, m_counts;

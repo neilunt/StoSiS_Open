@@ -20,8 +20,7 @@ namespace
     const QColor kGridColor(214, 214, 214);
     const QColor kStripeColor(244, 244, 244);
     const QColor kReferenceColor(204, 51, 17);
-    const QColor kMinLimitColor(118, 42, 131); // lila wie die Mindestzahl in Abb. 13.19.1
-    const QColor kMaxLimitColor(204, 51, 17);
+    const QColor kTargetColor(118, 42, 131); // lila: Soll nach der Kartendichte
 
     // Glatte Teilstriche (1, 2, 2,5, 5 mal 10^k), etwa "wanted" Stueck.
     std::vector<double> NiceTicks(double lo, double hi, int wanted)
@@ -215,7 +214,7 @@ void CardPlotWidget::ShowMessage(const QString& message)
     m_message = message;
     m_cards.clear();
     m_classes.clear();
-    m_rangeLimits.clear();
+    m_classTargets.clear();
     m_cumulative = {};
     m_refSizes.clear();
     m_refDensity.clear();
@@ -275,10 +274,9 @@ void CardPlotWidget::SetClasses(std::vector<stosis::SCardClass> classes, size_t 
     update();
 }
 
-void CardPlotWidget::SetRangeLimits(std::vector<stosis::SSliceRange> limits, int classesPerRange)
+void CardPlotWidget::SetClassTargets(std::vector<double> targets)
 {
-    m_rangeLimits = std::move(limits);
-    m_classesPerRange = std::max(1, classesPerRange);
+    m_classTargets = std::move(targets);
     update();
 }
 
@@ -396,20 +394,15 @@ QString CardPlotWidget::ClassTip(const stosis::SCardClass& c) const
     if (c.cards > 0 && c.cards < m_warnBelow)
         tip += QString("\nunter %1 Karten: Unsicherheit etwa 1/Wurzel(n) = %2 %").arg(m_warnBelow)
             .arg(QLocale().toString(100.0 / std::sqrt(static_cast<double>(c.cards)), 'f', 0));
-    for (const stosis::SSliceRange& r : m_rangeLimits)
-        if (c.lower >= r.lower * (1.0 - 1e-9) && c.upper <= r.upper * (1.0 + 1e-9))
-        {
-            tip += QString("\nBereich %1-%2 %3: %4 Karten, Grenzen %5 bis %6 (Sollzahl %7)")
-                .arg(Micro(r.lower), Micro(r.upper), Unit()).arg(r.cards).arg(r.minCards).arg(r.maxCards)
-                .arg(Num(r.target, 4));
-            break;
-        }
+    const size_t index = static_cast<size_t>(&c - m_classes.data());
+    if (&c >= m_classes.data() && index < m_classes.size() && index < m_classTargets.size())
+        tip += QString("\nSoll nach der Kartendichte: %1 Karten").arg(Num(m_classTargets[index], 3));
     return tip;
 }
 
 void CardPlotWidget::PaintDensity(QPainter& p, const QRect& plot)
 {
-    DrawTitle(p, plot, QString("A: Dichte q3*(ln d) aus den Karten - %1 Klassen").arg(m_classes.size()));
+    DrawTitle(p, plot, QString("Dichte q3*(ln d) aus den Karten - %1 Klassen").arg(m_classes.size()));
     double maxValue = 0.0;
     for (const stosis::SCardClass& c : m_classes)
         maxValue = std::max(maxValue, c.GetDensity());
@@ -463,7 +456,7 @@ void CardPlotWidget::PaintDensity(QPainter& p, const QRect& plot)
 
 void CardPlotWidget::PaintCumulative(QPainter& p, const QRect& plot)
 {
-    DrawTitle(p, plot, "B: Summenkurve Q3 direkt aus den Karten (ohne Klassen)");
+    DrawTitle(p, plot, "Summenkurve Q3 direkt aus den Karten (ohne Klassen)");
     const auto Y = [&](double q) { return plot.bottom() - q * plot.height(); };
     PaintSizeAxis(p, plot, true);
     DrawYAxis(p, plot, 1.0, 5, 100.0, " %");
@@ -533,7 +526,7 @@ void CardPlotWidget::PaintCumulative(QPainter& p, const QRect& plot)
 
 void CardPlotWidget::PaintRug(QPainter& p, const QRect& plot)
 {
-    DrawTitle(p, plot, "D: Kartenteppich - jede Karte ein Punkt (Hoehe zufaellig, nur gegen Ueberdecken)");
+    DrawTitle(p, plot, "Kartenteppich - jede Karte ein Punkt (Hoehe zufaellig, nur gegen Ueberdecken)");
     PaintSizeAxis(p, plot, false);
     p.save();
     p.setRenderHint(QPainter::Antialiasing, true);
@@ -558,20 +551,12 @@ void CardPlotWidget::PaintRug(QPainter& p, const QRect& plot)
 
 void CardPlotWidget::PaintClasses(QPainter& p, const QRect& plot)
 {
-    DrawTitle(p, plot, QString("C: Karten je Klasse - %1 Klassen").arg(m_classes.size()));
-    // Grenzen je Bereich, umgerechnet auf eine Klasse.
-    const double perClass = 1.0 / static_cast<double>(m_classesPerRange);
+    DrawTitle(p, plot, QString("Karten je Klasse - %1 Klassen").arg(m_classes.size()));
     double top = static_cast<double>(m_warnBelow);
     for (const stosis::SCardClass& c : m_classes)
         top = std::max(top, static_cast<double>(c.cards));
-    for (const stosis::SSliceRange& r : m_rangeLimits)
-        top = std::max(top, static_cast<double>(r.minCards) * perClass);
-    // Obergrenzen weit ueber den Balken staucht die Achse nicht; sie stehen
-    // dann als Pfeil am oberen Rand.
-    const double barsTop = top;
-    for (const stosis::SSliceRange& r : m_rangeLimits)
-        if (static_cast<double>(r.maxCards) * perClass <= 1.6 * barsTop)
-            top = std::max(top, static_cast<double>(r.maxCards) * perClass);
+    for (double target : m_classTargets)
+        top = std::max(top, target);
     const double yMax = 1.35 * top;
     const auto Y = [&](double value) { return plot.bottom() - value / yMax * plot.height(); };
 
@@ -601,37 +586,17 @@ void CardPlotWidget::PaintClasses(QPainter& p, const QRect& plot)
     const double yWarn = Y(static_cast<double>(m_warnBelow));
     p.drawLine(QPointF(plot.left(), yWarn), QPointF(plot.right(), yWarn));
 
-    // Grenzen je Stromscheibe: je Bereich eine Linie fuer N_min (lila) und
-    // fuer die Obergrenze (rot gestrichelt).
+    // Soll nach der Kartendichte: je Klasse eine Linie (lila) - so viele
+    // Karten laegen dort, wenn jede Karte denselben Anteil truege.
     p.save();
     p.setRenderHint(QPainter::Antialiasing, true);
-    for (const stosis::SSliceRange& r : m_rangeLimits)
+    p.setPen(QPen(kTargetColor, 2.0));
+    for (size_t i = 0; i < m_classes.size() && i < m_classTargets.size(); ++i)
     {
-        const double left = std::max(SizeToX(r.lower, plot), static_cast<double>(plot.left())) + 2.0;
-        const double right = std::min(SizeToX(r.upper, plot), static_cast<double>(plot.right())) - 2.0;
-        if (r.minCards > 0)
-        {
-            const double y = Y(static_cast<double>(r.minCards) * perClass);
-            p.setPen(QPen(kMinLimitColor, 2.0));
-            p.drawLine(QPointF(left, y), QPointF(right, y));
-        }
-        const double upper = static_cast<double>(r.maxCards) * perClass;
-        p.setPen(QPen(kMaxLimitColor, 2.0, Qt::DashLine));
-        if (upper <= yMax)
-            p.drawLine(QPointF(left, Y(upper)), QPointF(right, Y(upper)));
-        else
-        {
-            // Ueber dem oberen Rand: Pfeil nach oben mit dem Wert, links im
-            // Bereich (rechts oben steht die Legende).
-            const double x = left + 10.0;
-            p.setPen(QPen(kMaxLimitColor, 1.5));
-            p.drawLine(QPointF(x, plot.top() + 16.0), QPointF(x, plot.top() + 3.0));
-            p.drawLine(QPointF(x - 4.0, plot.top() + 7.0), QPointF(x, plot.top() + 3.0));
-            p.drawLine(QPointF(x + 4.0, plot.top() + 7.0), QPointF(x, plot.top() + 3.0));
-            // Nur die Zahl (rot wie "Obergrenze" in der Legende), damit sie
-            // auch in schmalen Fenstern neben die Legende passt.
-            p.drawText(QRectF(x + 6.0, plot.top() + 2.0, 60.0, 16.0), Qt::AlignLeft | Qt::AlignVCenter, Num(upper, 4));
-        }
+        const double left = std::max(SizeToX(m_classes[i].lower, plot), static_cast<double>(plot.left())) + 1.0;
+        const double right = std::min(SizeToX(m_classes[i].upper, plot), static_cast<double>(plot.right())) - 1.0;
+        if (m_classTargets[i] > 0.0 && right > left)
+            p.drawLine(QPointF(left, Y(m_classTargets[i])), QPointF(right, Y(m_classTargets[i])));
     }
     p.restore();
 
@@ -639,18 +604,14 @@ void CardPlotWidget::PaintClasses(QPainter& p, const QRect& plot)
     DrawYTitle(p, plot, "Karten");
     std::vector<SLegendItem> legend = { { SLegendItem::Bar, kBarColor, "Karten je Klasse" },
         { SLegendItem::Bar, kWarnColor, QString("unter %1 Karten (Schwelle gestrichelt)").arg(m_warnBelow) } };
-    if (!m_rangeLimits.empty())
-    {
-        const QString perClassText = m_classesPerRange > 1 ? QString(" / %1 je Klasse").arg(m_classesPerRange) : QString();
-        legend.push_back({ SLegendItem::Line, kMinLimitColor, "Untergrenze N_min" + perClassText });
-        legend.push_back({ SLegendItem::Dash, kMaxLimitColor, "Obergrenze" + perClassText });
-    }
+    if (!m_classTargets.empty())
+        legend.push_back({ SLegendItem::Line, kTargetColor, "Soll nach der Kartendichte" });
     DrawLegend(p, plot, legend);
 }
 
 void CardPlotWidget::PaintTimeMap(QPainter& p, const QRect& plot)
 {
-    DrawTitle(p, plot, "E: Verteilung ueber der Zeit - Farbe = q3*(ln d) aus den Karten (Lauf 1)", 250);
+    DrawTitle(p, plot, "Verteilung ueber der Zeit - Farbe = q3*(ln d) aus den Karten (Lauf 1)", 250);
     const double timeEnd = m_timeEnd > 0.0 ? m_timeEnd : 1.0;
     const auto X = [&](double t) { return plot.left() + t / timeEnd * plot.width(); };
     const double y0 = std::log10(m_sizeMin), y1 = std::log10(m_sizeMax);
@@ -777,7 +738,7 @@ void CardPlotWidget::PaintCounts(QPainter& p, const QRect& plot)
 
 void CardPlotWidget::PaintCloud(QPainter& p, const QRect& plot)
 {
-    DrawTitle(p, plot, "F: Gewicht je Karte - Groesse gegen Massenstrom (Diagnose)");
+    DrawTitle(p, plot, "Gewicht je Karte - Groesse gegen Massenstrom (Diagnose)");
     double mMin = 0.0, mMax = 0.0;
     for (const SCard& card : m_cards)
         if (card.mass > 0.0)

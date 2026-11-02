@@ -2,61 +2,74 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <numeric>
 #include <vector>
-#include "CardSettings.h"
+#include "CardDensity.h"
 #include "SizeDistribution.h"
 
 namespace stosis
 {
-    // Ein Groessenbereich bei der Platzierung - zum Nachvollziehen und Pruefen.
-    struct SCardRange
+    // Masse, Anzahl und Kartendichte einer Verteilung als Kurven ueber ln d
+    // (Vorschau): Dichten mit der Flaeche 1 an den Mitten feiner Zellen.
+    struct SCardDensityCurve
     {
-        int index = 0;
-        double lower = 0.0;          // m
-        double upper = 0.0;          // m
-        double massFraction = 0.0;   // Anteil an der Masse; der erste und letzte Bereich samt Auslaeufer
-        double numberFraction = 0.0; // Anteil an der Partikelzahl, gezaehlt in [countMin, countMax]
-        bool occupied = false;       // mindestens occupiedThreshold an Masse oder Anzahl
-        size_t numCards = 0;         // aus der Aufteilung; 0 = Masse geht an den Nachbarbereich
+        std::vector<double> sizes;  // m, aufsteigend (geometrische Zellmitten)
+        std::vector<double> mass;   // q3*(ln d)
+        std::vector<double> number; // q0*(ln d), gezaehlt wie CardNumberWeight
+        // Anzahl mit der echten Groesse auch unter countMin, gleich normiert
+        // wie number (nur Anzeige; ueber countMin gleich number).
+        std::vector<double> numberTrue;
+        std::vector<double> cards;  // Kartendichte c(ln d)
     };
+
+    // Raender fuer Kennzahlen und Hinweise: die feinsten 5 % der Partikel und
+    // die groebsten 5 % der Masse. Fein zaehlt die Anzahl (dort liegen viele
+    // leichte Partikel), grob die Masse (wenige schwere). Bei gleichen
+    // Prozenten bekommen beide Raender einer Log-Normal-Verteilung mit
+    // f = 0,5 gleich viele Karten.
+    inline constexpr double kFineEdgeNumberShare = 0.05;
+    inline constexpr double kCoarseEdgeMassShare = 0.05;
 
     struct SCardPlacement
     {
         std::vector<double> sizes;         // m, aufsteigend
         std::vector<double> massFractions; // Anteil jeder Karte an der Masse, Summe 1
-        std::vector<SCardRange> ranges;    // alle betrachteten Bereiche, aufsteigend
-        size_t numOccupied = 0;            // B_belegt
-        size_t minPerRange = 0;            // N_min
+        SCardDensityCurve curve;
+        // Schwerste Karte und meiste Partikel je Karte (gezaehlt wie
+        // CardNumberWeight), jeweils relativ zum Mittel.
+        double maxMassRatio = 0.0;
+        double maxNumberRatio = 0.0;
+        // Karten unter fineSize (feinste 5 % der Partikel) und ueber
+        // coarseSize (groebste 5 % der Masse).
+        double fineSize = 0.0;   // m
+        double coarseSize = 0.0; // m
+        size_t fineCards = 0;
+        size_t coarseCards = 0;
     };
 
-    // Karten fuer eine Massenverteilung, z.B. am Inlet (Methoden-Dokument
-    // 13.19 Frage A, 13.21):
-    //  1) Groessenbereiche [anchor * 2^k, anchor * 2^(k+1)) ueber die ganze
-    //     Verteilung; was unter dem ersten bzw. ueber dem letzten Bereich
-    //     liegt (Auslaeufer unter 1e-9 der Masse), zaehlt zu diesem.
-    //  2) Belegt ist ein Bereich mit mindestens 0,1 % der Masse oder der
-    //     Partikelzahl. Die Zahl (Dichte q3/d^3) wird nur in [countMin,
-    //     countMax] gezaehlt, sonst waechst sie bei Verteilungen mit Masse
-    //     nahe d = 0 (Normalverteilung, RRSB mit n <= 3) ohne Grenze.
-    //  3) N_min = ceil(f * N / B_belegt) Karten je belegtem Bereich, der Rest
-    //     nach Masse; ganze Karten nach dem groessten Rest, Summe genau N.
-    //  4) Bekommt ein Bereich keine Karte, geht seine Masse an den naechsten
-    //     Bereich mit Karten darunter (am unteren Ende: darueber) - nichts
-    //     geht verloren. Die Karten bleiben in ihrem eigenen Bereich und
-    //     werden nur schwerer: So hat jeder belegte Bereich wirklich seine
-    //     Mindestzahl, und unter dem Zaehlbereich entstehen keine Karten
-    //     (dort wuechse sonst die Partikelzahl ohne Grenze).
-    //  5) In jedem Bereich traegt jede Karte dieselbe Masse; ihre Groesse
-    //     liegt am Quantil in der Mitte ihres Anteils am Bereich (Quantile von Q3).
-    // Bei der Normalverteilung zaehlt nur der Teil mit d > 0 (hochgerechnet
-    // auf 1): Die Karten tragen immer genau den ganzen Massenstrom.
+    // Karten fuer eine Massenverteilung, z.B. am Inlet (Methoden-Dokument 13.26):
+    //  1) Zellen in x = ln d: je 2048 Punkte gleichmaessig in ln d und an
+    //     Quantilen der Masse, dazu countMin. Die Masse je Zelle folgt exakt
+    //     aus Q3; die Partikelzahl ~ Masse / d^3, unter countMin wie bei
+    //     countMin (CardNumberWeight) - sonst waechst sie bei Verteilungen mit
+    //     Masse nahe d = 0 ohne Grenze (Normalverteilung, RRSB mit n <= 3), und
+    //     abgeschnitten haette die Kartendichte bei countMin einen Sprung.
+    //  2) Kartendichte je Zelle c = M(q3*, q0*)^gamma (CardDensity.h).
+    //  3) Die Flaeche unter c wird in N gleiche Streifen geschnitten. Jede
+    //     Karte sitzt in der Mitte ihres Streifens (Quantil (i - 0,5) / N der
+    //     Kartendichte, innerhalb einer Zelle linear in ln d) und traegt die
+    //     Masse ihres Streifens, exakt aus Q3. Der erste Streifen reicht bis
+    //     d = 0, der letzte bis unendlich: Die Karten tragen genau den ganzen
+    //     Massenstrom. Die Auslaeufer ausserhalb der Zellen (je hoechstens
+    //     1e-9 der Masse) zaehlen nur fuer die Masse der ersten und letzten
+    //     Karte, nicht fuer die Dichte der Randzellen - sonst haette c dort
+    //     einen Knick.
+    // Bei der Normalverteilung zaehlt nur der Teil mit d > 0 (hochgerechnet auf 1).
     inline SCardPlacement PlaceCardsAtQuantiles(const SSizeDistribution& distribution,
-        const SCardSettings& settings, double countMin, double countMax)
+        const SCardSettings& settings, double countMin)
     {
         SCardPlacement placement;
         const size_t numCards = settings.cardsPerSlice;
-        if (numCards == 0 || !(settings.rangeFactor > 1.0) || !(settings.rangeAnchor > 0.0))
+        if (numCards == 0)
             return placement;
 
         // Q(d) = Massenanteil unter d (nur d > 0), D(p) = Umkehrung.
@@ -71,131 +84,155 @@ namespace stosis
         const double tail = 1e-9;
         const double bottom = sizeAt(tail);
         const double top = sizeAt(1.0 - tail);
-        if (!(positive > 0.0) || !(top > 0.0))
+        if (!(positive > 0.0) || !(top > 0.0) || !std::isfinite(top))
             return placement; // ungueltige Verteilung
-        const int kMaxRanges = 200;
-        const int last = GetCardRangeIndex(top, settings);
-        const int first = std::max(bottom > 0.0 ? GetCardRangeIndex(bottom, settings) : last - kMaxRanges,
-            last - kMaxRanges);
 
-        // 1) Bereiche: Masse aus Q an den Grenzen, Zahl ~ Integral dQ / d^3
-        //    (Mittelpunktregel in Q - auch fuer sehr schmale Verteilungen).
-        const size_t numRanges = static_cast<size_t>(last - first + 1);
-        std::vector<double> bounds(numRanges + 1); // Q an den Bereichsgrenzen, aussen 0 und 1
-        bounds[0] = 0.0;
-        bounds[numRanges] = 1.0;
-        for (size_t i = 1; i < numRanges; ++i)
-            bounds[i] = massBelow(GetCardRangeLower(first + static_cast<int>(i), settings));
-        std::vector<SCardRange>& ranges = placement.ranges;
-        double totalNumber = 0.0;
-        for (size_t i = 0; i < numRanges; ++i)
+        // 1) Zellen: unten bis zum Zaehlbereich der Anzahl (sie reicht weiter
+        //    ins Feine als die Masse), hoechstens 12 Dekaden unter top.
+        double low = bottom > 0.0 ? bottom : top * 1e-12;
+        if (countMin > 0.0 && countMin < low)
+            low = countMin;
+        low = std::max(low, top * 1e-12);
+        if (!(low < top))
+            low = top * 0.5;
+        std::vector<double> x;
+        const int kUniform = 2048, kQuantile = 2048;
+        x.reserve(kUniform + kQuantile + 4);
+        const double x0 = std::log(low), x1 = std::log(top);
+        for (int i = 0; i <= kUniform; ++i)
+            x.push_back(x0 + (x1 - x0) * static_cast<double>(i) / kUniform);
+        for (int i = 0; i <= kQuantile; ++i)
         {
-            SCardRange range;
-            range.index = first + static_cast<int>(i);
-            range.lower = GetCardRangeLower(range.index, settings);
-            range.upper = GetCardRangeLower(range.index + 1, settings);
-            range.massFraction = bounds[i + 1] - bounds[i];
-            const double a = std::max(range.lower, countMin);
-            const double b = std::min(range.upper, countMax);
-            if (a < b)
-            {
-                const double qa = massBelow(a);
-                const double qb = massBelow(b);
-                const int steps = 64;
-                double sum = 0.0;
-                for (int s = 0; s < steps; ++s)
-                {
-                    const double d = sizeAt(qa + (s + 0.5) * (qb - qa) / steps);
-                    if (d > 0.0)
-                        sum += 1.0 / (d * d * d);
-                }
-                range.numberFraction = sum * (qb - qa) / steps; // wird unten normiert
-                totalNumber += range.numberFraction;
-            }
-            ranges.push_back(range);
+            const double d = sizeAt(tail + (1.0 - 2.0 * tail) * static_cast<double>(i) / kQuantile);
+            if (d > low && d < top)
+                x.push_back(std::log(d));
         }
-
-        // 2) Belegte Bereiche.
-        size_t numOccupied = 0;
-        for (SCardRange& range : ranges)
+        if (countMin > low && countMin < top)
+            x.push_back(std::log(countMin));
+        // Fast gleiche Punkte zusammenlegen: Eine hauchduenne Zelle am Rand
+        // bekaeme sonst den ganzen Auslaeufer und zeigte eine Spitze.
+        std::sort(x.begin(), x.end());
+        x.erase(std::unique(x.begin(), x.end(), [](double a, double b) { return b - a <= 1e-7; }), x.end());
+        if (x.size() < 2)
+            return placement;
+        const size_t cells = x.size() - 1;
+        std::vector<double> cellMass(cells, 0.0), cellNumber(cells, 0.0), cellNumberTrue(cells, 0.0), width(cells, 0.0);
+        double previous = massBelow(std::exp(x[0])), totalNumber = 0.0;
+        for (size_t k = 0; k < cells; ++k)
         {
-            if (totalNumber > 0.0)
-                range.numberFraction /= totalNumber;
-            range.occupied = range.massFraction > 0.0 && (range.massFraction >= settings.occupiedThreshold
-                || range.numberFraction >= settings.occupiedThreshold);
-            numOccupied += range.occupied ? 1 : 0;
-        }
-        if (numOccupied == 0)
-        {
-            std::max_element(ranges.begin(), ranges.end(), [](const SCardRange& x, const SCardRange& y)
-                { return x.massFraction < y.massFraction; })->occupied = true;
-            numOccupied = 1;
+            const double da = std::exp(x[k]), db = std::exp(x[k + 1]);
+            const double q = std::max(previous, massBelow(db));
+            cellMass[k] = q - previous;
+            previous = q;
+            width[k] = x[k + 1] - x[k];
+            cellNumber[k] = CardNumberWeight(cellMass[k], std::sqrt(da * db), countMin);
+            cellNumberTrue[k] = CardNumberWeight(cellMass[k], std::sqrt(da * db), 0.0);
+            totalNumber += cellNumber[k];
         }
 
-        // 3) Mindestzahl, Rest nach Masse, ganze Karten nach dem groessten Rest.
-        size_t minPerRange = static_cast<size_t>(std::ceil(
-            settings.reservedFraction * static_cast<double>(numCards) / static_cast<double>(numOccupied) - 1e-9));
-        if (minPerRange * numOccupied > numCards)
-            minPerRange = numCards / numOccupied;
-        const double rest = static_cast<double>(numCards - minPerRange * numOccupied);
-        std::vector<double> remainder(numRanges, -1.0);
-        size_t assigned = 0;
-        for (size_t i = 0; i < numRanges; ++i)
+        // 2) Kartendichte je Zelle; ohne gezaehlte Partikel (z.B. Produkt fuer
+        //    eine Verteilung ausserhalb des Rasters) nach Masse.
+        const double gamma = CardDensityExponent(settings);
+        std::vector<double> weight(cells, 0.0);
+        double totalWeight = 0.0;
+        for (size_t k = 0; k < cells; ++k)
         {
-            SCardRange& range = ranges[i];
-            const double target = (range.occupied ? static_cast<double>(minPerRange) : 0.0) + rest * range.massFraction;
-            range.numCards = static_cast<size_t>(std::floor(target));
-            assigned += range.numCards;
-            if (range.massFraction > 0.0)
-                remainder[i] = target - std::floor(target);
-        }
-        std::vector<size_t> order(numRanges);
-        std::iota(order.begin(), order.end(), size_t(0));
-        std::stable_sort(order.begin(), order.end(), [&](size_t x, size_t y) { return remainder[x] > remainder[y]; });
-        for (size_t j = 0; assigned < numCards && j < numRanges; ++j)
-        {
-            if (remainder[order[j]] < 0.0)
-                break;
-            ++ranges[order[j]].numCards;
-            ++assigned;
-        }
-        placement.numOccupied = numOccupied;
-        placement.minPerRange = minPerRange;
-
-        // 4) Masse der kartenlosen Bereiche zum naechsten Bereich mit Karten.
-        std::vector<double> groupMass(numRanges, 0.0);
-        double pending = 0.0; // kartenlose Bereiche unter dem ersten mit Karten
-        size_t previous = numRanges;
-        for (size_t i = 0; i < numRanges; ++i)
-        {
-            if (ranges[i].numCards > 0)
-            {
-                groupMass[i] = ranges[i].massFraction + pending;
-                pending = 0.0;
-                previous = i;
-            }
-            else if (previous < numRanges)
-                groupMass[previous] += ranges[i].massFraction;
-            else
-                pending += ranges[i].massFraction;
-        }
-
-        // 5) Karten an den Quantilen des eigenen Bereichs, gleiche Masse.
-        placement.sizes.reserve(assigned);
-        placement.massFractions.reserve(assigned);
-        for (size_t i = 0; i < numRanges; ++i)
-        {
-            const size_t n = ranges[i].numCards;
-            if (n == 0)
+            if (!(width[k] > 0.0))
                 continue;
-            const double qa = massBelow(ranges[i].lower);
-            const double qb = massBelow(ranges[i].upper);
-            const double step = (qb - qa) / static_cast<double>(n);
-            for (size_t c = 0; c < n; ++c)
+            const double q3 = cellMass[k] / width[k];
+            const double q0 = totalNumber > 0.0 ? cellNumber[k] / totalNumber / width[k] : 0.0;
+            const double mean = CardDensityMean(q3, q0, settings);
+            weight[k] = mean > 0.0 ? std::pow(mean, gamma) * width[k] : 0.0;
+            totalWeight += weight[k];
+        }
+        if (!(totalWeight > 0.0))
+        {
+            weight = cellMass;
+            totalWeight = 0.0;
+            for (double w : weight)
+                totalWeight += w;
+            if (!(totalWeight > 0.0))
+                return SCardPlacement();
+        }
+        std::vector<double> cumulative(cells + 1, 0.0);
+        for (size_t k = 0; k < cells; ++k)
+            cumulative[k + 1] = cumulative[k] + weight[k] / totalWeight;
+        cumulative[cells] = 1.0;
+        // x mit dem Kartenanteil p darunter (linear innerhalb einer Zelle).
+        const auto positionAt = [&](double p)
+        {
+            size_t k = static_cast<size_t>(std::lower_bound(cumulative.begin() + 1, cumulative.end(), p)
+                - (cumulative.begin() + 1));
+            k = std::min(k, cells - 1);
+            while (k + 1 < cells && !(weight[k] > 0.0))
+                ++k;
+            const double span = cumulative[k + 1] - cumulative[k];
+            const double t = span > 0.0 ? std::clamp((p - cumulative[k]) / span, 0.0, 1.0) : 0.5;
+            return x[k] + t * width[k];
+        };
+
+        // 3) N Streifen gleicher Flaeche, Karte in der Mitte, Masse exakt.
+        placement.sizes.resize(numCards);
+        placement.massFractions.resize(numCards);
+        const double n = static_cast<double>(numCards);
+        double lowerMass = 0.0;
+        for (size_t i = 0; i < numCards; ++i)
+        {
+            placement.sizes[i] = std::exp(positionAt((static_cast<double>(i) + 0.5) / n));
+            const double upperMass = i + 1 == numCards ? 1.0
+                : std::max(lowerMass, massBelow(std::exp(positionAt(static_cast<double>(i + 1) / n))));
+            placement.massFractions[i] = upperMass - lowerMass;
+            lowerMass = upperMass;
+        }
+
+        // Kurven fuer die Vorschau.
+        SCardDensityCurve& curve = placement.curve;
+        curve.sizes.resize(cells);
+        curve.mass.resize(cells);
+        curve.number.resize(cells);
+        curve.numberTrue.resize(cells);
+        curve.cards.resize(cells);
+        for (size_t k = 0; k < cells; ++k)
+        {
+            const double w = width[k] > 0.0 ? width[k] : 1.0;
+            curve.sizes[k] = std::exp(0.5 * (x[k] + x[k + 1]));
+            curve.mass[k] = cellMass[k] / w;
+            curve.number[k] = totalNumber > 0.0 ? cellNumber[k] / totalNumber / w : 0.0;
+            curve.numberTrue[k] = totalNumber > 0.0 ? cellNumberTrue[k] / totalNumber / w : 0.0;
+            curve.cards[k] = weight[k] / totalWeight / w;
+        }
+
+        // Kennzahlen.
+        double maxMass = 0.0, maxNumber = 0.0, sumNumber = 0.0;
+        for (size_t i = 0; i < numCards; ++i)
+        {
+            const double number = CardNumberWeight(placement.massFractions[i], placement.sizes[i], countMin);
+            maxMass = std::max(maxMass, placement.massFractions[i]);
+            maxNumber = std::max(maxNumber, number);
+            sumNumber += number;
+        }
+        placement.maxMassRatio = maxMass * n;
+        placement.maxNumberRatio = sumNumber > 0.0 ? maxNumber * n / sumNumber : 0.0;
+        placement.coarseSize = sizeAt(1.0 - kCoarseEdgeMassShare);
+        placement.fineSize = 0.0;
+        if (totalNumber > 0.0)
+        {
+            double sum = 0.0;
+            for (size_t k = 0; k < cells; ++k)
             {
-                placement.sizes.push_back(sizeAt(qa + (static_cast<double>(c) + 0.5) * step));
-                placement.massFractions.push_back(groupMass[i] / static_cast<double>(n));
+                const double share = cellNumber[k] / totalNumber;
+                if (sum + share >= kFineEdgeNumberShare && share > 0.0)
+                {
+                    placement.fineSize = std::exp(x[k] + (kFineEdgeNumberShare - sum) / share * width[k]);
+                    break;
+                }
+                sum += share;
             }
+        }
+        for (double d : placement.sizes)
+        {
+            placement.fineCards += d < placement.fineSize ? 1 : 0;
+            placement.coarseCards += d > placement.coarseSize ? 1 : 0;
         }
         return placement;
     }

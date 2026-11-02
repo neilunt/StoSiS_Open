@@ -20,7 +20,7 @@ static void AddCards(CStreamSlice& slice, const SSizeDistribution& distribution,
 {
     SCardSettings settings;
     settings.cardsPerSlice = numCards;
-    const SCardPlacement placement = PlaceCardsAtQuantiles(distribution, settings, 1e-6, 1e-3);
+    const SCardPlacement placement = PlaceCardsAtQuantiles(distribution, settings, 1e-6);
     for (size_t k = 0; k < placement.sizes.size(); ++k)
         slice.AddCard(placement.sizes[k], compound, massFlow * placement.massFractions[k]);
 }
@@ -131,11 +131,70 @@ int main()
         std::printf("      mittlere Groesse in A: hoechstens %.2f %% neben dem Eingang; Anteil nach A je Groessenbereich: hoechstens %.1e neben 30 %%\n",
             worstMean * 100.0, worstRange);
         Check(countsOk, "Splitter: Kartenzahl bleibt (A + B = Eingang, nichts kopiert)");
-        Check(worstStep <= cardMax, "Splitter: je Schritt weicht A hoechstens um eine Karte vom Soll ab");
-        Check(worstTotal <= cardMax, "Splitter: aufsummiert ueber 1000 Schritte ebenfalls hoechstens eine Karte (kein Wegdriften)");
+        // Das Konto zaehlt Kartenanteile, nicht Masse: je Schritt etwa eine
+        // Karte daneben (Schranke zwei), und die Abweichungen der Masse
+        // gleichen sich nicht exakt aus, bleiben aber winzig.
+        Check(worstStep <= 2.0 * cardMax, "Splitter: je Schritt weicht A hoechstens um zwei Karten vom Soll ab");
+        Check(worstTotal <= 1e-4 * 0.3 * sumIn, "Splitter: aufsummiert ueber 1000 Schritte weniger als 1e-4 neben dem Soll");
         Check(worstAccounts < 1e-12, "Splitter: Summe der Konten bleibt 0");
         Check(worstMean < 0.01, "Splitter: mittlere Groesse in A wie im Eingang (1 %) in jedem Schritt");
         Check(worstRange < 2e-3, "Splitter: jeder Groessenbereich geht zu 30 % nach A");
+    }
+
+    // 2b) Sehr ungleich schwere Karten (Log-Normal sigma_ln = 0,6, Summe
+    //     f = 0,5, gamma = 1: die feinsten Karten tragen etwa 1/1000 der
+    //     mittleren Masse), Splitter 70 / 30. Die feinsten 5 % der Partikel
+    //     gehen nach Anzahl und Masse zu 70 % nach A und fehlen in keinem
+    //     Schritt in einem Ausgang. Mit einem Konto in Masse gingen sie
+    //     geschlossen in einen Ausgang und auf Dauer nur zu etwa 54 % nach A.
+    {
+        const size_t steps = 2000;
+        SSimulationGrid grid = MakeGrid(1, steps, 200.0);
+        grid.cards.numberShare = 0.5;
+        grid.cards.exponent = 1.0;
+        CSplitterUnit splitter(2);
+        splitter.SetFractions({ 0.7, 0.3 });
+        splitter.Initialize(grid, 5);
+        const SCardPlacement placement = PlaceCardsAtQuantiles({ EDistributionType::LogNormal, 100e-6, 0.6 }, grid.cards,
+            grid.GetCardCountMin());
+        CStreamSlice input;
+        input.Resize(300, 1, ERepresentation::Particles);
+        for (size_t k = 0; k < placement.sizes.size(); ++k)
+            input.AddCard(placement.sizes[k], 0, placement.massFractions[k]);
+        const double fineSize = placement.fineSize;
+        double fineMassIn = 0.0, lightest = 1.0;
+        for (size_t c = 0; c < input.GetNumCards(); ++c)
+        {
+            fineMassIn += input.GetCardSize(c) < fineSize ? input.GetCardMassFlow(c) : 0.0;
+            lightest = std::min(lightest, input.GetCardMassFlow(c) * static_cast<double>(input.GetNumCards()));
+        }
+        std::vector<CStreamSlice> outputs(2);
+        double fineCardsA = 0.0, fineCardsAll = 0.0, fineMassA = 0.0;
+        size_t emptySteps = 0;
+        for (size_t k = 0; k < steps; ++k)
+        {
+            for (CStreamSlice& o : outputs)
+                o.Resize(300, 1, ERepresentation::Particles);
+            splitter.Step({ k, 0.1 * k, 0.1 }, { &input }, outputs);
+            size_t inA = 0, inB = 0;
+            for (size_t c = 0; c < outputs[0].GetNumCards(); ++c)
+                if (outputs[0].GetCardSize(c) < fineSize)
+                {
+                    ++inA;
+                    fineMassA += outputs[0].GetCardMassFlow(c);
+                }
+            for (size_t c = 0; c < outputs[1].GetNumCards(); ++c)
+                inB += outputs[1].GetCardSize(c) < fineSize ? 1 : 0;
+            emptySteps += inA == 0 || inB == 0 ? 1 : 0;
+            fineCardsA += static_cast<double>(inA);
+            fineCardsAll += static_cast<double>(inA + inB);
+        }
+        const double shareCards = fineCardsA / fineCardsAll, shareMass = fineMassA / (fineMassIn * static_cast<double>(steps));
+        std::printf("      ungleich schwere Karten (leichteste %.1e x Mittel): feinste 5 %% der Partikel nach A %.2f %% der "
+            "Karten, %.2f %% der Masse; Schritte mit leerem Ausgang %zu\n", lightest, 100.0 * shareCards, 100.0 * shareMass,
+            emptySteps);
+        Check(NearAbs(shareCards, 0.7, 0.01) && NearAbs(shareMass, 0.7, 0.02) && emptySteps == 0,
+            "Splitter: leichte Karten zu 70 % nach A, in jedem Schritt in beiden Ausgaengen (Konto in Kartenanteilen)");
     }
 
     // 3) Zwei Stoffe mit denselben Kartengroessen, 50 / 50: jeder Stoff wird
@@ -163,7 +222,8 @@ int main()
         Check(worst <= 2.0 * MaxCardMass(input), "Splitter: zwei Stoffe gleicher Groesse - jeder Stoff je Schritt zur Haelfte in A");
     }
 
-    // 4) Drei Ausgaenge 50 / 30 / 20: aufsummiert jeder Ausgang auf eine Karte genau.
+    // 4) Drei Ausgaenge 50 / 30 / 20: je Schritt jeder Ausgang auf etwa eine
+    //    Karte genau, aufsummiert auf weniger als 1e-4.
     {
         const SSimulationGrid grid = MakeGrid(1, 500, 50.0);
         CSplitterUnit splitter(3);
@@ -174,7 +234,7 @@ int main()
         AddCards(input, standard, 2000, 0, 1.0);
         std::vector<CStreamSlice> outputs(3);
         std::vector<double> sums(3, 0.0);
-        double sumIn = 0.0, worst = 0.0;
+        double sumIn = 0.0, worst = 0.0, worstStep = 0.0;
         for (size_t k = 0; k < 500; ++k)
         {
             for (CStreamSlice& o : outputs)
@@ -184,11 +244,15 @@ int main()
             const double f[3] = { 0.5, 0.3, 0.2 };
             for (size_t i = 0; i < 3; ++i)
             {
+                worstStep = std::max(worstStep, std::abs(outputs[i].GetCardsMassFlow() - f[i] * input.GetCardsMassFlow()));
                 sums[i] += outputs[i].GetCardsMassFlow();
                 worst = std::max(worst, std::abs(sums[i] - f[i] * sumIn));
             }
         }
-        Check(worst <= MaxCardMass(input), "Splitter mit drei Ausgaengen: aufsummiert jeder Ausgang auf eine Karte genau");
+        std::printf("      drei Ausgaenge: je Schritt hoechstens %.2f Karten, aufsummiert %.1e des Durchsatzes neben dem Soll\n",
+            worstStep / MaxCardMass(input), worst / sumIn);
+        Check(worstStep <= 1.5 * MaxCardMass(input) && worst <= 1e-4 * sumIn,
+            "Splitter mit drei Ausgaengen: je Schritt etwa eine Karte, aufsummiert weniger als 1e-4 neben dem Soll");
     }
 
     // 5) Rueckfuehrung ohne Hold-up (Merger -> Splitter, 50 % zurueck): Die
@@ -261,7 +325,7 @@ int main()
         Check(graph.RunSimulations(1) == 1, "Flowsheet Inlets -> Merger -> Splitter -> Outlets laeuft im Partikelmodus");
         const CStreamRecord& cards1 = *graph.GetDisplayRecord(o1, 0);
         const CStreamRecord& cards2 = *graph.GetDisplayRecord(o2, 0);
-        const double cardMax = 2.0 / 2000.0 * 1.5; // groesste Karte: hoechstens 1,5 Mittelwerte (Mindestzahl-Bereiche sind leichter)
+        const double cardMax = 2.0 / 2000.0 * 1.5; // groesste Karte: hoechstens 1,5 Mittelwerte (Kartendichte Standard: 1,4)
         // Ohne Materialdatei stehen die Stoffe alphabetisch: Coal vor Sand.
         const std::vector<std::string>& names = cards1.GetCompoundNames();
         const size_t iSand = static_cast<size_t>(std::find(names.begin(), names.end(), "Sand") - names.begin());
@@ -316,11 +380,13 @@ int main()
             "Dosierwaage: Mittel (1e-4) und Streuung (1 %) im Partikelmodus wie im Kontinuum");
     }
 
-    // 6) Grenzen je Stromscheibe (Methoden-Dokument 13.24): teilen unter N_min,
-    //    zusammenlegen ueber 2 x Sollzahl; die Masse bleibt genau erhalten,
-    //    beim Zusammenlegen auch die Partikelzahl.
+    // 6) Grenzen je Stromscheibe (Methoden-Dokument 13.24, 13.26): ueber 2 N
+    //    Karten zusammenlegen (leichteste Paare nach Anteil an der
+    //    Kartendichte), Karten mit mehr als 5 / N teilen; die Masse bleibt
+    //    genau erhalten, beim Zusammenlegen auch die Partikelzahl.
     {
-        const SCardSettings settings; // N = 2000, f = 20 %, Obergrenze 2 x Sollzahl
+        const SCardSettings settings; // N = 2000, Summe f = 0,5, gamma = 0,8, hoechstens 2 N Karten und 5 / N je Karte
+        const double countMin = 1e-6;
         const auto sizesOf = [](const CStreamSlice& s)
         {
             std::vector<double> v(s.GetNumCards());
@@ -342,12 +408,13 @@ int main()
                 n += s.GetCardMassFlow(k) / std::pow(s.GetCardSize(k), 3.0);
             return n;
         };
-        // Jeder Bereich zwischen Unter- und Obergrenze (nach den Grenzen der Scheibe selbst).
+        // Innerhalb der Grenzen: hoechstens 2 N Karten, kein Anteil ueber 5 / N.
+        const double heaviest = settings.splitFactor / static_cast<double>(settings.cardsPerSlice);
         const auto withinLimits = [&](const CStreamSlice& s)
         {
-            bool ok = true;
-            for (const SSliceRange& r : ComputeSliceLimits(sizesOf(s), massesOf(s), settings).ranges)
-                ok = ok && r.cards >= r.minCards && r.cards <= r.maxCards;
+            bool ok = s.GetNumCards() <= static_cast<size_t>(settings.upperFactor * static_cast<double>(settings.cardsPerSlice));
+            for (double share : ComputeCardShares(sizesOf(s), massesOf(s), settings, countMin))
+                ok = ok && share <= heaviest * (1.0 + 1e-9);
             return ok;
         };
         // Masse je Groesse: Teilen darf nur Stuecke gleicher Groesse erzeugen.
@@ -366,16 +433,20 @@ int main()
             return merged;
         };
 
-        // a) Karten eines Inlets liegen genau auf den Sollzahlen: nichts zu tun.
+        // a) Karten eines Inlets tragen je etwa 1/N: nichts zu tun.
         CStreamSlice inlet;
         inlet.Resize(300, 1, ERepresentation::Particles);
         AddCards(inlet, standard, 2000, 0, 1.0);
+        const std::vector<double> inletShares = ComputeCardShares(sizesOf(inlet), massesOf(inlet), settings, countMin);
+        const auto [lightest, heaviestInlet] = std::minmax_element(inletShares.begin(), inletShares.end());
+        std::printf("      Inlet: Anteil je Karte %.3f bis %.3f / N\n", *lightest * 2000.0, *heaviestInlet * 2000.0);
         CStreamSlice same = inlet;
-        const SLimitCounts none = ApplySliceLimits(same, settings);
+        const SLimitCounts none = ApplySliceLimits(same, settings, countMin);
         bool identical = same.GetNumCards() == inlet.GetNumCards();
         for (size_t k = 0; identical && k < inlet.GetNumCards(); ++k)
             identical = same.GetCardSize(k) == inlet.GetCardSize(k) && same.GetCardMassFlow(k, 0) == inlet.GetCardMassFlow(k, 0);
-        Check(identical && none.added == 0 && none.removed == 0, "Grenzen: Inlet-Karten (Sollzahlen) bleiben unveraendert");
+        Check(identical && none.added == 0 && none.removed == 0, "Grenzen: Inlet-Karten bleiben unveraendert");
+        Check(*lightest * 2000.0 > 0.5 && *heaviestInlet * 2000.0 < 2.0, "Inlet: jede Karte traegt zwischen 1/(2N) und 2/N");
 
         // b) Teilen: 20 Karten (jede 100. des Inlets, wie hinter einem 1-%-Splitterausgang).
         CStreamSlice few;
@@ -383,12 +454,12 @@ int main()
         for (size_t k = 50; k < inlet.GetNumCards(); k += 100)
             few.AddCard(inlet.GetCardSize(k), 0, inlet.GetCardMassFlow(k, 0));
         CStreamSlice split = few;
-        const SLimitCounts added = ApplySliceLimits(split, settings);
-        const SSliceLimits splitLimits = ComputeSliceLimits(sizesOf(split), massesOf(split), settings);
-        std::printf("      Teilen: %zu Karten -> %zu (N_min = %zu in %zu belegten Bereichen)\n", few.GetNumCards(),
-            split.GetNumCards(), splitLimits.minPerRange, splitLimits.numOccupied);
+        const SLimitCounts added = ApplySliceLimits(split, settings, countMin);
+        std::printf("      Teilen: %zu Karten -> %zu (je Karte hoechstens 5 / N)\n", few.GetNumCards(), split.GetNumCards());
         Check(withinLimits(split) && added.added == split.GetNumCards() - few.GetNumCards() && added.removed == 0,
-            "Teilen: jeder belegte Bereich bekommt N_min Karten");
+            "Teilen: keine Karte traegt danach mehr als 5 / N");
+        Check(split.GetNumCards() >= 380 && split.GetNumCards() <= 440,
+            "Teilen: 20 Karten mit je etwa 1/20 -> zusammen etwa N / 5 = 400 Stuecke");
         const auto beforeSizes = massBySize(few), afterSizes = massBySize(split);
         bool sameMassBySize = beforeSizes.size() == afterSizes.size();
         for (size_t i = 0; sameMassBySize && i < beforeSizes.size(); ++i)
@@ -396,23 +467,26 @@ int main()
                 && NearRel(afterSizes[i].second, beforeSizes[i].second, 1e-12);
         Check(sameMassBySize && NearRel(split.GetCardsMassFlow(), few.GetCardsMassFlow(), 1e-14),
             "Teilen: nur Stuecke gleicher Groesse, Masse je Groesse genau erhalten (Raster unveraendert)");
-        // 90 gleich schwere Karten in einem Bereich, N_min = 134: die 44
-        // zusaetzlichen Stuecke verteilen sich gleichmaessig ueber den Bereich.
+        // Stueckzahl je Karte nach ihrem Anteil: nur nach Masse (f = 0, ohne
+        // Abflachung), N = 100, also hoechstens 0,05 je Karte.
         {
-            SCardSettings one = settings;
-            one.cardsPerSlice = 670; // ein belegter Bereich: N_min = ceil(0,2 * 670) = 134
-            CStreamSlice even;
-            even.Resize(300, 1, ERepresentation::Particles);
-            for (int i = 0; i < 90; ++i)
-                even.AddCard(130e-6 + 1e-6 * i, 0, 1.0);
-            ApplySliceLimits(even, one);
-            size_t lowerHalf = 0;
-            for (size_t k = 0; k < even.GetNumCards(); ++k)
-                lowerHalf += even.GetCardSize(k) < 174.5e-6 ? 1 : 0;
-            std::printf("      Teilen gleichmaessig: 90 -> %zu Karten, davon %zu in der kleineren Haelfte (ideal 67)\n",
-                even.GetNumCards(), lowerHalf);
-            Check(even.GetNumCards() == 134 && lowerHalf >= 66 && lowerHalf <= 68,
-                "Teilen: zusaetzliche Stuecke gleichmaessig ueber den Bereich, nicht nur die kleinsten Karten");
+            SCardSettings massOnly = settings;
+            massOnly.cardsPerSlice = 100;
+            massOnly.numberShare = 0.0;
+            massOnly.exponent = 1.0;
+            CStreamSlice two;
+            two.Resize(300, 1, ERepresentation::Particles);
+            two.AddCard(100e-6, 0, 0.9);
+            two.AddCard(200e-6, 0, 0.1);
+            ApplySliceLimits(two, massOnly, countMin);
+            size_t at100 = 0, at200 = 0;
+            for (size_t k = 0; k < two.GetNumCards(); ++k)
+            {
+                at100 += two.GetCardSize(k) == 100e-6 ? 1 : 0;
+                at200 += two.GetCardSize(k) == 200e-6 ? 1 : 0;
+            }
+            Check(at100 == 18 && at200 == 2 && NearRel(two.GetCardsMassFlow(), 1.0, 1e-14),
+                "Teilen je Karte nach ihrem Anteil: 0,9 -> 18 Stuecke, 0,1 -> 2 Stuecke (je hoechstens 5 / N)");
         }
 
         // c) Zusammenlegen: 10 Scheiben aus zwei verschiedenen Verteilungen in einer.
@@ -422,16 +496,28 @@ int main()
         for (int i = 0; i < 10; ++i)
             AddCards(many, i % 2 == 0 ? standard : coarse, 2000, 0, 0.1);
         CStreamSlice merged = many;
-        const SLimitCounts removed = ApplySliceLimits(merged, settings);
+        const SLimitCounts removed = ApplySliceLimits(merged, settings, countMin);
         const SCardCumulative q0 = MakeCardCumulative(sizesOf(many), massesOf(many));
         const SCardCumulative q1 = MakeCardCumulative(sizesOf(merged), massesOf(merged));
         double worstQuantile = 0.0;
         for (double f : { 0.1, 0.5, 0.9 })
             worstQuantile = std::max(worstQuantile, std::abs(GetCardQuantile(q1, f) / GetCardQuantile(q0, f) - 1.0));
-        std::printf("      Zusammenlegen: %zu Karten -> %zu, d10/d50/d90 um hoechstens %.3f %% verschoben\n",
-            many.GetNumCards(), merged.GetNumCards(), 100.0 * worstQuantile);
+        // Anteil der Karten in den groebsten 2 % der Masse vor und nach dem Zusammenlegen.
+        const double coarseEdge = GetCardQuantile(q0, 0.98);
+        const auto coarseShare = [&](const CStreamSlice& s)
+        {
+            size_t n = 0;
+            for (size_t k = 0; k < s.GetNumCards(); ++k)
+                n += s.GetCardSize(k) > coarseEdge ? 1 : 0;
+            return static_cast<double>(n) / static_cast<double>(s.GetNumCards());
+        };
+        std::printf("      Zusammenlegen: %zu Karten -> %zu, d10/d50/d90 um hoechstens %.3f %% verschoben, "
+            "Karten in den groebsten 2 %% der Masse: %.2f %% -> %.2f %%\n", many.GetNumCards(), merged.GetNumCards(),
+            100.0 * worstQuantile, 100.0 * coarseShare(many), 100.0 * coarseShare(merged));
         Check(withinLimits(merged) && removed.removed == many.GetNumCards() - merged.GetNumCards() && removed.added == 0,
-            "Zusammenlegen: jeder Bereich hoechstens 2 x Sollzahl");
+            "Zusammenlegen: hoechstens 2 N Karten");
+        Check(coarseShare(merged) >= 0.7 * coarseShare(many),
+            "Zusammenlegen: die Randkarten bleiben anteilig erhalten (nach Anteil an der Kartendichte, nicht nach Masse)");
         Check(NearRel(merged.GetCardsMassFlow(), many.GetCardsMassFlow(), 1e-12) && NearRel(numberOf(merged), numberOf(many), 1e-10),
             "Zusammenlegen: Masse und Partikelzahl genau erhalten");
         Check(worstQuantile < 0.005, "Zusammenlegen: d10, d50, d90 verschieben sich um weniger als 0,5 %");
@@ -445,7 +531,7 @@ int main()
             AddCards(mixed, standard, 2000, 1, 0.2);
         }
         CStreamSlice mixedMerged = mixed;
-        ApplySliceLimits(mixedMerged, settings);
+        ApplySliceLimits(mixedMerged, settings, countMin);
         bool pure = true;
         for (size_t k = 0; k < mixedMerged.GetNumCards(); ++k)
             pure = pure && (mixedMerged.GetCardMassFlow(k, 0) == 0.0 || mixedMerged.GetCardMassFlow(k, 1) == 0.0);
@@ -471,12 +557,12 @@ int main()
         {
             loop[0].Resize(300, 1, ERepresentation::Particles);
             merger.Step({ k, 0.1 * k, 0.1 }, { &inlet, &recycled }, loop);
-            ApplySliceLimits(loop[0], settings);
+            ApplySliceLimits(loop[0], settings, countMin);
             for (CStreamSlice& o : outputs)
                 o.Resize(300, 1, ERepresentation::Particles);
             splitter.Step({ k, 0.1 * k, 0.1 }, { &loop[0] }, outputs);
             for (CStreamSlice& o : outputs)
-                ApplySliceLimits(o, settings);
+                ApplySliceLimits(o, settings, countMin);
             recycled = outputs[1];
             loopCards = loop[0].GetNumCards();
             maxLoopCards = std::max(maxLoopCards, loopCards);
@@ -487,7 +573,8 @@ int main()
         Check(maxLoopCards <= 2 * settings.cardsPerSlice + 10 && NearAbs(outMass, 1.0, 0.01),
             "Rueckfuehrung R = 0,9: Grenzen deckeln die Karten im Kreis bei etwa 2 N, Austrag = Zulauf");
 
-        // f) Im Flowsheet: Inlet -> OU-Splitter 30/70 -> 2 Outlets. Teilen
+        // f) Im Flowsheet: Inlet -> OU-Splitter 10/90 -> 2 Outlets (am 10-%-
+        //    Ausgang traegt jede Karte etwa 10 / N und wird geteilt). Teilen
         //    aendert die Ergebnisse auf dem Raster nicht.
         CFlowsheetGraph graph;
         const std::string in = graph.AddInletNode("Inlet1", 0, 0);
@@ -495,7 +582,7 @@ int main()
         const std::string a = graph.AddOutletNode("Outlet1", 2, 0);
         const std::string b = graph.AddOutletNode("Outlet2", 2, 1);
         graph.GetSplitter(sp)->SetStochastic(true);
-        graph.GetSplitter(sp)->SetFractions({ 0.3, 0.7 });
+        graph.GetSplitter(sp)->SetFractions({ 0.1, 0.9 });
         graph.AddConnection(in, 0, sp, 0);
         graph.AddConnection(sp, 0, a, 0);
         graph.AddConnection(sp, 1, b, 0);
@@ -527,8 +614,9 @@ int main()
             for (size_t k = 0; k < masses.size(); ++k)
                 for (size_t c = 0; c < numC; ++c)
                     masses[k] += snapshot.massFlows[k * numC + c];
-            for (const SSliceRange& r : ComputeSliceLimits(snapshot.sizes, masses, on).ranges)
-                allWithin = allWithin && r.cards >= r.minCards && r.cards <= r.maxCards;
+            allWithin = allWithin && snapshot.sizes.size() <= 2 * on.cardsPerSlice;
+            for (double share : ComputeCardShares(snapshot.sizes, masses, on, countMin))
+                allWithin = allWithin && share <= heaviest * (1.0 + 1e-9);
         }
         const SUnitTiming& splitTiming = graph.GetSimulationTiming().units[1];
         std::printf("      Flowsheet: Splitter je Schritt +%.1f Karten durch Teilen, -%.1f durch Zusammenlegen; "

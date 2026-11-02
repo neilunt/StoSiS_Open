@@ -194,25 +194,25 @@ void MainWindow::SetupCentralArea()
                                       "schrittweise; bis dahin meldet \"Simulieren\", welche Unit noch fehlt.");
     simulationBar->addWidget(m_representationCombo, 5, 1);
 
-    // Karten je Stromscheibe N (Methoden-Dokument 13.19, 13.21); nur im
+    // Karten je Stromscheibe N (Methoden-Dokument 13.19, 13.26); nur im
     // Partikelmodus wirksam.
     simulationBar->addWidget(new QLabel("Karten je Zeitschritt:", flowsheetPanel), 6, 0);
     m_cardsSpin = new QSpinBox(flowsheetPanel);
     m_cardsSpin->setRange(10, 1000000);
     m_cardsSpin->setValue(static_cast<int>(m_graph.GetCardSettings().cardsPerSlice));
     m_cardsSpin->setToolTip("Karten, die jedes Inlet in jedem Zeitschritt erzeugt (N). Mehr Karten = weniger\n"
-                            "Rauschen (etwa 1/Wurzel(N)), aber mehr Rechenzeit. 20 % davon sind fuer die\n"
-                            "Mindestzahl je belegtem Groessenbereich reserviert, der Rest geht nach Masse.");
+                            "Rauschen (etwa 1/Wurzel(N)), aber mehr Rechenzeit. Wo die Karten sitzen, legt die\n"
+                            "Kartendichte fest (Einstellungen, Reiter \"Karten\").");
     m_cardsSpin->setEnabled(false);
     simulationBar->addWidget(m_cardsSpin, 6, 1);
     // Grenzen je Stromscheibe (Methoden-Dokument 13.24): an jedem Ausgang
     // teilen bzw. zusammenlegen; nur im Partikelmodus wirksam.
     m_limitsCheck = new QCheckBox("Grenzen je Stromscheibe", flowsheetPanel);
     m_limitsCheck->setChecked(m_graph.GetCardSettings().sliceLimits);
-    m_limitsCheck->setToolTip("An jedem Ausgang haelt jeder Groessenbereich zwischen N_min und 2 x Sollzahl Karten:\n"
-                              "darunter werden Karten geteilt (Masse und Groesse bleiben), darueber aehnliche Karten\n"
-                              "desselben Stoffs zusammengelegt (Masse und Partikelzahl bleiben). Ohne Haken laufen\n"
-                              "die Karten unveraendert weiter.");
+    m_limitsCheck->setToolTip("An jedem Ausgang: Bei mehr als 2 x N Karten werden benachbarte Karten desselben Stoffs\n"
+                              "zusammengelegt, die leichtesten Paare nach Anteil an der Kartendichte zuerst (Masse und\n"
+                              "Partikelzahl bleiben). Eine Karte mit mehr als 5/N der Kartendichte wird geteilt (Masse\n"
+                              "und Groesse bleiben). Ohne Haken laufen die Karten unveraendert weiter.");
     m_limitsCheck->setEnabled(false);
     simulationBar->addWidget(m_limitsCheck, 7, 0, 1, 2);
     connect(m_limitsCheck, &QCheckBox::toggled, this, [this](bool on)

@@ -13,8 +13,10 @@ class QLabel;
 class InletEditorWidget;
 class ProcessNodeEditorWidget;
 class SplitterEditorWidget;
+class QSlider;
 class MaterialsPage;
 class SieveGridWidget;
+class CardDensityPreviewWidget;
 
 // Einstellungsfenster (Einstellungsebene, getrennt von der Darstellung
 // im Hauptfenster). Reiter:
@@ -24,6 +26,10 @@ class SieveGridWidget;
 //   "Raster": gemeinsames Groessen-/Zeitraster des Flowsheets (Groessen in
 //             um, logarithmisch oder linear), darunter Richtwerte fuer
 //             typische Prozesse und die Pruefung, ob die Inlets passen.
+//   "Karten": Kartendichte im Partikelmodus (Regel, Anteil Anzahl f,
+//             Exponent gamma) mit gesetzter Formel, Vorschau fuer eine
+//             Beispielverteilung und Legende mit Empfehlungen
+//             (Methoden-Dokument 13.26).
 //   "Materialien": Stoffdaten aus data/Materialien.json (nur ansehen).
 // "Uebernehmen" schreibt ueberall nur Werte - simuliert wird
 // ausschliesslich ueber "Simulieren" im Hauptfenster.
@@ -60,14 +66,24 @@ private slots:
     void OnApplyGrid();
     // Info und Pruefung des eingegebenen (noch nicht uebernommenen) Rasters.
     void UpdateGridCheck();
+    void OnApplyCards();
+    // Formel und Vorschau der eingegebenen (noch nicht uebernommenen)
+    // Kartendichte.
+    void UpdateCardPreview();
 
 private:
     void SetupUi();
     QWidget* CreateNodeTab();
     QWidget* CreateGridTab();
+    QWidget* CreateCardTab();
     void LoadGridValues();
+    void LoadCardValues(const stosis::SCardSettings& settings);
+    // Beispielverteilungen: alle Inlets des Flowsheets und drei Log-Normal-Beispiele.
+    void RefreshCardExamples();
     // Das Raster aus den Eingabefeldern (Groessen in m).
     stosis::SSizeGrid EnteredSizeGrid() const;
+    // Die Karteneinstellungen des Flowsheets mit Regel, f und gamma aus den Eingabefeldern.
+    stosis::SCardSettings EnteredCardSettings() const;
 
     // Reihenfolge der Seiten im QStackedWidget.
     enum EPage
@@ -99,4 +115,14 @@ private:
     QLabel* m_gridInfoLabel = nullptr;   // Klassen je Dekade bzw. Delta d
     QLabel* m_gridCheckLabel = nullptr;  // Meldungen der Units zum Raster
     SieveGridWidget* m_sieveWidget = nullptr; // Raster und Siebsatz nebeneinander
+
+    QComboBox* m_cardRuleCombo = nullptr;
+    QSlider* m_cardShareSlider = nullptr;    // f in Prozent
+    QDoubleSpinBox* m_cardShareSpin = nullptr;
+    QSlider* m_cardExponentSlider = nullptr; // gamma in Hundertsteln
+    QDoubleSpinBox* m_cardExponentSpin = nullptr;
+    QComboBox* m_cardExampleCombo = nullptr;
+    QLabel* m_cardFormula = nullptr;      // gewaehlte Regel als Formel, mit f und gamma eingesetzt
+    CardDensityPreviewWidget* m_cardPreview = nullptr;
+    QLabel* m_cardSummary = nullptr;      // Kennzahlen der Vorschau
 };

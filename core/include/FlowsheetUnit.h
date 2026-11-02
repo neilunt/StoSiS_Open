@@ -35,7 +35,7 @@ namespace stosis
         // oben gilt auch im Partikelmodus: darauf werden die Karten fuer
         // Anzeige und Auswertung umgerechnet.
         ERepresentation representation = ERepresentation::Continuum;
-        // Kartenzahl, Mindestzahl, Groessenbereiche (nur im Partikelmodus).
+        // Kartenzahl, Kartendichte, Grenzen je Stromscheibe (nur im Partikelmodus).
         SCardSettings cards;
 
         // Aktive Stoffe des Flowsheets (Namen aus der Materialdatei); die
@@ -81,6 +81,10 @@ namespace stosis
         SSizeGrid GetSizeGrid() const { return { sizeGridType, numSizeClasses, sizeMin, sizeMax }; }
 
         double GetSizeAt(size_t sizeIdx) const { return GetSizeGrid().GetSizeAt(sizeIdx); }
+
+        // Kleinste positive Stuetzstelle: Partikel kleinerer Karten zaehlen,
+        // als laegen sie hier (CardNumberWeight in CardDensity.h).
+        double GetCardCountMin() const { return (sizeMin > 0.0 || numSizeClasses < 2) ? sizeMin : GetSizeAt(1); }
     };
 
     // Was eine Unit in einem Makroschritt ueber die Zeit wissen muss.
@@ -141,11 +145,11 @@ namespace stosis
         virtual std::vector<std::string> GetWarnings() const { return {}; }
 
         // Kurzbeschreibung nach Initialize fuer das Laufzeitprotokoll, z.B.
-        // "2000 Karten je Zeitschritt in 3 Groessenbereichen". Leer = nichts.
+        // "2000 Karten je Zeitschritt, Kartendichte Summe". Leer = nichts.
         virtual std::string DescribeForLog() const { return {}; }
 
-        // Liegen die Karten an den Ausgaengen schon auf den Sollzahlen der
-        // Grenzen je Stromscheibe (Inlet: Platzierung nach denselben Regeln)?
+        // Liegen die Karten an den Ausgaengen schon innerhalb der Grenzen je
+        // Stromscheibe (Inlet: Platzierung nach derselben Kartendichte)?
         // Dann prueft der Graph sie nicht noch einmal (CardLimits.h).
         virtual bool OutputsWithinCardLimits() const { return false; }
 

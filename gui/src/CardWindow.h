@@ -13,10 +13,10 @@ class CardPlotWidget;
 // Fenster "Kartenansicht" (Menue Flowsheet): zeigt im Partikelmodus die
 // Karten selbst statt ihres Fotos auf dem Groessenraster - fuer einen Strom
 // und einen Zeitpunkt von Lauf 1. Reiter "Verteilung": Dichte q3* oder
-// Summenkurve Q3 aus den Karten mit Vergleichskurve (A/B), Kartenteppich (D)
-// und Karten je Klasse (C) auf gemeinsamer d-Achse; "Zeitverlauf":
-// Verteilung ueber der Zeit (E) und Kartenzahl je Zeitschritt;
-// "Gewichte": Groesse gegen Massenstrom je Karte (F); "Tabelle": alle
+// Summenkurve Q3 aus den Karten mit Vergleichskurve, Kartenteppich
+// und Karten je Klasse auf gemeinsamer d-Achse; "Zeitverlauf":
+// Verteilung ueber der Zeit und Kartenzahl je Zeitschritt;
+// "Gewichte": Groesse gegen Massenstrom je Karte; "Tabelle": alle
 // Karten mit CSV-Export. Daten aus CFlowsheetGraph::GetCardHistory
 // (Methoden-Dokument 13.23).
 class CardWindow : public QWidget
@@ -33,7 +33,7 @@ public:
 
 private:
     void UpdateViews();
-    // d-Achse und Zeitkarte (E) haengen nur vom Strom und der Klassenzahl
+    // d-Achse und Zeitkarte haengen nur vom Strom und der Klassenzahl
     // ab, nicht vom Zeitpunkt; neu gerechnet wird nur, wenn sich das aendert.
     void UpdateAxisAndTimeMap(const stosis::CCardHistory& history);
     // Vergleichskurve: Mittel aller Laeufe auf dem Groessenraster als

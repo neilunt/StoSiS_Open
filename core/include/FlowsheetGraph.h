@@ -415,7 +415,7 @@ namespace stosis
         void SetRepresentation(ERepresentation representation) { m_grid.representation = representation; }
         ERepresentation GetRepresentation() const { return m_grid.representation; }
 
-        // Kartenzahl je Stromscheibe, Mindestzahl, Groessenbereiche (Partikelmodus).
+        // Kartenzahl je Stromscheibe, Kartendichte, Grenzen (Partikelmodus).
         void SetCardSettings(const SCardSettings& cards) { m_grid.cards = cards; }
         const SCardSettings& GetCardSettings() const { return m_grid.cards; }
 
@@ -817,7 +817,8 @@ namespace stosis
                     if (limits && !(rn.unit && rn.unit->OutputsWithinCardLimits()))
                         for (CStreamSlice& out : rn.current)
                         {
-                            const SLimitCounts changed = ApplySliceLimits(out, m_grid.cards);
+                            const SLimitCounts changed = ApplySliceLimits(out, m_grid.cards,
+                                m_grid.GetCardCountMin());
                             rn.timing->cardsAdded += static_cast<double>(changed.added);
                             rn.timing->cardsRemoved += static_cast<double>(changed.removed);
                         }
@@ -924,9 +925,12 @@ namespace stosis
                 + std::to_string(m_grid.numTimeSteps) + " Zeitpunkte (0 bis " + FormatNumber(m_grid.totalTime, 6)
                 + " s, dt = " + FormatNumber(m_grid.GetDt(), 6) + " s), Raster " + std::to_string(m_grid.numSizeClasses) + " Klassen, ";
             line += m_timing.particles
-                ? "Partikelmodus mit " + std::to_string(m_grid.cards.cardsPerSlice) + " Karten je Zeitschritt und Inlet"
+                ? "Partikelmodus mit " + std::to_string(m_grid.cards.cardsPerSlice) + " Karten je Zeitschritt und Inlet, Kartendichte "
+                    + GetCardDensityRuleName(m_grid.cards.rule) + " (f = " + FormatDecimal(m_grid.cards.numberShare, 2)
+                    + ", gamma = " + FormatDecimal(CardDensityExponent(m_grid.cards), 2) + ")"
                     + (m_grid.cards.sliceLimits
-                        ? ", Grenzen je Stromscheibe: N_min bis " + FormatDecimal(m_grid.cards.upperFactor, 1) + " x Sollzahl"
+                        ? ", Grenzen je Stromscheibe: hoechstens " + FormatDecimal(m_grid.cards.upperFactor, 1)
+                            + " x N Karten, Anteil je Karte hoechstens " + FormatDecimal(m_grid.cards.splitFactor, 1) + " / N"
                         : std::string(", ohne Grenzen je Stromscheibe"))
                 : std::string("Kontinuum");
             m_log.Add(line);

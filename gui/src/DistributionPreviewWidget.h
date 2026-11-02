@@ -11,9 +11,9 @@ class QPainter;
 // werden die Werte an den Gitterpunkten - also exakt das, was die
 // Simulation spaeter sieht. Zusaetzlich: Anteil der Masse, den das
 // Raster erfasst (warnt, wenn die Verteilung abgeschnitten wird oder
-// das Raster zu grob ist). Im Partikelmodus zusaetzlich der Siebsatz
-// (Groessenbereiche 1 um * 2^k) und die Karten des Inlets als Staebe
-// (Hoehe = Masse je Karte), mit der Kartenzahl je Bereich.
+// das Raster zu grob ist). Im Partikelmodus zusaetzlich die Karten des
+// Inlets als Staebe (Hoehe = Masse je Karte) und die Kartenzahl an den
+// Raendern (Kartendichte, Methoden-Dokument 13.26).
 class DistributionPreviewWidget : public QWidget
 {
     Q_OBJECT
@@ -30,7 +30,7 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 
 private:
-    // Siebsatz und Karten ueber die Kurve zeichnen (nur Partikelmodus).
+    // Karten ueber die Kurve zeichnen (nur Partikelmodus).
     void PaintCards(QPainter& painter, const QRect& plotRect);
 
     static constexpr int kMarginLeft = 10;

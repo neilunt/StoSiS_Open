@@ -82,13 +82,13 @@ CardWindow::CardWindow(QWidget* parent)
         m_classCombo->addItem(QString::number(n), n);
     m_classCombo->setCurrentIndex(2);
     m_classCombo->setToolTip("Jeder Groessenbereich des Siebsatzes wird in so viele gleich breite Klassen (in ln d)\n"
-                             "geteilt; gilt fuer A, C und E. Feinere Klassen zeigen mehr Einzelheiten, aber auch\n"
-                             "mehr Rauschen, weil weniger Karten in jeder Klasse liegen.");
+                             "geteilt; gilt fuer Dichte, Karten je Klasse und Zeitverlauf. Feinere Klassen zeigen\n"
+                             "mehr Einzelheiten, aber auch mehr Rauschen, weil weniger Karten in jeder Klasse liegen.");
     controls->addWidget(m_classCombo);
     controls->addSpacing(16);
     controls->addWidget(new QLabel("Verteilung:", this));
-    auto* densityRadio = new QRadioButton("Dichte q3* (A)", this);
-    m_cumulativeRadio = new QRadioButton("Summenkurve Q3 (B)", this);
+    auto* densityRadio = new QRadioButton("Dichte q3*", this);
+    m_cumulativeRadio = new QRadioButton("Summenkurve Q3", this);
     densityRadio->setChecked(true);
     controls->addWidget(densityRadio);
     controls->addWidget(m_cumulativeRadio);
@@ -100,7 +100,8 @@ CardWindow::CardWindow(QWidget* parent)
     m_info->setStyleSheet("color: gray;");
     layout->addWidget(m_info);
 
-    // Verteilung: A/B, D und C untereinander mit gemeinsamer d-Achse.
+    // Verteilung: Dichte bzw. Summenkurve, Kartenteppich und Karten je Klasse
+    // untereinander mit gemeinsamer d-Achse.
     auto* tabs = new QTabWidget(this);
     auto* distributionPage = new QWidget(tabs);
     auto* distributionLayout = new QVBoxLayout(distributionPage);
@@ -112,9 +113,10 @@ CardWindow::CardWindow(QWidget* parent)
     distributionLayout->addWidget(m_distribution, 5);
     distributionLayout->addWidget(m_rug);
     distributionLayout->addWidget(m_classes, 3);
-    tabs->addTab(distributionPage, "Verteilung (A-D)");
+    tabs->addTab(distributionPage, "Verteilung");
 
-    // Zeitverlauf: E und Kartenzahl untereinander mit gemeinsamer Zeitachse.
+    // Zeitverlauf: Verteilung ueber der Zeit und Kartenzahl untereinander mit
+    // gemeinsamer Zeitachse.
     auto* timePage = new QWidget(tabs);
     auto* timeLayout = new QVBoxLayout(timePage);
     timeLayout->setSpacing(0);
@@ -123,10 +125,10 @@ CardWindow::CardWindow(QWidget* parent)
     m_counts->setObjectName("countsPlot");
     timeLayout->addWidget(m_timeMap, 3);
     timeLayout->addWidget(m_counts, 2);
-    tabs->addTab(timePage, "Zeitverlauf (E)");
+    tabs->addTab(timePage, "Zeitverlauf");
 
     m_cloud = new CardPlotWidget(CardPlotWidget::EKind::Cloud, tabs);
-    tabs->addTab(m_cloud, "Gewichte (F)");
+    tabs->addTab(m_cloud, "Gewichte");
 
     auto* tablePage = new QWidget(tabs);
     auto* tableLayout = new QVBoxLayout(tablePage);
@@ -271,21 +273,34 @@ void CardWindow::UpdateViews()
     FillReference(snapshot->step, refSizes, refDensity, refLabel);
     m_distribution->SetDistribution(classes, stosis::MakeCardCumulative(snapshot->sizes, masses),
                                     std::move(refSizes), std::move(refDensity), refLabel);
-    m_classes->SetClasses(std::move(classes), stosis::CInletUnit::kMinCardsPerRange);
+    m_classes->SetClasses(std::move(classes), stosis::CInletUnit::kMinCards);
 
-    // Grenzen je Stromscheibe der gezeigten Scheibe, wenn sie in der letzten
-    // Simulation an waren (die Karten sind dann schon geteilt bzw. zusammengelegt).
-    std::vector<stosis::SSliceRange> limitRanges;
+    // Soll je Klasse nach der Kartendichte (13.26): Kartenzahl x Summe der
+    // Anteile der Karten in der Klasse. Traegt jede Karte denselben Anteil,
+    // stehen die Balken genau auf der Linie.
+    const stosis::SCardSettings& settings = m_graph->GetCardSettings();
+    const std::vector<double> shares = stosis::ComputeCardShares(snapshot->sizes, masses, settings,
+        grid.GetCardCountMin());
+    std::vector<double> targets(bounds.size() > 1 ? bounds.size() - 1 : 0, 0.0);
+    double minShare = 0.0, maxShare = 0.0;
+    for (size_t k = 0; k < numCards && k < shares.size() && !targets.empty(); ++k)
+    {
+        const size_t above = static_cast<size_t>(std::upper_bound(bounds.begin(), bounds.end(), snapshot->sizes[k]) - bounds.begin());
+        targets[std::min(targets.size() - 1, above > 0 ? above - 1 : size_t(0))] += shares[k] * static_cast<double>(numCards);
+        minShare = k == 0 ? shares[k] : std::min(minShare, shares[k]);
+        maxShare = std::max(maxShare, shares[k]);
+    }
+    m_classes->SetClassTargets(std::move(targets));
+    // Grenzen je Stromscheibe, wenn sie in der letzten Simulation an waren
+    // (die Karten sind dann schon geteilt bzw. zusammengelegt).
     if (m_graph->GetSimulationTiming().sliceLimits)
     {
-        const stosis::SCardSettings& settings = m_graph->GetCardSettings();
-        const stosis::SSliceLimits limits = stosis::ComputeSliceLimits(snapshot->sizes, masses, settings);
-        limitRanges = limits.ranges;
-        m_info->setText(m_info->text() + QString(" - Grenzen je Stromscheibe: N_min = %1 je belegtem Bereich "
-            "(%2 belegt), Obergrenze %3 x Sollzahl").arg(limits.minPerRange).arg(limits.numOccupied)
-            .arg(QLocale().toString(settings.upperFactor, 'f', 1)));
+        const double n = static_cast<double>(settings.cardsPerSlice);
+        m_info->setText(m_info->text() + QString(" - Grenzen je Stromscheibe: hoechstens %1 x N Karten, Anteil je Karte "
+            "hoechstens %2 / N (N = %3); hier %4 bis %5 / N")
+            .arg(QLocale().toString(settings.upperFactor, 'f', 1)).arg(QLocale().toString(settings.splitFactor, 'f', 1))
+            .arg(settings.cardsPerSlice).arg(Num(minShare * n, 3)).arg(Num(maxShare * n, 3)));
     }
-    m_classes->SetRangeLimits(std::move(limitRanges), GetClassesPerRange());
 
     QStringList compounds;
     for (size_t c = 0; c < numC; ++c)

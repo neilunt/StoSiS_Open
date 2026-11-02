@@ -74,6 +74,8 @@ src/SettingsWindow.cpp
 src/SettingsWindow.h
 src/DistributionPreviewWidget.cpp
 src/DistributionPreviewWidget.h
+src/CardDensityPreviewWidget.cpp
+src/CardDensityPreviewWidget.h
 src/SplitterEditorWidget.cpp
 src/SplitterEditorWidget.h
 src/FractionPreviewWidget.cpp

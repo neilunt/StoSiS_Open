@@ -7,6 +7,7 @@
 #include <string>
 #include "FlowsheetUnit.h"
 #include "Random.h"
+#include "CardDensity.h"
 
 namespace stosis
 {
@@ -142,6 +143,9 @@ namespace stosis
             m_cardRandom.Seed(MakeUnitSeed(unitSeed, "Konto-Verfahren"));
             m_accounts.assign(m_fractions.size(), 0.0);
             m_particles = grid.representation == ERepresentation::Particles;
+            // Kartendichte wie an Inlets und Grenzen: bestimmt den Anteil je Karte.
+            m_cardSettings = grid.cards;
+            m_countMin = grid.GetCardCountMin();
         }
 
         void Step(const SStepContext& context, const std::vector<const CStreamSlice*>& inputs,
@@ -188,11 +192,11 @@ namespace stosis
             }
             text += m_stochastic ? " %, schwankend (OU-Prozess)" : " %, fest";
             if (m_particles)
-                text += ", Karten nach dem Konto-Verfahren";
+                text += ", Karten nach dem Konto-Verfahren in Kartenanteilen";
             return text;
         }
 
-        // Konten des Konto-Verfahrens (Massenstrom, den jeder Ausgang noch
+        // Konten des Konto-Verfahrens (Kartenanteil, den jeder Ausgang noch
         // bekommen soll; Summe 0). Fuer Tests und Anzeige.
         const std::vector<double>& GetCardAccounts() const { return m_accounts; }
 
@@ -203,12 +207,18 @@ namespace stosis
         // Konto-Verfahren (Methoden-Dokument 13.18, 13.22): Die Karten eines
         // Schritts werden nach Stoff und darin nach Groesse geordnet und ab
         // einer zufaelligen Startposition einmal ringsum durchgegangen. Jede
-        // Karte zahlt f_i * m auf das Konto jedes Ausgangs i ein und geht ganz
-        // in den Ausgang mit dem hoechsten Kontostand, dessen Konto um m
-        // belastet wird. Die Konten laufen ueber die Schritte weiter, ihre
-        // Summe bleibt 0. So bekommt jeder Ausgang seinen Anteil bis auf
-        // weniger als eine Karte, Karten werden nicht kopiert (die Kartenzahl
-        // bleibt), und jeder Stoff und jede Groesse verteilt sich gleichmaessig.
+        // Karte zahlt f_i * s auf das Konto jedes Ausgangs i ein und geht ganz
+        // in den Ausgang mit dem hoechsten Kontostand, dessen Konto um s
+        // belastet wird. s ist ihr Anteil an der Kartendichte der Scheibe
+        // (ComputeCardShares mit der eingestellten Regel, Summe 1) - nicht
+        // ihre Masse: Sehr leichte Karten bewegten ein Massenkonto kaum,
+        // gingen geschlossen in einen Ausgang und teilten sich auf Dauer etwa
+        // haelftig statt im Verhaeltnis f. Mit dem Anteil geht von benachbarten
+        // Karten jede (1/f)-te nach A, fuer leichte wie fuer schwere. Die
+        // Konten laufen ueber die Schritte weiter, ihre Summe bleibt 0. Jeder
+        // Ausgang bekommt seine Masse je Schritt bis auf etwa eine Karte;
+        // nicht nachskaliert, weil das kleine Ausgaenge mit wenigen Karten
+        // verzerrt. Karten werden nicht kopiert (die Kartenzahl bleibt).
         // Zuerst nach Stoff: Haetten zwei Inlets dieselben Kartengroessen,
         // wechselten sich bei reiner Groessenordnung die Stoffe ab, und bei
         // f = 50 % ginge in einem Schritt ein Stoff ganz nach A, der andere
@@ -242,19 +252,31 @@ namespace stosis
                     return ca != cb ? ca < cb : input.GetCardSize(a) < input.GetCardSize(b);
                 });
 
+            // Anteil jeder Karte an der Kartendichte; ohne Masse zaehlt jede gleich.
+            m_sizes.resize(numCards);
+            m_masses.resize(numCards);
+            for (size_t k = 0; k < numCards; ++k)
+            {
+                m_sizes[k] = input.GetCardSize(k);
+                m_masses[k] = input.GetCardMassFlow(k);
+            }
+            std::vector<double> shares = ComputeCardShares(m_sizes, m_masses, m_cardSettings, m_countMin);
+            if (!(std::accumulate(shares.begin(), shares.end(), 0.0) > 0.0))
+                shares.assign(numCards, 1.0 / static_cast<double>(numCards));
+
             const size_t start = std::min(static_cast<size_t>(m_cardRandom.Uniform() * static_cast<double>(numCards)), numCards - 1);
             for (size_t j = 0; j < numCards; ++j)
             {
                 const size_t card = m_order[(start + j) % numCards];
-                const double mass = input.GetCardMassFlow(card);
+                const double share = shares[card];
                 size_t best = 0;
                 for (size_t i = 0; i < numOutputs; ++i)
                 {
-                    m_accounts[i] += m_currentFractions[i] * mass;
+                    m_accounts[i] += m_currentFractions[i] * share;
                     if (m_accounts[i] > m_accounts[best])
                         best = i;
                 }
-                m_accounts[best] -= mass;
+                m_accounts[best] -= share;
                 outputs[best].AppendCard(input, card);
             }
         }
@@ -295,8 +317,11 @@ namespace stosis
 
         // Partikelmodus (Konto-Verfahren)
         CRandom m_cardRandom;           // eigener Strom: Startposition je Schritt
-        std::vector<double> m_accounts; // Konto je Ausgang, Summe 0
+        std::vector<double> m_accounts; // Konto je Ausgang in Kartenanteilen, Summe 0
         std::vector<size_t> m_order;    // Kartenreihenfolge (wiederverwendet)
+        std::vector<double> m_sizes, m_masses; // Groesse und Masse je Karte (wiederverwendet)
+        SCardSettings m_cardSettings;   // Regel der Kartendichte
+        double m_countMin = 0.0;        // Partikel darunter zaehlen wie dort (CardNumberWeight)
         bool m_particles = false;       // Partikelmodus in der letzten Initialisierung
     };
 }

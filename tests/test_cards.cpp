@@ -1,6 +1,6 @@
 // Karten im Strom und ihre Umrechnung aufs Groessenraster (Partikelmodus,
-// Methoden-Dokument 13.20); Karten am Inlet an Quantilen mit
-// Mindestzahl je Groessenbereich (13.21).
+// Methoden-Dokument 13.20); Karten am Inlet in Streifen gleicher Flaeche
+// unter der Kartendichte (13.26).
 #include "FlowsheetGraph.h"
 #include "CardProjection.h"
 #include "CardDistribution.h"
@@ -260,82 +260,147 @@ int main()
         // erreicht absolut 5e-16, also Rundung in der letzten Stelle.
         Check(worst < 1e-8, "Quantile: Q3(Quantile(p)) = p fuer Normal, Log-Normal, RRSB, GGS, Tabelle (relativ 1e-8)");
 
-        // Karten fuer GGS und Tabelle: Masse exakt, alle Karten innerhalb der Verteilung.
+        // Karten fuer GGS und Tabelle: Masse exakt, alle Karten innerhalb der
+        // Verteilung (GGS: 0 bis 200 um, Tabelle: 40 bis 250 um).
         for (size_t t = 3; t < types.size(); ++t)
         {
-            const SCardPlacement placement = PlaceCardsAtQuantiles(types[t], SCardSettings(), 1e-6, 1e-3);
+            const SCardPlacement placement = PlaceCardsAtQuantiles(types[t], SCardSettings(), 1e-6);
             double sum = 0.0;
             for (double m : placement.massFractions)
                 sum += m;
             const double top = t == 3 ? 200e-6 : 250e-6;
-            std::printf("      %s: %zu belegte Bereiche, N_min = %zu, Karten %.3g ... %.4g um\n", t == 3 ? "GGS" : "Tabelle",
-                placement.numOccupied, placement.minPerRange, placement.sizes.front() * 1e6, placement.sizes.back() * 1e6);
+            std::printf("      %s: Karten %.3g ... %.4g um, Raender %zu / %zu Karten\n", t == 3 ? "GGS" : "Tabelle",
+                placement.sizes.front() * 1e6, placement.sizes.back() * 1e6, placement.fineCards, placement.coarseCards);
             Check(placement.sizes.size() == 2000 && NearAbs(sum, 1.0, 1e-12) && placement.sizes.back() <= top
-                && placement.sizes.front() >= (t == 3 ? 1e-6 : 40e-6),
+                && placement.sizes.front() >= (t == 3 ? 0.0 : 40e-6) && placement.sizes.front() > 0.0,
                 std::string(t == 3 ? "GGS" : "Tabelle") + ": 2000 Karten, Masse 1, alle innerhalb der Verteilung");
         }
     }
 
-    // 9) Beispiel aus dem Methoden-Dokument 13.19: Log-Normal d50 = 100 um,
-    //    sigma_ln = 0,4, 200 Karten, f = 25 %, Bereiche 12,5-25 ... 200-400 um
-    //    -> 10 / 16 / 79 / 79 / 16 Karten.
+    // 9) Beispiel aus dem Methoden-Dokument 13.26: Log-Normal d50 = 100 um,
+    //    sigma_ln = 0,5, 1000 Karten. Vergleichswerte aus einer unabhaengigen
+    //    Rechnung mit feiner Tabelle (Karten unter 20 um / ueber 300 um,
+    //    schwerste Karte, meiste Partikel je Karte).
     {
-        SCardSettings settings;
-        settings.cardsPerSlice = 200;
-        settings.reservedFraction = 0.25;
-        settings.rangeAnchor = 12.5e-6;
-        const SSizeDistribution distribution{ EDistributionType::LogNormal, 100e-6, 0.4 };
-        const SCardPlacement placement = PlaceCardsAtQuantiles(distribution, settings, 1e-6, 1e-3);
-        std::vector<size_t> counts;
-        for (const SCardRange& range : placement.ranges)
-            if (range.numCards > 0)
-                counts.push_back(range.numCards);
-        const std::vector<size_t> expected = { 10, 16, 79, 79, 16 };
-        size_t firstWithCards = 0;
-        while (firstWithCards < placement.ranges.size() && placement.ranges[firstWithCards].numCards == 0)
-            ++firstWithCards;
-        Check(counts == expected && placement.numOccupied == 5 && placement.minPerRange == 10
-            && NearRel(placement.ranges[firstWithCards].lower, 12.5e-6, 1e-12),
-            "Beispiel 13.19: 10 / 16 / 79 / 79 / 16 Karten ab 12,5 um, N_min = 10, 5 belegte Bereiche");
-        Check(placement.ranges[firstWithCards].massFraction < 1e-3 && placement.ranges[firstWithCards].numberFraction > 1e-3,
-            "Beispiel 13.19: 12,5-25 um belegt wegen der Anzahl, nicht wegen der Masse");
-        double sum = 0.0;
-        bool ascending = true, equalInRange = true;
-        for (size_t k = 0; k < placement.sizes.size(); ++k)
+        const SSizeDistribution distribution{ EDistributionType::LogNormal, 100e-6, 0.5 };
+        const auto place = [&](ECardDensityRule rule, double f, double gamma)
         {
-            sum += placement.massFractions[k];
-            if (k > 0)
+            SCardSettings settings;
+            settings.cardsPerSlice = 1000;
+            settings.rule = rule;
+            settings.numberShare = f;
+            settings.exponent = gamma;
+            return PlaceCardsAtQuantiles(distribution, settings, 1e-6);
+        };
+        const auto edges = [](const SCardPlacement& placement, size_t& fine, size_t& coarse)
+        {
+            fine = coarse = 0;
+            for (double d : placement.sizes)
             {
-                ascending = ascending && placement.sizes[k] > placement.sizes[k - 1];
-                if (GetCardRangeIndex(placement.sizes[k], settings) == GetCardRangeIndex(placement.sizes[k - 1], settings)
-                    && placement.sizes[k] > 12.5e-6 && placement.sizes[k] < 400e-6)
-                    equalInRange = equalInRange && placement.massFractions[k] == placement.massFractions[k - 1];
+                fine += d < 20e-6 ? 1 : 0;
+                coarse += d > 300e-6 ? 1 : 0;
             }
+        };
+        size_t fine = 0, coarse = 0;
+
+        // Summe f = 0,2, gamma = 0,6: 34 / 37 Karten, hoechstens 1,50-fache Masse und 2,6-fache Partikelzahl.
+        const SCardPlacement flat = place(ECardDensityRule::Sum, 0.2, 0.6);
+        edges(flat, fine, coarse);
+        double sum = 0.0;
+        bool ascending = true;
+        for (size_t k = 0; k < flat.sizes.size(); ++k)
+        {
+            sum += flat.massFractions[k];
+            ascending = ascending && (k == 0 || flat.sizes[k] > flat.sizes[k - 1]);
         }
-        Check(placement.sizes.size() == 200 && NearAbs(sum, 1.0, 1e-12), "Beispiel 13.19: genau 200 Karten, Masse 1");
-        Check(ascending && equalInRange, "Beispiel 13.19: Groessen aufsteigend, gleiche Masse innerhalb eines Bereichs");
+        std::printf("      Summe 0,2, gamma 0,6: unter 20 um %zu, ueber 300 um %zu Karten; Masse je Karte hoechstens %.3f, "
+            "Partikel je Karte hoechstens %.3f x Mittel\n", fine, coarse, flat.maxMassRatio, flat.maxNumberRatio);
+        Check(flat.sizes.size() == 1000 && NearAbs(sum, 1.0, 1e-12) && ascending, "Kartendichte: 1000 Karten, Masse 1, aufsteigend");
+        Check(fine >= 32 && fine <= 36 && coarse >= 35 && coarse <= 39,
+            "Summe 0,2, gamma 0,6: Raender 34 / 37 Karten wie in der Vergleichsrechnung (+-2)");
+        Check(NearAbs(flat.maxMassRatio, 1.50, 0.03) && NearAbs(flat.maxNumberRatio, 2.60, 0.06),
+            "Summe 0,2, gamma 0,6: schwerste Karte 1,50, meiste Partikel 2,6 x Mittel");
+
+        // Standard (Summe 0,5, gamma 0,8): feinste 5 % der Partikel und groebste 5 % der Masse je 39 Karten
+        // (bei f = 0,5 liegen beide Raender spiegelgleich).
+        const SCardPlacement standardCards = place(ECardDensityRule::Sum, 0.5, 0.8);
+        std::printf("      Standard: %zu Karten unter %.2f um (5 %% der Partikel), %zu ueber %.1f um (5 %% der Masse)\n",
+            standardCards.fineCards, standardCards.fineSize * 1e6, standardCards.coarseCards, standardCards.coarseSize * 1e6);
+        Check(standardCards.fineCards >= 37 && standardCards.fineCards <= 41 && standardCards.coarseCards >= 37
+            && standardCards.coarseCards <= 41 && NearRel(standardCards.fineSize, 20.8e-6, 0.01)
+            && NearRel(standardCards.coarseSize, 227.6e-6, 0.002),
+            "Standard: Raender je 39 Karten an den Grenzen 20,8 und 227,6 um (+-2)");
+
+        // Randzellen ohne Auslaeufer: Die Kartendichte hat an der ersten und
+        // letzten Zelle keinen Knick (sigma = 1, f = 1, gamma = 0,3 macht
+        // kleine Dichten gut sichtbar). Unter d_min ist die Anzahl mit echter
+        // Groesse groesser als die gezaehlte, darueber gleich.
+        {
+            SCardSettings settings;
+            settings.numberShare = 1.0;
+            settings.exponent = 0.3;
+            const SCardPlacement wide = PlaceCardsAtQuantiles({ EDistributionType::LogNormal, 100e-6, 1.0 }, settings, 1e-6);
+            const SCardDensityCurve& c = wide.curve;
+            const size_t last = c.cards.size() - 1;
+            const double firstStep = c.cards[0] / c.cards[1], lastStep = c.cards[last] / c.cards[last - 1];
+            bool trueAbove = true, trueBelow = true;
+            for (size_t k = 0; k < c.sizes.size(); ++k)
+                if (c.sizes[k] > 1e-6)
+                    trueAbove = trueAbove && c.numberTrue[k] == c.number[k];
+                else
+                    trueBelow = trueBelow && c.numberTrue[k] > c.number[k];
+            std::printf("      Randzellen: Kartendichte erste / zweite Zelle %.3f, letzte / vorletzte %.3f\n", firstStep, lastStep);
+            Check(firstStep > 0.9 && firstStep < 1.1 && lastStep > 0.9 && lastStep < 1.1,
+                "Kartendichte ohne Knick an der ersten und letzten Zelle (Nachbarn auf 10 % gleich)");
+            Check(trueAbove && trueBelow, "Anzahl mit echter Groesse: unter d_min groesser als gezaehlt, darueber gleich");
+        }
+
+        // Ohne Abflachung: Schranken 1/(1 - f) und 1/f (Summe), 2 und 2 (Quadratisch bei f = 0,5).
+        const SCardPlacement sum05 = place(ECardDensityRule::Sum, 0.5, 1.0);
+        const SCardPlacement quadratic = place(ECardDensityRule::Quadratic, 0.5, 1.0);
+        std::printf("      ohne Abflachung: Summe 0,5 %.3f / %.3f, Quadratisch 0,5 %.3f / %.3f x Mittel\n",
+            sum05.maxMassRatio, sum05.maxNumberRatio, quadratic.maxMassRatio, quadratic.maxNumberRatio);
+        Check(sum05.maxMassRatio <= 2.0 * 1.005 && sum05.maxNumberRatio <= 2.0 * 1.005
+            && quadratic.maxMassRatio <= 2.0 * 1.005 && quadratic.maxNumberRatio <= 2.0 * 1.005,
+            "ohne Abflachung: Summe und Quadratisch bei f = 0,5 hoechstens doppelte Masse und Partikelzahl");
+
+        // Produkt f = 0,5: ein Buckel mit dem Median von sqrt(Masse * Anzahl), 100 um * exp(-1,5 sigma^2) = 68,73 um.
+        const SCardPlacement product = place(ECardDensityRule::Product, 0.5, 1.0);
+        std::printf("      Produkt 0,5: Karte 500 bei %.2f um\n", product.sizes[499] * 1e6);
+        Check(NearRel(std::sqrt(product.sizes[499] * product.sizes[500]), 100e-6 * std::exp(-1.5 * 0.25), 0.005),
+            "Produkt f = 0,5: mittlere Karte beim Median von sqrt(Masse * Anzahl), 68,7 um");
+
+        // Anteil je Karte an der Kartendichte (Grenzen je Stromscheibe): am Inlet etwa 1/N.
+        SCardSettings settings;
+        settings.cardsPerSlice = 1000;
+        const std::vector<double> shares = ComputeCardShares(standardCards.sizes, standardCards.massFractions, settings, 1e-6);
+        double lowest = 1.0, highest = 0.0, worstInner = 0.0;
+        for (size_t k = 0; k < shares.size(); ++k)
+        {
+            lowest = std::min(lowest, shares[k] * 1000.0);
+            highest = std::max(highest, shares[k] * 1000.0);
+            if (k >= 10 && k + 10 < shares.size())
+                worstInner = std::max(worstInner, std::abs(shares[k] * 1000.0 - 1.0));
+        }
+        std::printf("      Anteil je Karte am Inlet: %.3f bis %.3f / N, innen hoechstens %.1f %% neben 1/N\n",
+            lowest, highest, 100.0 * worstInner);
+        Check(lowest > 0.5 && highest < 2.0 && worstInner < 0.05,
+            "Anteil je Karte am Inlet: alle zwischen 1/(2N) und 2/N, innen auf 5 % genau 1/N");
     }
 
-    // 10) Standard-Inlet (Normal 100 um +- 25 um) mit den Startwerten: Tabelle
-    //     der Bereiche fuer das Methoden-Dokument.
+    // 10) Normalverteilung (100 um +- 25 um, Teil unter d = 0 hochgerechnet) mit den Startwerten.
     {
-        const SCardSettings settings; // N 2000, f 20 %, Faktor 2 ab 1 um
+        const SCardSettings settings; // N 2000, Summe f = 0,5, gamma = 0,8
         const SSizeDistribution distribution{ EDistributionType::Normal, 100e-6, 25e-6 };
-        const SCardPlacement placement = PlaceCardsAtQuantiles(distribution, settings, 1e-6, 1e-3);
-        std::printf("      Bereich [um]      Masse        Anzahl      belegt  Karten\n");
-        for (const SCardRange& range : placement.ranges)
-            if (range.massFraction > 1e-12 || range.numCards > 0)
-                std::printf("      %7.4g - %-7.4g %.3e   %.3e   %s     %zu\n", range.lower * 1e6, range.upper * 1e6,
-                    range.massFraction, range.numberFraction, range.occupied ? "ja  " : "nein", range.numCards);
-        std::printf("      B_belegt = %zu, N_min = %zu, kleinste Karte %.3g um, groesste %.4g um\n", placement.numOccupied,
-            placement.minPerRange, placement.sizes.front() * 1e6, placement.sizes.back() * 1e6);
+        const SCardPlacement placement = PlaceCardsAtQuantiles(distribution, settings, 1e-6);
+        std::printf("      kleinste Karte %.3g um, groesste %.4g um; Raender %zu / %zu Karten; schwerste Karte %.2f, "
+            "meiste Partikel %.2f x Mittel\n", placement.sizes.front() * 1e6, placement.sizes.back() * 1e6,
+            placement.fineCards, placement.coarseCards, placement.maxMassRatio, placement.maxNumberRatio);
         double sum = 0.0;
         for (double m : placement.massFractions)
             sum += m;
         Check(placement.sizes.size() == 2000 && NearAbs(sum, 1.0, 1e-12) && placement.sizes.front() > 0.0,
             "Normalverteilung: 2000 Karten, Masse 1, alle Groessen > 0");
-        Check(placement.minPerRange * placement.numOccupied >= 400 && placement.minPerRange * placement.numOccupied < 400 + placement.numOccupied,
-            "Normalverteilung: Mindestzahlen zusammen f * N = 400 (aufgerundet)");
     }
 
     // 11) Inlet im Flowsheet: Karten tragen den Massenstrom exakt in jedem
@@ -376,7 +441,7 @@ int main()
         Check(worstShape < 2e-3, "Verteilungssumme wie im Kontinuum (Abweichung < 0,2 % des Massenstroms)");
     }
 
-    // 12) Warnung bei zu wenigen Karten je Bereich und bei ungueltiger Verteilung.
+    // 12) Warnung bei zu wenigen Karten an den Raendern und bei ungueltiger Verteilung.
     {
         CFlowsheetGraph graph;
         const std::string inlet = graph.AddInletNode("Inlet1", 0, 0);
@@ -389,8 +454,37 @@ int main()
         graph.RunSimulations(1);
         const std::vector<std::string> warnings = graph.GetSimulationWarnings();
         std::printf("      Hinweis: %s\n", warnings.empty() ? "-" : warnings[0].c_str());
-        Check(warnings.size() == 1 && warnings[0].find("Nur 2 Karten je belegtem") != std::string::npos,
-            "20 Karten: Warnung zu wenige Karten je Bereich (Standard-Inlet: 3 belegte Bereiche, N_min = 2)");
+        const auto has = [](const std::string& text, const char* part) { return text.find(part) != std::string::npos; };
+        Check(warnings.size() == 1 && has(warnings[0], "An beiden Raendern") && has(warnings[0], "feinsten 5 % der Partikel")
+            && has(warnings[0], "groebsten 5 % der Masse") && has(warnings[0], "mehr Karten je Zeitschritt")
+            && !has(warnings[0], "f kleiner") && !has(warnings[0], "f groesser"),
+            "20 Karten: Warnung fuer beide Raender, Abhilfe ohne f");
+
+        // Nur ein Rand zu duenn: nur dieser wird genannt, und nur Abhilfen,
+        // die dort helfen und noch moeglich sind (gamma = 0,3 ist das Kleinste).
+        graph.GetInlet(inlet)->SetSizeDistribution({ EDistributionType::LogNormal, 100e-6, 1.0 });
+        SCardSettings numberOnly;
+        numberOnly.cardsPerSlice = 500;
+        numberOnly.numberShare = 1.0;
+        numberOnly.exponent = 0.3;
+        graph.SetCardSettings(numberOnly);
+        graph.RunSimulations(1);
+        const std::vector<std::string> coarse = graph.GetSimulationWarnings();
+        std::printf("      Hinweis: %s\n", coarse.empty() ? "-" : coarse[0].c_str());
+        Check(coarse.size() == 1 && has(coarse[0], "Die groebsten 5 % der Masse bekommen nur") && !has(coarse[0], "feinsten")
+            && has(coarse[0], "f kleiner") && !has(coarse[0], "gamma kleiner"),
+            "f = 1, gamma = 0,3: nur der grobe Rand, Abhilfe f kleiner, nicht gamma kleiner");
+        SCardSettings massOnly;
+        massOnly.cardsPerSlice = 500;
+        massOnly.numberShare = 0.0;
+        massOnly.exponent = 1.0;
+        graph.SetCardSettings(massOnly);
+        graph.RunSimulations(1);
+        const std::vector<std::string> fine = graph.GetSimulationWarnings();
+        std::printf("      Hinweis: %s\n", fine.empty() ? "-" : fine[0].c_str());
+        Check(fine.size() == 1 && has(fine[0], "Die feinsten 5 % der Partikel bekommen nur") && !has(fine[0], "groebsten")
+            && has(fine[0], "f groesser") && has(fine[0], "gamma kleiner"),
+            "f = 0, gamma = 1: nur der feine Rand, Abhilfe f groesser und gamma kleiner");
         graph.SetCardSettings(SCardSettings());
         graph.GetInlet(inlet)->SetSizeDistribution({ EDistributionType::LogNormal, 100e-6, 0.0 });
         graph.RunSimulations(1);
@@ -400,21 +494,26 @@ int main()
     }
 
     // 13) RRSB mit n = 2: die Anzahl waechst zu kleinen Groessen ohne Grenze -
-    //     gezaehlt wird nur im Rasterbereich, Masse bleibt exakt.
+    //     Partikel unter d_min = 1 um zaehlen wie bei d_min, Masse bleibt exakt.
     {
         const SCardSettings settings;
         const SSizeDistribution distribution{ EDistributionType::RRSB, 65e-6, 2.0 };
-        const SCardPlacement placement = PlaceCardsAtQuantiles(distribution, settings, 1e-6, 1e-3);
+        const SCardPlacement placement = PlaceCardsAtQuantiles(distribution, settings, 1e-6);
         double sum = 0.0;
-        for (double m : placement.massFractions)
-            sum += m;
-        std::printf("      RRSB n = 2: %zu belegte Bereiche, N_min = %zu, kleinste Karte %.3g um\n",
-            placement.numOccupied, placement.minPerRange, placement.sizes.front() * 1e6);
-        Check(placement.sizes.size() == 2000 && NearAbs(sum, 1.0, 1e-12) && placement.numOccupied <= 12,
-            "RRSB n = 2: 2000 Karten, Masse 1, belegte Bereiche begrenzt");
+        size_t belowGrid = 0;
+        for (size_t k = 0; k < placement.sizes.size(); ++k)
+        {
+            sum += placement.massFractions[k];
+            belowGrid += placement.sizes[k] < 1e-6 ? 1 : 0;
+        }
+        std::printf("      RRSB n = 2: kleinste Karte %.3g um, %zu Karten unter 1 um, Raender %zu / %zu Karten, "
+            "meiste Partikel je Karte %.2f x Mittel\n", placement.sizes.front() * 1e6, belowGrid, placement.fineCards,
+            placement.coarseCards, placement.maxNumberRatio);
+        Check(placement.sizes.size() == 2000 && NearAbs(sum, 1.0, 1e-12) && placement.maxNumberRatio < 3.0,
+            "RRSB n = 2: 2000 Karten, Masse 1, keine Karte mit mehr als 3-mal so vielen Partikeln wie im Mittel");
     }
 
-    // 14) Verteilung aus den Karten (Kartenansicht A-E): feine Klassen,
+    // 14) Verteilung aus den Karten (Kartenansicht): feine Klassen,
     //     Dichte je ln d, Summenkurve und Quantile.
     {
         const SCardSettings settings;
@@ -453,7 +552,7 @@ int main()
             "Summenkurve einer Dichte (Trapezregel in ln d) und ihre Quantile");
 
         // Echte Platzierung (RRSB wie in 13): alle Karten einsortiert, Masse 1.
-        const SCardPlacement placement = PlaceCardsAtQuantiles({ EDistributionType::RRSB, 65e-6, 2.0 }, settings, 1e-6, 1e-3);
+        const SCardPlacement placement = PlaceCardsAtQuantiles({ EDistributionType::RRSB, 65e-6, 2.0 }, settings, 1e-6);
         const int first = GetCardRangeIndex(placement.sizes.front(), settings);
         const int last = GetCardRangeIndex(placement.sizes.back(), settings);
         size_t cards = 0;
