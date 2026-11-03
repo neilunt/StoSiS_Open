@@ -204,7 +204,7 @@ namespace stosis
         const std::vector<double>& GetCurrentFractions() const { return m_currentFractions; }
 
     private:
-        // Konto-Verfahren (Arbeitsdokument 13.18, 13.22): Die Karten eines
+        // Konto-Verfahren (Methodenhandbuch 9.4): Die Karten eines
         // Schritts werden nach Stoff und darin nach Groesse geordnet und ab
         // einer zufaelligen Startposition einmal ringsum durchgegangen. Jede
         // Karte zahlt f_i * s auf das Konto jedes Ausgangs i ein und geht ganz

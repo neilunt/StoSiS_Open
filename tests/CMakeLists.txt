@@ -6,19 +6,20 @@
 #     cmake --build build --config Release
 #     ctest --test-dir build -C Release --output-on-failure
 
+# In Klammern: Kapitel im Methodenhandbuch (docs/StoSiS_Methodenhandbuch.html).
 set(STOSIS_TESTS
-    test_distributions   # Groessenverteilungen am Inlet (Kapitel 3)
-    test_graph           # Ports, Splitter/Merger, Schnittregel (Kapitel 4, 6.2)
-    test_recycle         # Rueckfuehrungen, Massenbilanz (Kapitel 6.3)
-    test_splitter_ou     # OU-Splitter, Zufallszahlen (Kapitel 8, 9.4)
-    test_ensemble        # Mehrfachlaeufe gegen analytische Loesung (Kapitel 10, 11)
-    test_materials       # Materialdatei (Kapitel 14.4, Schritt 2)
-    test_streams         # Stoffe, Temperatur, Druck im Strom (Kapitel 14.4, Schritt 3)
-    test_sizegrid        # Logarithmisches Groessenraster, SI-Einheiten (Kapitel 2.5, 2.6)
-    test_signal_analysis # Auswertung schwankender Zeitreihen (Kapitel 12, 15)
-    test_cards           # Karten im Strom, Umrechnung aufs Raster (Kapitel 13.20)
-    test_particle_units  # Merger und Splitter im Partikelmodus (Kapitel 13.22)
-    test_runlog          # Laufzeitprotokoll, Fortschritt, Kartenspeicher (Kapitel 12, 13.23)
+    test_distributions   # Groessenverteilungen am Inlet (Kap. 5)
+    test_graph           # Ports, Splitter/Merger, Schnittregel (Kap. 3)
+    test_recycle         # Rueckfuehrungen, Massenbilanz (Kap. 3)
+    test_splitter_ou     # OU-Splitter, Zufallszahlen (Kap. 7.2, 8)
+    test_ensemble        # Mehrfachlaeufe gegen analytische Loesung (Kap. 8)
+    test_materials       # Materialdatei (Kap. 6)
+    test_streams         # Stoffe, Temperatur, Druck im Strom (Kap. 6)
+    test_sizegrid        # Logarithmisches Groessenraster, SI-Einheiten (Kap. 4)
+    test_signal_analysis # Auswertung schwankender Zeitreihen (Kap. 10, 11)
+    test_cards           # Karten im Strom, Umrechnung aufs Raster (Kap. 9.3, 9.6)
+    test_particle_units  # Merger und Splitter im Partikelmodus (Kap. 9.4, 9.5)
+    test_runlog          # Laufzeitprotokoll, Fortschritt, Kartenspeicher (Kap. 9.6, 10)
     test_regression      # alle Ergebnisse gegen gespeicherte Referenzwerte
 )
 
@@ -30,12 +31,12 @@ foreach(name IN LISTS STOSIS_TESTS)
     add_test(NAME ${name} COMMAND ${name})
 endforeach()
 
-# Auswertung fuer die Konvergenz-Abbildung im Arbeitsdokument (kein Test).
+# Auswertung fuer die Konvergenz ueber die Zahl der Laeufe (Methodenhandbuch Kap. 8, kein Test).
 add_executable(analysis_convergence analysis_convergence.cpp)
 target_link_libraries(analysis_convergence PRIVATE stosis_core)
 set_target_properties(analysis_convergence PROPERTIES FOLDER "Tests")
 
-# Auswertung fuer den Vergleich Dosierwaage - StoSiS (Arbeitsdokument Kap. 15, kein Test).
+# Auswertung fuer den Vergleich Dosierwaage - StoSiS (Methodenhandbuch Kap. 11, kein Test).
 add_executable(analysis_dosierwaage analysis_dosierwaage.cpp)
 target_link_libraries(analysis_dosierwaage PRIVATE stosis_core)
 set_target_properties(analysis_dosierwaage PROPERTIES FOLDER "Tests")

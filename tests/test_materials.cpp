@@ -1,5 +1,5 @@
-// Materialdatei lesen und Stoffwerte bei T und p auswerten (Arbeitsdokument
-// Kapitel 14.4, Pruefung Schritt 2).
+// Materialdatei lesen und Stoffwerte bei T und p auswerten (Methodenhandbuch
+// Kap. 6).
 #include "Materials.h"
 #include <cstdio>
 #include <cmath>

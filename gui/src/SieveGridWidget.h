@@ -5,9 +5,9 @@
 
 // Reiter "Raster": Groessenraster und Siebsatz auf derselben Achse. Oben die
 // Stuetzstellen des Rasters (Aufloesung von Kontinuum und Anzeige), darunter
-// die Groessenbereiche 1 um * 2^k des Siebsatzes, nach denen im Partikelmodus
-// die Mindestzahl an Karten je Bereich verteilt wird. Beide sind unabhaengig:
-// ein anderes Raster aendert die Karten nicht (Arbeitsdokument 13.21, 13.23).
+// die Groessenbereiche 1 um * 2^k des Siebsatzes, die in der Kartenansicht die
+// Klassen vorgeben. Beide sind unabhaengig:
+// ein anderes Raster aendert die Karten nicht (Methodenhandbuch 4, 9.6).
 class SieveGridWidget : public QWidget
 {
     Q_OBJECT

@@ -33,7 +33,7 @@
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
-    // Debug-Fassung im Titel: sie rechnet etwa sechsmal langsamer (Methoden Kap. 15).
+    // Debug-Fassung im Titel: sie rechnet etwa sechsmal langsamer.
     setWindowTitle(stosis::IsDebugBuild() ? "StoSiS [Debug-Fassung]" : "StoSiS");
     resize(1600, 900); // Startgroesse, falls nicht maximiert gestartet wird
 
@@ -63,7 +63,7 @@ void MainWindow::BuildTestFlowsheet()
     //   Inlet -> Merger -> Splitter -> Outlet (70 %),
     //   Splitter -> Prozess -> Merger (30 %, Rueckfuehrung ueber die
     //   Verzoegerung; der Graph schneidet den Kreis automatisch an einer
-    //   Verbindung auf, Kapitel 6).
+    //   Verbindung auf, Methodenhandbuch Kap. 3).
     // Lage: Der Splitter verzweigt nach oben zum Outlet und nach unten zum
     // Prozess; die Rueckfuehrung laeuft unten herum in den Merger - so
     // kreuzen sich keine Kabel (Merger und Splitter sind 60 hoch, Ports bei
@@ -183,7 +183,7 @@ void MainWindow::SetupCentralArea()
     simulationBar->addWidget(m_runsSpin, 4, 1);
 
     // Kontinuum oder Partikel (Karten) - gilt fuer alle Stroeme der
-    // Simulation (Arbeitsdokument 13.16, 13.20).
+    // Simulation (Methodenhandbuch 9.1, 9.6).
     simulationBar->addWidget(new QLabel("Darstellung:", flowsheetPanel), 5, 0);
     m_representationCombo = new QComboBox(flowsheetPanel);
     m_representationCombo->addItem("Kontinuum", static_cast<int>(stosis::ERepresentation::Continuum));
@@ -194,7 +194,7 @@ void MainWindow::SetupCentralArea()
                                       "schrittweise; bis dahin meldet \"Simulieren\", welche Unit noch fehlt.");
     simulationBar->addWidget(m_representationCombo, 5, 1);
 
-    // Karten je Stromscheibe N (Arbeitsdokument 13.19, 13.26); nur im
+    // Karten je Stromscheibe N (Methodenhandbuch 9.1, 9.3); nur im
     // Partikelmodus wirksam.
     simulationBar->addWidget(new QLabel("Karten je Zeitschritt:", flowsheetPanel), 6, 0);
     m_cardsSpin = new QSpinBox(flowsheetPanel);
@@ -205,7 +205,7 @@ void MainWindow::SetupCentralArea()
                             "Kartendichte fest (Einstellungen, Reiter \"Karten\").");
     m_cardsSpin->setEnabled(false);
     simulationBar->addWidget(m_cardsSpin, 6, 1);
-    // Grenzen je Stromscheibe (Arbeitsdokument 13.24): an jedem Ausgang
+    // Grenzen je Stromscheibe (Methodenhandbuch 9.5): an jedem Ausgang
     // teilen bzw. zusammenlegen; nur im Partikelmodus wirksam.
     m_limitsCheck = new QCheckBox("Grenzen je Stromscheibe", flowsheetPanel);
     m_limitsCheck->setChecked(m_graph.GetCardSettings().sliceLimits);

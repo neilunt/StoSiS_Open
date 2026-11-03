@@ -20,7 +20,7 @@ class AnalysisPlotWidget;
 // Simulationsleiste (Dauer, dt, Laeufe, Simulieren) mit denselben Werten
 // wie im Hauptfenster, damit man ohne Fensterwechsel neu rechnen kann.
 // Rechnet mit SignalAnalysis.h wie das Auswerteprogramm
-// tests/analysis_dosierwaage.cpp (Arbeitsdokument Kapitel 12 und 15).
+// tests/analysis_dosierwaage.cpp (Methodenhandbuch Kap. 10 und 11).
 class AnalysisWindow : public QWidget
 {
     Q_OBJECT

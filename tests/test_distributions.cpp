@@ -1,4 +1,4 @@
-// Groessenverteilungen am Inlet (Arbeitsdokument Kapitel 3).
+// Groessenverteilungen am Inlet (Methodenhandbuch Kap. 5).
 #include "FlowsheetGraph.h"
 #include "SizeDistribution.h"
 #include "TestSupport.h"

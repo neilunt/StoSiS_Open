@@ -6,7 +6,7 @@
 class QPainter;
 
 // Vorschau der Kartendichte fuer eine Beispielverteilung (Einstellungen,
-// Reiter "Karten", Arbeitsdokument 13.26):
+// Reiter "Karten", Methodenhandbuch 9.3):
 //   oben  - Masse q3*, Anzahl q0* und Kartendichte c ueber ln d (je Flaeche 1),
 //           unter d_min zusaetzlich die Anzahl mit echter Groesse (gestrichelt),
 //           darunter jede Karte als Strich (Kartenteppich),

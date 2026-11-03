@@ -13,7 +13,7 @@ class QPainter;
 // Raster erfasst (warnt, wenn die Verteilung abgeschnitten wird oder
 // das Raster zu grob ist). Im Partikelmodus zusaetzlich die Karten des
 // Inlets als Staebe (Hoehe = Masse je Karte) und die Kartenzahl an den
-// Raendern (Kartendichte, Arbeitsdokument 13.26).
+// Raendern (Kartendichte, Methodenhandbuch 9.3).
 class DistributionPreviewWidget : public QWidget
 {
     Q_OBJECT

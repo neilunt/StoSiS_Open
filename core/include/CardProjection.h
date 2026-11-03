@@ -23,7 +23,7 @@ namespace stosis
 
     // Karten -> Groessenraster, damit Heatmap, Kurven, Statistik und das
     // Fenster "Auswertung" im Partikelmodus unveraendert weiterarbeiten
-    // (Arbeitsdokument 13.20). Jede Karte gibt ihren Massenstrom je Stoff
+    // (Methodenhandbuch 9.6). Jede Karte gibt ihren Massenstrom je Stoff
     // an die beiden benachbarten Stuetzstellen ab, aufgeteilt nach ihrer Lage
     // dazwischen (linear in d bzw. in ln d): liegt sie zu 30 % des Wegs von
     // d_i nach d_i+1, gehen 70 % an d_i und 30 % an d_i+1. Geteilt durch das

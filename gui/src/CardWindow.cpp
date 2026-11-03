@@ -275,7 +275,7 @@ void CardWindow::UpdateViews()
                                     std::move(refSizes), std::move(refDensity), refLabel);
     m_classes->SetClasses(std::move(classes), stosis::CInletUnit::kMinCards);
 
-    // Soll je Klasse nach der Kartendichte (13.26): Kartenzahl x Summe der
+    // Soll je Klasse nach der Kartendichte (Methodenhandbuch 9.3): Kartenzahl x Summe der
     // Anteile der Karten in der Klasse. Traegt jede Karte denselben Anteil,
     // stehen die Balken genau auf der Linie.
     const stosis::SCardSettings& settings = m_graph->GetCardSettings();

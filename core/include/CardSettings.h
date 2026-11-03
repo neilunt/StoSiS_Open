@@ -5,7 +5,7 @@
 namespace stosis
 {
     // Wie Masse und Partikelzahl zur Kartendichte gemittelt werden
-    // (Arbeitsdokument 13.26); f = SCardSettings::numberShare.
+    // (Methodenhandbuch 9.3); f = SCardSettings::numberShare.
     enum class ECardDensityRule
     {
         Sum,      // (1 - f) * Masse + f * Anzahl
@@ -27,8 +27,8 @@ namespace stosis
         }
     }
 
-    // Einstellungen der Karten im Partikelmodus (Arbeitsdokument 13.19,
-    // 13.26).
+    // Einstellungen der Karten im Partikelmodus (Methodenhandbuch 9.3,
+    // 9.5).
     struct SCardSettings
     {
         size_t cardsPerSlice = 2000; // N: Karten je Stromscheibe (je Inlet und Zeitschritt)
@@ -47,7 +47,7 @@ namespace stosis
         double rangeAnchor = 1e-6;   // m (1 um), unabhaengig vom Raster
         // Speichergrenze der Kartenansicht: Karten von Lauf 1, alle Stroeme zusammen.
         size_t historyBudgetBytes = size_t(256) << 20;
-        // Noch nicht umgesetzt: Vorrat = 10 x N (Kap. 15).
+        // Noch nicht umgesetzt: Vorrat = 10 x N.
     };
 
     // Kleinstes gamma in der Oberflaeche: Darunter landen merklich Karten in

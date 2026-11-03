@@ -1,6 +1,6 @@
 // Karten im Strom und ihre Umrechnung aufs Groessenraster (Partikelmodus,
-// Arbeitsdokument 13.20); Karten am Inlet in Streifen gleicher Flaeche
-// unter der Kartendichte (13.26).
+// Methodenhandbuch 9.6); Karten am Inlet in Streifen gleicher Flaeche
+// unter der Kartendichte (9.3).
 #include "FlowsheetGraph.h"
 #include "CardProjection.h"
 #include "CardDistribution.h"
@@ -277,7 +277,7 @@ int main()
         }
     }
 
-    // 9) Beispiel aus dem Arbeitsdokument 13.26: Log-Normal d50 = 100 um,
+    // 9) Beispiel aus dem Methodenhandbuch 9.3 (Abbildung 9.3): Log-Normal d50 = 100 um,
     //    sigma_ln = 0,5, 1000 Karten. Vergleichswerte aus einer unabhaengigen
     //    Rechnung mit feiner Tabelle (Karten unter 20 um / ueber 300 um,
     //    schwerste Karte, meiste Partikel je Karte).

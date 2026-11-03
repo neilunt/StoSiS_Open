@@ -1,5 +1,5 @@
 // Stochastischer Splitter (Ornstein-Uhlenbeck-Prozess) und Zufallszahlen
-// (Arbeitsdokument Kapitel 8 und 9.4). Lange Einzellaeufe mit festem
+// (Methodenhandbuch 7.2 und Kap. 8). Lange Einzellaeufe mit festem
 // Seed; Toleranzen etwa 3-5 Standardfehler bei T/(2 tau) unabhaengigen
 // Abschnitten.
 #include "FlowsheetGraph.h"

@@ -1,5 +1,5 @@
 // Mehrere Laeufe und Statistik, Validierung gegen die analytische Loesung
-// (Arbeitsdokument Kapitel 10 und 11).
+// (Methodenhandbuch Kap. 8).
 //
 // Inlet (konstant m) -> Splitter (Ausgang 1: mu, sigma, tau) -> A, Rest -> B.
 // Masse an A ueber [0, T]:

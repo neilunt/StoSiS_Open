@@ -23,7 +23,7 @@ namespace stosis
     };
 
     // Ohne Optimierung uebersetzt (Debug-Fassung)? Im Partikelmodus rechnet
-    // sie etwa sechsmal langsamer als die Release-Fassung (Methoden Kap. 15).
+    // sie etwa sechsmal langsamer als die Release-Fassung.
     inline bool IsDebugBuild()
     {
 #ifdef NDEBUG

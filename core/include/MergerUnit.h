@@ -44,7 +44,7 @@ namespace stosis
                 if (!input)
                     continue;
                 // Partikelmodus: Karten aneinanderhaengen (zusammengelegt wird
-                // erst mit den Grenzen je Stromscheibe, Arbeitsdokument 13.19).
+                // erst mit den Grenzen je Stromscheibe, Methodenhandbuch 9.5).
                 if (out.HasCards())
                     out.AppendCards(*input);
                 else

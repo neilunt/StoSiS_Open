@@ -11,7 +11,7 @@ namespace stosis
     // Auswertung schwankender Zeitreihen (z.B. Massenstrom eines Ausgangs je
     // Zeitschritt) wie bei Messungen ueblich: Mittel ueber Zeitfenster,
     // optionaler Ausreisserfilter, Kennzahlen, Histogramm und
-    // Wahrscheinlichkeitsnetz (Arbeitsdokument Kapitel 12 und 15).
+    // Wahrscheinlichkeitsnetz (Methodenhandbuch Kap. 10 und 11).
     // Genutzt vom Fenster "Auswertung" der Oberflaeche und vom
     // Auswerteprogramm tests/analysis_dosierwaage.cpp - beide liefern damit
     // dieselben Zahlen.

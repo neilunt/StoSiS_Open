@@ -59,7 +59,7 @@ namespace stosis
     // als Dichte q(d) definiert (Integral ueber alle d = 1), also als
     // MASSEN-Dichte, weil das Inlet einen Massenstrom liefert. Standard ist
     // Log-Normal; die Normalverteilung ist waehlbar, aber mit Warnung
-    // (GetDistributionWarning, Arbeitsdokument Kap. 3). Die Nummern
+    // (GetDistributionWarning, Methodenhandbuch Kap. 5). Die Nummern
     // bleiben fest (neue Typen hinten anfuegen).
     enum class EDistributionType
     {

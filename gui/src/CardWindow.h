@@ -18,7 +18,7 @@ class CardPlotWidget;
 // Verteilung ueber der Zeit und Kartenzahl je Zeitschritt;
 // "Gewichte": Groesse gegen Massenstrom je Karte; "Tabelle": alle
 // Karten mit CSV-Export. Daten aus CFlowsheetGraph::GetCardHistory
-// (Arbeitsdokument 13.23).
+// (Methodenhandbuch 9.6).
 class CardWindow : public QWidget
 {
     Q_OBJECT

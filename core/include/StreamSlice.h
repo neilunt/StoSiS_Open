@@ -7,8 +7,7 @@
 namespace stosis
 {
     // Wie das Material in den Stroemen dargestellt wird - gilt fuer die ganze
-    // Simulation, ab dem Inlet (Arbeitsdokument 13.16: "einmal Partikel
-    // heisst ueberall Partikel"):
+    // Simulation, ab dem Inlet (Methodenhandbuch 9.1):
     //   Continuum: Massenstromdichte je Stoff auf dem Groessenraster,
     //   Particles: Karten (gewichtete MC-Partikel) mit freier Groesse.
     enum class ERepresentation
@@ -40,7 +39,7 @@ namespace stosis
     // dahin hat jede Karte genau einen Stoff. Die Partikelzahl (das
     // "Gewicht" der Karte) folgt aus Masse, Groesse und Dichte und wird erst
     // fuer die Koagulation gebraucht. Das Alter einer Karte merkt sich erst
-    // der Vorrat einer Unit (13.19), im Strom haben alle Karten dieselbe Zeit.
+    // der Vorrat einer Unit, im Strom haben alle Karten dieselbe Zeit.
     class CStreamSlice
     {
     public:
@@ -115,7 +114,7 @@ namespace stosis
 
         // this = other * factor (z.B. Splitter-Anteil); T und p bleiben.
         // Nicht fuer Karten: jede Karte zu skalieren waere das "Kopieren"
-        // (13.18) - im Partikelmodus verteilt der Splitter die Karten mit dem
+        // (Methodenhandbuch 9.4) - im Partikelmodus verteilt der Splitter die Karten mit dem
         // Konto-Verfahren.
         void AssignScaled(const CStreamSlice& other, double factor)
         {

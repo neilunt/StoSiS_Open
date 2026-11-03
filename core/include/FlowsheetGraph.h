@@ -621,7 +621,7 @@ namespace stosis
             EndLog(1, 1);
         }
 
-        // Textprotokoll und Laufzeiten der letzten Simulation (Methoden Kap. 12).
+        // Textprotokoll und Laufzeiten der letzten Simulation (Methodenhandbuch Kap. 10).
         const CSimulationLog& GetSimulationLog() const { return m_log; }
         const SSimulationTiming& GetSimulationTiming() const { return m_timing; }
         // Eine Zeile von aussen anhaengen, z.B. die Zeit fuers Neuzeichnen.
@@ -812,7 +812,7 @@ namespace stosis
                     if (rn.unit)
                         rn.unit->Step(context, rn.inputs, rn.current);
                     const double t1 = clock.GetSeconds();
-                    // Grenzen je Stromscheibe an jedem Ausgang (13.24): teilen
+                    // Grenzen je Stromscheibe an jedem Ausgang (Methodenhandbuch 9.5): teilen
                     // bzw. zusammenlegen, bevor der naechste Knoten die Karten sieht.
                     if (limits && !(rn.unit && rn.unit->OutputsWithinCardLimits()))
                         for (CStreamSlice& out : rn.current)
@@ -1013,8 +1013,8 @@ namespace stosis
             for (const std::string& name : names)
                 list += (list.empty() ? "" : ", ") + name;
             m_warnings.insert("Partikelmodus: Simulation nicht gestartet. Noch ohne Karten: " + list +
-                ". Die Units lernen Karten schrittweise (Arbeitsdokument Kap. 15); "
-                "bis dahin Darstellung \"Kontinuum\" waehlen.");
+                ". Welche Units Karten verarbeiten, steht im Methodenhandbuch (Kap. 1, Umfang); "
+                "fuer dieses Flowsheet Darstellung \"Kontinuum\" waehlen.");
             return false;
         }
 

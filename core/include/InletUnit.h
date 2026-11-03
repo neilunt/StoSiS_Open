@@ -53,7 +53,7 @@ namespace stosis
     //
     // Im Partikelmodus liefert das Inlet in jedem Schritt N Karten in N
     // Streifen gleicher Flaeche unter der Kartendichte (PlaceCardsAtQuantiles,
-    // Arbeitsdokument 13.26). Groessen und Massenanteile stehen einmal
+    // Methodenhandbuch 9.3). Groessen und Massenanteile stehen einmal
     // fest, jeder Schritt skaliert nur mit dem Massenstrom - die Karten
     // tragen ihn exakt.
     class CInletUnit : public IFlowsheetUnit
@@ -206,7 +206,7 @@ namespace stosis
         }
 
         // Darunter warnen Inlet (Raender) und Kartenansicht (Klassen):
-        // Unsicherheit etwa 1/sqrt(n), 13.19.
+        // Unsicherheit etwa 1/sqrt(n) (Methodenhandbuch 9.3).
         static constexpr size_t kMinCards = 10;
 
         // Meldet, wenn mehr als 0,1 % der Verteilung unter d_min oder ueber

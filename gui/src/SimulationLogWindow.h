@@ -11,7 +11,7 @@ class QTableWidget;
 // wann begonnen und beendet hat - Laeufe, Initialisierung und Zeitschritte
 // der Units, Statistik (Textprotokoll) - und wie lange jede Unit gerechnet
 // hat (Tabelle). Daten aus CFlowsheetGraph::GetSimulationLog und
-// GetSimulationTiming (Arbeitsdokument Kap. 12).
+// GetSimulationTiming (Methodenhandbuch Kap. 10).
 class SimulationLogWindow : public QWidget
 {
     Q_OBJECT

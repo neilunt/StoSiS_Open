@@ -1,5 +1,5 @@
 // Rueckfuehrungen: Aufschneiden von Kreisen, stationaere Werte,
-// Einschwingen und Massenbilanz (Arbeitsdokument Kapitel 6.3).
+// Einschwingen und Massenbilanz (Methodenhandbuch Kap. 3).
 #include "FlowsheetGraph.h"
 #include "TestSupport.h"
 

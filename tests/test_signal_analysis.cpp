@@ -1,5 +1,5 @@
 // Auswertung schwankender Zeitreihen (SignalAnalysis.h, Fenster
-// "Auswertung" der Oberflaeche; Arbeitsdokument Kapitel 12 und 15):
+// "Auswertung" der Oberflaeche; Methodenhandbuch Kap. 10 und 11):
 // Fenstermittel, Filter, Kennzahlen, Histogramm, Normalquantil und der
 // Dosierwaagen-Vergleich ueber denselben Weg wie die Oberflaeche.
 #include "FlowsheetGraph.h"
@@ -75,7 +75,7 @@ int main()
             && NearAbs(NormalQuantile(0.001), -3.090232306, 1e-8), "Normalquantil 0,975 / 0,5 / 0,001");
     }
 
-    // F: Dosierwaage (Methoden Kap. 15, Abb. Val_1) ueber denselben Weg wie die
+    // F: Dosierwaage (Methodenhandbuch Kap. 11) ueber denselben Weg wie die
     //    Oberflaeche: Laufstatistik des Outlets, 1-s-Fenster, Filter. Lauf 1
     //    nutzt genau den Seed 2012 und ist damit der gezeigte Lauf aus
     //    tests/analysis_dosierwaage.cpp (69,423 / 0,5342 / 1798 Werte).

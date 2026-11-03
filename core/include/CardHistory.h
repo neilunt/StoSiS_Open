@@ -7,8 +7,8 @@
 
 namespace stosis
 {
-    // Karten eines Stroms ueber die Zeit fuer die Kartenansicht (Methoden
-    // Kap. 15): die Kartenzahl in jedem Zeitschritt und die Karten selbst
+    // Karten eines Stroms ueber die Zeit fuer die Kartenansicht (Methodenhandbuch
+    // 9.6): die Kartenzahl in jedem Zeitschritt und die Karten selbst
     // (Groesse, Massenstrom je Stoff). Gespeichert wird nur ein Lauf (Lauf 1).
     // Damit der Speicher begrenzt bleibt, gibt es eine Obergrenze: Wird sie
     // ueberschritten, bleibt nur noch jeder zweite gespeicherte Schritt

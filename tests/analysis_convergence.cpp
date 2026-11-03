@@ -1,6 +1,6 @@
 // Auswertung (kein automatischer Test): Konvergenz der Monte-Carlo-
 // Schaetzung fuer Abbildung docs/abbildungen/Konvergenz_MonteCarlo.svg
-// (Arbeitsdokument Kapitel 11.1). Gibt die Daten als CSV aus, wie in
+// (Methodenhandbuch Kap. 8). Gibt die Daten als CSV aus, wie in
 // docs/abbildungen/Konvergenz_MonteCarlo_Daten.csv:
 //     analysis_convergence > Konvergenz_MonteCarlo_Daten.csv
 // Laufzeit in Release etwa eine Minute.
