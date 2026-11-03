@@ -30,12 +30,12 @@ foreach(name IN LISTS STOSIS_TESTS)
     add_test(NAME ${name} COMMAND ${name})
 endforeach()
 
-# Auswertung fuer die Konvergenz-Abbildung im Methoden-Dokument (kein Test).
+# Auswertung fuer die Konvergenz-Abbildung im Arbeitsdokument (kein Test).
 add_executable(analysis_convergence analysis_convergence.cpp)
 target_link_libraries(analysis_convergence PRIVATE stosis_core)
 set_target_properties(analysis_convergence PROPERTIES FOLDER "Tests")
 
-# Auswertung fuer den Vergleich Dosierwaage - StoSiS (Methoden-Dokument Kap. 15, kein Test).
+# Auswertung fuer den Vergleich Dosierwaage - StoSiS (Arbeitsdokument Kap. 15, kein Test).
 add_executable(analysis_dosierwaage analysis_dosierwaage.cpp)
 target_link_libraries(analysis_dosierwaage PRIVATE stosis_core)
 set_target_properties(analysis_dosierwaage PROPERTIES FOLDER "Tests")

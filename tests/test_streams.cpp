@@ -1,4 +1,4 @@
-// Stroeme mit Stoffen, Temperatur und Druck (Methoden-Dokument Kapitel 14.4,
+// Stroeme mit Stoffen, Temperatur und Druck (Arbeitsdokument Kapitel 14.4,
 // Pruefung Schritt 3).
 #include "FlowsheetGraph.h"
 #include <cstdio>

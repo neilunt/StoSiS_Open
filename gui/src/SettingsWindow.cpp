@@ -139,7 +139,7 @@ QWidget* SettingsWindow::CreateGridTab()
 
     layout->addLayout(form);
 
-    // Groessenraster und Siebsatz auf derselben Achse (Methoden-Dokument 13.23).
+    // Groessenraster und Siebsatz auf derselben Achse (Arbeitsdokument 13.23).
     auto* sieveGroup = new QGroupBox("Groessenraster und Siebsatz", tab);
     auto* sieveLayout = new QVBoxLayout(sieveGroup);
     m_sieveWidget = new SieveGridWidget(sieveGroup);
@@ -156,7 +156,7 @@ QWidget* SettingsWindow::CreateGridTab()
     sieveLayout->addWidget(sieveHint);
     layout->addWidget(sieveGroup);
 
-    // Richtwerte (Methoden-Dokument 2.6). "Einsetzen" fuellt nur die Felder,
+    // Richtwerte (Arbeitsdokument 2.6). "Einsetzen" fuellt nur die Felder,
     // uebernommen wird wie immer erst mit "Uebernehmen".
     struct SSuggestion
     {
@@ -242,7 +242,7 @@ QWidget* SettingsWindow::CreateCardTab()
     auto* tab = new QWidget(scroll);
     auto* layout = new QVBoxLayout(tab);
 
-    // Regel, f und gamma (Methoden-Dokument 13.26).
+    // Regel, f und gamma (Arbeitsdokument 13.26).
     auto* ruleGroup = new QGroupBox("Kartendichte im Partikelmodus", tab);
     auto* form = new QFormLayout(ruleGroup);
     m_cardRuleCombo = new QComboBox(ruleGroup);

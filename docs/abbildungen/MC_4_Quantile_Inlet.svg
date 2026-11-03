@@ -13,7 +13,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 .arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
 </style>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
-<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">③ Quantil-Platzierung am Inlet: fünf Rechenpartikel in gleich schweren Massenbändern</text>
+<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">⑤ Quantil-Platzierung am Inlet: fünf Rechenpartikel in gleich schweren Massenbändern</text>
 <g transform="translate(0,30)">
 <rect x="80" y="252" width="520" height="48" fill="#7F77DD" fill-opacity="0.1"/>
 <rect x="80" y="156" width="520" height="48" fill="#7F77DD" fill-opacity="0.1"/>

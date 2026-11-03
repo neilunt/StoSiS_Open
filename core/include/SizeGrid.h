@@ -24,7 +24,7 @@ namespace stosis
     //   Linear:         d_i = sizeMin + i * Delta d
     //   Logarithmisch:  d_i = sizeMin * r^i,  r = (sizeMax / sizeMin)^(1 / (numClasses - 1))
     // Das logarithmische Raster hat gleich viele Stuetzstellen je Dekade und
-    // braucht sizeMin > 0 (Methoden-Dokument Kapitel 2.5).
+    // braucht sizeMin > 0 (Arbeitsdokument Kapitel 2.5).
     struct SSizeGrid
     {
         ESizeGridType type = ESizeGridType::Logarithmic;

@@ -16,5 +16,5 @@ CMakeUserPresets.json
 *.ilk
 *.exe
 
-# Aus docs/StoSiS_Methoden.html erzeugte PDFs (bei Bedarf selbst drucken)
+# Aus den HTML-Dokumenten in docs/ erzeugte PDFs (bei Bedarf selbst drucken)
 docs/*.pdf

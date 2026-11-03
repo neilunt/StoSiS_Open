@@ -9,7 +9,7 @@
 namespace stosis
 {
     // Verteilungen direkt aus den Karten eines Zeitpunkts (Kartenansicht,
-    // Methoden-Dokument 13.23). Feine Klassen: jeder Groessenbereich des
+    // Arbeitsdokument 13.23). Feine Klassen: jeder Groessenbereich des
     // Siebsatzes wird in perRange gleich breite Teile in ln d geteilt.
     // Dichte q3*(ln d) = Massenanteil der Klasse / Klassenbreite in ln d;
     // damit sind Klassen verschiedener Breite und die Kurve vom

@@ -1,5 +1,5 @@
 // Laufzeitprotokoll, Fortschritt je Zeitschritt und Kartenspeicher fuer die
-// Kartenansicht (Methoden-Dokument Kap. 12, 13.23).
+// Kartenansicht (Arbeitsdokument Kap. 12, 13.23).
 #include "FlowsheetGraph.h"
 #include "CardHistory.h"
 #include <cmath>

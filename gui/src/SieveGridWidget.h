@@ -7,7 +7,7 @@
 // Stuetzstellen des Rasters (Aufloesung von Kontinuum und Anzeige), darunter
 // die Groessenbereiche 1 um * 2^k des Siebsatzes, nach denen im Partikelmodus
 // die Mindestzahl an Karten je Bereich verteilt wird. Beide sind unabhaengig:
-// ein anderes Raster aendert die Karten nicht (Methoden-Dokument 13.21, 13.23).
+// ein anderes Raster aendert die Karten nicht (Arbeitsdokument 13.21, 13.23).
 class SieveGridWidget : public QWidget
 {
     Q_OBJECT

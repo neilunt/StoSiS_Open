@@ -53,7 +53,7 @@ namespace stosis
     //
     // Im Partikelmodus liefert das Inlet in jedem Schritt N Karten in N
     // Streifen gleicher Flaeche unter der Kartendichte (PlaceCardsAtQuantiles,
-    // Methoden-Dokument 13.26). Groessen und Massenanteile stehen einmal
+    // Arbeitsdokument 13.26). Groessen und Massenanteile stehen einmal
     // fest, jeder Schritt skaliert nur mit dem Massenstrom - die Karten
     // tragen ihn exakt.
     class CInletUnit : public IFlowsheetUnit

@@ -1,7 +1,7 @@
 // Auswertung (kein automatischer Test): Vergleich einer Dosierwaage
 // (Engisch & Muzzio 2012, Powder Technology 228, 395-403, Abb. 10a) mit
 // StoSiS fuer Abbildung docs/abbildungen/Val_1_Dosierwaage_StoSiS.svg
-// (Methoden-Dokument Kapitel 15). Gibt die Daten als CSV aus, wie in
+// (Arbeitsdokument Kapitel 15). Gibt die Daten als CSV aus, wie in
 // docs/abbildungen/Val_1_Daten.csv:
 //     analysis_dosierwaage > Val_1_Daten.csv
 // Mit Argument "zeitreihe" stattdessen den Massenstrom des gezeigten Laufs

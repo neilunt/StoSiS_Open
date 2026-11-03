@@ -1,5 +1,5 @@
 // Auswertung schwankender Zeitreihen (SignalAnalysis.h, Fenster
-// "Auswertung" der Oberflaeche; Methoden-Dokument Kapitel 12 und 15):
+// "Auswertung" der Oberflaeche; Arbeitsdokument Kapitel 12 und 15):
 // Fenstermittel, Filter, Kennzahlen, Histogramm, Normalquantil und der
 // Dosierwaagen-Vergleich ueber denselben Weg wie die Oberflaeche.
 #include "FlowsheetGraph.h"

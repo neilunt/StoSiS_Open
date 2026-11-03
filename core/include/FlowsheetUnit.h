@@ -31,7 +31,7 @@ namespace stosis
         std::uint64_t randomSeed = 1;
 
         // Kontinuum oder Partikel (Karten) - fuer alle Stroeme dieser
-        // Simulation (Methoden-Dokument 13.16, 13.20). Das Groessenraster
+        // Simulation (Arbeitsdokument 13.16, 13.20). Das Groessenraster
         // oben gilt auch im Partikelmodus: darauf werden die Karten fuer
         // Anzeige und Auswertung umgerechnet.
         ERepresentation representation = ERepresentation::Continuum;
@@ -130,7 +130,7 @@ namespace stosis
 
         // Kann die Unit im Partikelmodus rechnen, also Karten lesen und
         // schreiben? Welche Units es koennen, steht im
-        // Methoden-Dokument (Kap. 15). Solange eine Unit im Flowsheet es
+        // Arbeitsdokument (Kap. 15). Solange eine Unit im Flowsheet es
         // nicht kann, startet der Graph keine Simulation im Partikelmodus und
         // sagt, woran es liegt - statt still falsch zu rechnen.
         virtual bool SupportsParticles() const { return false; }
@@ -157,7 +157,7 @@ namespace stosis
         // Inlet: Teil der Verteilung liegt ausserhalb). Der Reiter "Raster"
         // ruft das schon vor der Simulation mit den eingegebenen Werten auf.
         // Spaeter melden hier auch Keimbildung (Keimgroesse) und Bruch
-        // (kleinste Bruchstuecke) ihren Bedarf (Methoden-Dokument 2.6).
+        // (kleinste Bruchstuecke) ihren Bedarf (Arbeitsdokument 2.6).
         virtual std::vector<std::string> CheckSizeGrid(const SSizeGrid& /*sizes*/) const { return {}; }
     };
 }

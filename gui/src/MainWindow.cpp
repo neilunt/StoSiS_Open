@@ -183,7 +183,7 @@ void MainWindow::SetupCentralArea()
     simulationBar->addWidget(m_runsSpin, 4, 1);
 
     // Kontinuum oder Partikel (Karten) - gilt fuer alle Stroeme der
-    // Simulation (Methoden-Dokument 13.16, 13.20).
+    // Simulation (Arbeitsdokument 13.16, 13.20).
     simulationBar->addWidget(new QLabel("Darstellung:", flowsheetPanel), 5, 0);
     m_representationCombo = new QComboBox(flowsheetPanel);
     m_representationCombo->addItem("Kontinuum", static_cast<int>(stosis::ERepresentation::Continuum));
@@ -194,7 +194,7 @@ void MainWindow::SetupCentralArea()
                                       "schrittweise; bis dahin meldet \"Simulieren\", welche Unit noch fehlt.");
     simulationBar->addWidget(m_representationCombo, 5, 1);
 
-    // Karten je Stromscheibe N (Methoden-Dokument 13.19, 13.26); nur im
+    // Karten je Stromscheibe N (Arbeitsdokument 13.19, 13.26); nur im
     // Partikelmodus wirksam.
     simulationBar->addWidget(new QLabel("Karten je Zeitschritt:", flowsheetPanel), 6, 0);
     m_cardsSpin = new QSpinBox(flowsheetPanel);
@@ -205,7 +205,7 @@ void MainWindow::SetupCentralArea()
                             "Kartendichte fest (Einstellungen, Reiter \"Karten\").");
     m_cardsSpin->setEnabled(false);
     simulationBar->addWidget(m_cardsSpin, 6, 1);
-    // Grenzen je Stromscheibe (Methoden-Dokument 13.24): an jedem Ausgang
+    // Grenzen je Stromscheibe (Arbeitsdokument 13.24): an jedem Ausgang
     // teilen bzw. zusammenlegen; nur im Partikelmodus wirksam.
     m_limitsCheck = new QCheckBox("Grenzen je Stromscheibe", flowsheetPanel);
     m_limitsCheck->setChecked(m_graph.GetCardSettings().sliceLimits);

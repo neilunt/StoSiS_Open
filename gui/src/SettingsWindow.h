@@ -29,7 +29,7 @@ class CardDensityPreviewWidget;
 //   "Karten": Kartendichte im Partikelmodus (Regel, Anteil Anzahl f,
 //             Exponent gamma) mit gesetzter Formel, Vorschau fuer eine
 //             Beispielverteilung und Legende mit Empfehlungen
-//             (Methoden-Dokument 13.26).
+//             (Arbeitsdokument 13.26).
 //   "Materialien": Stoffdaten aus data/Materialien.json (nur ansehen).
 // "Uebernehmen" schreibt ueberall nur Werte - simuliert wird
 // ausschliesslich ueber "Simulieren" im Hauptfenster.

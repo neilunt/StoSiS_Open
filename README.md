@@ -5,8 +5,9 @@ stochastische Lösung mit gewichteten Monte-Carlo-Partikeln, beschleunigt auf
 GPUs (CUDA, Großrechner amplitUDE mit NVIDIA H100) und kompatibel zu
 Dyssol Open.
 
-Methoden, Designentscheidungen und Validierungen stehen ausführlich in
-[`docs/StoSiS_Methoden.html`](docs/StoSiS_Methoden.html). Diese Datei gibt nur
+Modell, Annahmen und Verfahren beschreibt das Methodenhandbuch
+[`docs/StoSiS_Methodenhandbuch.html`](docs/StoSiS_Methodenhandbuch.html), als PDF
+[`docs/StoSiS_Methodenhandbuch.pdf`](docs/StoSiS_Methodenhandbuch.pdf). Diese Datei gibt nur
 einen Überblick.
 
 ## Funktionsumfang
@@ -24,23 +25,26 @@ Umgesetzt:
   linear; intern SI-Einheiten, Anzeige in µm.
 - **Rechenablauf:** Makroschritte, Units der Reihe nach (Gauß-Seidel),
   Rückführungen werden an einer Verbindung aufgeschnitten.
-- **Mehrere Läufe:** globaler Seed mit eigenem Zufallsstrom je Unit,
+- **Mehrere Läufe:** globaler Seed mit separatem Zufallsstrom je Unit,
   Mittelwert und Streuung nach Welford, Bänder und Perzentile; validiert
   gegen eine analytische Lösung.
 - **Auswertung schwankender Ströme:** Fenstermittel, Ausreißerfilter,
   Histogramm, Wahrscheinlichkeitsnetz und Zeitverlauf; Vergleich mit
   Messdaten einer Dosierwaage.
-- **Materialien:** eigene Materialdatei [`data/Materialien.json`](data/README.md)
+- **Materialien:** Materialdatei [`data/Materialien.json`](data/README.md)
   (18 Stoffe, Startinhalt aus Dyssol, jeder Wert mit Quelle und Prüfstatus).
   Ströme tragen je Stoff und Größenklasse eine Massenstromdichte sowie T
   und p; beim Mischen gilt die Energiebilanz.
-- **Partikelmodus (im Aufbau):** Ströme tragen gewichtete MC-Partikel
-  („Karten“); das Inlet erzeugt sie an Quantilen mit Mindestzahl je
-  Größenbereich, für die Anzeige werden sie aufs Raster umgerechnet.
+- **Partikelmodus:** Ströme tragen gewichtete Monte-Carlo-Partikel
+  („Karten“); Inlet, Outlet, Merger und Splitter rechnen damit. Das Inlet
+  verteilt die Karten nach einer einstellbaren Kartendichte aus Masse und
+  Anzahl, der Splitter teilt sie nach einem Konto-Verfahren auf, Grenzen je
+  Stromscheibe halten die Kartenzahl klein; für die Anzeige werden die Karten
+  aufs Raster umgerechnet.
 
-Noch nicht umgesetzt (Planung in Kapitel 13 bis 15 des Methoden-Dokuments):
+Noch nicht umgesetzt:
 
-- Partikelmodus für Merger, Splitter und Units mit Hold-up; Koagulator mit
+- Partikelmodus für Units mit Hold-up (Verzögerung); Koagulator mit
   Koagulation, Bruch, Wachstum und Keimbildung
 - Flowsheets speichern und laden (geplant JSON); Import von Dyssol-Dateien
   (`.dflw`, Format HDF5)
@@ -61,7 +65,7 @@ StoSiS/
 │   └── third_party/nlohmann_json   JSON-Bibliothek (MIT)
 ├── gui/src/       stosis_gui: Oberfläche (Qt 6 Widgets), Programm StoSiS.exe
 ├── data/          Materialdatei mit Anleitung und Dyssol-Lizenzhinweis
-├── docs/          Methoden-Dokument, Abbildungen
+├── docs/          Methodenhandbuch (HTML und PDF), Abbildungen
 ├── tests/         automatische Tests des Rechenkerns (CTest)
 ├── tools/         dmdb_to_json.pl (Umwandlung der Dyssol-Materialdatenbank)
 └── CMakeLists.txt
@@ -117,7 +121,7 @@ Kit (msvc2022_64) installiert ist.
 
 ## Tests
 
-Die Prüfungen aus dem Methoden-Dokument liegen als Testprogramme in
+Die Prüfungen aus dem Methodenhandbuch liegen als Testprogramme in
 `tests/` (Größenverteilungen, Graph und Rückführungen, OU-Splitter,
 Mehrfachläufe gegen die analytische Lösung, Materialien, Ströme mit Stoff/T/p
 und ein Regressionstest über alle Ergebnisse). Ausführen nach dem Bauen:
@@ -129,8 +133,8 @@ ctest --test-dir build -C Release --output-on-failure
 
 Stochastische Tests nutzen feste Seeds und sind reproduzierbar. Ändert sich
 die Rechnung bewusst, gibt `test_regression --update` neue Referenzwerte aus.
-`analysis_convergence` erzeugt die Daten der Konvergenz-Abbildung im
-Methoden-Dokument neu. Mit `-DSTOSIS_BUILD_TESTS=OFF` lassen sich die Tests
+`analysis_convergence` erzeugt die Daten zur Konvergenz über die Zahl der
+Läufe neu. Mit `-DSTOSIS_BUILD_TESTS=OFF` lassen sich die Tests
 abschalten.
 
 ## Lizenzen

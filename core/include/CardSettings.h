@@ -5,7 +5,7 @@
 namespace stosis
 {
     // Wie Masse und Partikelzahl zur Kartendichte gemittelt werden
-    // (Methoden-Dokument 13.26); f = SCardSettings::numberShare.
+    // (Arbeitsdokument 13.26); f = SCardSettings::numberShare.
     enum class ECardDensityRule
     {
         Sum,      // (1 - f) * Masse + f * Anzahl
@@ -27,7 +27,7 @@ namespace stosis
         }
     }
 
-    // Einstellungen der Karten im Partikelmodus (Methoden-Dokument 13.19,
+    // Einstellungen der Karten im Partikelmodus (Arbeitsdokument 13.19,
     // 13.26).
     struct SCardSettings
     {

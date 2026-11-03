@@ -16,7 +16,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_subdirectory(core)
 add_subdirectory(gui)
 
-# Weitergabe ohne Qt, Visual Studio, CUDA und CMake (Methoden-Dokument
+# Weitergabe ohne Qt, Visual Studio, CUDA und CMake (Arbeitsdokument
 # Kap. 15): Nach dem Bauen legt
 #     cmake --build build --config Release --target package
 # in build/ zwei Pakete an:

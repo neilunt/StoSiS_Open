@@ -7,7 +7,7 @@
 namespace stosis
 {
     // Wie das Material in den Stroemen dargestellt wird - gilt fuer die ganze
-    // Simulation, ab dem Inlet (Methoden-Dokument 13.16: "einmal Partikel
+    // Simulation, ab dem Inlet (Arbeitsdokument 13.16: "einmal Partikel
     // heisst ueberall Partikel"):
     //   Continuum: Massenstromdichte je Stoff auf dem Groessenraster,
     //   Particles: Karten (gewichtete MC-Partikel) mit freier Groesse.

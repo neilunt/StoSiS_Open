@@ -1,4 +1,4 @@
-// Logarithmisches Groessenraster und SI-Einheiten (Methoden-Dokument
+// Logarithmisches Groessenraster und SI-Einheiten (Arbeitsdokument
 // Kapitel 2.5 und 2.6).
 #include "FlowsheetGraph.h"
 #include "SizeDistribution.h"

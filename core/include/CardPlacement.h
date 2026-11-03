@@ -46,7 +46,7 @@ namespace stosis
         size_t coarseCards = 0;
     };
 
-    // Karten fuer eine Massenverteilung, z.B. am Inlet (Methoden-Dokument 13.26):
+    // Karten fuer eine Massenverteilung, z.B. am Inlet (Arbeitsdokument 13.26):
     //  1) Zellen in x = ln d: je 2048 Punkte gleichmaessig in ln d und an
     //     Quantilen der Masse, dazu countMin. Die Masse je Zelle folgt exakt
     //     aus Q3; die Partikelzahl ~ Masse / d^3, unter countMin wie bei

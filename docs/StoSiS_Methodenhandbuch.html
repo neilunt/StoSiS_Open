@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StoSiS – Methodenhandbuch</title>
+<style>
+  :root { --text: #1f2328; --muted: #5b6470; --line: #dfe3e8; --bg: #ffffff; --panel: #f6f7f9; --accent: #2563eb; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 17px/1.62 "Segoe UI", system-ui, -apple-system, sans-serif; }
+  main { max-width: 49rem; margin: 0 auto; padding: 2.75rem 1.25rem 4rem; }
+  h1 { font-size: 2.1rem; line-height: 1.2; margin: 0 0 .35rem; }
+  .sub { color: var(--muted); margin: 0 0 1.6rem; font-size: 1.05rem; }
+  h2 { font-size: 1.45rem; line-height: 1.3; margin: 3rem 0 .6rem; padding-top: .4rem; border-top: 1px solid var(--line); }
+  h2 .nr, h3 .nr { color: var(--muted); font-weight: 600; margin-right: .4rem; }
+  h3 { font-size: 1.12rem; margin: 1.8rem 0 .4rem; }
+  h4 { font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+       margin: 1.2rem 0 .3rem; }
+  p { margin: 0 0 .85rem; }
+  ul { margin: 0 0 .9rem; padding-left: 1.3rem; }
+  li { margin: .15rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-size: .9em; }
+
+  nav.inhalt { background: var(--panel); border-radius: .5rem; padding: .9rem 1.2rem; margin: 1.2rem 0 1.5rem; }
+  nav.inhalt ol { margin: 0; padding-left: 1.4rem; columns: 2; column-gap: 2rem; }
+  nav.inhalt li { break-inside: avoid; }
+
+  .formel { font-family: "Times New Roman", serif; font-size: 1.12rem; text-align: center; margin: .6rem 0 1rem; }
+  .formel i { font-style: italic; }
+
+  table { border-collapse: collapse; width: 100%; font-size: .93rem; margin: .4rem 0 1rem; }
+  th { text-align: left; font-weight: 600; color: var(--muted); border-bottom: 2px solid var(--line); padding: .35rem .5rem; }
+  td { border-bottom: 1px solid var(--line); padding: .4rem .5rem; vertical-align: top; }
+
+  figure { margin: 1.2rem 0 1.4rem; }
+  figure img { max-width: 100%; border: 1px solid var(--line); border-radius: .3rem; }
+  figcaption { font-size: .88rem; color: var(--muted); margin-top: .4rem; }
+
+  dl.begriffe dt { font-weight: 600; margin-top: .6rem; }
+  dl.begriffe dd { margin: 0 0 .2rem 0; }
+  .lit p { font-size: .92rem; margin-bottom: .45rem; }
+
+  @media (max-width: 640px) { nav.inhalt ol { columns: 1; } }
+  @media print {
+    body { font-size: 11pt; }
+    main { max-width: none; padding: 0; }
+    h2 { break-before: auto; }
+    figure, table, .zusammen { break-inside: avoid; }
+    a { color: #000; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<h1>StoSiS – Methodenhandbuch</h1>
+<p class="sub">Modell, Annahmen und Verfahren</p>
+
+<p>StoSiS ist eine dynamische Fließschemasimulation für die Feststoffverfahrenstechnik. Dieses Handbuch beschreibt, was das Programm rechnet und wie: die Annahmen des Modells, die Verfahren, ihre Grenzen und wie sie geprüft sind. Die meisten Kapitel folgen demselben Aufbau – Zweck, Annahmen, Verfahren, Grenzen, Prüfung.</p>
+
+<nav class="inhalt">
+<ol>
+  <li><a href="#k1">Überblick</a></li>
+  <li><a href="#k2">Grundannahmen</a></li>
+  <li><a href="#k3">Flowsheet und Zeitschritte</a></li>
+  <li><a href="#k4">Größenraster</a></li>
+  <li><a href="#k5">Inlet und Größenverteilungen</a></li>
+  <li><a href="#k6">Stoffe, Temperatur und Druck</a></li>
+  <li><a href="#k7">Units</a></li>
+  <li><a href="#k8">Zufallszahlen und mehrere Läufe</a></li>
+  <li><a href="#k9">Partikelmodus: Karten</a></li>
+  <li><a href="#k10">Auswertung</a></li>
+  <li><a href="#k11">Prüfung und Validierung</a></li>
+  <li><a href="#k12">Begriffe</a></li>
+  <li><a href="#k13">Literatur</a></li>
+</ol>
+</nav>
+
+
+<h2 id="k1"><span class="nr">1</span>Überblick</h2>
+<p>Ein Flowsheet besteht aus Units, deren Ein- und Ausgänge über Ströme verbunden sind. Ein Strom trägt die Massenstromdichte über der Partikelgröße, getrennt nach Stoffen, dazu Temperatur und Druck. Gerechnet wird in Zeitschritten: In jedem Schritt verarbeitet jede Unit genau eine Zeitscheibe ihrer Eingänge.</p>
+<p>Units können Zufallsprozesse enthalten, etwa einen schwankenden Teilungsanteil. Ein Ergebnis ist dann keine einzelne Kurve, sondern eine Statistik über viele Läufe mit verschiedenen Zufallszahlen.</p>
+<p>Für die Partikel gibt es zwei Darstellungen, die für eine ganze Simulation gelten:</p>
+<ul>
+  <li><b>Kontinuum:</b> Der Strom ist eine Verteilung auf einem festen Größenraster.</li>
+  <li><b>Partikelmodus:</b> Der Strom ist eine Liste gewichteter Monte-Carlo-Partikel, hier Karten genannt. Jede Karte trägt eine Größe und eine Masse je Stoff (Kapitel 9).</li>
+</ul>
+<p>Der Rechenkern ist reines C++ ohne Abhängigkeit von der Oberfläche; er läuft auch in automatischen Tests und im Batchbetrieb. Die Oberfläche (Qt) dient zum Aufbauen, Einstellen und Auswerten.</p>
+<h4>Umfang</h4>
+<p>Verfügbare Units: Inlet, Outlet, Merger, Splitter (fest oder schwankend) und eine größenabhängige Verzögerung. Im Partikelmodus rechnen Inlet, Outlet, Merger und Splitter; die Verzögerung nur im Kontinuum. Prozesse, die Partikel verändern – Koagulation, Bruch, Wachstum, Keimbildung –, sind nicht enthalten.</p>
+
+
+<h2 id="k2"><span class="nr">2</span>Grundannahmen</h2>
+<ul>
+  <li>Ein Strom wird durch die Massenstromdichte je Stoff über der Partikelgröße beschrieben. Eine Partikelzahl wird nicht gespeichert; sie folgt bei Bedarf aus Masse, Größe und Dichte.</li>
+  <li>Partikel sind Kugeln aus Feststoff ohne Poren; ihre Dichte ist die Feststoffdichte des Stoffs.</li>
+  <li>Temperatur und Druck sind Eigenschaften jedes Stroms und wandern mit dem Material. Es gibt keine globale Umgebungstemperatur.</li>
+  <li>Ein Inlet liefert genau einen Stoff. Mischungen entstehen, wenn Ströme in einem Merger zusammenlaufen.</li>
+  <li>Units rechnen ohne Iteration, Schritt für Schritt. Der Zeitschritt muss kleiner sein als die kürzeste Verweil- oder Rücklaufzeit im Flowsheet.</li>
+  <li>Zufall entsteht nur in Units mit einem Zufallsprozess. Ein Flowsheet ohne solche Units wird einmal gerechnet.</li>
+  <li>Intern wird in SI-Einheiten gerechnet (m, kg, s, K, Pa); die Oberfläche zeigt Partikelgrößen in µm.</li>
+</ul>
+
+
+<h2 id="k3"><span class="nr">3</span>Flowsheet und Zeitschritte</h2>
+<h4>Zweck</h4>
+<p>Material soll in der Zeit durch das Flowsheet laufen, auch durch Rückführungen und durch Units mit Gedächtnis (Hold-up).</p>
+<h4>Annahmen</h4>
+<p>Jede Unit hat nummerierte Ein- und Ausgänge (Ports); an jedem Port hängt höchstens eine Verbindung. Aufteilen und Zusammenführen geschieht nur in Splittern und Mergern, sodass die Massenbilanz an jedem Knoten eindeutig ist. Alle Units teilen sich eine globale Uhr <i>t<sub>k</sub></i> = <i>k</i>·Δ<i>t</i>.</p>
+<h4>Verfahren</h4>
+<p>In jedem Zeitschritt (Makroschritt) rechnet jede Unit genau einmal: Sie erhält die Ströme an ihren Eingängen und liefert die Ströme an ihren Ausgängen. Was zwischen zwei Schritten in einer Unit steckt, ist ihr innerer Zustand.</p>
+<p>Die Units rechnen der Reihe nach in Flussrichtung und lesen die Ausgänge ihrer Vorgänger aus demselben Schritt (wie beim Gauß-Seidel-Verfahren). Die Reihenfolge liefert eine topologische Sortierung nach Kahn. Material durchläuft so in einem Schritt beliebig lange Ketten ohne künstliche Verzögerung.</p>
+<p>Ein Kreis hat keine erste Unit. Dort wird genau eine Verbindung aufgeschnitten: Ihr Ziel liest den Strom des vorherigen Schritts, die Verbindung wirkt wie ein kurzes Rohr mit der Totzeit Δ<i>t</i>. Die Schnittstelle wird nach einer festen Regel gewählt, damit das Ergebnis nicht von der Reihenfolge abhängt, in der das Flowsheet gezeichnet wurde:</p>
+<ul>
+  <li>bevorzugt am Eingang eines Mergers, denn jeder Kreis braucht eine Zusammenführung;</li>
+  <li>dort am Eingang, der aus einem Trennapparat kommt – dort beginnt der Rückführstrom, und Frischgut bleibt unverzögert;</li>
+  <li>sonst am Knoten mit den meisten bereits berechneten Eingängen.</li>
+</ul>
+<p>Eine Verbindung kann auch von Hand als Rückführung markiert werden. Aufgeschnittene Verbindungen sind im Flowsheet orange gestrichelt.</p>
+<h4>Grenzen</h4>
+<p>Jeder Kreis erhält eine Totzeit von einem Zeitschritt. Der stationäre Zustand hängt davon nicht ab, der zeitliche Verlauf verschiebt sich um Δ<i>t</i>. Alle Units rechnen mit demselben Zeitschritt; feinere Teilschritte innerhalb einer Unit gibt es nicht.</p>
+<h4>Prüfung</h4>
+<ul>
+  <li>Kreis aus Merger und Splitter 50/50 bei 10 kg/s Zulauf: Das Einschwingen folgt exakt <i>M<sub>k</sub></i> = 10 + ½ <i>M</i><sub><i>k</i>−1</sub>, stationär 20 kg/s im Merger.</li>
+  <li>Kreis mit 1 s Verzögerung und 30 % Rücklauf: Merger 14,2857 kg/s, Outlet 10 kg/s; die Massenbilanz einschließlich Hold-up geht exakt auf.</li>
+</ul>
+
+
+<h2 id="k4"><span class="nr">4</span>Größenraster</h2>
+<h4>Zweck</h4>
+<p>Im Kontinuum ist das Raster der Strom: Jeder Strom besteht aus Werten an den Stützstellen. Im Partikelmodus dient es nur zum Auszählen der Karten für Anzeige und Vergleich.</p>
+<h4>Verfahren</h4>
+<p>Standard ist ein geometrisches Raster, bei dem jede Stützstelle um einen festen Faktor <i>r</i> größer ist als die vorige:</p>
+<p class="formel"><i>d<sub>i</sub></i> = <i>d</i><sub>min</sub> · <i>r<sup>i</sup></i>, &nbsp; Standard 1 µm bis 1 mm mit 300 Stützstellen</p>
+<p>Ein lineares Raster ist ebenfalls wählbar. Gespeichert wird an jeder Stützstelle die Massenstromdichte <i>q</i>(<i>t</i>, <i>d</i>) – eine Dichte, keine Menge je Klasse. So hängen Ergebnisse nicht von der Klassenbreite ab, und jedes Integral hat eine Bedeutung. Integriert wird auf dem geometrischen Raster mit der Trapezregel in ln <i>d</i>:</p>
+<p class="formel"><i>ṁ</i>(<i>t</i>) = ∫ <i>d</i> · <i>q</i>(<i>t</i>, <i>d</i>) d(ln <i>d</i>) ≈ ln <i>r</i> · [ ½ <i>d</i><sub>0</sub><i>q</i><sub>0</sub> + <i>d</i><sub>1</sub><i>q</i><sub>1</sub> + … + ½ <i>d<sub>n</sub>q<sub>n</sub></i> ]</p>
+<p>Aus derselben Matrix folgen der Massenstrom über der Zeit, die Größenverteilung des Durchsatzes und die Gesamtmasse. Vor dem Rechnen prüft das Programm jedes Inlet gegen das Raster und meldet, wenn mehr als 0,1 % seiner Verteilung außerhalb liegen.</p>
+<h4>Grenzen</h4>
+<p>Im Kontinuum fehlt Material außerhalb von [<i>d</i><sub>min</sub>, <i>d</i><sub>max</sub>]. Die Auflösung ist durch die Zahl der Stützstellen begrenzt.</p>
+<h4>Prüfung</h4>
+<p>Der vom Raster erfasste Anteil trifft die exakte Verteilungssumme <i>Q</i><sub>3</sub>(<i>d</i><sub>max</sub>) − <i>Q</i><sub>3</sub>(<i>d</i><sub>min</sub>) für fünf Verteilungen auf 1,3 · 10<sup>−6</sup>. Die Massenbilanz über Verzögerung und Splitter geht auf 3 · 10<sup>−14</sup> kg von 50 kg auf.</p>
+
+
+<h2 id="k5"><span class="nr">5</span>Inlet und Größenverteilungen</h2>
+<h4>Zweck</h4>
+<p>Das Inlet speist Material mit vorgegebenem Massenstrom und vorgegebener Größenverteilung in das Flowsheet ein.</p>
+<h4>Annahmen</h4>
+<p>Der Massenstrom <i>ṁ</i>(<i>t</i>) ist stückweise linear zwischen Stützpunkten und wird außerhalb konstant fortgesetzt. Die Form der Verteilung bleibt zeitlich gleich, nur ihre Höhe folgt dem Massenstrom: <i>q</i>(<i>t</i>, <i>d</i>) = <i>ṁ</i>(<i>t</i>) · <i>q</i><sub>3</sub>(<i>d</i>).</p>
+<h4>Verfahren</h4>
+<p>Die Verteilung wird als Massendichte <i>q</i><sub>3</sub>(<i>d</i>) bzw. Verteilungssumme <i>Q</i><sub>3</sub>(<i>d</i>) angegeben – <i>Q</i><sub>3</sub>(<i>d</i>) ist der Massenanteil aller Partikel kleiner als <i>d</i>.</p>
+<table>
+  <tr><th>Verteilung</th><th>Parameter</th><th>Verteilungssumme bzw. Dichte</th></tr>
+  <tr><td>Log-Normal (Standard)</td><td><i>d</i><sub>50</sub>, σ<sub>ln</sub></td><td><i>q</i><sub>3</sub> = 1/(<i>d</i> σ<sub>ln</sub> √(2π)) · exp(−ln²(<i>d</i>/<i>d</i><sub>50</sub>) / (2σ<sub>ln</sub>²))</td></tr>
+  <tr><td>RRSB</td><td><i>d</i>′, <i>n</i></td><td><i>Q</i><sub>3</sub> = 1 − exp(−(<i>d</i>/<i>d</i>′)<sup><i>n</i></sup>)</td></tr>
+  <tr><td>GGS</td><td><i>d</i><sub>max</sub>, <i>m</i></td><td><i>Q</i><sub>3</sub> = (<i>d</i>/<i>d</i><sub>max</sub>)<sup><i>m</i></sup> für <i>d</i> ≤ <i>d</i><sub>max</sub></td></tr>
+  <tr><td>Tabelle</td><td>Punkte (<i>d<sub>i</sub></i>, <i>Q</i><sub>3,<i>i</i></sub>)</td><td><i>Q</i><sub>3</sub> linear in ln <i>d</i> zwischen den Punkten</td></tr>
+  <tr><td>Normal (nicht empfohlen)</td><td><i>d</i><sub>0</sub>, σ</td><td>Gaußsche Glockenkurve; erlaubt <i>d</i> &lt; 0, daher mit Warnung</td></tr>
+</table>
+<p>Standard ist Log-Normal mit <i>d</i><sub>50</sub> = 100 µm und σ<sub>ln</sub> = 0,25: Partikelgrößen sind positiv und ihre Verteilungen meist schief. Die Tabelle nimmt gemessene Verteilungen auf, etwa aus einer Siebanalyse, ohne zwischen den Punkten eine Form dazuzuerfinden.</p>
+<p>Im Kontinuum erhält jede Stützstelle genau die Masse, die ihr bei anteiliger Aufteilung nach der Lage zwischen den Nachbarn zusteht (Hutfunktion in ln <i>d</i>). Die Summe über alle Stützstellen ist damit exakt <i>Q</i><sub>3</sub>(<i>d</i><sub>max</sub>) − <i>Q</i><sub>3</sub>(<i>d</i><sub>min</sub>), auch wenn die Dichte springt wie bei GGS am Größtkorn. Im Partikelmodus erzeugt das Inlet Karten nach der Kartendichte (Kapitel 9.3).</p>
+<h4>Grenzen</h4>
+<p>Die Verteilung ist zeitlich konstant; eine sich ändernde Verteilung entsteht nur über mehrere Inlets und einen Merger. Die Hutfunktion glättet den Gipfel leicht – beim Standard-Inlet um höchstens 7 · 10<sup>−4</sup> des Maximums.</p>
+<h4>Prüfung</h4>
+<p>Für alle Verteilungen gilt <i>Q</i><sub>3</sub>(Quantil(<i>p</i>)) = <i>p</i> auf 10<sup>−8</sup> relativ, und die eingespeiste Masse entspricht in jedem Zeitschritt dem Zulaufprofil.</p>
+
+
+<h2 id="k6"><span class="nr">6</span>Stoffe, Temperatur und Druck</h2>
+<h4>Zweck</h4>
+<p>Mehrere Stoffe sollen gemeinsam durch das Flowsheet laufen, und Stoffwerte wie Dichte, Wärmekapazität oder Viskosität sollen bei der jeweiligen Temperatur und dem jeweiligen Druck verfügbar sein.</p>
+<h4>Annahmen</h4>
+<p>Ein Strom trägt je Stoff eine separate Verteilung auf demselben Raster, dazu eine Temperatur und einen Druck. Einfache Units wie Splitter und Verzögerung reichen beide unverändert weiter.</p>
+<h4>Verfahren</h4>
+<p>Die Stoffwerte stehen in einer Materialdatei im JSON-Format (<code>data/Materialien.json</code>) mit 18 Stoffen. Jede Eigenschaft ist eine Konstante, eine Formel (ideales Gas, Sutherland, Antoine, Polynome) oder eine Tabelle über der Temperatur, jeweils mit Gültigkeitsbereich, Quelle und Prüfstatus. Gibt es mehrere Einträge, gilt zuerst einer mit Temperatur und Druck im Bereich, dann einer mit der Temperatur im Bereich, sonst der mit der nächstgelegenen Temperaturgrenze; Werte außerhalb des Bereichs oder jenseits der Messpunkte werden markiert. Die aktiven Stoffe eines Flowsheets ergeben sich aus den Inlets.</p>
+<p>Gespeichert wird nur die Wärmekapazität <i>c<sub>p</sub></i>(<i>T</i>); die Enthalpie folgt durch Integration, <i>h</i>(<i>T</i>) = ∫ <i>c<sub>p</sub></i> d<i>T</i> ab 298,15 K. Laufen Ströme zusammen, gilt die Energiebilanz: Die Mischtemperatur ist die Temperatur, bei der die Enthalpie der Mischung gleich der Summe der zugeführten Enthalpien ist. Gelöst wird sie mit dem Newton-Verfahren, abgesichert durch Bisektion zwischen kältester und wärmster Eintrittstemperatur. Bei konstanter Wärmekapazität ergibt sich</p>
+<p class="formel"><i>T</i><sub>Misch</sub> = Σ <i>ṁ<sub>i</sub></i> <i>c</i><sub><i>p</i>,<i>i</i></sub> <i>T<sub>i</sub></i> / Σ <i>ṁ<sub>i</sub></i> <i>c</i><sub><i>p</i>,<i>i</i></sub></p>
+<p>Der Druck nach dem Mischen ist der kleinste Eingangsdruck eines Stroms mit Material. An einer Zusammenführung herrscht nur ein Druck, und Material strömt nur vom höheren zum niedrigeren Druck.</p>
+<h4>Grenzen</h4>
+<p>Die Werte stammen zunächst aus der Datenbank von Dyssol und sind bis zu ihrer Prüfung als ungeprüft gekennzeichnet; auffällige Einträge tragen eine Warnung. Fehlt einem Stoff die Wärmekapazität, wird die Temperatur nach der Masse gemittelt und ein Hinweis ausgegeben. Eine Gasphase als Trägermedium gibt es nicht.</p>
+<h4>Prüfung</h4>
+<ul>
+  <li>Sand bei 20 °C und 80 °C im Massenverhältnis 10 : 5 mischen sich zu 40,000 °C, Sand mit Harnstoff zu 48,92 °C – die geschlossene Lösung für konstante Wärmekapazität.</li>
+  <li>Die Massenbilanz je Stoff über Merger und Splitter stimmt auf 10<sup>−15</sup>.</li>
+  <li>Die Viskositäten von Stickstoff, Sauerstoff und Luft liegen bis 500 K innerhalb von 1 % der Referenzgleichungen von Lemmon &amp; Jacobsen (2004).</li>
+</ul>
+
+
+<h2 id="k7"><span class="nr">7</span>Units</h2>
+
+<h3 id="k7-1"><span class="nr">7.1</span>Merger</h3>
+<p>Der Merger addiert die Massenstromdichten seiner Eingänge je Stoff; Temperatur und Druck folgen aus Kapitel 6. Im Partikelmodus hängt er die Karten aller Eingänge aneinander.</p>
+
+<h3 id="k7-2"><span class="nr">7.2</span>Splitter</h3>
+<h4>Zweck</h4>
+<p>Der Splitter teilt einen Strom auf zwei oder drei Ausgänge auf, als reiner Mengenteiler: Der Anteil gilt für alle Partikelgrößen gleich.</p>
+<h4>Annahmen</h4>
+<p>Die Anteile sind fest oder schwanken zeitlich korreliert um einen Mittelwert. Der letzte Ausgang erhält jeweils den Rest.</p>
+<h4>Verfahren</h4>
+<p>Im schwankenden Modus folgt der Anteil <i>g<sub>i</sub></i> jedes Ausgangs außer dem letzten einem Ornstein-Uhlenbeck-Prozess mit Mittelwert μ, Streuung σ und Korrelationszeit τ:</p>
+<p class="formel">d<i>g</i> = −(<i>g</i> − μ)/τ · d<i>t</i> + σ √(2/τ) d<i>W</i></p>
+<p>Der Prozess ist stationär und normalverteilt, kehrt immer zum Mittelwert zurück und hat genau eine Korrelationszeit. Fortgeschrieben wird er exakt statt mit dem Euler-Verfahren, sodass Mittelwert, Streuung und Zeitverhalten nicht vom Zeitschritt abhängen:</p>
+<p class="formel"><i>g</i><sub><i>k</i>+1</sub> = μ + (<i>g<sub>k</sub></i> − μ) <i>a</i> + σ √(1 − <i>a</i>²) ξ, &nbsp; <i>a</i> = e<sup>−Δ<i>t</i>/τ</sup>, &nbsp; ξ ~ N(0, 1)</p>
+<p>Der Prozess startet bereits im Gleichgewicht, <i>g</i>(0) ~ N(μ, σ²). Anteile außerhalb von [0, 1] werden abgeschnitten; übersteigt die Summe der schwankenden Anteile 1, werden sie anteilig gekürzt. Die Masse bleibt in jedem Schritt exakt erhalten. Der Zufallsprozess läuft auch ohne Zulauf weiter, sodass die Zufallsfolge nur vom Seed abhängt. Im Partikelmodus verteilt das Konto-Verfahren die Karten (Kapitel 9.4).</p>
+<h4>Grenzen</h4>
+<p>Bei großem σ verschiebt das Abschneiden den Mittelwert leicht; der Editor weist darauf hin, wenn μ ± 3σ außerhalb von [0, 1] liegt. Größenabhängiges Trennen, wie in einem Sieb, leistet der Splitter nicht.</p>
+<h4>Prüfung</h4>
+<table>
+  <tr><th>Fall</th><th>Erwartung</th><th>Ergebnis</th></tr>
+  <tr><td>μ = 0,3, σ = 0,05, τ = 2 s, Δ<i>t</i> = 0,1 s</td><td>Mittel 0,3, Streuung 0,05, Autokorrelation nach 2 s e<sup>−1</sup> = 0,368</td><td>0,301 / 0,049 / 0,353</td></tr>
+  <tr><td>dasselbe mit Δ<i>t</i> = 0,5 s</td><td>gleiche Statistik</td><td>0,301 / 0,050 / 0,368</td></tr>
+  <tr><td>τ = 0</td><td>keine Autokorrelation</td><td>0,005</td></tr>
+  <tr><td>drei Ausgänge, σ = 0,03 und 0,06</td><td>Rest-Streuung √(0,03² + 0,06²) = 0,067</td><td>0,066</td></tr>
+</table>
+
+<h3 id="k7-3"><span class="nr">7.3</span>Größenabhängige Verzögerung</h3>
+<p>Die Verzögerung hält Material je Größe unterschiedlich lange zurück:</p>
+<p class="formel"><i>t</i><sub>delay</sub>(<i>d</i>) = <i>t</i><sub>ref</sub> · (<i>d</i> / <i>d</i><sub>ref</sub>)<sup><i>p</i></sup></p>
+<p>Ihr Hold-up ist ein Ringpuffer der letzten Eingänge; zwischen den Zeitpunkten wird linear interpoliert. Jeder Platz im Puffer merkt sich Temperatur und Druck seines Materials, und gleichzeitig ankommendes Material wird wie im Merger gemischt. Die Unit ist ein Platzhalter für Transportmodelle auf Basis von Verweilzeitverteilungen und rechnet nur im Kontinuum.</p>
+
+<h3 id="k7-4"><span class="nr">7.4</span>Outlet</h3>
+<p>Das Outlet nimmt den ankommenden Strom auf und zeichnet ihn auf.</p>
+
+
+<h2 id="k8"><span class="nr">8</span>Zufallszahlen und mehrere Läufe</h2>
+<h4>Zweck</h4>
+<p>Gleicher Seed soll auf jedem System dasselbe Ergebnis liefern, und Units sollen voneinander unabhängige Zufallszahlen erhalten. Aus vielen Läufen entsteht die Statistik eines Ergebnisses.</p>
+<h4>Verfahren</h4>
+<ul>
+  <li><b>Generator:</b> Mersenne Twister mt19937_64; Gleichverteilung aus den oberen 53 Bit; Normalverteilung mit der Polarmethode nach Marsaglia. Die Normalverteilung der C++-Standardbibliothek wird nicht verwendet, weil ihr Verfahren je nach Bibliothek verschieden ist.</li>
+  <li><b>Seed je Unit:</b> Seed<sub>Unit</sub> = SplitMix64(Seed ⊕ SplitMix64(FNV-1a(Knoten-ID))). Die Zufallsfolge einer Unit hängt damit nur vom globalen Seed und ihrer Kennung ab, nicht von der Zeichenreihenfolge, und zwei Units schwanken nicht im Gleichtakt.</li>
+  <li><b>Läufe:</b> Lauf 1 nutzt den eingestellten Seed, weitere Läufe abgeleitete Seeds. Standard sind 20 Läufe.</li>
+  <li><b>Statistik:</b> Mittelwert und Varianz je Zelle werden mit dem Welford-Verfahren in einem Durchgang fortgeschrieben, numerisch stabil und mit Bessel-Korrektur. Volle Matrizen gibt es für Lauf 1, den Mittelwert und die Standardabweichung; für jeden Lauf werden zusätzlich Massenstrom über der Zeit, Größenverteilung und Gesamtmasse gespeichert.</li>
+  <li><b>Darstellung:</b> Mittelwert mit Band ±1σ, ±2σ oder dem 5–95-%-Perzentil (lineare Interpolation, Typ 7 nach Hyndman &amp; Fan), auf Wunsch mit den Einzelläufen. Die Randverteilungen der Streuungs-Heatmap werden aus den Einzelläufen berechnet, nicht durch Integration der Streuungsmatrix, weil die Größenklassen miteinander korreliert sind.</li>
+</ul>
+<h4>Grenzen</h4>
+<p>Die Unsicherheit eines Mittelwerts sinkt mit 1/√<i>N</i>: Hundertmal mehr Läufe machen ihn nur zehnmal genauer. Perzentile sind erst ab etwa 20 Läufen aussagekräftig.</p>
+<h4>Prüfung</h4>
+<p>Für einen Splitter hinter einem konstanten Zulauf <i>ṁ</i> lässt sich die Streuung der Masse <i>M</i>, die in der Zeit <i>T</i> einen Ausgang erreicht, geschlossen angeben:</p>
+<p class="formel">E[<i>M</i>] = μ <i>ṁ</i> <i>T</i>, &nbsp;&nbsp; Var[<i>M</i>] = 2 <i>ṁ</i>² σ² τ ( <i>T</i> − τ (1 − e<sup>−<i>T</i>/τ</sup>) )</p>
+<p>Mit <i>ṁ</i> = 10 kg/s, μ = 0,3, σ = 0,05, τ = 2 s und <i>T</i> = 40 s erwartet man 120,000 kg ± 6,164 kg; 2000 Läufe ergeben 120,058 kg ± 6,094 kg. Die Abweichung der Streuung von −1,1 % liegt innerhalb der statistischen Unsicherheit von 1,6 %. Der Fehler fällt mit der Zahl der Läufe wie 1/√<i>N</i>.</p>
+
+
+<h2 id="k9"><span class="nr">9</span>Partikelmodus: Karten</h2>
+
+<h3 id="k9-1"><span class="nr">9.1</span>Karten sind Monte-Carlo-Partikel</h3>
+<p>Im Partikelmodus besteht ein Strom aus Karten. Eine Karte ist ein gewichtetes Monte-Carlo-Partikel, in der Literatur auch gewichtetes Simulationspartikel genannt (Zhao, Kruis &amp; Zheng 2009; Kotalczyk &amp; Kruis 2017): ein Rechenpartikel, das eine Gruppe gleicher echter Partikel vertritt. „Karte“ und „Monte-Carlo-Partikel“ bezeichnen in diesem Handbuch dasselbe.</p>
+<p>Eine Karte trägt eine Größe <i>d</i> und einen Massenstrom <i>ṁ</i><sub><i>k</i></sub> je Stoff <i>k</i>. Ihr Gewicht <i>w</i> – die Zahl der echten Partikel, die sie in einem Zeitschritt Δ<i>t</i> vertritt – folgt daraus für kompakte Kugeln:</p>
+<p class="formel"><i>w</i> = Δ<i>t</i> · Σ<sub><i>k</i></sub> (<i>ṁ</i><sub><i>k</i></sub> / ρ<sub><i>k</i></sub>) / (π <i>d</i>³ / 6)</p>
+<p>Das Prinzip ist das einer Umfrage, in der wenige Befragte mit ihren Merkmalen für viele Menschen stehen: Einige tausend Karten je Zeitschritt beschreiben einen Strom aus Milliarden Partikeln. Wo viel Material ist, liegen viele Karten; Größenbereiche ohne Material kosten nichts.</p>
+<p>Partikel statt Raster lohnen sich, wenn ein Partikel mehrere Eigenschaften trägt, etwa Größe, Porosität und fraktale Dimension. Im Kontinuum braucht jede Eigenschaft eine Achse des Rasters, und jede Zelle speichert eine Zahl, ob dort Material liegt oder nicht. Eine Karte speichert nur ihre Eigenschaften und ihr Gewicht. Mit <i>M</i> Klassen je Achse, <i>n</i> Eigenschaften und <i>N</i> Karten ergibt sich:</p>
+<p class="formel">Raster: <i>M</i><sup><i>n</i></sup> Zahlen &nbsp;&nbsp;&nbsp;&nbsp; Karten: <i>N</i> · (<i>n</i> + 1) Zahlen</p>
+<p>Das Raster wächst exponentiell mit der Zahl der Eigenschaften, die Karten wachsen linear (Abbildung 9.1). Bei 32 Klassen je Achse und drei Eigenschaften hat das Raster 32³ = 32 768 Zellen; in der Beispielverteilung liegen 99 % der Masse in 1017 davon (3,1 %), alle übrigen sind leer oder fast leer und belegen trotzdem Speicher. 2000 Karten brauchen 2000 · 4 = 8000 Zahlen, liegen nur dort, wo Material ist, und tragen exakte Werte statt Klassen. Bei fünf Eigenschaften stehen 3,4 · 10<sup>7</sup> Zellen gegen 12 000 Zahlen; mit 100 Klassen je Achse hätte das Raster schon bei drei Eigenschaften 10<sup>6</sup> Zellen.</p>
+<p>Für eine einzige Eigenschaft ist das Raster dagegen kleiner (32 gegen 4000 Zahlen) und rauschfrei; die Grenze liegt in diesem Beispiel bei <i>n</i> ≈ 2,6. Das passt zur Schätzung von Shima et al. (2009) für Wolkentropfen, nach der Rechenpartikel ab etwa zwei bis vier Eigenschaften weniger Rechenzeit brauchen als ein Raster. Der Preis der Karten ist ein statistisches Rauschen, wo Karten zufällig gezogen oder verteilt werden; es fällt mit 1/√<i>N</i>.</p>
+<figure>
+  <img src="abbildungen/MC_21_Raster_Karten_3D.svg" alt="Raster mit 32 mal 32 mal 32 Zellen gegen 2000 Karten und gespeicherte Zahlen über der Zahl der Eigenschaften">
+  <figcaption>Abbildung 9.1 – Raster gegen Karten für eine angenommene Beispielverteilung über Größe, Porosität und fraktaler Dimension (größere Partikel sind offener). Links das Raster mit 32 Klassen je Achse: Die türkisen Zellen tragen 99 % der Masse, alle 32 768 Zellen belegen Speicher. Rechts 2000 Karten aus derselben Verteilung mit je vier Zahlen, grau ihr Schatten auf dem Boden. Unten die gespeicherten Zahlen über der Zahl der Eigenschaften <i>n</i>.</figcaption>
+</figure>
+<p>Für Prozesse wie die Koagulation, bei denen Paare von Partikeln zählen, wächst der Unterschied noch weiter (Abbildung 9.2). Ein Raster koppelt jede Zelle mit jeder, also (<i>M</i><sup><i>n</i></sup>)² Zellpaare je Zeitschritt; bei 32 Klassen und drei Eigenschaften sind das 1,1 · 10<sup>9</sup>. Ein Monte-Carlo-Verfahren durchsucht dagegen nicht alle Paare: Es lost Partner aus und nimmt ein Paar mit einer Wahrscheinlichkeit proportional zum Koagulationskern an (Akzeptanz-Verwerfung; Kruis, Maisels &amp; Fissan 2000). Bei einem zeitgesteuerten Verfahren ist das etwa ein Versuch je Karte und Zeitschritt, also größenordnungsmäßig <i>N</i> Paare, unabhängig von der Zahl der Eigenschaften; selbst alle <i>N</i>² Kartenpaare blieben bei 4 · 10<sup>6</sup>. Würde das Raster nur die belegten Zellen paaren, wären es bei drei Eigenschaften immer noch 1017² ≈ 10<sup>6</sup> Paare, rund das 500-Fache der ausgelosten Kartenpaare.</p>
+<figure>
+  <img src="abbildungen/MC_22_Koagulation_Paare.svg" alt="Paare je Zeitschritt bei der Koagulation: Raster gegen Karten über der Zahl der Eigenschaften">
+  <figcaption>Abbildung 9.2 – Paare je Zeitschritt bei der Koagulation über der Zahl der Eigenschaften <i>n</i>, mit 32 Klassen je Achse und 2000 Karten wie in Abbildung 9.1. Das Raster koppelt jede Zelle mit jeder; Karten brauchen alle Paare <i>N</i>² oder, mit ausgelosten Partnern, etwa <i>N</i> – beides unabhängig von <i>n</i>. Offener Kreis: nur die 1017 belegten Zellen aus Abbildung 9.1 gepaart.</figcaption>
+</figure>
+<div class="zusammen">
+<p>Die Bausteine gewichteter Monte-Carlo-Verfahren finden sich im Partikelmodus wieder:</p>
+<table>
+  <tr><th>Gewichtetes Monte-Carlo-Verfahren</th><th>Partikelmodus</th></tr>
+  <tr><td>Simulationspartikel</td><td>Karte</td></tr>
+  <tr><td>Eigenschaften: Größe, Zusammensetzung</td><td>Größe <i>d</i>, Massenstrom <i>ṁ</i><sub><i>k</i></sub> je Stoff</td></tr>
+  <tr><td>Gewicht: Zahl der vertretenen echten Partikel</td><td>Gewicht <i>w</i></td></tr>
+  <tr><td>Zahl der Simulationspartikel</td><td>Karten je Zeitschritt und Inlet, <i>N</i></td></tr>
+  <tr><td>Verteilung der Simulationspartikel über der Größe, etwa über Gewichtsfunktionen (DeVille, Riemer &amp; West 2011)</td><td>Kartendichte (Kapitel 9.3)</td></tr>
+  <tr><td>Teilen und Zusammenlegen von Simulationspartikeln (Zhao, Kruis &amp; Zheng 2009; Kotalczyk &amp; Kruis 2017)</td><td>Grenzen je Stromscheibe (Kapitel 9.5)</td></tr>
+  <tr><td>Ereignisse zwischen Simulationspartikeln, etwa Koagulation</td><td>nicht enthalten (Kapitel 1); Größe, Zusammensetzung und Gewicht liegen auf jeder Karte vor</td></tr>
+</table>
+</div>
+<p>„Monte Carlo“ beschreibt das Verfahren: Zufallszahlen entscheiden, was mit den Partikeln geschieht. Im Partikelmodus sind das der schwankende Teilungsanteil eines Splitters und die zufällige Startposition seines Konto-Verfahrens (Kapitel 9.4); viele Läufe ergeben die Statistik (Kapitel 8). Am Inlet entstehen die Karten dagegen ohne Zufall, eine in der Mitte jedes Streifens gleicher Fläche unter der Kartendichte (Kapitel 9.3), und sind damit rauschfrei. In einer Dimension ist das die Punktmenge mit der kleinsten Diskrepanz, wie sie Quasi-Monte-Carlo-Verfahren nutzen; für die Koagulationsgleichung ordnen Lécot &amp; Wagner (2004) die Partikel ebenfalls nach der Masse und verwenden Folgen geringer Diskrepanz statt Zufallszahlen.</p>
+<p>Die Darstellung gilt für die ganze Simulation, vom Inlet bis zum Outlet. Eine Simulation im Partikelmodus startet nur, wenn alle Units des Flowsheets Karten verarbeiten können. Die Zahl der Karten je Zeitschritt und Inlet, <i>N</i>, ist einstellbar (Standard 2000); sie bestimmt, wie genau ein Lauf die Verteilung wiedergibt.</p>
+
+<h3 id="k9-2"><span class="nr">9.2</span>Der Begriff „Karte“</h3>
+<p>Der Name stammt vom Bild eines Karteikastens. Das Kontinuum gleicht einem Setzkasten mit einem festen Fach je Größe und Stoff, in dem nur steht, wie viel Masse darin liegt. Im Partikelmodus tritt an seine Stelle ein Karteikasten: eine Karte je Rechenpartikel, auf der Größe, Masse je Stoff und Gewicht stehen. Eine weitere Eigenschaft ist eine weitere Zeile, und Karten gibt es nur für das, was tatsächlich vorkommt.</p>
+<p>Für einen separaten Namen neben „Monte-Carlo-Partikel“ sprechen drei Gründe:</p>
+<ul>
+  <li><b>Eindeutig neben „Partikel“.</b> In der Feststoffverfahrenstechnik ist ein Partikel das echte Korn. Eine Karte vertritt viele davon, und zwei Wörter halten beides auseinander: „eine Karte vertritt eine Million Partikel“ statt „ein Partikel vertritt eine Million Partikel“. Dasselbe gilt für zusammengesetzte Wörter: Kartendichte, Kartenzahl und Masse je Karte sind eindeutig, während Partikeldichte (Masse je Volumen eines Partikels), Partikelzahl und Partikelmasse bereits die echten Partikel bezeichnen.</li>
+  <li><b>Name der Darstellung, nicht des Verfahrens.</b> Eine Karte bleibt eine Karte, ob sie zufällig oder nach einer festen Regel behandelt wird – am Inlet ohne Zufall, im Splitter nach dem Konto-Verfahren mit zufälligem Start. „Monte-Carlo-Partikel“ benennt dasselbe Objekt aus der Sicht des Verfahrens, „Karte“ aus der Sicht der Daten.</li>
+  <li><b>Ein Objekt, mehrere Namen.</b> Auch in der Literatur heißt das gewichtete Rechenpartikel je nach Fachgebiet anders: <em>weighted simulation particle</em> bei der Koagulation (Zhao, Kruis &amp; Zheng 2009), <em>parcel</em> bei Sprays (Dukowicz 1980), <em>super-droplet</em> in der Wolkenphysik, wo das Gewicht <em>multiplicity</em> heißt (Shima et al. 2009). „Karte“ ist ein kurzer deutscher Name dafür, der sich gut zusammensetzen lässt: Kartendichte, Kartenansicht, Karten je Zeitschritt.</li>
+</ul>
+
+<h3 id="k9-3"><span class="nr">9.3</span>Kartendichte und Karten am Inlet</h3>
+<h4>Zweck</h4>
+<p>Die Karten sollen über der Größe so verteilt sein, dass sowohl massenbezogene Ergebnisse (Massenstrom, d<sub>50</sub>) als auch anzahlbezogene (Feingut, Partikelzahl) eine brauchbare Statistik haben.</p>
+<h4>Verfahren</h4>
+<p>Die Kartendichte <i>c</i> über ln <i>d</i> ist ein Mittel aus der Massendichte <i>q</i><sub>3</sub>* und der Anzahldichte <i>q</i><sub>0</sub>* (beide je ln <i>d</i>, Fläche 1), abgeflacht mit dem Exponenten γ:</p>
+<p class="formel"><i>c</i>(<i>d</i>) ∝ <i>M</i>(<i>q</i><sub>3</sub>*, <i>q</i><sub>0</sub>*)<sup>γ</sup></p>
+<table>
+  <tr><th>Regel</th><th>Mittel <i>M</i></th><th>Eigenschaft</th></tr>
+  <tr><td>Summe (Standard)</td><td>(1 − <i>f</i>) <i>q</i><sub>3</sub>* + <i>f</i> <i>q</i><sub>0</sub>*</td><td>ohne Abflachung trägt keine Karte mehr als 1/(1 − <i>f</i>)-mal die mittlere Masse und 1/<i>f</i>-mal die mittlere Partikelzahl</td></tr>
+  <tr><td>Quadratisch</td><td>((1 − <i>f</i>) <i>q</i><sub>3</sub>*² + <i>f</i> <i>q</i><sub>0</sub>*²)<sup>1/2</sup></td><td>folgt stärker dem jeweils Größeren; Schranken 1 + √(<i>f</i>/(1 − <i>f</i>)) und 1 + √((1 − <i>f</i>)/<i>f</i>)</td></tr>
+  <tr><td>Produkt</td><td><i>q</i><sub>3</sub>*<sup>1 − <i>f</i></sup> · <i>q</i><sub>0</sub>*<sup><i>f</i></sup></td><td>ein Buckel zwischen Masse und Anzahl, dünne Ränder, keine Schranke</td></tr>
+</table>
+<p>Der Anteil <i>f</i> gewichtet die Anzahl (0 = nur Masse, 1 = nur Anzahl); γ = 1 bedeutet keine Abflachung, kleinere Werte geben beiden Rändern mehr Karten. Standard ist die Summe mit <i>f</i> = 0,5 und γ = 0,8. Alle drei Mittel sind homogen vom Grad 1, sodass Teilen und Zusammenlegen von Karten konsistent bleiben.</p>
+<p>Am Inlet wird die Fläche unter der Kartendichte in <i>N</i> gleiche Streifen geteilt. In jeden Streifen kommt eine Karte, platziert in seiner Mitte; ihre Masse ist die Masse des Streifens, exakt aus <i>Q</i><sub>3</sub>. Größen und Massenanteile stehen damit einmal fest, jeder Zeitschritt skaliert sie mit dem aktuellen Massenstrom – ohne Zufall, in jedem Schritt gleich.</p>
+<p>Partikel unter der kleinsten Stützstelle des Rasters, <i>d</i><sub>min</sub>, zählen für die Kartendichte so, als hätten sie die Größe <i>d</i><sub>min</sub>. Das Raster löst darunter nicht auf, und bei Verteilungen, deren Partikelzahl zu kleinen Größen ohne Grenze wächst (etwa RRSB mit <i>n</i> &lt; 3), bliebe die Anzahl sonst unbegrenzt.</p>
+<figure>
+  <img src="abbildungen/GUI_Kartendichte.png" alt="Einstellungen der Kartendichte mit Vorschau">
+  <figcaption>Abbildung 9.3 – Einstellung der Kartendichte mit Vorschau: Masse (türkis), Anzahl (orange) und Kartendichte (lila) für Log-Normal mit d<sub>50</sub> = 100 µm, σ<sub>ln</sub> = 0,5 und 1000 Karten; darunter jede Karte als Strich sowie Masse und Partikelzahl je Karte relativ zum Mittel.</figcaption>
+</figure>
+<h4>Grenzen</h4>
+<p>Das Rauschen einer Größenregion sinkt mit der Wurzel der Karten, die dort liegen. Als Kennzahl dienen die beiden Ränder: die feinsten 5 % der Partikel und die gröbsten 5 % der Masse. Bekommt ein Rand weniger als 10 Karten je Zeitschritt, meldet das Inlet das zusammen mit Abhilfen, die bei den aktuellen Einstellungen noch möglich sind. Bei Verteilungen mit vielen sehr feinen Partikeln liegt ein Teil der Karten unter <i>d</i><sub>min</sub>.</p>
+<h4>Prüfung</h4>
+<p>Die Platzierung stimmt mit einer unabhängigen Rechnung überein; bei der Summe ohne Abflachung bleiben Masse und Partikelzahl je Karte unter den Schranken. Am Inlet trägt jede Karte im Inneren auf 0,1 % genau den Anteil 1/<i>N</i> an der Kartendichte.</p>
+
+<h3 id="k9-4"><span class="nr">9.4</span>Splitter: Konto-Verfahren</h3>
+<p>Der Splitter verteilt ganze Karten, ohne sie zu kopieren. Die Karten eines Schritts werden nach Stoff und darin nach Größe geordnet und ab einer zufälligen Startposition einmal ringsum durchgegangen. Jede Karte zahlt <i>f<sub>i</sub></i> · <i>s</i> auf das Konto jedes Ausgangs <i>i</i> ein und geht ganz in den Ausgang mit dem höchsten Kontostand, dessen Konto um <i>s</i> belastet wird. Dabei ist <i>s</i> der Anteil der Karte an der Kartendichte der Stromscheibe, berechnet mit derselben Regel wie am Inlet; die Anteile einer Scheibe ergeben zusammen 1. Die Konten laufen über die Schritte weiter, ihre Summe bleibt null.</p>
+<p>So geht von benachbarten Karten jede (1/<i>f</i>)-te in einen Ausgang mit dem Anteil <i>f</i> – für leichte Karten genauso wie für schwere, nach Anzahl wie nach Masse. Die Ordnung nach Stoff sorgt dafür, dass jeder Stoff für sich im richtigen Verhältnis geteilt wird. Die Startposition stammt aus einem separaten Zufallsstrom; der Verlauf des schwankenden Anteils ist deshalb bei gleichem Seed im Kontinuum und im Partikelmodus derselbe.</p>
+<p>Die Masse je Ausgang weicht je Schritt um etwa eine Karte vom Soll ab; über viele Schritte gleichen sich diese Abweichungen nicht exakt aus, bleiben aber in der Größenordnung von 10<sup>−5</sup> des Durchsatzes. Nachskaliert wird nicht: Ein Faktor je Ausgang wäre ein Verhältnis aus Zufallsgrößen und verzerrt Ausgänge mit wenigen Karten.</p>
+
+<h3 id="k9-5"><span class="nr">9.5</span>Grenzen je Stromscheibe</h3>
+<p>Hinter Mergern, Splittern und Rückführungen ändert sich die Kartenzahl: Ein Kreis mit dem Rücklaufanteil <i>R</i> vervielfacht sie um 1/(1 − <i>R</i>), ein kleiner Splitteranteil verdünnt sie. Deshalb gelten an jedem Ausgang einer Unit zwei Grenzen, gemessen am Anteil jeder Karte an der Kartendichte:</p>
+<ul>
+  <li><b>Höchstens 2<i>N</i> Karten je Stromscheibe.</b> Sind es mehr, werden benachbarte Karten desselben Stoffs paarweise zusammengelegt, die leichtesten Paare zuerst; ein Paar darf zusammen höchstens 5/<i>N</i> tragen. Masse und Partikelzahl bleiben erhalten, die neue Größe folgt aus <i>d</i>³ = (<i>m</i><sub>1</sub> + <i>m</i><sub>2</sub>) / (<i>m</i><sub>1</sub>/<i>d</i><sub>1</sub>³ + <i>m</i><sub>2</sub>/<i>d</i><sub>2</sub>³).</li>
+  <li><b>Keine Karte über 5/<i>N</i>.</b> Eine schwerere Karte wird in gleiche Stücke gleicher Größe geteilt; die Verteilung ändert sich dadurch nicht.</li>
+</ul>
+<p>Inlets sind ausgenommen, ihre Karten folgen bereits der Kartendichte.</p>
+<p><b>Prüfung:</b> 20 000 Karten aus zehn Scheiben werden zu 4000 zusammengelegt, d<sub>10</sub>, d<sub>50</sub> und d<sub>90</sub> verschieben sich um höchstens 0,014 %; eine Rückführung mit <i>R</i> = 0,9 hält höchstens 4000 Karten im Kreis; das Teilen ändert das Ergebnis auf dem Raster um 5,5 · 10<sup>−16</sup>.</p>
+
+<h3 id="k9-6"><span class="nr">9.6</span>Umrechnung auf das Raster</h3>
+<p>Für Kurven, Heatmap und Auswertung werden die Karten auf das Größenraster umgerechnet: Jede Karte gibt ihre Masse anteilig an die beiden benachbarten Stützstellen ab, linear nach ihrer Lage in ln <i>d</i> (cloud-in-cell). Masse und mittleres ln <i>d</i> bleiben dabei exakt erhalten. Eine Kartenansicht zeigt außerdem die Verteilungen direkt aus den Karten – Dichte, Summenkurve, Karten je Klasse und den Verlauf über der Zeit – neben dem Mittel aller Läufe.</p>
+
+<h3 id="k9-7"><span class="nr">9.7</span>Prüfung des Partikelmodus</h3>
+<ul>
+  <li>Inlet → Outlet: Der Massenstrom am Outlet entspricht in jedem Schritt dem Zulaufprofil (relativ 10<sup>−12</sup>), die Verteilungssumme weicht um weniger als 0,2 % des Massenstroms vom Kontinuum ab.</li>
+  <li>Zwei Inlets → Merger → schwankender Splitter: Bei gleichem Seed liegen die Outlet-Massenströme je Schritt höchstens etwa eine Karte neben dem Kontinuum; jeder Stoff kommt vollständig an.</li>
+  <li>Sehr ungleich schwere Karten (Splitter 70/30): Die feinsten 5 % der Partikel gehen zu 69,97 % der Karten und 69,92 % der Masse in den 70-%-Ausgang, und kein Ausgang bleibt in einem Schritt ohne feine Karte.</li>
+  <li>Dosierwaage (Kapitel 11): Mittelwert und Streuung im Partikelmodus wie im Kontinuum.</li>
+</ul>
+
+
+<h2 id="k10"><span class="nr">10</span>Auswertung</h2>
+<p>Kurven zeigen Massenstrom, Temperatur und Druck über der Zeit oder die Verteilung über der Größe, jeweils mit Streuband über die Läufe. Die Heatmap zeigt die Massenstromdichte über Zeit und Größe mit beiden Randverteilungen; umschaltbar sind Lauf 1, Mittelwert und Standardabweichung.</p>
+<p>Das Fenster „Auswertung“ bereitet den Massenstrom eines Ausgangs so auf, wie man eine Messung auswertet (nach Engisch &amp; Muzzio 2012):</p>
+<ul>
+  <li>Mittel über Zeitfenster, etwa 1 s wie bei einer Waage; die Einschwingzeit lässt sich ausschließen.</li>
+  <li>Ausreißerfilter: erst Sollwert ± <i>x</i> %, dann wiederholt ± <i>k</i>σ, bis sich nichts mehr ändert.</li>
+  <li>Kennzahlen: Mittelwert, Standardabweichung, relative Standardabweichung, Schiefe und die Korrelation benachbarter Werte.</li>
+  <li>Dichte-Histogramm mit Band über alle Läufe, Wahrscheinlichkeitsnetz und Zeitverlauf; Export als CSV.</li>
+</ul>
+<p>Angeboten werden nur Ströme, die von einer Unit mit Zufall abhängen. Bei einem deterministischen Strom würde der zeitliche Verlauf sonst als scheinbare Streuung erscheinen. Ein Laufzeitprotokoll hält fest, welche Unit wann wie lange gerechnet hat.</p>
+<figure>
+  <img src="abbildungen/GUI_Auswertung.png" alt="Fenster Auswertung">
+  <figcaption>Abbildung 10.1 – Fenster „Auswertung“: Fenstermittel des Massenstroms mit Kennzahlen, Dichte-Histogramm, Wahrscheinlichkeitsnetz und Zeitverlauf.</figcaption>
+</figure>
+
+
+<h2 id="k11"><span class="nr">11</span>Prüfung und Validierung</h2>
+<p>Geprüft wird auf drei Ebenen.</p>
+<ul>
+  <li><b>Verifikation:</b> Rechnet das Programm, was das Modell sagt? Dazu dienen analytische Lösungen, Bilanzen und das Konvergenzverhalten mit 1/√<i>N</i>.</li>
+  <li><b>Vergleich mit anderen Programmen</b> wie Dyssol oder PharmaPy: gleiche Modelle, gleiche Ergebnisse?</li>
+  <li><b>Validierung:</b> Trifft das Modell die Wirklichkeit? Das zeigt nur ein Experiment.</li>
+</ul>
+<p>Die Prüfungen der Verifikation liegen als 13 Testprogramme im Repository und laufen mit einem Befehl (CTest). Stochastische Tests laufen mit festem Seed; ihre Toleranzen folgen aus dem statistischen Fehler und sind nicht frei gewählt. Ein Regressionstest überwacht Kennzahlen fester Flowsheets.</p>
+<h4>Validierung: Dosierwaage</h4>
+<p>Engisch &amp; Muzzio (2012) messen den Massenstrom einer Dosierwaage für Laktose mit einer Auffangwaage, die alle 0,1 s abliest. Simuliert wird ein Inlet mit 100 kg/h, gefolgt von einem schwankenden Splitter (μ = 0,6944, τ = 0,3 s), über 30 min mit Δ<i>t</i> = 0,1 s. Beide Datenreihen werden gleich ausgewertet: 1-s-Mittel, Filter ±10 % um den Sollwert, dann iterativ ±3σ.</p>
+<table>
+  <tr><th></th><th>Mittel</th><th>Standardabweichung</th><th>relative Std.</th></tr>
+  <tr><td>Messung</td><td>69,45 kg/h</td><td>0,539 kg/h</td><td>0,78 %</td></tr>
+  <tr><td>StoSiS</td><td>69,42 kg/h</td><td>0,534 kg/h</td><td>0,77 %</td></tr>
+</table>
+<p>Beide Verteilungen sind normalverteilt und statistisch nicht zu unterscheiden; 28 von 32 Balken des gemessenen Histogramms liegen im Band aus 20 Läufen. Validiert ist damit die Form der Schwankung, nicht ihre Vorhersage: Mittelwert und Streuung des Splitters sind an die Messung angepasst. Periodische Anteile im Messsignal, etwa von Rührern und Schnecken, bildet der Ornstein-Uhlenbeck-Prozess nicht ab.</p>
+<h4>Grenzen</h4>
+<p>Ein Vergleich mit anderen Programmen an gemeinsamen Flowsheets liegt nicht vor. Gegen Experimente geprüft ist nur der schwankende Splitter.</p>
+
+
+<h2 id="k12"><span class="nr">12</span>Begriffe</h2>
+<dl class="begriffe">
+  <dt>Flowsheet, Unit, Port</dt><dd>Das Fließschema aus Prozesseinheiten (Units), verbunden über nummerierte Ein- und Ausgänge (Ports).</dd>
+  <dt>Makroschritt, Zeitscheibe, Stromscheibe</dt><dd>Ein globaler Zeitschritt Δ<i>t</i>; der Strom an einer Verbindung während dieses Schritts.</dd>
+  <dt>Hold-up</dt><dd>Material, das zwischen zwei Schritten in einer Unit verbleibt.</dd>
+  <dt>Aufgeschnittene Verbindung</dt><dd>Die Verbindung in einem Kreis, deren Ziel den Strom des vorherigen Schritts liest.</dd>
+  <dt>Lauf, Seed</dt><dd>Eine vollständige Simulation mit einer Folge von Zufallszahlen; der Startwert dieser Folge.</dd>
+  <dt>Stützstelle</dt><dd>Größe, an der im Kontinuum die Massenstromdichte gespeichert wird.</dd>
+  <dt><i>Q</i><sub>3</sub>, <i>q</i><sub>3</sub>, <i>q</i><sub>3</sub>*, <i>q</i><sub>0</sub>*</dt><dd>Verteilungssumme der Masse, ihre Dichte über <i>d</i>, die Massendichte und die Anzahldichte je ln <i>d</i> (Fläche 1).</dd>
+  <dt>Karte</dt><dd>Gewichtetes Monte-Carlo-Partikel (Simulationspartikel) des Partikelmodus mit Größe und Massenstrom je Stoff; der Name stammt vom Bild eines Karteikastens (Kapitel 9.1, 9.2).</dd>
+  <dt>Gewicht einer Karte</dt><dd>Zahl der echten Partikel, die eine Karte in einem Zeitschritt vertritt.</dd>
+  <dt>Kartendichte, Anteil einer Karte</dt><dd>Die Dichte, nach der Karten über der Größe verteilt werden; der Anteil einer Karte daran innerhalb ihrer Stromscheibe.</dd>
+</dl>
+
+
+<h2 id="k13"><span class="nr">13</span>Literatur</h2>
+<div class="lit">
+<p>DeVille, R. E. L.; Riemer, N.; West, M. (2011): Weighted Flow Algorithms (WFA) for stochastic particle coagulation. Journal of Computational Physics 230(23), 8427–8451.</p>
+<p>Dukowicz, J. K. (1980): A particle-fluid numerical model for liquid sprays. Journal of Computational Physics 35(2), 229–253.</p>
+<p>Engisch, W. E.; Muzzio, F. J. (2012): Method for characterization of loss-in-weight feeder equipment. Powder Technology 228, 395–403.</p>
+<p>Gillespie, D. T. (1996): Exact numerical simulation of the Ornstein-Uhlenbeck process and its integral. Physical Review E 54, 2084–2091.</p>
+<p>Hesterberg, T. (1995): Weighted average importance sampling and defensive mixture distributions. Technometrics 37(2), 185–194.</p>
+<p>Hyndman, R. J.; Fan, Y. (1996): Sample quantiles in statistical packages. The American Statistician 50, 361–365.</p>
+<p>Kahn, A. B. (1962): Topological sorting of large networks. Communications of the ACM 5, 558–562.</p>
+<p>Kotalczyk, G.; Kruis, F. E. (2017): A Monte Carlo method for the simulation of coagulation and nucleation based on weighted particles and the concepts of stochastic resolution and merging. Journal of Computational Physics 340, 276–296.</p>
+<p>Kruis, F. E.; Maisels, A.; Fissan, H. (2000): Direct simulation Monte Carlo method for particle coagulation and aggregation. AIChE Journal 46, 1735–1742.</p>
+<p>Lécot, C.; Wagner, W. (2004): A quasi-Monte Carlo scheme for Smoluchowski's coagulation equation. Mathematics of Computation 73, 1953–1966.</p>
+<p>Lemmon, E. W.; Jacobsen, R. T (2004): Viscosity and thermal conductivity equations for nitrogen, oxygen, argon, and air. International Journal of Thermophysics 25, 21–69.</p>
+<p>Marsaglia, G.; Bray, T. A. (1964): A convenient method for generating normal variables. SIAM Review 6, 260–264.</p>
+<p>Matsumoto, M.; Nishimura, T. (1998): Mersenne Twister: a 623-dimensionally equidistributed uniform pseudo-random number generator. ACM Transactions on Modeling and Computer Simulation 8, 3–30.</p>
+<p>Shima, S.; Kusano, K.; Kawano, A.; Sugiyama, T.; Kawahara, S. (2009): The super-droplet method for the numerical simulation of clouds and precipitation: a particle-based and probabilistic microphysics model coupled with a non-hydrostatic model. Quarterly Journal of the Royal Meteorological Society 135, 1307–1320.</p>
+<p>Skorych, V.; Dosta, M.; Heinrich, S. (2020): Dyssol – an open-source flowsheet simulation framework for particulate materials. SoftwareX 12, 100572.</p>
+<p>Steele, G. L.; Lea, D.; Flood, C. H. (2014): Fast splittable pseudorandom number generators. Proceedings OOPSLA 2014.</p>
+<p>Uhlenbeck, G. E.; Ornstein, L. S. (1930): On the theory of the Brownian motion. Physical Review 36, 823–841.</p>
+<p>Welford, B. P. (1962): Note on a method for calculating corrected sums of squares and products. Technometrics 4, 419–420.</p>
+<p>Zhao, H.; Kruis, F. E.; Zheng, C. (2009): Reducing statistical noise and extending the size spectrum by applying weighted simulation particles in Monte Carlo simulation of coagulation. Aerosol Science and Technology 43, 781–793.</p>
+</div>
+
+</main>
+</body>
+</html>

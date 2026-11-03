@@ -8,7 +8,7 @@
 
 namespace stosis
 {
-    // Kartendichte (Methoden-Dokument 13.26): Wo Karten sitzen, legt ein
+    // Kartendichte (Arbeitsdokument 13.26): Wo Karten sitzen, legt ein
     // Mittel aus Masse und Partikelzahl fest, abgeflacht mit dem Exponenten
     // gamma:
     //   c ~ M(q3*, q0*)^gamma mit M(a, b) = (1 - f) a + f b             (Summe)

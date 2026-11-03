@@ -10,7 +10,7 @@
 
 namespace stosis
 {
-    // Grenzen je Stromscheibe (Partikelmodus Schritt 2.4, Methoden-Dokument
+    // Grenzen je Stromscheibe (Partikelmodus Schritt 2.4, Arbeitsdokument
     // 13.24 und 13.26). Jede Karte traegt einen Anteil s an der Kartendichte
     // ihrer Scheibe (ComputeCardShares, dieselbe Regel wie am Inlet); Bezug
     // ist N = Karten je Stromscheibe.

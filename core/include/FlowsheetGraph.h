@@ -1013,7 +1013,7 @@ namespace stosis
             for (const std::string& name : names)
                 list += (list.empty() ? "" : ", ") + name;
             m_warnings.insert("Partikelmodus: Simulation nicht gestartet. Noch ohne Karten: " + list +
-                ". Die Units lernen Karten schrittweise (Methoden-Dokument Kap. 15); "
+                ". Die Units lernen Karten schrittweise (Arbeitsdokument Kap. 15); "
                 "bis dahin Darstellung \"Kontinuum\" waehlen.");
             return false;
         }

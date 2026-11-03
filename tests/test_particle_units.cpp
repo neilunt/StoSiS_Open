@@ -1,4 +1,4 @@
-// Merger und Splitter im Partikelmodus (Methoden-Dokument 13.18, 13.22):
+// Merger und Splitter im Partikelmodus (Arbeitsdokument 13.18, 13.22):
 // Karten aneinanderhaengen, Konto-Verfahren, Vergleich mit dem Kontinuum.
 #include "FlowsheetGraph.h"
 #include "CardPlacement.h"
@@ -257,7 +257,7 @@ int main()
 
     // 5) Rueckfuehrung ohne Hold-up (Merger -> Splitter, 50 % zurueck): Die
     //    Kartenzahl im Kreis bleibt begrenzt (N / (1 - R)), der Austrag
-    //    erreicht den Zulauf - ohne Zusammenlegen (Methoden-Dokument 13.19, Fall C).
+    //    erreicht den Zulauf - ohne Zusammenlegen (Arbeitsdokument 13.19, Fall C).
     {
         for (double recycle : { 0.5, 0.9 })
         {
@@ -344,7 +344,7 @@ int main()
         Check(worstBalance < 1e-12, "Flowsheet: Sand und Kohle kommen je Schritt vollstaendig an den Outlets an");
     }
 
-    // 7) Dosierwaage (Methoden-Dokument Kap. 15): Inlet 100 kg/h -> OU-Splitter
+    // 7) Dosierwaage (Arbeitsdokument Kap. 15): Inlet 100 kg/h -> OU-Splitter
     //    (mu 0,6944, sigma 0,0081, tau 0,3 s) -> Auffangwaage, 1800 s, dt 0,1 s.
     //    Auswertung wie im Fenster "Auswertung" (1-s-Mittel): Kontinuum und
     //    Partikelmodus liefern dieselbe Statistik.
@@ -380,7 +380,7 @@ int main()
             "Dosierwaage: Mittel (1e-4) und Streuung (1 %) im Partikelmodus wie im Kontinuum");
     }
 
-    // 6) Grenzen je Stromscheibe (Methoden-Dokument 13.24, 13.26): ueber 2 N
+    // 6) Grenzen je Stromscheibe (Arbeitsdokument 13.24, 13.26): ueber 2 N
     //    Karten zusammenlegen (leichteste Paare nach Anteil an der
     //    Kartendichte), Karten mit mehr als 5 / N teilen; die Masse bleibt
     //    genau erhalten, beim Zusammenlegen auch die Partikelzahl.

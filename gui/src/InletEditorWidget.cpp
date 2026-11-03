@@ -179,7 +179,7 @@ QWidget* InletEditorWidget::CreateDistributionGroup()
 	m_distForm = form;
 
 	// Log-Normal zuerst (Standard), die Normalverteilung zuletzt und mit
-	// Warnung (Methoden-Dokument Kap. 3).
+	// Warnung (Arbeitsdokument Kap. 3).
 	m_distTypeCombo = new QComboBox(group);
 	for (stosis::EDistributionType type : { stosis::EDistributionType::LogNormal,
 	                                              stosis::EDistributionType::RRSB,
