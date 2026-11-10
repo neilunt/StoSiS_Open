@@ -326,7 +326,7 @@ void FlowsheetStructureWindow::AddBranch(QTreeWidgetItem* parent, const stosis::
             + "): liest den Strom des vorigen Zeitschritts");
         const QString tip = byHand
             ? "Von Hand als Rueckfuehrung markiert (in der Datei \"recycle\": \"manual\")."
-            : "Der Graph hat den Kreis hier aufgeschnitten (Regel im Methodenhandbuch Kap. 3);\n"
+            : "Der Graph hat den Kreis hier aufgeschnitten (Regel im Methodenhandbuch 3.2);\n"
               "in der Datei \"recycle\": \"auto\", beim Laden wird es neu bestimmt.";
         for (int column = 0; column < kNumColumns; ++column)
         {

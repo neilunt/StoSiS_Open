@@ -6,7 +6,7 @@ class QGraphicsItem;
 class QGraphicsRectItem;
 class QGraphicsScene;
 
-// Reiter "Bild" im Fenster "Struktur" (Methodenhandbuch Kap. 3): die
+// Reiter "Bild" im Fenster "Struktur" (Methodenhandbuch 3.3): die
 // Struktur als Zeichnung von links nach rechts in Stromrichtung, Aeste nach
 // oben und unten. Kasten = Unit mit Name und darunter grau "node k" (k =
 // Platz in der Rechenreihenfolge ab 0, bei jedem Zeichnen neu vergeben).

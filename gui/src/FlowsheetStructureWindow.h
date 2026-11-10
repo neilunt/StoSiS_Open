@@ -13,7 +13,7 @@ class QTreeWidgetItem;
 class StructureDiagramWidget;
 
 // Fenster "Struktur" (Werkzeugleiste, Menue Flowsheet; Methodenhandbuch
-// Kap. 3): wie der Graph das Flowsheet in jedem Zeitschritt abarbeitet -
+// 3.3): wie der Graph das Flowsheet in jedem Zeitschritt abarbeitet -
 // Rechenreihenfolge, Kreise und aufgeschnittene Rueckfuehrungen. Reiter
 // "Bild": Aststruktur als Zeichnung (StructureDiagramWidget); Reiter "Text":
 // derselbe Baum als Liste. Daneben das Flowsheet so, wie es in der Datei

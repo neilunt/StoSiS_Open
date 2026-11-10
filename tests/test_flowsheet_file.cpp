@@ -1,4 +1,4 @@
-// Flowsheet als Datei und Struktur (Methodenhandbuch Kap. 3):
+// Flowsheet als Datei und Struktur (Methodenhandbuch 3.3, 3.4):
 // Rundlauftest (schreiben, lesen, wieder schreiben = derselbe Text; gleiche
 // Ergebnisse bei gleichem Seed), jede Einstellung abweichend vom Standard,
 // Fehler und Hinweise beim Lesen, Rechenreihenfolge, Kreise, Schnitte und

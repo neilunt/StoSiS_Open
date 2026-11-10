@@ -9,8 +9,8 @@
 # In Klammern: Kapitel im Methodenhandbuch (docs/StoSiS_Methodenhandbuch.html).
 set(STOSIS_TESTS
     test_distributions   # Groessenverteilungen am Inlet (Kap. 5)
-    test_graph           # Ports, Splitter/Merger, Schnittregel (Kap. 3)
-    test_recycle         # Rueckfuehrungen, Massenbilanz (Kap. 3)
+    test_graph           # Ports, Splitter/Merger, Schnittregel (Kap. 3.1, 3.2)
+    test_recycle         # Rueckfuehrungen, Massenbilanz (Kap. 3.2)
     test_splitter_ou     # OU-Splitter, Zufallszahlen (Kap. 7.2, 8)
     test_ensemble        # Mehrfachlaeufe gegen analytische Loesung (Kap. 8)
     test_materials       # Materialdatei (Kap. 6)
@@ -21,7 +21,7 @@ set(STOSIS_TESTS
     test_particle_units  # Merger und Splitter im Partikelmodus (Kap. 9.4, 9.5)
     test_vessel          # Behaelter: vier Mischungen, Anfangsfuellung, Vorrat (Kap. 7.4)
     test_runlog          # Laufzeitprotokoll, Fortschritt, Kartenspeicher (Kap. 9.6, 10)
-    test_flowsheet_file  # Flowsheet als Datei: Rundlauf, Fehler, Struktur (Kap. 3)
+    test_flowsheet_file  # Flowsheet als Datei: Rundlauf, Fehler, Struktur (Kap. 3.3, 3.4)
     test_regression      # alle Ergebnisse gegen gespeicherte Referenzwerte
 )
 

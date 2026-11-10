@@ -12,7 +12,7 @@
 #define STOSIS_VERSION "?"
 #endif
 
-// Flowsheet als Datei (Methodenhandbuch Kap. 3). Die JSON-Bibliothek
+// Flowsheet als Datei (Methodenhandbuch 3.4). Die JSON-Bibliothek
 // (nlohmann/json) wird nur hier und in MaterialDatabase.cpp gebraucht.
 
 namespace stosis

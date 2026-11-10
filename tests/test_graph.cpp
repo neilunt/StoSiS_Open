@@ -1,5 +1,5 @@
 // Flowsheet-Graph: Ports, Splitter/Merger, Wahl der Schnittstelle in
-// Kreisen (Methodenhandbuch Kap. 3).
+// Kreisen (Methodenhandbuch 3.1, 3.2).
 #include "FlowsheetGraph.h"
 #include "TestSupport.h"
 

@@ -96,7 +96,7 @@ namespace stosis
     };
 
     // Ein Eintrag im Baum der Flowsheet-Struktur (Fenster "Struktur",
-    // Methodenhandbuch Kap. 3). Jede Unit steht genau einmal als Unit-Eintrag
+    // Methodenhandbuch 3.3). Jede Unit steht genau einmal als Unit-Eintrag
     // darin, und zwar unter dem Vorgaenger an ihrem niedrigsten nicht
     // aufgeschnittenen Eingang. Jede weitere Verbindung erscheint als Blatt:
     // als Verweis (die Unit steht an anderer Stelle im Baum) oder als
@@ -112,7 +112,7 @@ namespace stosis
     };
 
     // Wie der Graph das Flowsheet in jedem Zeitschritt abarbeitet
-    // (CFlowsheetGraph::GetStructure, Methodenhandbuch Kap. 3).
+    // (CFlowsheetGraph::GetStructure, Methodenhandbuch 3.3).
     struct SFlowsheetStructure
     {
         std::vector<std::string> order;               // Knoten-IDs in Rechenreihenfolge
@@ -188,7 +188,7 @@ namespace stosis
             return AddNode(name, ENodeType::Vessel, 1, 1, posX, posY, std::make_unique<CVesselUnit>());
         }
 
-        // Knoten mit vorgegebener ID (Flowsheet-Datei, Methodenhandbuch Kap. 3):
+        // Knoten mit vorgegebener ID (Flowsheet-Datei, Methodenhandbuch 3.4):
         // Aus der ID leitet sich der Zufallsstrom der Unit ab (GetUnitSeed),
         // deshalb behaelt ein geladenes Flowsheet seine IDs. numPorts = Zahl
         // der Ausgaenge beim Splitter bzw. der Eingaenge beim Merger, bei den
@@ -308,7 +308,7 @@ namespace stosis
         }
 
         // Rechenreihenfolge, aufgeschnittene Verbindungen, Kreise und der
-        // Baum fuer das Fenster "Struktur" (Methodenhandbuch Kap. 3). Ein
+        // Baum fuer das Fenster "Struktur" (Methodenhandbuch 3.3). Ein
         // Kreis ist eine Gruppe von Units, die sich ueber Verbindungen
         // gegenseitig erreichen (starke Zusammenhangskomponente mit mehr als
         // einer Unit); aufgeschnittene Verbindungen zaehlen dabei mit.

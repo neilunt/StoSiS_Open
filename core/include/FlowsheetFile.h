@@ -5,7 +5,7 @@
 
 namespace stosis
 {
-    // Flowsheet als Datei (Methodenhandbuch Kap. 3): JSON mit allen
+    // Flowsheet als Datei (Methodenhandbuch 3.4): JSON mit allen
     // Eingaben, jeder Wert ausgeschrieben (auch Standardwerte, damit eine
     // Datei auch dann gleich rechnet, wenn sich ein Standardwert aendert).
     //  - Simulation: Dauer, dt, Seed, Laeufe, Darstellung, Groessenraster,

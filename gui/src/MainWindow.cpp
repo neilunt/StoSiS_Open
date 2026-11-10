@@ -65,7 +65,7 @@ void MainWindow::BuildTestFlowsheet()
     //   Inlet -> Merger -> Splitter -> Outlet (70 %),
     //   Splitter -> Prozess -> Merger (30 %, Rueckfuehrung ueber die
     //   Verzoegerung; der Graph schneidet den Kreis automatisch an einer
-    //   Verbindung auf, Methodenhandbuch Kap. 3).
+    //   Verbindung auf, Methodenhandbuch 3.2).
     // Lage: Der Splitter verzweigt nach oben zum Outlet und nach unten zum
     // Prozess; die Rueckfuehrung laeuft unten herum in den Merger - so
     // kreuzen sich keine Kabel (Merger und Splitter sind 60 hoch, Ports bei
@@ -113,7 +113,7 @@ void MainWindow::SetupMenuAndToolBar()
     QAction* logAction = flowsheetMenu->addAction("&Laufzeitprotokoll oeffnen");
     connect(logAction, &QAction::triggered, this, &MainWindow::OnShowLog);
     // Struktur: Rechenreihenfolge, Kreise, Schnitte als Baum und das Flowsheet
-    // als Datei (Methodenhandbuch Kap. 3).
+    // als Datei (Methodenhandbuch 3.3, 3.4).
     QAction* structureAction = flowsheetMenu->addAction("&Struktur anzeigen");
     connect(structureAction, &QAction::triggered, this, &MainWindow::OnShowStructure);
     flowsheetMenu->addSeparator();
