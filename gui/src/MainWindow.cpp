@@ -7,6 +7,7 @@
 #include "AnalysisWindow.h"
 #include "CardWindow.h"
 #include "SimulationLogWindow.h"
+#include "FlowsheetStructureWindow.h"
 #include "ResultsHeatmapWindow.h"
 #include "SettingsWindow.h"
 #include "MaterialsPage.h"
@@ -27,6 +28,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLocale>
+#include <QDir>
 #include <algorithm>
 #include <cmath>
 
@@ -110,6 +112,13 @@ void MainWindow::SetupMenuAndToolBar()
     connect(cardsAction, &QAction::triggered, this, &MainWindow::OnShowCards);
     QAction* logAction = flowsheetMenu->addAction("&Laufzeitprotokoll oeffnen");
     connect(logAction, &QAction::triggered, this, &MainWindow::OnShowLog);
+    // Struktur: Rechenreihenfolge, Kreise, Schnitte als Baum und das Flowsheet
+    // als Datei (Methodenhandbuch Kap. 3).
+    QAction* structureAction = flowsheetMenu->addAction("&Struktur anzeigen");
+    connect(structureAction, &QAction::triggered, this, &MainWindow::OnShowStructure);
+    flowsheetMenu->addSeparator();
+    QAction* saveAction = flowsheetMenu->addAction("Flowsheet als &Datei speichern ...");
+    connect(saveAction, &QAction::triggered, this, &MainWindow::OnSaveFlowsheet);
 
     // Alte Test-/Demo-Fenster: weiterhin erreichbar, aber aus dem
     // Hauptablauf heraus.
@@ -128,6 +137,7 @@ void MainWindow::SetupMenuAndToolBar()
     toolBar->addAction(analysisAction);
     toolBar->addAction(cardsAction);
     toolBar->addAction(logAction);
+    toolBar->addAction(structureAction);
 }
 
 void MainWindow::SetupCentralArea()
@@ -220,12 +230,14 @@ void MainWindow::SetupCentralArea()
             stosis::SCardSettings settings = m_graph.GetCardSettings();
             settings.sliceLimits = on;
             m_graph.SetCardSettings(settings);
+            RefreshStructureWindow();
         });
     connect(m_cardsSpin, &QSpinBox::valueChanged, this, [this](int cards)
         {
             stosis::SCardSettings settings = m_graph.GetCardSettings();
             settings.cardsPerSlice = static_cast<size_t>(cards);
             m_graph.SetCardSettings(settings);
+            RefreshStructureWindow();
             if (m_settingsWindow)
                 m_settingsWindow->RefreshPreviews();
         });
@@ -236,6 +248,7 @@ void MainWindow::SetupCentralArea()
             m_cardsSpin->setEnabled(representation == stosis::ERepresentation::Particles);
             m_limitsCheck->setEnabled(representation == stosis::ERepresentation::Particles);
             SyncAnalysisSettings();
+            RefreshStructureWindow();
             if (m_settingsWindow)
                 m_settingsWindow->RefreshPreviews();
         });
@@ -252,10 +265,12 @@ void MainWindow::SetupCentralArea()
     connect(m_durationSpin, &QDoubleSpinBox::valueChanged, this, &MainWindow::ApplyTimeGrid);
     connect(m_dtSpin, &QDoubleSpinBox::valueChanged, this, &MainWindow::ApplyTimeGrid);
     connect(m_runsSpin, &QSpinBox::valueChanged, this, &MainWindow::SyncAnalysisSettings);
+    connect(m_runsSpin, &QSpinBox::valueChanged, this, &MainWindow::RefreshStructureWindow);
     ApplyTimeGrid();
     connect(m_seedSpin, &QSpinBox::valueChanged, this, [this](int seed)
         {
             m_graph.SetRandomSeed(static_cast<std::uint64_t>(seed));
+            RefreshStructureWindow();
             if (m_settingsWindow)
                 m_settingsWindow->RefreshPreviews();
         });
@@ -295,6 +310,8 @@ void MainWindow::SetupCentralArea()
                 m_cardWindow->RefreshNodeList();
         });
     connect(m_canvas, &FlowsheetCanvasWidget::NodeDoubleClicked, this, &MainWindow::OnNodeDoubleClicked);
+    connect(m_canvas, &FlowsheetCanvasWidget::NodesChanged, this, &MainWindow::RefreshStructureWindow);
+    connect(m_canvas, &FlowsheetCanvasWidget::ConnectionsChanged, this, &MainWindow::RefreshStructureWindow);
 }
 
 void MainWindow::OnSimulate()
@@ -398,6 +415,8 @@ SettingsWindow* MainWindow::EnsureSettingsWindow()
         // Ergebnisansichten halten Zeiger auf deren Ergebnisse und muessen
         // sie sofort neu holen, sonst zeigen sie auf freigegebenen Speicher.
         connect(m_settingsWindow, &SettingsWindow::ModelTypeChanged, this, &MainWindow::RefreshResultViews);
+        connect(m_settingsWindow, &SettingsWindow::SettingsApplied, this, &MainWindow::RefreshStructureWindow);
+        connect(m_settingsWindow, &SettingsWindow::ModelTypeChanged, this, &MainWindow::RefreshStructureWindow);
     }
     return m_settingsWindow;
 }
@@ -423,6 +442,7 @@ void MainWindow::ApplyTimeGrid()
     if (m_settingsWindow)
         m_settingsWindow->RefreshPreviews();
     SyncAnalysisSettings();
+    RefreshStructureWindow();
 }
 
 QString MainWindow::TimeGridInfo() const
@@ -538,4 +558,37 @@ void MainWindow::OnRunCudaTest()
         QMessageBox::information(this, "CUDA-Test", QString::fromStdString(info));
     else
         QMessageBox::warning(this, "CUDA-Test", QString::fromStdString(info));
+}
+
+stosis::SFlowsheetFileSettings MainWindow::CurrentFileSettings() const
+{
+    stosis::SFlowsheetFileSettings settings;
+    settings.runs = static_cast<size_t>(m_runsSpin->value());
+    return settings;
+}
+
+void MainWindow::RefreshStructureWindow()
+{
+    if (m_structureWindow)
+        m_structureWindow->Refresh();
+}
+
+void MainWindow::OnShowStructure()
+{
+    if (!m_structureWindow)
+    {
+        m_structureWindow = new FlowsheetStructureWindow(this);
+        m_structureWindow->SetFileSettingsProvider([this]() { return CurrentFileSettings(); });
+        m_structureWindow->SetGraph(&m_graph);
+    }
+    m_structureWindow->show();
+    m_structureWindow->raise();
+    m_structureWindow->activateWindow();
+}
+
+void MainWindow::OnSaveFlowsheet()
+{
+    const QString path = FlowsheetStructureWindow::SaveFlowsheetAs(this, m_graph, CurrentFileSettings());
+    if (!path.isEmpty())
+        statusBar()->showMessage("Flowsheet gespeichert: " + QDir::toNativeSeparators(path), 8000);
 }

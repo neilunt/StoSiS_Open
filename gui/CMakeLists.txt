@@ -60,6 +60,10 @@ src/AnalysisPlotWidget.cpp
 src/AnalysisPlotWidget.h
 src/SimulationLogWindow.cpp
 src/SimulationLogWindow.h
+src/FlowsheetStructureWindow.cpp
+src/FlowsheetStructureWindow.h
+src/StructureDiagramWidget.cpp
+src/StructureDiagramWidget.h
 src/CardWindow.cpp
 src/CardWindow.h
 src/CardPlotWidget.cpp
@@ -78,6 +82,8 @@ src/CardDensityPreviewWidget.cpp
 src/CardDensityPreviewWidget.h
 src/SplitterEditorWidget.cpp
 src/SplitterEditorWidget.h
+src/VesselEditorWidget.cpp
+src/VesselEditorWidget.h
 src/FractionPreviewWidget.cpp
 src/FractionPreviewWidget.h
 src/ResultsEntryKey.h

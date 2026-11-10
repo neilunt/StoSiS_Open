@@ -2,6 +2,7 @@
 #include "InletEditorWidget.h"
 #include "ProcessNodeEditorWidget.h"
 #include "SplitterEditorWidget.h"
+#include "VesselEditorWidget.h"
 #include "MaterialsPage.h"
 #include "SieveGridWidget.h"
 #include "CardDensityPreviewWidget.h"
@@ -44,7 +45,11 @@ void SettingsWindow::SetupUi()
     m_materialsPage = new MaterialsPage(this);
     m_tabs->addTab(m_materialsPage, "Materialien");
     // Neu geladene Stoffliste auch in der Inlet-Auswahl zeigen.
-    connect(m_materialsPage, &MaterialsPage::DatabaseReloaded, this, [this]() { m_inletEditor->RefreshMaterialList(); });
+    connect(m_materialsPage, &MaterialsPage::DatabaseReloaded, this, [this]()
+        {
+            m_inletEditor->RefreshMaterialList();
+            m_vesselEditor->RefreshMaterialList();
+        });
     // Pruefung im Reiter "Raster" aktuell halten (Inlet geaendert, Reiter gewechselt).
     connect(this, &SettingsWindow::SettingsApplied, this, &SettingsWindow::UpdateGridCheck);
     connect(m_tabs, &QTabWidget::currentChanged, this, &SettingsWindow::UpdateGridCheck);
@@ -89,11 +94,15 @@ QWidget* SettingsWindow::CreateNodeTab()
     mergerPage->setAlignment(Qt::AlignCenter);
     m_pages->insertWidget(PageMerger, mergerPage);
 
+    m_vesselEditor = new VesselEditorWidget(m_pages);
+    m_pages->insertWidget(PageVessel, m_vesselEditor);
+
     layout->addWidget(m_pages, 1);
 
     connect(m_inletEditor, &InletEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
     connect(m_processEditor, &ProcessNodeEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
     connect(m_splitterEditor, &SplitterEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
+    connect(m_vesselEditor, &VesselEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
     connect(m_processEditor, &ProcessNodeEditorWidget::ModelTypeChanged, this, &SettingsWindow::ModelTypeChanged);
 
     return tab;
@@ -604,6 +613,7 @@ void SettingsWindow::SetGraph(stosis::CFlowsheetGraph* graph)
     m_inletEditor->SetGraph(graph);
     m_processEditor->SetGraph(graph);
     m_splitterEditor->SetGraph(graph);
+    m_vesselEditor->SetGraph(graph);
     LoadGridValues();
     if (graph)
         LoadCardValues(graph->GetCardSettings());
@@ -614,6 +624,7 @@ void SettingsWindow::SetMaterialDatabase(stosis::CMaterialDatabase* database, co
 {
     m_materialsPage->SetDatabase(database, loadError);
     m_inletEditor->SetMaterialDatabase(database);
+    m_vesselEditor->SetMaterialDatabase(database);
 }
 
 void SettingsWindow::ShowMaterials()
@@ -696,6 +707,10 @@ void SettingsWindow::OnNodeSelectionChanged(int index)
         case stosis::ENodeType::Merger:
             m_pages->setCurrentIndex(PageMerger);
             break;
+        case stosis::ENodeType::Vessel:
+            m_vesselEditor->SetNode(nodeId);
+            m_pages->setCurrentIndex(PageVessel);
+            break;
         }
         return;
     }
@@ -741,5 +756,6 @@ void SettingsWindow::RefreshPreviews()
     UpdateGridCheck();
     m_inletEditor->RefreshGridPreview();
     m_splitterEditor->UpdatePreview();
+    m_vesselEditor->UpdateHints();
     UpdateCardPreview();
 }

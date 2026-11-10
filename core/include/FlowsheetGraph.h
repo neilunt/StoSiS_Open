@@ -19,6 +19,7 @@
 #include "OutletUnit.h"
 #include "SplitterUnit.h"
 #include "MergerUnit.h"
+#include "VesselUnit.h"
 #include "StreamProcessorRegistry.h"
 #include "BuiltinStreamProcessors.h"
 
@@ -33,7 +34,8 @@ namespace stosis
         Outlet,
         Process,
         Splitter,
-        Merger
+        Merger,
+        Vessel
     };
 
     // Anzeigename eines Knotentyps - an einer Stelle, damit alle Listen
@@ -47,6 +49,7 @@ namespace stosis
         case ENodeType::Process:  return "Prozess";
         case ENodeType::Splitter: return "Splitter";
         case ENodeType::Merger:   return "Merger";
+        case ENodeType::Vessel:   return "Behaelter";
         }
         return "?";
     }
@@ -92,6 +95,48 @@ namespace stosis
         std::string label;
     };
 
+    // Ein Eintrag im Baum der Flowsheet-Struktur (Fenster "Struktur",
+    // Methodenhandbuch Kap. 3). Jede Unit steht genau einmal als Unit-Eintrag
+    // darin, und zwar unter dem Vorgaenger an ihrem niedrigsten nicht
+    // aufgeschnittenen Eingang. Jede weitere Verbindung erscheint als Blatt:
+    // als Verweis (die Unit steht an anderer Stelle im Baum) oder als
+    // Schnitt (aufgeschnittene Verbindung, das Ziel liest den Strom aus dem
+    // vorigen Zeitschritt).
+    struct SStructureBranch
+    {
+        enum class EKind { Unit, Reference, Cut };
+        EKind kind = EKind::Unit;
+        std::string nodeId;       // Unit: diese Unit; Verweis/Schnitt: Ziel der Verbindung
+        std::string connectionId; // Verbindung vom Eintrag darueber, leer bei Wurzeln
+        std::vector<SStructureBranch> children;
+    };
+
+    // Wie der Graph das Flowsheet in jedem Zeitschritt abarbeitet
+    // (CFlowsheetGraph::GetStructure, Methodenhandbuch Kap. 3).
+    struct SFlowsheetStructure
+    {
+        std::vector<std::string> order;               // Knoten-IDs in Rechenreihenfolge
+        std::set<std::string> lagged;                 // aufgeschnittene Verbindungen
+        std::vector<std::vector<std::string>> cycles; // Kreise: Knoten-IDs, in Rechenreihenfolge
+        std::vector<SStructureBranch> roots;          // Baum: Wurzeln = Units ohne laufenden Zulauf
+
+        // Platz in der Rechenreihenfolge ab 1; 0, wenn unbekannt.
+        size_t GetStep(const std::string& nodeId) const
+        {
+            const auto it = std::find(order.begin(), order.end(), nodeId);
+            return it != order.end() ? static_cast<size_t>(it - order.begin()) + 1 : 0;
+        }
+
+        // Kreis ab 0, auf dem die Unit liegt; -1, wenn auf keinem.
+        int GetCycle(const std::string& nodeId) const
+        {
+            for (size_t i = 0; i < cycles.size(); ++i)
+                if (std::find(cycles[i].begin(), cycles[i].end(), nodeId) != cycles[i].end())
+                    return static_cast<int>(i);
+            return -1;
+        }
+    };
+
     // Generisches Flowsheet: beliebig viele Knoten, beliebig viele
     // Verbindungen dazwischen, auch mit Rueckfuehrungen (Kreisen).
     //
@@ -122,11 +167,7 @@ namespace stosis
 
         std::string AddProcessNode(const std::string& name, double posX, double posY)
         {
-            const std::vector<std::string> names = m_processorRegistry.GetAvailableTypeNames();
-            std::unique_ptr<IFlowsheetUnit> processor;
-            if (!names.empty())
-                processor = m_processorRegistry.CreateProcessor(names.front());
-            return AddNode(name, ENodeType::Process, 1, 1, posX, posY, std::move(processor));
+            return AddNode(name, ENodeType::Process, 1, 1, posX, posY, CreateDefaultProcessor());
         }
 
         std::string AddSplitterNode(const std::string& name, size_t numOutputs, double posX, double posY)
@@ -139,6 +180,45 @@ namespace stosis
         {
             return AddNode(name, ENodeType::Merger, numInputs, 1, posX, posY,
                 std::make_unique<CMergerUnit>(numInputs));
+        }
+
+        // Behaelter mit Hold-up (Methodenhandbuch 7.4), ein Ein- und ein Ausgang.
+        std::string AddVesselNode(const std::string& name, double posX, double posY)
+        {
+            return AddNode(name, ENodeType::Vessel, 1, 1, posX, posY, std::make_unique<CVesselUnit>());
+        }
+
+        // Knoten mit vorgegebener ID (Flowsheet-Datei, Methodenhandbuch Kap. 3):
+        // Aus der ID leitet sich der Zufallsstrom der Unit ab (GetUnitSeed),
+        // deshalb behaelt ein geladenes Flowsheet seine IDs. numPorts = Zahl
+        // der Ausgaenge beim Splitter bzw. der Eingaenge beim Merger, bei den
+        // anderen Typen ohne Bedeutung. Leer, wenn die ID leer oder vergeben
+        // ist oder ein Splitter/Merger keinen Port haette.
+        std::string AddNodeWithId(const std::string& id, ENodeType type, const std::string& name,
+            size_t numPorts, double posX, double posY)
+        {
+            if (id.empty() || FindNode(id))
+                return std::string();
+            switch (type)
+            {
+            case ENodeType::Inlet:
+                return AddNode(name, type, 0, 1, posX, posY, std::make_unique<CInletUnit>(), id);
+            case ENodeType::Outlet:
+                return AddNode(name, type, 1, 0, posX, posY, std::make_unique<COutletUnit>(), id);
+            case ENodeType::Process:
+                return AddNode(name, type, 1, 1, posX, posY, CreateDefaultProcessor(), id);
+            case ENodeType::Splitter:
+                return numPorts > 0
+                    ? AddNode(name, type, 1, numPorts, posX, posY, std::make_unique<CSplitterUnit>(numPorts), id)
+                    : std::string();
+            case ENodeType::Merger:
+                return numPorts > 0
+                    ? AddNode(name, type, numPorts, 1, posX, posY, std::make_unique<CMergerUnit>(numPorts), id)
+                    : std::string();
+            case ENodeType::Vessel:
+                return AddNode(name, type, 1, 1, posX, posY, std::make_unique<CVesselUnit>(), id);
+            }
+            return std::string();
         }
 
         // Entfernt einen Knoten samt seiner Recheneinheit, seiner Ergebnisse
@@ -227,6 +307,104 @@ namespace stosis
             return lagged;
         }
 
+        // Rechenreihenfolge, aufgeschnittene Verbindungen, Kreise und der
+        // Baum fuer das Fenster "Struktur" (Methodenhandbuch Kap. 3). Ein
+        // Kreis ist eine Gruppe von Units, die sich ueber Verbindungen
+        // gegenseitig erreichen (starke Zusammenhangskomponente mit mehr als
+        // einer Unit); aufgeschnittene Verbindungen zaehlen dabei mit.
+        SFlowsheetStructure GetStructure() const
+        {
+            SFlowsheetStructure structure;
+            BuildExecutionPlan(structure.order, structure.lagged);
+
+            // Erreichbarkeit ueber alle Verbindungen (Flowsheets sind klein).
+            std::map<std::string, std::set<std::string>> reach;
+            for (const SFlowsheetNode& node : m_nodes)
+            {
+                std::set<std::string>& seen = reach[node.id];
+                std::vector<std::string> stack = { node.id };
+                while (!stack.empty())
+                {
+                    const std::string current = stack.back();
+                    stack.pop_back();
+                    for (const SFlowsheetConnection& conn : m_connections)
+                        if (conn.sourceNodeId == current && seen.insert(conn.targetNodeId).second)
+                            stack.push_back(conn.targetNodeId);
+                }
+            }
+            std::set<std::string> assigned;
+            for (const std::string& id : structure.order)
+            {
+                if (assigned.count(id) || !reach[id].count(id))
+                    continue;
+                std::vector<std::string> cycle;
+                for (const std::string& other : structure.order)
+                    if (other == id || (reach[id].count(other) && reach[other].count(id)))
+                        cycle.push_back(other);
+                assigned.insert(cycle.begin(), cycle.end());
+                structure.cycles.push_back(cycle);
+            }
+
+            // Baum: jede Unit unter dem Vorgaenger an ihrem niedrigsten nicht
+            // aufgeschnittenen Eingang; Units ohne solchen Eingang sind Wurzeln.
+            std::map<std::string, std::string> primary; // Knoten-ID -> Verbindungs-ID
+            for (const SFlowsheetConnection& conn : m_connections)
+            {
+                if (structure.lagged.count(conn.id))
+                    continue;
+                auto it = primary.find(conn.targetNodeId);
+                if (it == primary.end())
+                    primary[conn.targetNodeId] = conn.id;
+                else if (const SFlowsheetConnection* old = FindConnection(it->second))
+                    if (conn.targetPort < old->targetPort)
+                        it->second = conn.id;
+            }
+            std::set<std::string> placed;
+            std::function<SStructureBranch(const std::string&, const std::string&)> build =
+                [&](const std::string& nodeId, const std::string& viaConnection)
+                {
+                    SStructureBranch branch;
+                    branch.nodeId = nodeId;
+                    branch.connectionId = viaConnection;
+                    placed.insert(nodeId);
+                    std::vector<const SFlowsheetConnection*> outgoing;
+                    for (const SFlowsheetConnection& conn : m_connections)
+                        if (conn.sourceNodeId == nodeId)
+                            outgoing.push_back(&conn);
+                    std::sort(outgoing.begin(), outgoing.end(),
+                        [](const SFlowsheetConnection* a, const SFlowsheetConnection* b) { return a->sourcePort < b->sourcePort; });
+                    for (const SFlowsheetConnection* conn : outgoing)
+                    {
+                        auto it = primary.find(conn->targetNodeId);
+                        const bool own = it != primary.end() && it->second == conn->id && !placed.count(conn->targetNodeId);
+                        if (structure.lagged.count(conn->id) || !own)
+                        {
+                            SStructureBranch leaf;
+                            leaf.kind = structure.lagged.count(conn->id) ? SStructureBranch::EKind::Cut
+                                                                         : SStructureBranch::EKind::Reference;
+                            leaf.nodeId = conn->targetNodeId;
+                            leaf.connectionId = conn->id;
+                            branch.children.push_back(leaf);
+                        }
+                        else
+                            branch.children.push_back(build(conn->targetNodeId, conn->id));
+                    }
+                    return branch;
+                };
+            for (const std::string& id : structure.order)
+                if (!primary.count(id) && !placed.count(id))
+                    structure.roots.push_back(build(id, std::string()));
+            return structure;
+        }
+
+        const SFlowsheetConnection* FindConnection(const std::string& connectionId) const
+        {
+            for (const SFlowsheetConnection& conn : m_connections)
+                if (conn.id == connectionId)
+                    return &conn;
+            return nullptr;
+        }
+
         bool IsOutputPortConnected(const std::string& nodeId, size_t port) const
         {
             for (const SFlowsheetConnection& conn : m_connections)
@@ -275,6 +453,15 @@ namespace stosis
         IStreamProcessor* GetProcessor(const std::string& nodeId) { return FindUnit<IStreamProcessor>(nodeId); }
         CSplitterUnit* GetSplitter(const std::string& nodeId) { return FindUnit<CSplitterUnit>(nodeId); }
         CMergerUnit* GetMerger(const std::string& nodeId) { return FindUnit<CMergerUnit>(nodeId); }
+        CVesselUnit* GetVessel(const std::string& nodeId) { return FindUnit<CVesselUnit>(nodeId); }
+        // Nur lesen (z.B. zum Schreiben der Flowsheet-Datei).
+        const CInletUnit* GetInlet(const std::string& nodeId) const { return FindUnit<CInletUnit>(nodeId); }
+        const IStreamProcessor* GetProcessor(const std::string& nodeId) const { return FindUnit<IStreamProcessor>(nodeId); }
+        const CSplitterUnit* GetSplitter(const std::string& nodeId) const { return FindUnit<CSplitterUnit>(nodeId); }
+        const CVesselUnit* GetVessel(const std::string& nodeId) const { return FindUnit<CVesselUnit>(nodeId); }
+
+        // Noch keine Knoten und keine Verbindungen (Laden einer Datei).
+        bool IsEmpty() const { return m_nodes.empty() && m_connections.empty(); }
 
         const CStreamProcessorRegistry& GetProcessorRegistry() const { return m_processorRegistry; }
 
@@ -999,8 +1186,25 @@ namespace stosis
         }
 
     private:
-        std::string MakeNodeId() { return "node_" + std::to_string(m_nextNodeId++); }
+        // Naechste freie ID; ueberspringt IDs, die aus einer Datei kamen.
+        std::string MakeNodeId()
+        {
+            std::string id;
+            do
+                id = "node_" + std::to_string(m_nextNodeId++);
+            while (FindNode(id));
+            return id;
+        }
         std::string MakeConnectionId() { return "conn_" + std::to_string(m_nextConnectionId++); }
+
+        // Prozess-Unit eines neuen Knotens: das erste Modell der Registry.
+        std::unique_ptr<IFlowsheetUnit> CreateDefaultProcessor()
+        {
+            const std::vector<std::string> names = m_processorRegistry.GetAvailableTypeNames();
+            if (names.empty())
+                return nullptr;
+            return m_processorRegistry.CreateProcessor(names.front());
+        }
 
         // false (und ein Hinweis in m_warnings), wenn im Partikelmodus
         // eine Unit noch keine Karten kann.
@@ -1019,10 +1223,10 @@ namespace stosis
         }
 
         std::string AddNode(const std::string& name, ENodeType type, size_t numInputs, size_t numOutputs,
-            double posX, double posY, std::unique_ptr<IFlowsheetUnit> unit)
+            double posX, double posY, std::unique_ptr<IFlowsheetUnit> unit, const std::string& id = std::string())
         {
             SFlowsheetNode node;
-            node.id = MakeNodeId();
+            node.id = id.empty() ? MakeNodeId() : id;
             node.name = name;
             node.type = type;
             node.numInputs = numInputs;
@@ -1040,17 +1244,24 @@ namespace stosis
             return node.id;
         }
 
-        // Aktive Stoffe = Stoffe aller Inlets, in der Reihenfolge der
+        // Aktive Stoffe = Stoffe aller Inlets und der vorgegebenen
+        // Anfangsfuellungen von Behaeltern, in der Reihenfolge der
         // Materialdatei (dort fehlende Stoffe alphabetisch dahinter). Das
         // Ergebnis haengt also nicht von der Reihenfolge der Knoten ab.
         void PrepareMaterials()
         {
             std::vector<std::string> names;
+            const auto add = [&names](const std::string& name)
+            {
+                if (!name.empty() && std::find(names.begin(), names.end(), name) == names.end())
+                    names.push_back(name);
+            };
             for (const SFlowsheetNode& node : m_nodes)
             {
-                const CInletUnit* inlet = node.type == ENodeType::Inlet ? FindUnit<CInletUnit>(node.id) : nullptr;
-                if (inlet && std::find(names.begin(), names.end(), inlet->GetMaterial()) == names.end())
-                    names.push_back(inlet->GetMaterial());
+                if (const CInletUnit* inlet = node.type == ENodeType::Inlet ? FindUnit<CInletUnit>(node.id) : nullptr)
+                    add(inlet->GetMaterial());
+                if (const CVesselUnit* vessel = node.type == ENodeType::Vessel ? FindUnit<CVesselUnit>(node.id) : nullptr)
+                    add(vessel->GetFillMaterial());
             }
             const size_t notInDatabase = static_cast<size_t>(-1);
             auto rank = [this, notInDatabase](const std::string& name)
@@ -1079,6 +1290,13 @@ namespace stosis
         {
             auto it = m_units.find(nodeId);
             return (it != m_units.end()) ? dynamic_cast<T*>(it->second.get()) : nullptr;
+        }
+
+        template <typename T>
+        const T* FindUnit(const std::string& nodeId) const
+        {
+            auto it = m_units.find(nodeId);
+            return (it != m_units.end()) ? dynamic_cast<const T*>(it->second.get()) : nullptr;
         }
 
         // Bestimmt die Reihenfolge, in der die Knoten in JEDEM Schritt

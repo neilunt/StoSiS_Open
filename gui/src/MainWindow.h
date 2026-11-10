@@ -2,6 +2,7 @@
 #include <QMainWindow>
 #include "FlowsheetGraph.h"
 #include "Materials.h"
+#include "FlowsheetFile.h"
 
 class QDoubleSpinBox;
 class QSpinBox;
@@ -17,6 +18,7 @@ class ComparisonWindow;
 class AnalysisWindow;
 class SimulationLogWindow;
 class CardWindow;
+class FlowsheetStructureWindow;
 
 // Hauptfenster = Darstellungsebene: links das Flowsheet (mit
 // Simulationsdauer + "Simulieren" darunter), rechts Kurven ueber
@@ -40,6 +42,8 @@ private slots:
     void OnShowAnalysis();
     void OnShowLog();
     void OnShowCards();
+    void OnShowStructure();
+    void OnSaveFlowsheet();
     void OnNodeDoubleClicked(const QString& nodeId);
     void OnShowHeatmapDemo();
     void OnShowComparisonWindow();
@@ -59,6 +63,10 @@ private:
     void SyncAnalysisSettings();
     // Holt die Ergebnis-Zeiger in Kurven und Heatmap neu.
     void RefreshResultViews();
+    // Was ausser dem Graphen in die Flowsheet-Datei gehoert (Anzahl Laeufe).
+    stosis::SFlowsheetFileSettings CurrentFileSettings() const;
+    // Fenster "Struktur" nach einer Aenderung am Flowsheet neu aufbauen.
+    void RefreshStructureWindow();
 
     stosis::CFlowsheetGraph m_graph;
     stosis::CMaterialDatabase m_materials;
@@ -82,5 +90,6 @@ private:
     AnalysisWindow* m_analysisWindow = nullptr;
     SimulationLogWindow* m_logWindow = nullptr;
     CardWindow* m_cardWindow = nullptr;
+    FlowsheetStructureWindow* m_structureWindow = nullptr;
     double m_lastGuiSeconds = 0.0; // Neuzeichnen nach der letzten Simulation
 };

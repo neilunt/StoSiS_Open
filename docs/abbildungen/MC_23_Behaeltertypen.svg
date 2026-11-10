@@ -1,0 +1,267 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="610" viewBox="0 0 680 610">
+<title>Behältertypen: Verweilzeit und Austritt je Schritt</title>
+<style>
+text { font-family: Calibri, Arial, sans-serif; }
+.th { font-size: 13px; font-weight: bold; fill: #222222; } .ts { font-size: 11px; fill: #595959; }
+.rl { font-size: 11.5px; font-weight: bold; fill: #3f3f3f; } .tl { font-size: 10.5px; fill: #3f3f3f; } .ta { font-size: 10px; fill: #595959; }
+.tv { font-size: 10.5px; font-weight: bold; fill: #6d28d9; } .gl { stroke: #eceff3; stroke-width: 1; } .ax { stroke: #9ca3af; stroke-width: 1; }
+.wand { fill: #f8fafc; stroke: #64748b; stroke-width: 1.2; } .ce { fill: none; stroke: #0f766e; stroke-width: 2; } .cf { fill: #0f766e; fill-opacity: 0.12; stroke: none; }
+.cp { fill: none; stroke: #7c3aed; stroke-width: 2; } .mn { stroke: #9ca3af; stroke-width: 1; stroke-dasharray: 3 3; }
+</style>
+<rect width="680" height="610" fill="#ffffff"/>
+<defs>
+<marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker>
+<marker id="at" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/></marker>
+<marker id="av" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker>
+</defs>
+<text class="th" text-anchor="middle" x="88.0" y="16.0">Ideal durchmischt</text>
+<text class="ts" text-anchor="middle" x="88.0" y="31.0">jede Karte gleich</text>
+<text class="th" text-anchor="middle" x="256.0" y="16.0">Pfropfenströmung</text>
+<text class="ts" text-anchor="middle" x="256.0" y="31.0">die älteste zuerst</text>
+<text class="th" text-anchor="middle" x="424.0" y="16.0">Kaskade aus 3 Kesseln</text>
+<text class="ts" text-anchor="middle" x="424.0" y="31.0">dazwischen</text>
+<text class="th" text-anchor="middle" x="592.0" y="16.0">Kernfluss-Silo</text>
+<text class="ts" text-anchor="middle" x="592.0" y="31.0">teils die neueste zuerst</text>
+<rect class="wand" x="46.0" y="58" width="84" height="90" rx="12"/>
+<rect x="80.0" y="40" width="16" height="7" fill="#94a3b8"/>
+<line x1="88.0" y1="47" x2="88.0" y2="122" stroke="#94a3b8" stroke-width="2"/><line x1="74.0" y1="122" x2="102.0" y2="122" stroke="#94a3b8" stroke-width="3"/>
+<rect x="53.6" y="73.0" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="65.3" y="134.8" width="9" height="6" rx="1" fill="#7c3aed" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="74.1" y="117.9" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="66.7" y="114.5" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="59.0" y="130.2" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="60.7" y="129.3" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="65.4" y="85.9" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="63.4" y="132.0" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="63.8" y="131.1" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="58.6" y="122.3" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="101.2" y="116.9" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="107.8" y="130.6" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="110.3" y="93.8" width="9" height="6" rx="1" fill="#a78bfa" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="112.1" y="126.7" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="95.0" y="123.8" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="102.8" y="105.5" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="92.0" y="82.1" width="9" height="6" rx="1" fill="#7c3aed" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="100.0" y="123.7" width="9" height="6" rx="1" fill="#7c3aed" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="106.2" y="116.0" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="95.8" y="109.7" width="9" height="6" rx="1" fill="#a78bfa" stroke="#ffffff" stroke-width="0.6"/>
+<line x1="16.0" y1="50.0" x2="50.0" y2="64.0" stroke="#64748b" stroke-width="1.4" marker-end="url(#ag)"/>
+<line x1="130.0" y1="140.0" x2="166.0" y2="140.0" stroke="#64748b" stroke-width="1.4" marker-end="url(#ag)"/>
+<rect x="134.0" y="130.0" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="144.0" y="130.0" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="154.0" y="130.0" width="9" height="6" rx="1" fill="#a78bfa" stroke="#ffffff" stroke-width="0.6"/>
+<rect class="wand" x="190.0" y="86" width="132" height="28" rx="14"/>
+<rect x="198.0" y="97.0" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="209.0" y="97.0" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="220.0" y="97.0" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="231.0" y="97.0" width="9" height="6" rx="1" fill="#a78bfa" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="242.0" y="97.0" width="9" height="6" rx="1" fill="#a78bfa" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="253.0" y="97.0" width="9" height="6" rx="1" fill="#7c3aed" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="264.0" y="97.0" width="9" height="6" rx="1" fill="#7c3aed" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="275.0" y="97.0" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="286.0" y="97.0" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="297.0" y="97.0" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="308.0" y="97.0" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<line x1="176.0" y1="100.0" x2="191.0" y2="100.0" stroke="#64748b" stroke-width="1.4" marker-end="url(#ag)"/>
+<line x1="322.0" y1="100.0" x2="336.0" y2="100.0" stroke="#64748b" stroke-width="1.4" marker-end="url(#ag)"/>
+<text class="ta" text-anchor="middle" x="256.0" y="132.0">Reihenfolge bleibt erhalten</text>
+<text class="ta" text-anchor="middle" x="256.0" y="76.0">neu → alt</text>
+<rect class="wand" x="348.0" y="72" width="38" height="52" rx="7"/>
+<rect class="wand" x="402.0" y="72" width="38" height="52" rx="7"/>
+<rect class="wand" x="456.0" y="72" width="38" height="52" rx="7"/>
+<rect x="366.3" y="86.1" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="373.1" y="111.0" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="368.9" y="110.3" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="363.0" y="89.7" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="355.8" y="112.5" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="354.9" y="87.5" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="419.3" y="100.0" width="9" height="6" rx="1" fill="#a78bfa" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="411.2" y="96.0" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="410.7" y="88.6" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="411.0" y="85.3" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="413.9" y="92.2" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="425.5" y="104.1" width="9" height="6" rx="1" fill="#a78bfa" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="459.2" y="99.3" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="476.6" y="107.0" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="471.4" y="91.3" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="461.2" y="111.7" width="9" height="6" rx="1" fill="#7c3aed" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="481.8" y="97.6" width="9" height="6" rx="1" fill="#a78bfa" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="473.0" y="109.3" width="9" height="6" rx="1" fill="#7c3aed" stroke="#ffffff" stroke-width="0.6"/>
+<line x1="367.0" y1="50.0" x2="367.0" y2="70.0" stroke="#64748b" stroke-width="1.4" marker-end="url(#ag)"/>
+<line x1="386.0" y1="110.0" x2="402.0" y2="110.0" stroke="#64748b" stroke-width="1.4" marker-end="url(#ag)"/>
+<line x1="440.0" y1="110.0" x2="456.0" y2="110.0" stroke="#64748b" stroke-width="1.4" marker-end="url(#ag)"/>
+<line x1="494.0" y1="110.0" x2="504.0" y2="110.0" stroke="#64748b" stroke-width="1.4" marker-end="url(#ag)"/>
+<text class="ta" text-anchor="middle" x="424.0" y="142.0">jeder Kessel für sich durchmischt</text>
+<path class="wand" d="M548.0,48 L636.0,48 L636.0,118 L600.0,148 L584.0,148 L548.0,118 Z"/>
+<path d="M549.0,49 L549.0,118 L585.0,147 L599.0,147 L635.0,118 L635.0,49 Z" fill="#e2e8f0"/>
+<path d="M578.0,49 L606.0,49 L598.0,147 L586.0,147 Z" fill="#ffffff"/>
+<rect x="562.7" y="58.9" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="560.6" y="89.5" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="556.6" y="101.1" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="554.9" y="77.7" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="620.5" y="81.9" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="619.4" y="87.5" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="610.4" y="83.4" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="611.4" y="95.3" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="588.0" y="58.0" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="589.6" y="72.0" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="587.2" y="86.0" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="588.8" y="100.0" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="586.4" y="114.0" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="588.0" y="128.0" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="584.0" y="148" width="16" height="6" fill="#64748b"/>
+<line x1="592.0" y1="36.0" x2="592.0" y2="50.0" stroke="#64748b" stroke-width="1.4" marker-end="url(#ag)"/>
+<line x1="592.0" y1="154.0" x2="592.0" y2="166.0" stroke="#64748b" stroke-width="1.4" marker-end="url(#ag)"/>
+<text class="ta" text-anchor="end" x="542.0" y="90.0">Rand</text>
+<text class="ta" text-anchor="start" x="641.0" y="90.0">Rand</text>
+<text class="rl" text-anchor="start" x="8.0" y="180.0">Verweilzeitverteilung E(t): welcher Anteil nach der Zeit t austritt (Mittel in allen vier Fällen τ, gestrichelt)</text>
+<line class="gl" x1="34.0" y1="272.0" x2="162.0" y2="272.0"/>
+<line class="gl" x1="34.0" y1="238.7" x2="162.0" y2="238.7"/>
+<line class="gl" x1="34.0" y1="205.3" x2="162.0" y2="205.3"/>
+<line class="ax" x1="34.0" y1="272.0" x2="162.0" y2="272.0"/>
+<line class="ax" x1="34.0" y1="272.0" x2="34.0" y2="192.0"/>
+<text class="ta" text-anchor="middle" x="34.0" y="284.0">0</text>
+<text class="ta" text-anchor="middle" x="76.7" y="284.0">τ</text>
+<text class="ta" text-anchor="middle" x="119.3" y="284.0">2τ</text>
+<text class="ta" text-anchor="middle" x="162.0" y="284.0">3τ</text>
+<line class="mn" x1="76.7" y1="272.0" x2="76.7" y2="192.0"/>
+<line class="gl" x1="202.0" y1="272.0" x2="330.0" y2="272.0"/>
+<line class="gl" x1="202.0" y1="238.7" x2="330.0" y2="238.7"/>
+<line class="gl" x1="202.0" y1="205.3" x2="330.0" y2="205.3"/>
+<line class="ax" x1="202.0" y1="272.0" x2="330.0" y2="272.0"/>
+<line class="ax" x1="202.0" y1="272.0" x2="202.0" y2="192.0"/>
+<text class="ta" text-anchor="middle" x="202.0" y="284.0">0</text>
+<text class="ta" text-anchor="middle" x="244.7" y="284.0">τ</text>
+<text class="ta" text-anchor="middle" x="287.3" y="284.0">2τ</text>
+<text class="ta" text-anchor="middle" x="330.0" y="284.0">3τ</text>
+<line class="mn" x1="244.7" y1="272.0" x2="244.7" y2="192.0"/>
+<line class="gl" x1="370.0" y1="272.0" x2="498.0" y2="272.0"/>
+<line class="gl" x1="370.0" y1="238.7" x2="498.0" y2="238.7"/>
+<line class="gl" x1="370.0" y1="205.3" x2="498.0" y2="205.3"/>
+<line class="ax" x1="370.0" y1="272.0" x2="498.0" y2="272.0"/>
+<line class="ax" x1="370.0" y1="272.0" x2="370.0" y2="192.0"/>
+<text class="ta" text-anchor="middle" x="370.0" y="284.0">0</text>
+<text class="ta" text-anchor="middle" x="412.7" y="284.0">τ</text>
+<text class="ta" text-anchor="middle" x="455.3" y="284.0">2τ</text>
+<text class="ta" text-anchor="middle" x="498.0" y="284.0">3τ</text>
+<line class="mn" x1="412.7" y1="272.0" x2="412.7" y2="192.0"/>
+<line class="gl" x1="538.0" y1="272.0" x2="666.0" y2="272.0"/>
+<line class="gl" x1="538.0" y1="238.7" x2="666.0" y2="238.7"/>
+<line class="gl" x1="538.0" y1="205.3" x2="666.0" y2="205.3"/>
+<line class="ax" x1="538.0" y1="272.0" x2="666.0" y2="272.0"/>
+<line class="ax" x1="538.0" y1="272.0" x2="538.0" y2="192.0"/>
+<text class="ta" text-anchor="middle" x="538.0" y="284.0">0</text>
+<text class="ta" text-anchor="middle" x="580.7" y="284.0">τ</text>
+<text class="ta" text-anchor="middle" x="623.3" y="284.0">2τ</text>
+<text class="ta" text-anchor="middle" x="666.0" y="284.0">3τ</text>
+<line class="mn" x1="580.7" y1="272.0" x2="580.7" y2="192.0"/>
+<text class="ta" text-anchor="end" x="30.0" y="275.5">0</text>
+<text class="ta" text-anchor="end" x="30.0" y="242.2">0,5/τ</text>
+<text class="ta" text-anchor="end" x="30.0" y="208.8">1/τ</text>
+<path class="cf" d="M34.0,205.3 L34.9,206.7 L35.7,207.9 L36.6,209.2 L37.4,210.5 L38.3,211.7 L39.1,212.9 L40.0,214.0 L40.8,215.2 L41.7,216.3 L42.5,217.4 L43.4,218.5 L44.2,219.6 L45.1,220.6 L45.9,221.6 L46.8,222.6 L47.7,223.6 L48.5,224.5 L49.4,225.5 L50.2,226.4 L51.1,227.3 L51.9,228.2 L52.8,229.1 L53.6,229.9 L54.5,230.7 L55.3,231.6 L56.2,232.4 L57.0,233.2 L57.9,233.9 L58.7,234.7 L59.6,235.4 L60.5,236.1 L61.3,236.8 L62.2,237.5 L63.0,238.2 L63.9,238.9 L64.7,239.5 L65.6,240.2 L66.4,240.8 L67.3,241.4 L68.1,242.0 L69.0,242.6 L69.8,243.2 L70.7,243.8 L71.5,244.3 L72.4,244.9 L73.3,245.4 L74.1,246.0 L75.0,246.5 L75.8,247.0 L76.7,247.5 L77.5,248.0 L78.4,248.4 L79.2,248.9 L80.1,249.4 L80.9,249.8 L81.8,250.2 L82.6,250.7 L83.5,251.1 L84.3,251.5 L85.2,251.9 L86.1,252.3 L86.9,252.7 L87.8,253.1 L88.6,253.5 L89.5,253.8 L90.3,254.2 L91.2,254.5 L92.0,254.9 L92.9,255.2 L93.7,255.6 L94.6,255.9 L95.4,256.2 L96.3,256.5 L97.1,256.8 L98.0,257.1 L98.9,257.4 L99.7,257.7 L100.6,258.0 L101.4,258.3 L102.3,258.5 L103.1,258.8 L104.0,259.1 L104.8,259.3 L105.7,259.6 L106.5,259.8 L107.4,260.1 L108.2,260.3 L109.1,260.5 L109.9,260.8 L110.8,261.0 L111.7,261.2 L112.5,261.4 L113.4,261.6 L114.2,261.8 L115.1,262.0 L115.9,262.2 L116.8,262.4 L117.6,262.6 L118.5,262.8 L119.3,263.0 L120.2,263.2 L121.0,263.3 L121.9,263.5 L122.7,263.7 L123.6,263.8 L124.5,264.0 L125.3,264.2 L126.2,264.3 L127.0,264.5 L127.9,264.6 L128.7,264.8 L129.6,264.9 L130.4,265.0 L131.3,265.2 L132.1,265.3 L133.0,265.4 L133.8,265.6 L134.7,265.7 L135.5,265.8 L136.4,266.0 L137.3,266.1 L138.1,266.2 L139.0,266.3 L139.8,266.4 L140.7,266.5 L141.5,266.6 L142.4,266.7 L143.2,266.8 L144.1,266.9 L144.9,267.0 L145.8,267.1 L146.6,267.2 L147.5,267.3 L148.3,267.4 L149.2,267.5 L150.1,267.6 L150.9,267.7 L151.8,267.8 L152.6,267.9 L153.5,267.9 L154.3,268.0 L155.2,268.1 L156.0,268.2 L156.9,268.3 L157.7,268.3 L158.6,268.4 L159.4,268.5 L160.3,268.5 L161.1,268.6 L162.0,268.7 L162.0,272.0 L34.0,272.0 Z"/><path class="ce" d="M34.0,205.3 L34.9,206.7 L35.7,207.9 L36.6,209.2 L37.4,210.5 L38.3,211.7 L39.1,212.9 L40.0,214.0 L40.8,215.2 L41.7,216.3 L42.5,217.4 L43.4,218.5 L44.2,219.6 L45.1,220.6 L45.9,221.6 L46.8,222.6 L47.7,223.6 L48.5,224.5 L49.4,225.5 L50.2,226.4 L51.1,227.3 L51.9,228.2 L52.8,229.1 L53.6,229.9 L54.5,230.7 L55.3,231.6 L56.2,232.4 L57.0,233.2 L57.9,233.9 L58.7,234.7 L59.6,235.4 L60.5,236.1 L61.3,236.8 L62.2,237.5 L63.0,238.2 L63.9,238.9 L64.7,239.5 L65.6,240.2 L66.4,240.8 L67.3,241.4 L68.1,242.0 L69.0,242.6 L69.8,243.2 L70.7,243.8 L71.5,244.3 L72.4,244.9 L73.3,245.4 L74.1,246.0 L75.0,246.5 L75.8,247.0 L76.7,247.5 L77.5,248.0 L78.4,248.4 L79.2,248.9 L80.1,249.4 L80.9,249.8 L81.8,250.2 L82.6,250.7 L83.5,251.1 L84.3,251.5 L85.2,251.9 L86.1,252.3 L86.9,252.7 L87.8,253.1 L88.6,253.5 L89.5,253.8 L90.3,254.2 L91.2,254.5 L92.0,254.9 L92.9,255.2 L93.7,255.6 L94.6,255.9 L95.4,256.2 L96.3,256.5 L97.1,256.8 L98.0,257.1 L98.9,257.4 L99.7,257.7 L100.6,258.0 L101.4,258.3 L102.3,258.5 L103.1,258.8 L104.0,259.1 L104.8,259.3 L105.7,259.6 L106.5,259.8 L107.4,260.1 L108.2,260.3 L109.1,260.5 L109.9,260.8 L110.8,261.0 L111.7,261.2 L112.5,261.4 L113.4,261.6 L114.2,261.8 L115.1,262.0 L115.9,262.2 L116.8,262.4 L117.6,262.6 L118.5,262.8 L119.3,263.0 L120.2,263.2 L121.0,263.3 L121.9,263.5 L122.7,263.7 L123.6,263.8 L124.5,264.0 L125.3,264.2 L126.2,264.3 L127.0,264.5 L127.9,264.6 L128.7,264.8 L129.6,264.9 L130.4,265.0 L131.3,265.2 L132.1,265.3 L133.0,265.4 L133.8,265.6 L134.7,265.7 L135.5,265.8 L136.4,266.0 L137.3,266.1 L138.1,266.2 L139.0,266.3 L139.8,266.4 L140.7,266.5 L141.5,266.6 L142.4,266.7 L143.2,266.8 L144.1,266.9 L144.9,267.0 L145.8,267.1 L146.6,267.2 L147.5,267.3 L148.3,267.4 L149.2,267.5 L150.1,267.6 L150.9,267.7 L151.8,267.8 L152.6,267.9 L153.5,267.9 L154.3,268.0 L155.2,268.1 L156.0,268.2 L156.9,268.3 L157.7,268.3 L158.6,268.4 L159.4,268.5 L160.3,268.5 L161.1,268.6 L162.0,268.7"/>
+<text class="tl" text-anchor="start" x="85.2" y="235.3">exponentiell</text>
+<line x1="244.7" y1="272.0" x2="244.7" y2="196.0" stroke="#0f766e" stroke-width="1.4" marker-end="url(#at)"/>
+<text class="tl" text-anchor="start" x="249.7" y="202.0">alle genau bei τ</text>
+<path class="cf" d="M370.0,272.0 L370.9,271.7 L371.7,270.7 L372.6,269.3 L373.4,267.5 L374.3,265.3 L375.1,263.0 L376.0,260.4 L376.8,257.7 L377.7,255.0 L378.5,252.2 L379.4,249.5 L380.2,246.8 L381.1,244.1 L381.9,241.5 L382.8,239.1 L383.7,236.7 L384.5,234.5 L385.4,232.4 L386.2,230.4 L387.1,228.6 L387.9,227.0 L388.8,225.5 L389.6,224.1 L390.5,222.9 L391.3,221.8 L392.2,220.9 L393.0,220.1 L393.9,219.4 L394.7,218.9 L395.6,218.4 L396.5,218.1 L397.3,218.0 L398.2,217.9 L399.0,217.9 L399.9,218.0 L400.7,218.2 L401.6,218.5 L402.4,218.8 L403.3,219.3 L404.1,219.7 L405.0,220.3 L405.8,220.9 L406.7,221.6 L407.5,222.3 L408.4,223.0 L409.3,223.8 L410.1,224.6 L411.0,225.4 L411.8,226.3 L412.7,227.2 L413.5,228.1 L414.4,229.0 L415.2,229.9 L416.1,230.9 L416.9,231.8 L417.8,232.8 L418.6,233.7 L419.5,234.7 L420.3,235.6 L421.2,236.6 L422.1,237.5 L422.9,238.5 L423.8,239.4 L424.6,240.3 L425.5,241.2 L426.3,242.1 L427.2,243.0 L428.0,243.9 L428.9,244.7 L429.7,245.5 L430.6,246.4 L431.4,247.2 L432.3,248.0 L433.1,248.7 L434.0,249.5 L434.9,250.2 L435.7,251.0 L436.6,251.7 L437.4,252.4 L438.3,253.0 L439.1,253.7 L440.0,254.3 L440.8,255.0 L441.7,255.6 L442.5,256.1 L443.4,256.7 L444.2,257.3 L445.1,257.8 L445.9,258.3 L446.8,258.8 L447.7,259.3 L448.5,259.8 L449.4,260.3 L450.2,260.7 L451.1,261.1 L451.9,261.5 L452.8,261.9 L453.6,262.3 L454.5,262.7 L455.3,263.1 L456.2,263.4 L457.0,263.8 L457.9,264.1 L458.7,264.4 L459.6,264.7 L460.5,265.0 L461.3,265.3 L462.2,265.6 L463.0,265.8 L463.9,266.1 L464.7,266.3 L465.6,266.6 L466.4,266.8 L467.3,267.0 L468.1,267.2 L469.0,267.4 L469.8,267.6 L470.7,267.8 L471.5,268.0 L472.4,268.1 L473.3,268.3 L474.1,268.5 L475.0,268.6 L475.8,268.7 L476.7,268.9 L477.5,269.0 L478.4,269.2 L479.2,269.3 L480.1,269.4 L480.9,269.5 L481.8,269.6 L482.6,269.7 L483.5,269.8 L484.3,269.9 L485.2,270.0 L486.1,270.1 L486.9,270.2 L487.8,270.3 L488.6,270.3 L489.5,270.4 L490.3,270.5 L491.2,270.6 L492.0,270.6 L492.9,270.7 L493.7,270.7 L494.6,270.8 L495.4,270.9 L496.3,270.9 L497.1,271.0 L498.0,271.0 L498.0,272.0 L370.0,272.0 Z"/><path class="ce" d="M370.0,272.0 L370.9,271.7 L371.7,270.7 L372.6,269.3 L373.4,267.5 L374.3,265.3 L375.1,263.0 L376.0,260.4 L376.8,257.7 L377.7,255.0 L378.5,252.2 L379.4,249.5 L380.2,246.8 L381.1,244.1 L381.9,241.5 L382.8,239.1 L383.7,236.7 L384.5,234.5 L385.4,232.4 L386.2,230.4 L387.1,228.6 L387.9,227.0 L388.8,225.5 L389.6,224.1 L390.5,222.9 L391.3,221.8 L392.2,220.9 L393.0,220.1 L393.9,219.4 L394.7,218.9 L395.6,218.4 L396.5,218.1 L397.3,218.0 L398.2,217.9 L399.0,217.9 L399.9,218.0 L400.7,218.2 L401.6,218.5 L402.4,218.8 L403.3,219.3 L404.1,219.7 L405.0,220.3 L405.8,220.9 L406.7,221.6 L407.5,222.3 L408.4,223.0 L409.3,223.8 L410.1,224.6 L411.0,225.4 L411.8,226.3 L412.7,227.2 L413.5,228.1 L414.4,229.0 L415.2,229.9 L416.1,230.9 L416.9,231.8 L417.8,232.8 L418.6,233.7 L419.5,234.7 L420.3,235.6 L421.2,236.6 L422.1,237.5 L422.9,238.5 L423.8,239.4 L424.6,240.3 L425.5,241.2 L426.3,242.1 L427.2,243.0 L428.0,243.9 L428.9,244.7 L429.7,245.5 L430.6,246.4 L431.4,247.2 L432.3,248.0 L433.1,248.7 L434.0,249.5 L434.9,250.2 L435.7,251.0 L436.6,251.7 L437.4,252.4 L438.3,253.0 L439.1,253.7 L440.0,254.3 L440.8,255.0 L441.7,255.6 L442.5,256.1 L443.4,256.7 L444.2,257.3 L445.1,257.8 L445.9,258.3 L446.8,258.8 L447.7,259.3 L448.5,259.8 L449.4,260.3 L450.2,260.7 L451.1,261.1 L451.9,261.5 L452.8,261.9 L453.6,262.3 L454.5,262.7 L455.3,263.1 L456.2,263.4 L457.0,263.8 L457.9,264.1 L458.7,264.4 L459.6,264.7 L460.5,265.0 L461.3,265.3 L462.2,265.6 L463.0,265.8 L463.9,266.1 L464.7,266.3 L465.6,266.6 L466.4,266.8 L467.3,267.0 L468.1,267.2 L469.0,267.4 L469.8,267.6 L470.7,267.8 L471.5,268.0 L472.4,268.1 L473.3,268.3 L474.1,268.5 L475.0,268.6 L475.8,268.7 L476.7,268.9 L477.5,269.0 L478.4,269.2 L479.2,269.3 L480.1,269.4 L480.9,269.5 L481.8,269.6 L482.6,269.7 L483.5,269.8 L484.3,269.9 L485.2,270.0 L486.1,270.1 L486.9,270.2 L487.8,270.3 L488.6,270.3 L489.5,270.4 L490.3,270.5 L491.2,270.6 L492.0,270.6 L492.9,270.7 L493.7,270.7 L494.6,270.8 L495.4,270.9 L496.3,270.9 L497.1,271.0 L498.0,271.0"/>
+<text class="tl" text-anchor="start" x="419.1" y="215.3">Buckel (Gamma)</text>
+<path class="cf" d="M538.0,259.0 L538.9,259.1 L539.7,259.2 L540.6,259.4 L541.4,259.5 L542.3,259.6 L543.1,259.7 L544.0,259.9 L544.8,260.0 L545.7,260.1 L546.5,260.2 L547.4,260.3 L548.2,260.4 L549.1,260.5 L549.9,260.7 L550.8,260.8 L551.7,260.9 L552.5,261.0 L553.4,261.1 L554.2,261.2 L555.1,261.3 L555.9,261.4 L556.8,261.5 L557.6,261.6 L558.5,261.7 L559.3,261.8 L560.2,261.9 L561.0,262.0 L561.9,262.1 L562.7,262.2 L563.6,262.3 L564.5,262.4 L565.3,262.5 L566.2,262.6 L567.0,262.7 L567.9,262.8 L568.7,262.8 L569.6,262.9 L570.4,263.0 L571.3,263.1 L572.1,263.2 L573.0,263.3 L573.8,263.4 L574.7,263.4 L575.5,263.5 L576.4,263.6 L577.3,263.7 L578.1,263.8 L579.0,263.9 L579.8,263.9 L580.7,264.0 L581.5,264.1 L582.4,264.2 L583.2,264.2 L584.1,264.3 L584.9,264.4 L585.8,264.5 L586.6,264.5 L587.5,264.6 L588.3,264.7 L589.2,264.8 L590.1,264.8 L590.9,264.9 L591.8,265.0 L592.6,265.0 L593.5,265.1 L594.3,265.2 L595.2,265.2 L596.0,265.3 L596.9,265.4 L597.7,265.4 L598.6,265.5 L599.4,265.6 L600.3,265.6 L601.1,265.7 L602.0,265.7 L602.9,265.8 L603.7,265.9 L604.6,265.9 L605.4,266.0 L606.3,266.0 L607.1,266.1 L608.0,266.2 L608.8,266.2 L609.7,266.3 L610.5,266.3 L611.4,266.4 L612.2,266.4 L613.1,266.5 L613.9,266.5 L614.8,266.6 L615.7,266.6 L616.5,266.7 L617.4,266.7 L618.2,266.8 L619.1,266.9 L619.9,266.9 L620.8,267.0 L621.6,267.0 L622.5,267.0 L623.3,267.1 L624.2,267.1 L625.0,267.2 L625.9,267.2 L626.7,267.3 L627.6,267.3 L628.5,267.4 L629.3,267.4 L630.2,267.5 L631.0,267.5 L631.9,267.6 L632.7,267.6 L633.6,267.6 L634.4,267.7 L635.3,267.7 L636.1,267.8 L637.0,267.8 L637.8,267.8 L638.7,267.9 L639.5,267.9 L640.4,268.0 L641.3,268.0 L642.1,268.0 L643.0,268.1 L643.8,268.1 L644.7,268.2 L645.5,268.2 L646.4,268.2 L647.2,268.3 L648.1,268.3 L648.9,268.3 L649.8,268.4 L650.6,268.4 L651.5,268.4 L652.3,268.5 L653.2,268.5 L654.1,268.5 L654.9,268.6 L655.8,268.6 L656.6,268.6 L657.5,268.7 L658.3,268.7 L659.2,268.7 L660.0,268.8 L660.9,268.8 L661.7,268.8 L662.6,268.9 L663.4,268.9 L664.3,268.9 L665.1,269.0 L666.0,269.0 L666.0,272.0 L538.0,272.0 Z"/><path class="ce" d="M538.0,259.0 L538.9,259.1 L539.7,259.2 L540.6,259.4 L541.4,259.5 L542.3,259.6 L543.1,259.7 L544.0,259.9 L544.8,260.0 L545.7,260.1 L546.5,260.2 L547.4,260.3 L548.2,260.4 L549.1,260.5 L549.9,260.7 L550.8,260.8 L551.7,260.9 L552.5,261.0 L553.4,261.1 L554.2,261.2 L555.1,261.3 L555.9,261.4 L556.8,261.5 L557.6,261.6 L558.5,261.7 L559.3,261.8 L560.2,261.9 L561.0,262.0 L561.9,262.1 L562.7,262.2 L563.6,262.3 L564.5,262.4 L565.3,262.5 L566.2,262.6 L567.0,262.7 L567.9,262.8 L568.7,262.8 L569.6,262.9 L570.4,263.0 L571.3,263.1 L572.1,263.2 L573.0,263.3 L573.8,263.4 L574.7,263.4 L575.5,263.5 L576.4,263.6 L577.3,263.7 L578.1,263.8 L579.0,263.9 L579.8,263.9 L580.7,264.0 L581.5,264.1 L582.4,264.2 L583.2,264.2 L584.1,264.3 L584.9,264.4 L585.8,264.5 L586.6,264.5 L587.5,264.6 L588.3,264.7 L589.2,264.8 L590.1,264.8 L590.9,264.9 L591.8,265.0 L592.6,265.0 L593.5,265.1 L594.3,265.2 L595.2,265.2 L596.0,265.3 L596.9,265.4 L597.7,265.4 L598.6,265.5 L599.4,265.6 L600.3,265.6 L601.1,265.7 L602.0,265.7 L602.9,265.8 L603.7,265.9 L604.6,265.9 L605.4,266.0 L606.3,266.0 L607.1,266.1 L608.0,266.2 L608.8,266.2 L609.7,266.3 L610.5,266.3 L611.4,266.4 L612.2,266.4 L613.1,266.5 L613.9,266.5 L614.8,266.6 L615.7,266.6 L616.5,266.7 L617.4,266.7 L618.2,266.8 L619.1,266.9 L619.9,266.9 L620.8,267.0 L621.6,267.0 L622.5,267.0 L623.3,267.1 L624.2,267.1 L625.0,267.2 L625.9,267.2 L626.7,267.3 L627.6,267.3 L628.5,267.4 L629.3,267.4 L630.2,267.5 L631.0,267.5 L631.9,267.6 L632.7,267.6 L633.6,267.6 L634.4,267.7 L635.3,267.7 L636.1,267.8 L637.0,267.8 L637.8,267.8 L638.7,267.9 L639.5,267.9 L640.4,268.0 L641.3,268.0 L642.1,268.0 L643.0,268.1 L643.8,268.1 L644.7,268.2 L645.5,268.2 L646.4,268.2 L647.2,268.3 L648.1,268.3 L648.9,268.3 L649.8,268.4 L650.6,268.4 L651.5,268.4 L652.3,268.5 L653.2,268.5 L654.1,268.5 L654.9,268.6 L655.8,268.6 L656.6,268.6 L657.5,268.7 L658.3,268.7 L659.2,268.7 L660.0,268.8 L660.9,268.8 L661.7,268.8 L662.6,268.9 L663.4,268.9 L664.3,268.9 L665.1,269.0 L666.0,269.0"/>
+<line x1="550.8" y1="272.0" x2="550.8" y2="196.0" stroke="#0f766e" stroke-width="1.4" marker-end="url(#at)"/>
+<text class="tl" text-anchor="start" x="555.8" y="202.0">60 % im Kern bei 0,3 τ</text>
+<text class="tl" text-anchor="start" x="587.1" y="250.7">Rand: Ausläufer</text>
+<text class="rl" text-anchor="start" x="8.0" y="302.0">Wahrscheinlichkeit p, dass eine Karte dieses Alters im nächsten Schritt geht (Δt = 0,02 τ)</text>
+<line class="gl" x1="34.0" y1="394.0" x2="162.0" y2="394.0"/>
+<line class="gl" x1="34.0" y1="374.0" x2="162.0" y2="374.0"/>
+<line class="gl" x1="34.0" y1="354.0" x2="162.0" y2="354.0"/>
+<line class="gl" x1="34.0" y1="334.0" x2="162.0" y2="334.0"/>
+<line class="gl" x1="34.0" y1="314.0" x2="162.0" y2="314.0"/>
+<line class="ax" x1="34.0" y1="394.0" x2="162.0" y2="394.0"/>
+<line class="ax" x1="34.0" y1="394.0" x2="34.0" y2="314.0"/>
+<text class="ta" text-anchor="middle" x="34.0" y="406.0">0</text>
+<text class="ta" text-anchor="middle" x="76.7" y="406.0">τ</text>
+<text class="ta" text-anchor="middle" x="119.3" y="406.0">2τ</text>
+<text class="ta" text-anchor="middle" x="162.0" y="406.0">3τ</text>
+<line class="gl" x1="202.0" y1="394.0" x2="330.0" y2="394.0"/>
+<line class="gl" x1="202.0" y1="374.0" x2="330.0" y2="374.0"/>
+<line class="gl" x1="202.0" y1="354.0" x2="330.0" y2="354.0"/>
+<line class="gl" x1="202.0" y1="334.0" x2="330.0" y2="334.0"/>
+<line class="gl" x1="202.0" y1="314.0" x2="330.0" y2="314.0"/>
+<line class="ax" x1="202.0" y1="394.0" x2="330.0" y2="394.0"/>
+<line class="ax" x1="202.0" y1="394.0" x2="202.0" y2="314.0"/>
+<text class="ta" text-anchor="middle" x="202.0" y="406.0">0</text>
+<text class="ta" text-anchor="middle" x="244.7" y="406.0">τ</text>
+<text class="ta" text-anchor="middle" x="287.3" y="406.0">2τ</text>
+<text class="ta" text-anchor="middle" x="330.0" y="406.0">3τ</text>
+<line class="gl" x1="370.0" y1="394.0" x2="498.0" y2="394.0"/>
+<line class="gl" x1="370.0" y1="374.0" x2="498.0" y2="374.0"/>
+<line class="gl" x1="370.0" y1="354.0" x2="498.0" y2="354.0"/>
+<line class="gl" x1="370.0" y1="334.0" x2="498.0" y2="334.0"/>
+<line class="gl" x1="370.0" y1="314.0" x2="498.0" y2="314.0"/>
+<line class="ax" x1="370.0" y1="394.0" x2="498.0" y2="394.0"/>
+<line class="ax" x1="370.0" y1="394.0" x2="370.0" y2="314.0"/>
+<text class="ta" text-anchor="middle" x="370.0" y="406.0">0</text>
+<text class="ta" text-anchor="middle" x="412.7" y="406.0">τ</text>
+<text class="ta" text-anchor="middle" x="455.3" y="406.0">2τ</text>
+<text class="ta" text-anchor="middle" x="498.0" y="406.0">3τ</text>
+<line class="gl" x1="538.0" y1="394.0" x2="666.0" y2="394.0"/>
+<line class="gl" x1="538.0" y1="374.0" x2="666.0" y2="374.0"/>
+<line class="gl" x1="538.0" y1="354.0" x2="666.0" y2="354.0"/>
+<line class="gl" x1="538.0" y1="334.0" x2="666.0" y2="334.0"/>
+<line class="gl" x1="538.0" y1="314.0" x2="666.0" y2="314.0"/>
+<line class="ax" x1="538.0" y1="394.0" x2="666.0" y2="394.0"/>
+<line class="ax" x1="538.0" y1="394.0" x2="538.0" y2="314.0"/>
+<text class="ta" text-anchor="middle" x="538.0" y="406.0">0</text>
+<text class="ta" text-anchor="middle" x="580.7" y="406.0">τ</text>
+<text class="ta" text-anchor="middle" x="623.3" y="406.0">2τ</text>
+<text class="ta" text-anchor="middle" x="666.0" y="406.0">3τ</text>
+<text class="ta" text-anchor="end" x="30.0" y="397.5">0</text>
+<text class="ta" text-anchor="end" x="30.0" y="377.5">2 %</text>
+<text class="ta" text-anchor="end" x="30.0" y="357.5">4 %</text>
+<text class="ta" text-anchor="end" x="30.0" y="337.5">6 %</text>
+<text class="ta" text-anchor="end" x="30.0" y="317.5">8 %</text>
+<line class="cp" x1="34.0" y1="374.2" x2="162.0" y2="374.2"/>
+<text class="tl" text-anchor="middle" x="98.0" y="367.2">1,98 % in jedem Alter</text>
+<line class="cp" x1="202.0" y1="393.0" x2="244.7" y2="393.0"/>
+<line x1="244.7" y1="393.0" x2="244.7" y2="318.0" stroke="#7c3aed" stroke-width="1.4" marker-end="url(#av)"/>
+<text class="tl" text-anchor="start" x="249.7" y="324.0">100 % bei Alter τ</text>
+<text class="ta" text-anchor="middle" x="223.3" y="388.0">0</text>
+<path class="cp" d="M370.0,394.0 L370.9,393.8 L371.7,393.4 L372.6,392.9 L373.4,392.3 L374.3,391.6 L375.1,390.9 L376.0,390.1 L376.8,389.3 L377.7,388.4 L378.5,387.5 L379.4,386.6 L380.2,385.7 L381.1,384.8 L381.9,384.0 L382.8,383.1 L383.7,382.2 L384.5,381.4 L385.4,380.5 L386.2,379.7 L387.1,378.9 L387.9,378.1 L388.8,377.4 L389.6,376.6 L390.5,375.9 L391.3,375.2 L392.2,374.5 L393.0,373.8 L393.9,373.2 L394.7,372.6 L395.6,371.9 L396.5,371.3 L397.3,370.8 L398.2,370.2 L399.0,369.6 L399.9,369.1 L400.7,368.6 L401.6,368.1 L402.4,367.6 L403.3,367.1 L404.1,366.6 L405.0,366.2 L405.8,365.7 L406.7,365.3 L407.5,364.9 L408.4,364.5 L409.3,364.1 L410.1,363.7 L411.0,363.3 L411.8,362.9 L412.7,362.6 L413.5,362.2 L414.4,361.9 L415.2,361.5 L416.1,361.2 L416.9,360.9 L417.8,360.6 L418.6,360.3 L419.5,360.0 L420.3,359.7 L421.2,359.4 L422.1,359.1 L422.9,358.8 L423.8,358.6 L424.6,358.3 L425.5,358.0 L426.3,357.8 L427.2,357.5 L428.0,357.3 L428.9,357.1 L429.7,356.8 L430.6,356.6 L431.4,356.4 L432.3,356.2 L433.1,356.0 L434.0,355.8 L434.9,355.6 L435.7,355.4 L436.6,355.2 L437.4,355.0 L438.3,354.8 L439.1,354.6 L440.0,354.4 L440.8,354.2 L441.7,354.1 L442.5,353.9 L443.4,353.7 L444.2,353.6 L445.1,353.4 L445.9,353.2 L446.8,353.1 L447.7,352.9 L448.5,352.8 L449.4,352.6 L450.2,352.5 L451.1,352.3 L451.9,352.2 L452.8,352.1 L453.6,351.9 L454.5,351.8 L455.3,351.7 L456.2,351.5 L457.0,351.4 L457.9,351.3 L458.7,351.1 L459.6,351.0 L460.5,350.9 L461.3,350.8 L462.2,350.7 L463.0,350.6 L463.9,350.4 L464.7,350.3 L465.6,350.2 L466.4,350.1 L467.3,350.0 L468.1,349.9 L469.0,349.8 L469.8,349.7 L470.7,349.6 L471.5,349.5 L472.4,349.4 L473.3,349.3 L474.1,349.2 L475.0,349.1 L475.8,349.0 L476.7,348.9 L477.5,348.8 L478.4,348.7 L479.2,348.7 L480.1,348.6 L480.9,348.5 L481.8,348.4 L482.6,348.3 L483.5,348.2 L484.3,348.2 L485.2,348.1 L486.1,348.0 L486.9,347.9 L487.8,347.8 L488.6,347.8 L489.5,347.7 L490.3,347.6 L491.2,347.5 L492.0,347.5 L492.9,347.4 L493.7,347.3 L494.6,347.3 L495.4,347.2 L496.3,347.1 L497.1,347.1 L498.0,347.0"/>
+<text class="tl" text-anchor="middle" x="438.3" y="341.0">steigt mit dem Alter</text>
+<line class="cp" x1="538.0" y1="390.4" x2="549.9" y2="390.4"/>
+<line x1="550.4" y1="390.4" x2="550.4" y2="318.0" stroke="#7c3aed" stroke-width="1.4" marker-end="url(#av)"/>
+<text class="tl" text-anchor="start" x="555.4" y="324.0">63 % bei Alter 0,3 τ</text>
+<line class="cp" x1="550.8" y1="384.3" x2="666.0" y2="384.3"/>
+<text class="tl" text-anchor="middle" x="610.5" y="377.3">danach 0,97 %</text>
+<text class="rl" text-anchor="start" x="8.0" y="426.0">Was jede Karte zusätzlich zu Größe und Masse mitführen muss</text>
+<rect x="18.0" y="434" width="140" height="30" rx="4" fill="#ffffff" stroke="#c4b5fd" stroke-width="1.2"/>
+<text class="tl" text-anchor="middle" x="88.0" y="453.0">nichts</text>
+<text class="ta" text-anchor="middle" x="88.0" y="478.0">gedächtnislos</text>
+<rect x="186.0" y="434" width="140" height="30" rx="4" fill="#ffffff" stroke="#c4b5fd" stroke-width="1.2"/>
+<text class="tv" text-anchor="middle" x="256.0" y="453.0">+ Alter</text>
+<text class="ta" text-anchor="middle" x="256.0" y="478.0">oder ihre Austrittszeit</text>
+<rect x="354.0" y="434" width="140" height="30" rx="4" fill="#ffffff" stroke="#c4b5fd" stroke-width="1.2"/>
+<text class="tl" text-anchor="middle" x="424.0" y="453.0">nichts</text>
+<text class="ta" text-anchor="middle" x="424.0" y="478.0">jeder Kessel gedächtnislos</text>
+<rect x="522.0" y="434" width="140" height="30" rx="4" fill="#ffffff" stroke="#c4b5fd" stroke-width="1.2"/>
+<text class="tv" text-anchor="middle" x="592.0" y="453.0">+ Zone (Kern oder Rand)</text>
+<text class="ta" text-anchor="middle" x="592.0" y="478.0">im Kern zusätzlich das Alter</text>
+<text class="rl" text-anchor="start" x="8.0" y="500.0">Beispiele</text>
+<text class="tl" text-anchor="middle" x="88.0" y="516.0">Rührkessel, Wirbelschicht,</text>
+<text class="tl" text-anchor="middle" x="88.0" y="530.0">Aerosolkammer, Koagulator</text>
+<text class="tl" text-anchor="middle" x="256.0" y="516.0">Rohr, Förderband,</text>
+<text class="tl" text-anchor="middle" x="256.0" y="530.0">Massenfluss-Silo, Verzögerung</text>
+<text class="tl" text-anchor="middle" x="424.0" y="516.0">mehrere Behälter hinter-</text>
+<text class="tl" text-anchor="middle" x="424.0" y="530.0">einander, Rückvermischung</text>
+<text class="tl" text-anchor="middle" x="592.0" y="516.0">Bunker und Silos</text>
+<text class="tl" text-anchor="middle" x="592.0" y="530.0">mit Totzonen</text>
+<line x1="8" y1="548" x2="672" y2="548" stroke="#e5e7eb" stroke-width="1"/>
+<text class="ta" text-anchor="start" x="8.0" y="566.0">Farbe der Karten:</text>
+<rect x="88.0" y="559.0" width="9" height="6" rx="1" fill="#ede9fe" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="100.0" y="559.0" width="9" height="6" rx="1" fill="#c4b5fd" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="112.0" y="559.0" width="9" height="6" rx="1" fill="#a78bfa" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="124.0" y="559.0" width="9" height="6" rx="1" fill="#7c3aed" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="136.0" y="559.0" width="9" height="6" rx="1" fill="#5b21b6" stroke="#ffffff" stroke-width="0.6"/>
+<rect x="148.0" y="559.0" width="9" height="6" rx="1" fill="#3b0764" stroke="#ffffff" stroke-width="0.6"/>
+<text class="ta" text-anchor="start" x="162.0" y="566.0">neu → alt</text>
+<text class="ta" text-anchor="start" x="8.0" y="584.0">Kernfluss vereinfacht: 60 % laufen als Kern in 0,3 τ durch, 40 % liegen in der Randzone (dort im Mittel 2,05 τ).</text>
+<text class="ta" text-anchor="start" x="8.0" y="599.0">Allgemein gilt p(t) = 1 − S(t + Δt) / S(t) mit S(t) = Anteil, der nach der Zeit t noch im Behälter ist.</text>
+</svg>

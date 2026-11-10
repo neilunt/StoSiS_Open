@@ -8,6 +8,8 @@ add_library(stosis_core STATIC
     src/Unit.cpp
     src/BuiltinTransportUnits.cpp
     src/MaterialDatabase.cpp
+    src/FlowsheetFile.cpp
+    include/FlowsheetFile.h
     include/Materials.h
     include/StreamMixing.h
     include/StreamRecord.h
@@ -44,6 +46,7 @@ include/BuiltinStreamProcessors.h
 include/SizeDistribution.h
 include/SplitterUnit.h
 include/MergerUnit.h
+include/VesselUnit.h
 include/StreamSlice.h
 include/CardProjection.h
 include/CardSettings.h
@@ -61,11 +64,15 @@ target_include_directories(stosis_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# JSON-Bibliothek (nlohmann/json 3.12.0, MIT-Lizenz, nur Header) zum Lesen
-# der Materialdatei. PRIVATE: nur MaterialDatabase.cpp braucht sie.
+# JSON-Bibliothek (nlohmann/json 3.12.0, MIT-Lizenz, nur Header) fuer die
+# Materialdatei und die Flowsheet-Datei. PRIVATE: nur MaterialDatabase.cpp
+# und FlowsheetFile.cpp brauchen sie.
 target_include_directories(stosis_core PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/nlohmann_json/include
 )
+
+# Programmversion fuer den Kopf der Flowsheet-Datei (FlowsheetFile.cpp).
+target_compile_definitions(stosis_core PRIVATE STOSIS_VERSION="${PROJECT_VERSION}")
 
 set_target_properties(stosis_core PROPERTIES FOLDER "Core")
 

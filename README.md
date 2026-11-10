@@ -20,11 +20,17 @@ Umgesetzt:
 - **Units:** Inlet (Zeitprofil; Größenverteilung Log-Normal, RRSB, GGS,
   Tabelle oder Normal; Stoff, T, p), Outlet, Splitter (2 oder 3 Ausgänge,
   deterministisch oder stochastisch nach Ornstein-Uhlenbeck), Merger (2 oder
-  3 Eingänge), größenabhängige Verzögerung als Platzhalter-Prozess.
+  3 Eingänge), Behälter (ideal durchmischt, Pfropfenströmung, Kaskade,
+  Kernfluss oder Charge; Anfangsfüllung leer, wie im Dauerbetrieb oder
+  vorgegeben), größenabhängige Verzögerung als Platzhalter-Prozess.
 - **Größenraster:** logarithmisch (Standard 1 µm – 1 mm, 300 Klassen) oder
   linear; intern SI-Einheiten, Anzeige in µm.
 - **Rechenablauf:** Makroschritte, Units der Reihe nach (Gauß-Seidel),
-  Rückführungen werden an einer Verbindung aufgeschnitten.
+  Rückführungen werden an einer Verbindung aufgeschnitten. Das Fenster
+  „Struktur“ zeigt Reihenfolge, Kreise und Schnitte als Bild und als Baum.
+- **Flowsheet als Datei:** JSON mit allen Eingaben (Simulation, Units mit
+  allen Einstellungen, Verbindungen); speichern in der Oberfläche, lesen im
+  Rechenkern, abgesichert durch einen Rundlauftest.
 - **Mehrere Läufe:** globaler Seed mit separatem Zufallsstrom je Unit,
   Mittelwert und Streuung nach Welford, Bänder und Perzentile; validiert
   gegen eine analytische Lösung.
@@ -36,18 +42,19 @@ Umgesetzt:
   Ströme tragen je Stoff und Größenklasse eine Massenstromdichte sowie T
   und p; beim Mischen gilt die Energiebilanz.
 - **Partikelmodus:** Ströme tragen gewichtete Monte-Carlo-Partikel
-  („Karten“); Inlet, Outlet, Merger und Splitter rechnen damit. Das Inlet
-  verteilt die Karten nach einer einstellbaren Kartendichte aus Masse und
-  Anzahl, der Splitter teilt sie nach einem Konto-Verfahren auf, Grenzen je
-  Stromscheibe halten die Kartenzahl klein; für die Anzeige werden die Karten
-  aufs Raster umgerechnet.
+  („Karten“); Inlet, Outlet, Merger, Splitter und Behälter rechnen damit.
+  Das Inlet verteilt die Karten nach einer einstellbaren Kartendichte aus
+  Masse und Anzahl, Splitter und Behälter teilen sie nach einem
+  Konto-Verfahren auf, Grenzen je Stromscheibe halten die Kartenzahl klein;
+  für die Anzeige werden die Karten aufs Raster umgerechnet.
 
 Noch nicht umgesetzt:
 
-- Partikelmodus für Units mit Hold-up (Verzögerung); Koagulator mit
-  Koagulation, Bruch, Wachstum und Keimbildung
-- Flowsheets speichern und laden (geplant JSON); Import von Dyssol-Dateien
-  (`.dflw`, Format HDF5)
+- Partikelmodus für die größenabhängige Verzögerung; Inhalt eines Behälters
+  als Ergebnis; Koagulator mit Koagulation, Bruch, Wachstum und Keimbildung
+- Flowsheet-Datei in der Oberfläche öffnen und ohne Oberfläche daraus
+  rechnen; Übersetzer für Dyssol-Flowsheets (`.dflw`, Format HDF5) in diese
+  Datei
 - Materialien bearbeiten in der Oberfläche, Export ins Dyssol-Format
 - 3D-Darstellung der Heatmap (Qt Graphs)
 
@@ -123,8 +130,9 @@ Kit (msvc2022_64) installiert ist.
 
 Die Prüfungen aus dem Methodenhandbuch liegen als Testprogramme in
 `tests/` (Größenverteilungen, Graph und Rückführungen, OU-Splitter,
-Mehrfachläufe gegen die analytische Lösung, Materialien, Ströme mit Stoff/T/p
-und ein Regressionstest über alle Ergebnisse). Ausführen nach dem Bauen:
+Mehrfachläufe gegen die analytische Lösung, Materialien, Ströme mit Stoff/T/p,
+Karten, Behälter gegen die geschlossenen Verweilzeitverteilungen und ein
+Regressionstest über alle Ergebnisse). Ausführen nach dem Bauen:
 
 ```bat
 cmake --build build --config Release

@@ -47,7 +47,7 @@ namespace stosis
         double rangeAnchor = 1e-6;   // m (1 um), unabhaengig vom Raster
         // Speichergrenze der Kartenansicht: Karten von Lauf 1, alle Stroeme zusammen.
         size_t historyBudgetBytes = size_t(256) << 20;
-        // Noch nicht umgesetzt: Vorrat = 10 x N.
+        // Vorrat eines Behaelters: SVesselSettings::stockFactor x N Karten (Methodenhandbuch 7.4).
     };
 
     // Kleinstes gamma in der Oberflaeche: Darunter landen merklich Karten in

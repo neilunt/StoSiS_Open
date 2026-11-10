@@ -45,6 +45,9 @@ signals:
     void NodesChanged();
     // Doppelklick auf eine Knoten-Box - oeffnet dessen Einstellungen.
     void NodeDoubleClicked(const QString& nodeId);
+    // Verbindung hinzugefuegt, geloescht oder als Rueckfuehrung markiert
+    // (Fenster "Struktur" neu aufbauen).
+    void ConnectionsChanged();
 
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override;

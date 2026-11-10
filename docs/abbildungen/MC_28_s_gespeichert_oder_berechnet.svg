@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="350" viewBox="0 0 680 350">
+<title>Anteil s gespeichert oder bei Bedarf berechnet</title>
+<style>
+text { font-family: Calibri, Arial, sans-serif; }
+.th { font-size: 13px; font-weight: bold; fill: #222222; } .tn { font-size: 11px; font-weight: bold; fill: #222222; }
+.tl { font-size: 10.5px; fill: #3f3f3f; } .tv { font-size: 13px; font-weight: bold; fill: #4c1d95; } .tk { font-size: 10px; fill: #595959; }
+.tc { font-size: 10px; font-weight: bold; fill: #7c3aed; } .tg { font-size: 10px; fill: #6b7280; }
+</style>
+<rect width="680" height="350" fill="#ffffff"/>
+<text class="th" x="8" y="18">Eine Karte auf dem Weg durch das Flowsheet: N · s (N = 2000) und wann gerechnet wird</text>
+<!-- Stationen -->
+<g>
+<rect x="22" y="30" width="118" height="42" rx="4" fill="#f1f5f9" stroke="#94a3b8"/><text class="tn" text-anchor="middle" x="81" y="46">Inlet</text><text class="tk" text-anchor="middle" x="81" y="62">2000 Karten, 1 kg/s</text>
+<rect x="150" y="30" width="118" height="42" rx="4" fill="#f1f5f9" stroke="#94a3b8"/><text class="tn" text-anchor="middle" x="209" y="46">Splitter-Eingang</text><text class="tk" text-anchor="middle" x="209" y="62">dasselbe Paket</text>
+<rect x="278" y="30" width="118" height="42" rx="4" fill="#f1f5f9" stroke="#94a3b8"/><text class="tn" text-anchor="middle" x="337" y="46">Ausgang A (30 %)</text><text class="tk" text-anchor="middle" x="337" y="62">600 Karten, 0,3 kg/s</text>
+<rect x="406" y="30" width="118" height="42" rx="4" fill="#f1f5f9" stroke="#94a3b8"/><text class="tn" text-anchor="middle" x="465" y="46">Merger + Inlet 2</text><text class="tk" text-anchor="middle" x="465" y="62">2600 Karten, 1,3 kg/s</text>
+<rect x="534" y="30" width="118" height="42" rx="4" fill="#f1f5f9" stroke="#94a3b8"/><text class="tn" text-anchor="middle" x="593" y="46">Outlet</text><text class="tk" text-anchor="middle" x="593" y="62">dasselbe Paket</text>
+<path d="M140,51 L150,51 M268,51 L278,51 M396,51 L406,51 M524,51 L534,51" stroke="#6b7280" stroke-width="1.4"/>
+</g>
+<!-- Zeile A -->
+<text class="th" x="8" y="96">A) s gespeichert und neu berechnet, sobald sich das Paket ändert</text>
+<rect x="22" y="104" width="118" height="46" rx="4" fill="#ede9fe" stroke="#7c3aed"/><text class="tv" text-anchor="middle" x="81" y="122">1,00</text><text class="tc" text-anchor="middle" x="81" y="140">berechnet, gespeichert</text>
+<rect x="150" y="104" width="118" height="46" rx="4" fill="#f8fafc" stroke="#cbd5e1"/><text class="tv" text-anchor="middle" x="209" y="122">1,00</text><text class="tg" text-anchor="middle" x="209" y="140">behalten</text>
+<rect x="278" y="104" width="118" height="46" rx="4" fill="#ede9fe" stroke="#7c3aed"/><text class="tv" text-anchor="middle" x="337" y="122">3,33</text><text class="tc" text-anchor="middle" x="337" y="140">neu (Paket geändert)</text>
+<rect x="406" y="104" width="118" height="46" rx="4" fill="#ede9fe" stroke="#7c3aed"/><text class="tv" text-anchor="middle" x="465" y="122">0,77</text><text class="tc" text-anchor="middle" x="465" y="140">neu (Paket geändert)</text>
+<rect x="534" y="104" width="118" height="46" rx="4" fill="#f8fafc" stroke="#cbd5e1"/><text class="tv" text-anchor="middle" x="593" y="122">0,77</text><text class="tg" text-anchor="middle" x="593" y="140">behalten</text>
+<!-- Zeile B -->
+<text class="th" x="8" y="174">B) s nicht gespeichert, berechnet, wenn es gebraucht wird (Umsetzung)</text>
+<rect x="22" y="182" width="118" height="46" rx="4" fill="#f8fafc" stroke="#cbd5e1"/><text class="tv" text-anchor="middle" x="81" y="200">(1,00)</text><text class="tg" text-anchor="middle" x="81" y="218">Platzierung gibt 1/N</text>
+<rect x="150" y="182" width="118" height="46" rx="4" fill="#ede9fe" stroke="#7c3aed"/><text class="tv" text-anchor="middle" x="209" y="200">1,00</text><text class="tc" text-anchor="middle" x="209" y="218">berechnet fürs Konto</text>
+<rect x="278" y="182" width="118" height="46" rx="4" fill="#ede9fe" stroke="#7c3aed"/><text class="tv" text-anchor="middle" x="337" y="200">3,33</text><text class="tc" text-anchor="middle" x="337" y="218">berechnet (Grenzen)</text>
+<rect x="406" y="182" width="118" height="46" rx="4" fill="#ede9fe" stroke="#7c3aed"/><text class="tv" text-anchor="middle" x="465" y="200">0,77</text><text class="tc" text-anchor="middle" x="465" y="218">berechnet (Grenzen)</text>
+<rect x="534" y="182" width="118" height="46" rx="4" fill="#f8fafc" stroke="#cbd5e1"/><text class="tv" text-anchor="middle" x="593" y="200">–</text><text class="tg" text-anchor="middle" x="593" y="218">nicht gebraucht</text>
+<!-- gebraucht -->
+<text class="th" x="8" y="252">Wird s hier gebraucht?</text>
+<text class="tl" text-anchor="middle" x="81" y="270">nein</text>
+<text class="tl" text-anchor="middle" x="209" y="270">ja: Konto im Splitter</text>
+<text class="tl" text-anchor="middle" x="337" y="270">ja: Grenzen (2N, 5/N)</text>
+<text class="tl" text-anchor="middle" x="465" y="270">ja: Grenzen (2N, 5/N)</text>
+<text class="tl" text-anchor="middle" x="593" y="270">nein</text>
+<!-- Fazit -->
+<text class="tl" x="8" y="296">Beide Wege geben an jeder Stelle denselben Wert, weil beide dieselbe Rechnung über das jetzige Paket machen: a = 0,5 · m/Σm + 0,5 · n/Σn,</text>
+<text class="tl" x="8" y="309">w = (a / Breite)^0,8 · Breite, s = w / Σw. Verschieden ist nur, wann gerechnet wird. Hier rechnen beide dreimal: A am Inlet und nach jeder Änderung,</text>
+<text class="tl" x="8" y="322">B dort, wo s gebraucht wird. Fast jede Unit ändert das Paket, deshalb spart A kaum etwas; dafür müsste jede Unit melden, dass sich das Paket</text>
+<text class="tl" x="8" y="335">geändert hat (auch Behälter, Grenzen, später Koagulation). Vergisst eine Unit das, bleibt ein altes s stehen; B kann kein altes s haben.</text>
+</svg>

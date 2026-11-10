@@ -19,7 +19,9 @@ set(STOSIS_TESTS
     test_signal_analysis # Auswertung schwankender Zeitreihen (Kap. 10, 11)
     test_cards           # Karten im Strom, Umrechnung aufs Raster (Kap. 9.3, 9.6)
     test_particle_units  # Merger und Splitter im Partikelmodus (Kap. 9.4, 9.5)
+    test_vessel          # Behaelter: vier Mischungen, Anfangsfuellung, Vorrat (Kap. 7.4)
     test_runlog          # Laufzeitprotokoll, Fortschritt, Kartenspeicher (Kap. 9.6, 10)
+    test_flowsheet_file  # Flowsheet als Datei: Rundlauf, Fehler, Struktur (Kap. 3)
     test_regression      # alle Ergebnisse gegen gespeicherte Referenzwerte
 )
 
