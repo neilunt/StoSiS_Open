@@ -141,7 +141,10 @@ install(TARGETS stosis_gui RUNTIME DESTINATION .)
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/data/" DESTINATION data)
 install(FILES "${CMAKE_SOURCE_DIR}/docs/StoSiS_Programmhilfe.html" "${CMAKE_SOURCE_DIR}/docs/StoSiS_Methodenhandbuch.html" DESTINATION docs)
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/docs/abbildungen" DESTINATION docs)
-install(DIRECTORY "${CMAKE_SOURCE_DIR}/validierung/flowsheets" DESTINATION validierung)
+# Ordner Flowsheets mit den Validierungs-Flowsheets; das Setup macht ihn fuer
+# Nutzer beschreibbar (gui/resources/Setup_Flowsheets.iss), damit Speichern
+# auch unter "Programme" geht.
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/Flowsheets/Validierungs-Flowsheets" DESTINATION Flowsheets)
 if(WIN32 AND WINDEPLOYQT_EXE)
     install(CODE "execute_process(COMMAND \"${WINDEPLOYQT_EXE}\" --no-compiler-runtime --no-translations --no-opengl-sw
         \"\${CMAKE_INSTALL_PREFIX}/StoSiS.exe\" COMMAND_ERROR_IS_FATAL ANY OUTPUT_QUIET)")

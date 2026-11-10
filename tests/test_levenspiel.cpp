@@ -1,5 +1,5 @@
 // Kompartiment-Modelle nach Levenspiel (1999) und Mischer nach Engisch und
-// Muzzio (2016) aus den Flowsheet-Dateien in validierung/flowsheets
+// Muzzio (2016) aus den Flowsheet-Dateien in Flowsheets/Validierungs-Flowsheets
 // (Methodenhandbuch 11.3, 11.4): Tracerpuls von 1 kg im ersten Zeitschritt,
 // Ablauf gegen die exakte Verweilzeitverteilung E(t), im Kontinuum und im
 // Partikelmodus. Mit einem Ordner als Argument schreibt das Programm je

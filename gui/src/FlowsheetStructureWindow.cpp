@@ -374,11 +374,13 @@ QString FlowsheetStructureWindow::FlowsheetFolder()
 {
     if (g_flowsheetFolder.isEmpty())
     {
-        // Installiert liegt data/ neben der exe; sonst gilt der Quellordner.
+        // StoSiS-Ordner: installiert liegt data/ neben der exe, sonst gilt der
+        // Quellordner. Darin der Ordner Flowsheets (mit Validierungs-Flowsheets).
         const QString besideExe = QCoreApplication::applicationDirPath();
-        g_flowsheetFolder = QFileInfo::exists(besideExe + "/data")
+        const QString root = QFileInfo::exists(besideExe + "/data")
             ? besideExe
             : QDir(QString(STOSIS_DATA_DIR) + "/..").absolutePath();
+        g_flowsheetFolder = QFileInfo::exists(root + "/Flowsheets") ? root + "/Flowsheets" : root;
     }
     return g_flowsheetFolder;
 }

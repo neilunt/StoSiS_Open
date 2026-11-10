@@ -30,7 +30,7 @@ Umgesetzt:
   „Struktur“ zeigt Reihenfolge, Kreise und Schnitte als Bild und als Baum.
 - **Flowsheet als Datei:** JSON mit allen Eingaben (Simulation, Units mit
   allen Einstellungen, Verbindungen); neu (Strg+N), öffnen und speichern in der Oberfläche,
-  abgesichert durch einen Rundlauftest. Beispiele in `validierung/flowsheets`:
+  abgesichert durch einen Rundlauftest. Beispiele in `Flowsheets/Validierungs-Flowsheets`:
   Kompartiment-Modelle nach Levenspiel und ein Mischer, gegen ihre exakte
   Verweilzeitverteilung geprüft (`test_levenspiel`).
 - **Mehrere Läufe:** globaler Seed mit separatem Zufallsstrom je Unit,
@@ -75,7 +75,7 @@ StoSiS/
 ├── data/          Materialdatei mit Anleitung und Dyssol-Lizenzhinweis
 ├── docs/          Methodenhandbuch (HTML und PDF), Programmhilfe, Abbildungen
 ├── tests/         automatische Tests des Rechenkerns (CTest)
-├── validierung/   Validierungs-Flowsheets als Dateien (zum Öffnen in StoSiS)
+├── Flowsheets/    Flowsheet-Dateien; darin Validierungs-Flowsheets (zum Öffnen in StoSiS)
 ├── tools/         dmdb_to_json.pl (Umwandlung der Dyssol-Materialdatenbank)
 └── CMakeLists.txt
 ```

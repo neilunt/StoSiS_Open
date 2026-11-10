@@ -33,8 +33,8 @@ public:
     void Refresh();
 
     // Startordner der Dialoge "Flowsheet oeffnen" und "speichern": der zuletzt
-    // benutzte Ordner, anfangs der StoSiS-Ordner (installiert neben der exe,
-    // sonst der Quellordner).
+    // benutzte Ordner, anfangs der Ordner Flowsheets im StoSiS-Ordner
+    // (installiert neben der exe, sonst im Quellordner).
     static QString FlowsheetFolder();
     static void RememberFlowsheetFolder(const QString& filePath);
     // Schreibt die Datei ohne Dialog (vorhandene wird ueberschrieben);

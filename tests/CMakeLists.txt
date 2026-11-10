@@ -29,7 +29,7 @@ set(STOSIS_TESTS
 foreach(name IN LISTS STOSIS_TESTS)
     add_executable(${name} ${name}.cpp TestSupport.h)
     target_link_libraries(${name} PRIVATE stosis_core)
-    target_compile_definitions(${name} PRIVATE STOSIS_DATA_DIR="${CMAKE_SOURCE_DIR}/data" STOSIS_VALIDATION_DIR="${CMAKE_SOURCE_DIR}/validierung/flowsheets")
+    target_compile_definitions(${name} PRIVATE STOSIS_DATA_DIR="${CMAKE_SOURCE_DIR}/data" STOSIS_VALIDATION_DIR="${CMAKE_SOURCE_DIR}/Flowsheets/Validierungs-Flowsheets")
     set_target_properties(${name} PROPERTIES FOLDER "Tests")
     add_test(NAME ${name} COMMAND ${name})
 endforeach()

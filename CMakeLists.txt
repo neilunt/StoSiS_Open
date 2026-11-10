@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(StoSiS VERSION 0.2.0 LANGUAGES CXX CUDA)
+project(StoSiS VERSION 0.2.1 LANGUAGES CXX CUDA)
 
 # CUDA ist aktiv: Die GPU-Kernel (z.B. First-Passage-Time-Transport) liegen
 # in der Bibliothek stosis_cuda, GPU-Architekturen siehe core/CMakeLists.txt
@@ -50,6 +50,8 @@ if(STOSIS_ISCC_EXE)
     # unter Einstellungen -> Apps.
     set(CPACK_INNOSETUP_ICON_FILE "${CMAKE_SOURCE_DIR}/gui/resources/StoSiS.ico")
     set(CPACK_INNOSETUP_SETUP_UninstallDisplayIcon "{app}\\StoSiS.exe")
+    # Ordner Flowsheets fuer Nutzer beschreibbar (Speichern unter "Programme").
+    set(CPACK_INNOSETUP_EXTRA_SCRIPTS "${CMAKE_SOURCE_DIR}/gui/resources/Setup_Flowsheets.iss")
 endif()
 # Werte unveraendert an cpack weitergeben: Ohne diese Einstellung landet der
 # Backslash aus "{app}\StoSiS.exe" unmaskiert in CPackConfig.cmake, und
