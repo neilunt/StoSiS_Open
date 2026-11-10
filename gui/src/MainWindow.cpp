@@ -29,6 +29,11 @@
 #include <QHBoxLayout>
 #include <QLocale>
 #include <QDir>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QSignalBlocker>
+#include <QDesktopServices>
+#include <QUrl>
 #include <algorithm>
 #include <cmath>
 
@@ -36,7 +41,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
     // Debug-Fassung im Titel: sie rechnet etwa sechsmal langsamer.
-    setWindowTitle(stosis::IsDebugBuild() ? "StoSiS [Debug-Fassung]" : "StoSiS");
+    SetCurrentFile(QString());
     resize(1600, 900); // Startgroesse, falls nicht maximiert gestartet wird
 
     LoadMaterials();
@@ -90,11 +95,15 @@ void MainWindow::BuildTestFlowsheet()
     // Zeitprofil und Groessenverteilung: Standardwerte aus CInletUnit
     // (GetDefaultInletTimeProfile in InletUnit.h, Log-Normal d50 = 100 um,
     // sigma_ln = 0,25) - dieselben bekommt jedes neu angelegte Inlet.
-    // Raster: logarithmisch 1 um bis 1 mm mit 300 Klassen (Methoden 2.5).
-
-    // Zeitraster: 40 s mit dt = 0,2 s (201 Zeitpunkte).
-    m_graph.ConfigureGrid(300, 1e-6, 1e-3, 201, 40.0);
+    ConfigureDefaultGrid(m_graph);
     m_graph.RunSimulations(kDefaultNumRuns);
+}
+
+void MainWindow::ConfigureDefaultGrid(stosis::CFlowsheetGraph& graph)
+{
+    // Raster: logarithmisch 1 um bis 1 mm mit 300 Klassen (Methodenhandbuch
+    // Kap. 4); Zeitraster: 40 s mit dt = 0,2 s (201 Zeitpunkte).
+    graph.ConfigureGrid(300, 1e-6, 1e-3, 201, 40.0);
 }
 
 void MainWindow::SetupMenuAndToolBar()
@@ -117,8 +126,20 @@ void MainWindow::SetupMenuAndToolBar()
     QAction* structureAction = flowsheetMenu->addAction("&Struktur anzeigen");
     connect(structureAction, &QAction::triggered, this, &MainWindow::OnShowStructure);
     flowsheetMenu->addSeparator();
-    QAction* saveAction = flowsheetMenu->addAction("Flowsheet als &Datei speichern ...");
+    QAction* newAction = flowsheetMenu->addAction("&Neues Flowsheet");
+    newAction->setShortcut(QKeySequence::New);
+    connect(newAction, &QAction::triggered, this, &MainWindow::OnNewFlowsheet);
+    QAction* openAction = flowsheetMenu->addAction("Flowsheet aus Datei &oeffnen ...");
+    openAction->setShortcut(QKeySequence::Open);
+    connect(openAction, &QAction::triggered, this, &MainWindow::OnOpenFlowsheet);
+    // Speichern schreibt in die Datei des Flowsheets (geoeffnet oder zuletzt
+    // gespeichert); ohne Datei wie "speichern unter".
+    QAction* saveAction = flowsheetMenu->addAction("Flowsheet &speichern");
+    saveAction->setShortcut(QKeySequence::Save);
     connect(saveAction, &QAction::triggered, this, &MainWindow::OnSaveFlowsheet);
+    QAction* saveAsAction = flowsheetMenu->addAction("Flowsheet speichern &unter ...");
+    saveAsAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S));
+    connect(saveAsAction, &QAction::triggered, this, &MainWindow::OnSaveFlowsheetAs);
 
     // Alte Test-/Demo-Fenster: weiterhin erreichbar, aber aus dem
     // Hauptablauf heraus.
@@ -129,6 +150,14 @@ void MainWindow::SetupMenuAndToolBar()
     connect(comparisonAction, &QAction::triggered, this, &MainWindow::OnShowComparisonWindow);
     QAction* cudaTestAction = devMenu->addAction("&CUDA-Test ausfuehren");
     connect(cudaTestAction, &QAction::triggered, this, &MainWindow::OnRunCudaTest);
+
+    // Hilfe: Bedienung (Programmhilfe) und Verfahren (Methodenhandbuch) als HTML im Browser.
+    QMenu* helpMenu = menuBar()->addMenu("&Hilfe");
+    QAction* helpAction = helpMenu->addAction("&Programmhilfe");
+    helpAction->setShortcut(QKeySequence::HelpContents);
+    connect(helpAction, &QAction::triggered, this, [this]() { OpenDocument("StoSiS_Programmhilfe.html"); });
+    QAction* manualAction = helpMenu->addAction("&Methodenhandbuch");
+    connect(manualAction, &QAction::triggered, this, [this]() { OpenDocument("StoSiS_Methodenhandbuch.html"); });
 
     QToolBar* toolBar = addToolBar("Werkzeuge");
     toolBar->setMovable(false);
@@ -579,6 +608,8 @@ void MainWindow::OnShowStructure()
     {
         m_structureWindow = new FlowsheetStructureWindow(this);
         m_structureWindow->SetFileSettingsProvider([this]() { return CurrentFileSettings(); });
+        connect(m_structureWindow, &FlowsheetStructureWindow::FlowsheetSaved, this,
+            [this](const QString& path) { SetCurrentFile(path); });
         m_structureWindow->SetGraph(&m_graph);
     }
     m_structureWindow->show();
@@ -586,9 +617,140 @@ void MainWindow::OnShowStructure()
     m_structureWindow->activateWindow();
 }
 
+void MainWindow::SetCurrentFile(const QString& path)
+{
+    // Titelleiste: Dateiname, in den Strg+S schreibt, bzw. "ohne Datei".
+    m_currentFile = path;
+    const QString base = stosis::IsDebugBuild() ? "StoSiS [Debug-Fassung]" : "StoSiS";
+    setWindowTitle(base + " " + QChar(0x2013) + " " + (path.isEmpty() ? QString("ohne Datei") : QFileInfo(path).fileName()));
+}
+
 void MainWindow::OnSaveFlowsheet()
 {
+    if (m_currentFile.isEmpty())
+    {
+        OnSaveFlowsheetAs();
+        return;
+    }
+    if (FlowsheetStructureWindow::WriteFlowsheet(this, m_currentFile, m_graph, CurrentFileSettings()))
+        statusBar()->showMessage("Flowsheet gespeichert: " + QDir::toNativeSeparators(m_currentFile), 8000);
+}
+
+void MainWindow::OnSaveFlowsheetAs()
+{
     const QString path = FlowsheetStructureWindow::SaveFlowsheetAs(this, m_graph, CurrentFileSettings());
-    if (!path.isEmpty())
-        statusBar()->showMessage("Flowsheet gespeichert: " + QDir::toNativeSeparators(path), 8000);
+    if (path.isEmpty())
+        return;
+    SetCurrentFile(path);
+    statusBar()->showMessage("Flowsheet gespeichert: " + QDir::toNativeSeparators(path), 8000);
+}
+
+void MainWindow::OnNewFlowsheet()
+{
+    // Neues Flowsheet Inlet -> Prozess -> Outlet: Units wie frisch angelegt,
+    // Raster und Simulationsleiste wie beim Programmstart.
+    if (QMessageBox::question(this, "Neues Flowsheet",
+            "Neues Flowsheet Inlet -> Prozess -> Outlet anlegen?\n"
+            "Das aktuelle Flowsheet wird ersetzt; nicht gespeicherte Aenderungen gehen verloren.",
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) != QMessageBox::Yes)
+        return;
+
+    stosis::CFlowsheetGraph graph;
+    graph.SetMaterialDatabase(&m_materials);
+    const std::string inletId = graph.AddInletNode(graph.MakeDefaultNodeName(stosis::ENodeType::Inlet), 0.0, 0.0);
+    const std::string processId = graph.AddProcessNode(graph.MakeDefaultNodeName(stosis::ENodeType::Process), 200.0, 0.0);
+    const std::string outletId = graph.AddOutletNode(graph.MakeDefaultNodeName(stosis::ENodeType::Outlet), 400.0, 0.0);
+    graph.AddConnection(inletId, 0, processId, 0);
+    graph.AddConnection(processId, 0, outletId, 0);
+    ConfigureDefaultGrid(graph);
+    ReplaceGraph(std::move(graph), static_cast<int>(kDefaultNumRuns));
+    SetCurrentFile(QString());
+
+    statusBar()->showMessage("Neues Flowsheet: Inlet -> Prozess -> Outlet", 8000);
+    OnSimulate();
+}
+
+void MainWindow::OnOpenFlowsheet()
+{
+    // Flowsheet-Datei laden (Methodenhandbuch 3.4): erst in einen neuen
+    // Graphen lesen; nur wenn das gelingt, ersetzt er das bisherige Flowsheet.
+    const QString path = QFileDialog::getOpenFileName(this, "Flowsheet oeffnen",
+        FlowsheetStructureWindow::FlowsheetFolder(), "StoSiS-Flowsheet (*.json)");
+    if (path.isEmpty())
+        return;
+    FlowsheetStructureWindow::RememberFlowsheetFolder(path);
+
+    stosis::CFlowsheetGraph loaded;
+    loaded.SetMaterialDatabase(&m_materials);
+    const stosis::SFlowsheetReadResult read = stosis::LoadFlowsheetFile(path.toStdString(), loaded);
+    if (!read.ok)
+    {
+        QMessageBox::warning(this, "Flowsheet oeffnen",
+            "Die Datei wurde nicht geladen, das bisherige Flowsheet bleibt.\n\n" + QString::fromStdString(read.error));
+        return;
+    }
+    ReplaceGraph(std::move(loaded), static_cast<int>(read.settings.runs));
+    SetCurrentFile(path);
+
+    if (!read.warnings.empty())
+    {
+        QStringList lines;
+        for (size_t i = 0; i < read.warnings.size() && i < 20; ++i)
+            lines << QString::fromStdString(read.warnings[i]);
+        if (read.warnings.size() > 20)
+            lines << QString("... und %1 weitere").arg(read.warnings.size() - 20);
+        QMessageBox::information(this, "Hinweise zur Datei", lines.join("\n"));
+    }
+    statusBar()->showMessage("Flowsheet geladen: " + QDir::toNativeSeparators(path), 8000);
+    // Ergebnisse gibt es noch keine: gleich rechnen, damit alle Fenster etwas zeigen.
+    OnSimulate();
+}
+
+void MainWindow::ReplaceGraph(stosis::CFlowsheetGraph&& graph, int runs)
+{
+    m_graph = std::move(graph);
+    m_graph.SetMaterialDatabase(&m_materials);
+
+    // Simulationsleiste aus dem neuen Graphen, ohne dass die Felder dabei einzeln zurueckschreiben.
+    {
+        const stosis::SSimulationGrid& grid = m_graph.GetGrid();
+        const QSignalBlocker b1(m_durationSpin), b2(m_dtSpin), b3(m_seedSpin), b4(m_runsSpin),
+            b5(m_representationCombo), b6(m_cardsSpin), b7(m_limitsCheck);
+        m_durationSpin->setValue(grid.totalTime);
+        m_dtSpin->setValue(grid.GetDt());
+        m_seedSpin->setValue(static_cast<int>(grid.randomSeed));
+        m_runsSpin->setValue(runs);
+        m_representationCombo->setCurrentIndex(std::max(0, m_representationCombo->findData(static_cast<int>(grid.representation))));
+        const bool particles = grid.representation == stosis::ERepresentation::Particles;
+        m_cardsSpin->setValue(static_cast<int>(grid.cards.cardsPerSlice));
+        m_cardsSpin->setEnabled(particles);
+        m_limitsCheck->setChecked(grid.cards.sliceLimits);
+        m_limitsCheck->setEnabled(particles);
+    }
+    m_timeInfoLabel->setText(TimeGridInfo());
+
+    // Alle Ansichten auf den neuen Inhalt setzen (Zeiger auf alte Ergebnisse verwerfen).
+    m_canvas->SetGraph(&m_graph);
+    m_resultsCurveView->SetGraph(&m_graph);
+    m_resultsHeatmapView->SetGraph(&m_graph);
+    if (m_settingsWindow)
+        m_settingsWindow->SetGraph(&m_graph);
+    if (m_analysisWindow)
+        m_analysisWindow->SetGraph(&m_graph);
+    if (m_cardWindow)
+        m_cardWindow->SetGraph(&m_graph);
+    if (m_logWindow)
+        m_logWindow->SetGraph(&m_graph);
+    if (m_structureWindow)
+        m_structureWindow->SetGraph(&m_graph);
+    SyncAnalysisSettings();
+}
+
+void MainWindow::OpenDocument(const QString& fileName)
+{
+    QString path = QCoreApplication::applicationDirPath() + "/docs/" + fileName;
+    if (!QFileInfo::exists(path))
+        path = QString(STOSIS_DATA_DIR) + "/../docs/" + fileName;
+    if (!QFileInfo::exists(path) || !QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(path).absoluteFilePath())))
+        QMessageBox::information(this, "Hilfe", "Die Datei " + fileName + " wurde nicht gefunden.");
 }

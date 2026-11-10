@@ -29,8 +29,10 @@ Umgesetzt:
   Rückführungen werden an einer Verbindung aufgeschnitten. Das Fenster
   „Struktur“ zeigt Reihenfolge, Kreise und Schnitte als Bild und als Baum.
 - **Flowsheet als Datei:** JSON mit allen Eingaben (Simulation, Units mit
-  allen Einstellungen, Verbindungen); speichern in der Oberfläche, lesen im
-  Rechenkern, abgesichert durch einen Rundlauftest.
+  allen Einstellungen, Verbindungen); neu (Strg+N), öffnen und speichern in der Oberfläche,
+  abgesichert durch einen Rundlauftest. Beispiele in `validierung/flowsheets`:
+  Kompartiment-Modelle nach Levenspiel und ein Mischer, gegen ihre exakte
+  Verweilzeitverteilung geprüft (`test_levenspiel`).
 - **Mehrere Läufe:** globaler Seed mit separatem Zufallsstrom je Unit,
   Mittelwert und Streuung nach Welford, Bänder und Perzentile; validiert
   gegen eine analytische Lösung.
@@ -52,9 +54,8 @@ Noch nicht umgesetzt:
 
 - Partikelmodus für die größenabhängige Verzögerung; Inhalt eines Behälters
   als Ergebnis; Koagulator mit Koagulation, Bruch, Wachstum und Keimbildung
-- Flowsheet-Datei in der Oberfläche öffnen und ohne Oberfläche daraus
-  rechnen; Übersetzer für Dyssol-Flowsheets (`.dflw`, Format HDF5) in diese
-  Datei
+- Ohne Oberfläche aus einer Flowsheet-Datei rechnen; Übersetzer für
+  Dyssol-Flowsheets (`.dflw`, Format HDF5) in diese Datei
 - Materialien bearbeiten in der Oberfläche, Export ins Dyssol-Format
 - 3D-Darstellung der Heatmap (Qt Graphs)
 
@@ -72,8 +73,9 @@ StoSiS/
 │   └── third_party/nlohmann_json   JSON-Bibliothek (MIT)
 ├── gui/src/       stosis_gui: Oberfläche (Qt 6 Widgets), Programm StoSiS.exe
 ├── data/          Materialdatei mit Anleitung und Dyssol-Lizenzhinweis
-├── docs/          Methodenhandbuch (HTML und PDF), Abbildungen
+├── docs/          Methodenhandbuch (HTML und PDF), Programmhilfe, Abbildungen
 ├── tests/         automatische Tests des Rechenkerns (CTest)
+├── validierung/   Validierungs-Flowsheets als Dateien (zum Öffnen in StoSiS)
 ├── tools/         dmdb_to_json.pl (Umwandlung der Dyssol-Materialdatenbank)
 └── CMakeLists.txt
 ```

@@ -22,13 +22,14 @@ set(STOSIS_TESTS
     test_vessel          # Behaelter: vier Mischungen, Anfangsfuellung, Vorrat (Kap. 7.4)
     test_runlog          # Laufzeitprotokoll, Fortschritt, Kartenspeicher (Kap. 9.6, 10)
     test_flowsheet_file  # Flowsheet als Datei: Rundlauf, Fehler, Struktur (Kap. 3.3, 3.4)
+    test_levenspiel      # Kompartiment-Modelle und Mischer aus Dateien gegen exakte RTD (Kap. 11.3, 11.4)
     test_regression      # alle Ergebnisse gegen gespeicherte Referenzwerte
 )
 
 foreach(name IN LISTS STOSIS_TESTS)
     add_executable(${name} ${name}.cpp TestSupport.h)
     target_link_libraries(${name} PRIVATE stosis_core)
-    target_compile_definitions(${name} PRIVATE STOSIS_DATA_DIR="${CMAKE_SOURCE_DIR}/data")
+    target_compile_definitions(${name} PRIVATE STOSIS_DATA_DIR="${CMAKE_SOURCE_DIR}/data" STOSIS_VALIDATION_DIR="${CMAKE_SOURCE_DIR}/validierung/flowsheets")
     set_target_properties(${name} PROPERTIES FOLDER "Tests")
     add_test(NAME ${name} COMMAND ${name})
 endforeach()

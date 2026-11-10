@@ -98,7 +98,13 @@
       <li><a href="#k9-7">Prüfung des Partikelmodus</a></li>
     </ol></li>
   <li><a href="#k10">Auswertung</a></li>
-  <li><a href="#k11">Prüfung und Validierung</a></li>
+  <li><a href="#k11">Prüfung und Validierung</a>
+    <ol>
+      <li><a href="#k11-1">Prüfebenen</a></li>
+      <li><a href="#k11-2">Dosierwaage</a></li>
+      <li><a href="#k11-3">Kompartiment-Modelle nach Levenspiel</a></li>
+      <li><a href="#k11-4">Kontinuierlicher Mischer</a></li>
+    </ol></li>
   <li><a href="#k12">Begriffe</a></li>
   <li><a href="#k13">Literatur</a></li>
 </ol>
@@ -163,13 +169,13 @@
 <p>Das Fenster „Struktur“ zeigt, wie der Graph das Flowsheet einteilt – als Bild (Abbildung 3.1) und als Baum in Stromrichtung:</p>
 <ul>
   <li>Jede Unit steht rechts neben bzw. unter dem Vorgänger an ihrem ersten Eingang.</li>
-  <li>„node <i>k</i>“ ist ihr Platz <i>k</i> in der Rechenreihenfolge, ab 0 gezählt und bei jedem Anzeigen neu vergeben. Die Nummer ist nur Anzeige; in der Datei steht die ID der Unit (Kapitel 3.4).</li>
+  <li>Im Kasten steht links der Schritt, also der Platz in der Rechenreihenfolge ab 1; rechts stehen der Name der Unit und darunter ihre ID aus der Datei (Kapitel 3.4).</li>
   <li>Ein Kreis ist eine Gruppe von Units, die sich über Verbindungen gegenseitig erreichen (starke Zusammenhangskomponente).</li>
-  <li>Eine aufgeschnittene Verbindung endet in einem orangen „→ <i>k</i>“: Unit <i>k</i> liest dort den Strom des vorigen Zeitschritts. Ein weiterer Zulauf zu einer Unit, die an anderer Stelle steht, endet in einem grauen „→ <i>k</i>“.</li>
+  <li>Eine aufgeschnittene Verbindung endet in einem orangen „→ Name“: Die genannte Unit liest dort den Strom des vorigen Zeitschritts. Ein weiterer Zulauf zu einer Unit, die an anderer Stelle steht, endet in einem grauen „→ Name“.</li>
 </ul>
 <figure>
   <img src="abbildungen/GUI_Struktur_Bild.png" alt="Fenster Struktur, Reiter Bild, mit zwei Rückführungen in denselben Merger">
-  <figcaption>Abbildung 3.1 – Fenster „Struktur“, Reiter „Bild“, für ein Flowsheet mit zwei Rückführungen in Merger1: über Prozess1 und über Splitter2, drei parallele Äste und Merger2. Beide Rückführungen werden am Merger1 aufgeschnitten (oranges „→ 1“); die Äste von Prozess2 und Prozess3 laufen in Merger2 zusammen (graues „→ 10“). Merger2 rechnet als letzter, weil er auf alle drei Äste wartet.</figcaption>
+  <figcaption>Abbildung 3.1 – Fenster „Struktur“, Reiter „Bild“, für ein Flowsheet mit zwei Rückführungen in Merger1: über Prozess1 und über Splitter2, drei parallele Äste und Merger2. Beide Rückführungen werden am Merger1 aufgeschnitten (oranges „→ Merger1“); die Äste von Prozess2 und Prozess3 laufen in Merger2 zusammen (graues „→ Merger2“). Merger2 steht bei Schritt 11: Er rechnet als letzter, weil er auf alle drei Äste wartet.</figcaption>
 </figure>
 <h4>Prüfung</h4>
 <p>Start-Flowsheet: Reihenfolge Inlet, Merger, Splitter, Outlet, Prozess, ein Kreis aus Merger, Splitter und Prozess, Schnitt Prozess → Merger. Bei zwei Inlets vor einem Merger steht der Merger unter dem ersten Inlet und unter dem zweiten ein Verweis.</p>
@@ -191,7 +197,7 @@
   <li>Fehlt ein Feld, gilt der Standardwert mit Hinweis; ein unbekanntes Feld wird mit Hinweis übergangen; ein ungültiger Wert bricht das Lesen mit Ortsangabe ab. Dateien der Formatversion 1 („recycle“ als true/false) werden weiter gelesen.</li>
 </ul>
 <h4>Grenzen</h4>
-<p>Die Oberfläche speichert Flowsheets, lädt sie aber noch nicht; gelesen werden Dateien bisher nur vom Rechenkern. Stoffwerte, Ergebnisse, Auswertung, Kartenansicht und Fensterlage stehen nicht in der Datei.</p>
+<p>Die Oberfläche speichert und öffnet Flowsheets; beim Öffnen wird erst in ein neues Flowsheet gelesen, bei einem Fehler bleibt das bisherige. Ohne Oberfläche aus einer Datei zu rechnen, geht nur in den Testprogrammen. Stoffwerte, Ergebnisse, Auswertung, Kartenansicht und Fensterlage stehen nicht in der Datei.</p>
 <h4>Prüfung</h4>
 <p>Ein Flowsheet mit allen Unit-Typen und Einstellungen abseits des Standards wird geschrieben, gelesen und wieder geschrieben: Beide Texte sind gleich, und bei gleichem Seed stimmen alle Ergebnisse exakt überein, im Kontinuum wie im Partikelmodus. Dateien mit anderem Format, neuerer Version, Anteilen ohne Summe 1 oder einer Verbindung zu einer unbekannten Unit werden mit Ortsangabe abgewiesen. Dieselbe Datei in Formatversion 1 ergibt beim erneuten Schreiben wieder die Datei der Version 2.</p>
 
@@ -494,14 +500,18 @@
 
 
 <h2 id="k11"><span class="nr">11</span>Prüfung und Validierung</h2>
+
+<h3 id="k11-1"><span class="nr">11.1</span>Prüfebenen</h3>
 <p>Geprüft wird auf drei Ebenen.</p>
 <ul>
   <li><b>Verifikation:</b> Rechnet das Programm, was das Modell sagt? Dazu dienen analytische Lösungen, Bilanzen und das Konvergenzverhalten mit 1/√<i>N</i>.</li>
   <li><b>Vergleich mit anderen Programmen</b> wie Dyssol oder PharmaPy: gleiche Modelle, gleiche Ergebnisse?</li>
   <li><b>Validierung:</b> Trifft das Modell die Wirklichkeit? Das zeigt nur ein Experiment.</li>
 </ul>
-<p>Die Prüfungen der Verifikation liegen als 15 Testprogramme im Repository und laufen mit einem Befehl (CTest). Stochastische Tests laufen mit festem Seed; ihre Toleranzen folgen aus dem statistischen Fehler und sind nicht frei gewählt. Ein Regressionstest überwacht Kennzahlen fester Flowsheets.</p>
-<h4>Validierung: Dosierwaage</h4>
+<p>Die Prüfungen der Verifikation liegen als 16 Testprogramme im Repository und laufen mit einem Befehl (CTest). Stochastische Tests laufen mit festem Seed; ihre Toleranzen folgen aus dem statistischen Fehler und sind nicht frei gewählt. Ein Regressionstest überwacht Kennzahlen fester Flowsheets. Die Flowsheets der Abschnitte 11.3 und 11.4 liegen als Dateien in <code>validierung/flowsheets</code> und lassen sich in der Oberfläche öffnen.</p>
+<p>Ein Vergleich mit anderen Programmen an gemeinsamen Flowsheets liegt nicht vor. Gegen Messdaten geprüft ist der schwankende Splitter (11.2); für den Mischer (11.4) dient eine Verweilzeitkurve aus der Literatur, aus der Abbildung abgelesen.</p>
+
+<h3 id="k11-2"><span class="nr">11.2</span>Dosierwaage</h3>
 <p>Engisch &amp; Muzzio (2012) messen den Massenstrom einer Dosierwaage für Laktose mit einer Auffangwaage, die alle 0,1 s abliest. Simuliert wird ein Inlet mit 100 kg/h, gefolgt von einem schwankenden Splitter (μ = 0,6944, τ = 0,3 s), über 30 min mit Δ<i>t</i> = 0,1 s. Beide Datenreihen werden gleich ausgewertet: 1-s-Mittel, Filter ±10 % um den Sollwert, dann iterativ ±3σ.</p>
 <table>
   <tr><th></th><th>Mittel</th><th>Standardabweichung</th><th>relative Std.</th></tr>
@@ -513,8 +523,28 @@
   <figcaption>Abbildung 11.1 – Dosierwaage (Engisch &amp; Muzzio 2012) gegen StoSiS: a) Verteilung der 1-s-Werte mit dem Band aus 20 Läufen, b) Wahrscheinlichkeitsnetz, c) erste Minute der simulierten Zeitreihe (Rohwerte alle 0,1 s und 1-s-Werte), d) Kennzahlen.</figcaption>
 </figure>
 <p>Beide Verteilungen sind normalverteilt und statistisch nicht zu unterscheiden; 28 von 32 Balken des gemessenen Histogramms liegen im Band aus 20 Läufen (Abbildung 11.1). Validiert ist damit die Form der Schwankung, nicht ihre Vorhersage: Mittelwert und Streuung des Splitters sind an die Messung angepasst. Periodische Anteile im Messsignal, etwa von Rührern und Schnecken, bildet der Ornstein-Uhlenbeck-Prozess nicht ab.</p>
-<h4>Grenzen</h4>
-<p>Ein Vergleich mit anderen Programmen an gemeinsamen Flowsheets liegt nicht vor. Gegen Experimente geprüft ist nur der schwankende Splitter.</p>
+
+<h3 id="k11-3"><span class="nr">11.3</span>Kompartiment-Modelle nach Levenspiel</h3>
+<p>Levenspiel (1999) setzt reale Apparate aus Rohren (Pfropfenströmung), durchmischten Kesseln, Bypässen, Totzonen und Rückführungen zusammen; für diese Kompartiment-Modelle ist die Verweilzeitverteilung exakt bekannt. Vier davon sind in StoSiS aus Splitter, Behälter und Merger nachgebaut. Durch jedes läuft ein Tracerpuls von 1 kg im ersten Zeitschritt. Verglichen wird die Summenkurve <i>F</i>(<i>t</i>), also der Anteil des Tracers, der bis zur Zeit <i>t</i> ausgetreten ist. Die Referenz ist hier eine Formel, keine Messung: Das prüft, ob StoSiS die Modelle richtig rechnet (Verifikation).</p>
+<p>Jede Abbildung zeigt ① das Modell im Original, ② den Nachbau in StoSiS mit seinen Parametern, ③ die exakte Lösung, ④ den Ablauf in StoSiS und ⑤ beides übereinander mit Mittel und Standardabweichung der Verweilzeit.</p>
+<figure>
+  <img src="abbildungen/Val_4b_Parallele_Wege.svg" alt="Parallele Wege: Original, StoSiS und Vergleich">
+  <figcaption>Abbildung 11.2 – Parallele Wege: 40 % durch ein Rohr (Sprung bei 5 s), 60 % durch einen Kessel mit 12 s. Mittel 9,2 s in allen drei Rechnungen; Partikelmodus 0,3 % daneben.</figcaption>
+</figure>
+<figure>
+  <img src="abbildungen/Val_4d_Kessel_in_Reihe.svg" alt="Drei Kessel in Reihe: Original, StoSiS und Vergleich">
+  <figcaption>Abbildung 11.3 – Drei Kessel in Reihe auf zwei Wegen: ein Behälter mit Kaskade aus drei Kesseln (exakt) und drei getrennte Behälter (6 · 10<sup>−4</sup> des Gipfels daneben, weil jeder Folgebehälter seinen Zulauf innerhalb eines Schritts als konstant nimmt).</figcaption>
+</figure>
+<p>Die beiden übrigen Fälle laufen im selben Test. Ein Kessel mit 20 % Bypass und 20 % Totzone trifft die exakte Lösung je Schritt auf 10<sup>−9</sup> des Maximums. Beim Rohr mit Rückführung (<i>R</i> = 1,5) dauert in StoSiS jeder weitere Umlauf einen Zeitschritt länger, weil der Kreis aufgeschnitten wird (Kapitel 3.2): Das Mittel liegt um <i>R</i> · Δ<i>t</i> = 0,15 s über den 5 s nach Levenspiel, mit dieser Totzeit stimmt StoSiS exakt.</p>
+<p>Im Partikelmodus treffen die Mittel auf höchstens 0,7 %. Einzelne Schritte rauschen, weil ein einzelner Puls nur 2000 Karten hat (Kapitel 9.4).</p>
+
+<h3 id="k11-4"><span class="nr">11.4</span>Kontinuierlicher Mischer</h3>
+<p>Engisch &amp; Muzzio (2016) bestimmen in einer Direktverpressungs-Linie die Verweilzeit jeder Unit mit einem Tracerversuch und beschreiben sie als Kessel in Reihe. Für den Mischer zeigen sie eine Verweilzeitkurve mit dem Mittel 68,8 s und der Standardabweichung 22,4 s (dort Abb. 17). Daraus folgt die Zahl der Kessel <i>n</i> = (Mittel/Std.-Abw.)² = 9,4; StoSiS bildet den Mischer als Behälter mit einer Kaskade aus 9 Kesseln nach. Die Kurve liegt nur als Bild vor und ist daraus Pixel für Pixel abgelesen: Zeitachse aus den eingezeichneten Linien für Mittel und Standardabweichung, Fläche auf 1 normiert.</p>
+<figure>
+  <img src="abbildungen/Val_4f_Mischer_Verweilzeitkurve.svg" alt="Mischer: Originalgrafik aus dem Paper, StoSiS und Vergleich mit der abgelesenen Kurve">
+  <figcaption>Abbildung 11.4 – Mischer: ③ die Originalgrafik (Engisch &amp; Muzzio 2016, CC BY 4.0), ⑤ die daraus abgelesene Kurve (Rauten) gegen das Kessel-Modell und StoSiS. Die abgelesene Kurve hat 68,8 s und 21,5 s; der Unterschied zu 22,4 s liegt im flachen Ausläufer nahe der Nulllinie. Mit 9 Kesseln ergibt sich 22,9 s, weil nur ganze Kessel möglich sind.</figcaption>
+</figure>
+<p>Ein zweiter Fall aus dem Paper (Grundfall mit 41,6 s und 12 s, also 12 Kessel) läuft im selben Test und trifft die Kennzahlen auf 41,60 s und 12,01 s; eine Kurve gibt es dazu im Paper nicht. Geprüft ist damit die Form der Kurve für ein festes Kessel-Modell. Die Zahl der Kessel stammt aus dem Paper und ist nicht vorhergesagt.</p>
 
 
 <h2 id="k12"><span class="nr">12</span>Begriffe</h2>
@@ -524,7 +554,7 @@
   <dt>Hold-up</dt><dd>Material, das zwischen zwei Schritten in einer Unit verbleibt.</dd>
   <dt>Verweilzeit, Verweilzeitverteilung</dt><dd>Zeit vom Eintritt bis zum Austritt; ihre Verteilung <i>E</i>(<i>t</i>) und Summenkurve <i>F</i>(<i>t</i>) über allem Material, das einen Behälter durchläuft (Kapitel 7.4).</dd>
   <dt>Vorrat</dt><dd>Die Karten im Inneren eines Behälters im Partikelmodus (Kapitel 7.4).</dd>
-  <dt>Rechenreihenfolge, node <i>k</i></dt><dd>Die Folge, in der die Units in jedem Zeitschritt rechnen; „node <i>k</i>“ ist im Fenster „Struktur“ der Platz <i>k</i> darin, ab 0 gezählt (Kapitel 3.3).</dd>
+  <dt>Rechenreihenfolge</dt><dd>Die Folge, in der die Units in jedem Zeitschritt rechnen; im Fenster „Struktur“ der Schritt links in jedem Kasten (Kapitel 3.3).</dd>
   <dt>Kreis</dt><dd>Gruppe von Units, die sich über Verbindungen gegenseitig erreichen; dort wird aufgeschnitten (Kapitel 3.2).</dd>
   <dt>Aufgeschnittene Verbindung</dt><dd>Die Verbindung in einem Kreis, deren Ziel den Strom des vorherigen Schritts liest.</dd>
   <dt>Lauf, Seed</dt><dd>Eine vollständige Simulation mit einer Folge von Zufallszahlen; der Startwert dieser Folge.</dd>
@@ -543,6 +573,7 @@
 <p>DeVille, R. E. L.; Riemer, N.; West, M. (2011): Weighted Flow Algorithms (WFA) for stochastic particle coagulation. Journal of Computational Physics 230(23), 8427–8451.</p>
 <p>Dukowicz, J. K. (1980): A particle-fluid numerical model for liquid sprays. Journal of Computational Physics 35(2), 229–253.</p>
 <p>Engisch, W. E.; Muzzio, F. J. (2012): Method for characterization of loss-in-weight feeder equipment. Powder Technology 228, 395–403.</p>
+<p>Engisch, W. E.; Muzzio, F. J. (2016): Using residence time distributions (RTDs) to address the traceability of raw materials in continuous pharmaceutical manufacturing. Journal of Pharmaceutical Innovation 11, 64–81.</p>
 <p>Gillespie, D. T. (1996): Exact numerical simulation of the Ornstein-Uhlenbeck process and its integral. Physical Review E 54, 2084–2091.</p>
 <p>Hesterberg, T. (1995): Weighted average importance sampling and defensive mixture distributions. Technometrics 37(2), 185–194.</p>
 <p>Hyndman, R. J.; Fan, Y. (1996): Sample quantiles in statistical packages. The American Statistician 50, 361–365.</p>

@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="520" viewBox="0 0 680 520">
+<defs><marker id="mg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555555"/></marker>
+<marker id="mo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d2781e"/></marker>
+<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#9aa5b1" stroke-width="1.5"/></pattern></defs>
+<style>text { font-family: Calibri, Arial, sans-serif; } .th { font-size: 13px; font-weight: bold; fill: #222222; } .th2 { font-size: 11.5px; font-weight: bold; fill: #222222; } .tl { font-size: 10.5px; fill: #333333; } .tn { font-size: 9.5px; fill: #5b6470; } .tu { font-size: 10px; font-weight: bold; fill: #222222; } .ta { font-size: 9px; fill: #5b6470; }</style>
+<rect width="680" height="520" fill="#ffffff"/>
+<text class="th" text-anchor="start" x="8.0" y="16.0">a) Durchmischter Kessel mit Bypass und Totzone (Levenspiel 1999, Kap. 12)</text>
+<text class="th2" text-anchor="start" x="10.0" y="38.0">① Im Original: Kompartiment-Modell</text>
+<line x1="14.0" y1="110.0" x2="52.0" y2="110.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<text class="tn" text-anchor="start" x="20.0" y="104.0">v</text>
+<circle cx="56.0" cy="110.0" r="2.8" fill="#555555"/>
+<polyline points="56,110 56,62 250,62 250,104" fill="none" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<text class="tn" text-anchor="middle" x="150.0" y="57.0">Bypass b·v = 0,2 v</text>
+<line x1="56.0" y1="110.0" x2="112.0" y2="110.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<rect x="114.0" y="84.0" width="92.0" height="56.0" rx="4" fill="#e6f3f3" stroke="#3f7f7f" stroke-width="1.3"/>
+<rect x="115.0" y="123.2" width="90.0" height="15.8" fill="url(#hatch)" stroke="none"/>
+<line x1="160.0" y1="78.0" x2="160.0" y2="109.2" stroke="#3f7f7f" stroke-width="1.3"/>
+<line x1="151.0" y1="109.2" x2="169.0" y2="109.2" stroke="#3f7f7f" stroke-width="2"/>
+<text class="tl" text-anchor="middle" x="160.0" y="152.0">Kessel V, aktiv m = 80 %</text>
+<text class="tn" text-anchor="middle" x="160.0" y="164.0">Totzone 20 % (schraffiert)</text>
+<line x1="206.0" y1="110.0" x2="246.0" y2="110.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<circle cx="250.0" cy="110.0" r="2.8" fill="#555555"/>
+<line x1="250.0" y1="110.0" x2="318.0" y2="110.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<text class="tn" text-anchor="start" x="10.0" y="190.0">V/v = 10 s; exakt: E(t) = b·δ(t) + (1−b)²/(m·V/v) · exp(−(1−b) t/(m·V/v))</text>
+<text class="th2" text-anchor="start" x="350.0" y="38.0">② In StoSiS (Levenspiel_A1_Bypass_Totzone.json)</text>
+<rect x="352.0" y="64.0" width="60.0" height="24" rx="5" fill="#d4ecd4" stroke="#4f8f4f" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="382.0" y="80.0">Inlet</text>
+<text class="tn" text-anchor="middle" x="382.0" y="100.0">Puls 1 kg</text>
+<text class="tn" text-anchor="middle" x="382.0" y="111.0">in Schritt 1</text>
+<line x1="412.0" y1="76.0" x2="424.0" y2="76.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<rect x="426.0" y="64.0" width="54.0" height="24" rx="5" fill="#e3d9ee" stroke="#6f4f97" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="453.0" y="80.0">Splitter</text>
+<text class="tn" text-anchor="middle" x="453.0" y="100.0">80 % / 20 %</text>
+<line x1="480.0" y1="76.0" x2="494.0" y2="76.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<rect x="496.0" y="64.0" width="64.0" height="24" rx="5" fill="#ecd9d3" stroke="#8f4f3f" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="528.0" y="80.0">Behälter</text>
+<text class="tn" text-anchor="middle" x="528.0" y="100.0">durchmischt</text>
+<text class="tn" text-anchor="middle" x="528.0" y="111.0">τ = 10 s</text>
+<polyline points="453,88 453,128 587,128 587,90" fill="none" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<text class="tn" text-anchor="middle" x="520.0" y="140.0">Bypass 20 %</text>
+<line x1="560.0" y1="76.0" x2="572.0" y2="76.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<rect x="574.0" y="64.0" width="42.0" height="24" rx="5" fill="#cfe6e6" stroke="#3f7f7f" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="595.0" y="80.0">Merger</text>
+<line x1="616.0" y1="76.0" x2="626.0" y2="76.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<rect x="628.0" y="64.0" width="42.0" height="24" rx="5" fill="#d4e4f4" stroke="#4f77a8" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="649.0" y="80.0">Outlet</text>
+<text class="tn" text-anchor="start" x="352.0" y="166.0">τ = m·V/((1−b)v) = 0,8 · 10 s / 0,8 = 10 s; Δt = 0,1 s; 100 s</text>
+<text class="th2" text-anchor="start" x="10.0" y="212.0">③ Exakte Lösung</text>
+<text class="tn" text-anchor="start" x="10.0" y="224.0">Referenz ist die Formel aus ①, keine Messung</text>
+<rect x="44.0" y="232.0" width="276.0" height="98.0" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
+<line x1="44.0" y1="330.0" x2="320.0" y2="330.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="333.0">0</text>
+<line x1="44.0" y1="281.0" x2="320.0" y2="281.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="284.0">0,5</text>
+<line x1="44.0" y1="232.0" x2="320.0" y2="232.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="235.0">1</text>
+<text class="ta" text-anchor="middle" x="44.0" y="342.0">0 s</text>
+<text class="ta" text-anchor="middle" x="113.0" y="342.0">12.5 s</text>
+<text class="ta" text-anchor="middle" x="182.0" y="342.0">25 s</text>
+<text class="ta" text-anchor="middle" x="251.0" y="342.0">37.5 s</text>
+<text class="ta" text-anchor="middle" x="320.0" y="342.0">50 s</text>
+<text class="ta" text-anchor="middle" x="18.0" y="281.0">F</text>
+<path d="M44.6,310.0 L46.2,307.7 L47.9,305.5 L49.5,303.3 L51.2,301.2 L52.8,299.1 L54.5,297.2 L56.1,295.2 L57.8,293.4 L59.5,291.6 L61.1,289.8 L62.8,288.1 L64.4,286.4 L66.1,284.8 L67.7,283.3 L69.4,281.7 L71.0,280.3 L72.7,278.8 L74.4,277.5 L76.0,276.1 L77.7,274.8 L79.3,273.5 L81.0,272.3 L82.6,271.1 L84.3,270.0 L86.0,268.8 L87.6,267.8 L89.3,266.7 L90.9,265.7 L92.6,264.7 L94.2,263.7 L95.9,262.8 L97.5,261.9 L99.2,261.0 L100.9,260.1 L102.5,259.3 L104.2,258.5 L105.8,257.7 L107.5,256.9 L109.1,256.2 L110.8,255.5 L112.4,254.8 L114.1,254.1 L115.8,253.5 L117.4,252.8 L119.1,252.2 L120.7,251.6 L122.4,251.0 L124.0,250.5 L125.7,249.9 L127.4,249.4 L129.0,248.9 L130.7,248.4 L132.3,247.9 L134.0,247.4 L135.6,247.0 L137.3,246.5 L138.9,246.1 L140.6,245.7 L142.3,245.3 L143.9,244.9 L145.6,244.5 L147.2,244.1 L148.9,243.8 L150.5,243.4 L152.2,243.1 L153.8,242.8 L155.5,242.5 L157.2,242.1 L158.8,241.8 L160.5,241.6 L162.1,241.3 L163.8,241.0 L165.4,240.7 L167.1,240.5 L168.8,240.2 L170.4,240.0 L172.1,239.7 L173.7,239.5 L175.4,239.3 L177.0,239.1 L178.7,238.9 L180.3,238.7 L182.0,238.5 L183.7,238.3 L185.3,238.1 L187.0,237.9 L188.6,237.7 L190.3,237.6 L191.9,237.4 L193.6,237.2 L195.2,237.1 L196.9,236.9 L198.6,236.8 L200.2,236.6 L201.9,236.5 L203.5,236.4 L205.2,236.2 L206.8,236.1 L208.5,236.0 L210.2,235.9 L211.8,235.8 L213.5,235.7 L215.1,235.5 L216.8,235.4 L218.4,235.3 L220.1,235.2 L221.7,235.1 L223.4,235.1 L225.1,235.0 L226.7,234.9 L228.4,234.8 L230.0,234.7 L231.7,234.6 L233.3,234.6 L235.0,234.5 L236.6,234.4 L238.3,234.3 L240.0,234.3 L241.6,234.2 L243.3,234.1 L244.9,234.1 L246.6,234.0 L248.2,233.9 L249.9,233.9 L251.6,233.8 L253.2,233.8 L254.9,233.7 L256.5,233.7 L258.2,233.6 L259.8,233.6 L261.5,233.5 L263.1,233.5 L264.8,233.4 L266.5,233.4 L268.1,233.4 L269.8,233.3 L271.4,233.3 L273.1,233.2 L274.7,233.2 L276.4,233.2 L278.0,233.1 L279.7,233.1 L281.4,233.1 L283.0,233.0 L284.7,233.0 L286.3,233.0 L288.0,232.9 L289.6,232.9 L291.3,232.9 L293.0,232.9 L294.6,232.8 L296.3,232.8 L297.9,232.8 L299.6,232.8 L301.2,232.7 L302.9,232.7 L304.5,232.7 L306.2,232.7 L307.9,232.7 L309.5,232.6 L311.2,232.6 L312.8,232.6 L314.5,232.6 L316.1,232.6 L317.8,232.6 L319.4,232.5" fill="none" stroke="#222222" stroke-width="1.6"/>
+<text class="th2" text-anchor="start" x="350.0" y="212.0">④ StoSiS: Ablauf am Outlet</text>
+<text class="tn" text-anchor="start" x="350.0" y="224.0">Kreise: Kontinuum, gestrichelt: Partikelmodus (2000 Karten)</text>
+<rect x="384.0" y="232.0" width="276.0" height="98.0" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
+<line x1="384.0" y1="330.0" x2="660.0" y2="330.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="380.0" y="333.0">0</text>
+<line x1="384.0" y1="281.0" x2="660.0" y2="281.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="380.0" y="284.0">0,5</text>
+<line x1="384.0" y1="232.0" x2="660.0" y2="232.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="380.0" y="235.0">1</text>
+<text class="ta" text-anchor="middle" x="384.0" y="342.0">0 s</text>
+<text class="ta" text-anchor="middle" x="453.0" y="342.0">12.5 s</text>
+<text class="ta" text-anchor="middle" x="522.0" y="342.0">25 s</text>
+<text class="ta" text-anchor="middle" x="591.0" y="342.0">37.5 s</text>
+<text class="ta" text-anchor="middle" x="660.0" y="342.0">50 s</text>
+<text class="ta" text-anchor="middle" x="358.0" y="281.0">F</text>
+<path d="M384.6,310.0 L386.2,307.7 L387.9,305.5 L389.5,303.3 L391.2,301.2 L392.8,299.1 L394.5,297.1 L396.1,295.2 L397.8,293.3 L399.5,291.5 L401.1,289.7 L402.8,288.0 L404.4,286.4 L406.1,284.8 L407.7,283.3 L409.4,281.8 L411.0,280.4 L412.7,279.0 L414.4,277.6 L416.0,276.2 L417.7,274.9 L419.3,273.6 L421.0,272.4 L422.6,271.2 L424.3,270.1 L426.0,269.0 L427.6,267.9 L429.3,266.9 L430.9,265.9 L432.6,264.9 L434.2,263.9 L435.9,263.0 L437.5,262.2 L439.2,261.3 L440.9,260.4 L442.5,259.6 L444.2,258.8 L445.8,258.0 L447.5,257.2 L449.1,256.4 L450.8,255.8 L452.4,255.1 L454.1,254.5 L455.8,253.8 L457.4,253.2 L459.1,252.5 L460.7,251.9 L462.4,251.3 L464.0,250.8 L465.7,250.2 L467.4,249.7 L469.0,249.2 L470.7,248.8 L472.3,248.2 L474.0,247.7 L475.6,247.3 L477.3,246.9 L478.9,246.4 L480.6,246.0 L482.3,245.5 L483.9,245.2 L485.6,244.8 L487.2,244.4 L488.9,244.0 L490.5,243.7 L492.2,243.3 L493.8,243.0 L495.5,242.6 L497.2,242.3 L498.8,242.0 L500.5,241.6 L502.1,241.4 L503.8,241.1 L505.4,240.8 L507.1,240.6 L508.8,240.4 L510.4,240.1 L512.1,239.8 L513.7,239.6 L515.4,239.4 L517.0,239.2 L518.7,239.1 L520.3,238.9 L522.0,238.7 L523.7,238.5 L525.3,238.3 L527.0,238.2 L528.6,237.9 L530.3,237.8 L531.9,237.6 L533.6,237.4 L535.2,237.2 L536.9,237.1 L538.6,237.0 L540.2,236.8 L541.9,236.7 L543.5,236.5 L545.2,236.4 L546.8,236.3 L548.5,236.1 L550.2,235.9 L551.8,235.8 L553.5,235.7 L555.1,235.6 L556.8,235.5 L558.4,235.4 L560.1,235.3 L561.7,235.2 L563.4,235.0 L565.1,235.0 L566.7,234.8 L568.4,234.8 L570.0,234.7 L571.7,234.6 L573.3,234.5 L575.0,234.5 L576.6,234.4 L578.3,234.3 L580.0,234.2 L581.6,234.2 L583.3,234.1 L584.9,234.0 L586.6,234.0 L588.2,233.9 L589.9,233.8 L591.6,233.7 L593.2,233.7 L594.9,233.7 L596.5,233.6 L598.2,233.5 L599.8,233.5 L601.5,233.5 L603.1,233.4 L604.8,233.4 L606.5,233.4 L608.1,233.4 L609.8,233.3 L611.4,233.3 L613.1,233.2 L614.7,233.2 L616.4,233.2 L618.0,233.1 L619.7,233.1 L621.4,233.1 L623.0,233.0 L624.7,233.0 L626.3,232.9 L628.0,232.9 L629.6,232.9 L631.3,232.9 L633.0,232.9 L634.6,232.8 L636.3,232.8 L637.9,232.8 L639.6,232.8 L641.2,232.7 L642.9,232.7 L644.5,232.7 L646.2,232.7 L647.9,232.7 L649.5,232.7 L651.2,232.7 L652.8,232.6 L654.5,232.6 L656.1,232.6 L657.8,232.5 L659.4,232.5" fill="none" stroke="#7c3aed" stroke-width="1.1" stroke-dasharray="5 3"/>
+<circle cx="396.1" cy="295.2" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="408.3" cy="282.7" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="420.4" cy="272.7" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="432.6" cy="264.7" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="444.7" cy="258.2" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="456.9" cy="253.0" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="469.0" cy="248.9" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="481.2" cy="245.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="493.3" cy="242.9" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="505.4" cy="240.7" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="517.6" cy="239.0" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="529.7" cy="237.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="541.9" cy="236.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="554.0" cy="235.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="566.2" cy="234.9" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="578.3" cy="234.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="590.4" cy="233.9" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="602.6" cy="233.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="614.7" cy="233.2" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="626.9" cy="233.0" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="639.0" cy="232.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="651.2" cy="232.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<text class="th2" text-anchor="start" x="10.0" y="362.0">⑤ Übereinander: Exakte Lösung (Linie) und StoSiS</text>
+<rect x="44.0" y="382.0" width="416.0" height="118.0" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
+<line x1="44.0" y1="500.0" x2="460.0" y2="500.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="503.0">0</text>
+<line x1="44.0" y1="441.0" x2="460.0" y2="441.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="444.0">0,5</text>
+<line x1="44.0" y1="382.0" x2="460.0" y2="382.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="385.0">1</text>
+<text class="ta" text-anchor="middle" x="44.0" y="512.0">0 s</text>
+<text class="ta" text-anchor="middle" x="148.0" y="512.0">12.5 s</text>
+<text class="ta" text-anchor="middle" x="252.0" y="512.0">25 s</text>
+<text class="ta" text-anchor="middle" x="356.0" y="512.0">37.5 s</text>
+<text class="ta" text-anchor="middle" x="460.0" y="512.0">50 s</text>
+<text class="ta" text-anchor="middle" x="18.0" y="441.0">F</text>
+<path d="M44.8,475.9 L47.3,473.2 L49.8,470.5 L52.3,467.8 L54.8,465.3 L57.3,462.8 L59.8,460.5 L62.3,458.1 L64.8,455.9 L67.3,453.7 L69.8,451.6 L72.3,449.5 L74.8,447.5 L77.3,445.6 L79.8,443.7 L82.3,441.9 L84.8,440.1 L87.3,438.4 L89.8,436.7 L92.3,435.1 L94.8,433.5 L97.2,432.0 L99.7,430.5 L102.2,429.1 L104.7,427.7 L107.2,426.4 L109.7,425.1 L112.2,423.8 L114.7,422.6 L117.2,421.4 L119.7,420.2 L122.2,419.1 L124.7,418.0 L127.2,416.9 L129.7,415.9 L132.2,414.9 L134.7,413.9 L137.2,413.0 L139.7,412.0 L142.2,411.2 L144.7,410.3 L147.2,409.5 L149.7,408.6 L152.2,407.9 L154.7,407.1 L157.2,406.4 L159.6,405.6 L162.1,404.9 L164.6,404.3 L167.1,403.6 L169.6,403.0 L172.1,402.3 L174.6,401.7 L177.1,401.2 L179.6,400.6 L182.1,400.0 L184.6,399.5 L187.1,399.0 L189.6,398.5 L192.1,398.0 L194.6,397.5 L197.1,397.1 L199.6,396.6 L202.1,396.2 L204.6,395.8 L207.1,395.4 L209.6,395.0 L212.1,394.6 L214.6,394.2 L217.1,393.9 L219.6,393.5 L222.0,393.2 L224.5,392.8 L227.0,392.5 L229.5,392.2 L232.0,391.9 L234.5,391.6 L237.0,391.3 L239.5,391.0 L242.0,390.8 L244.5,390.5 L247.0,390.3 L249.5,390.0 L252.0,389.8 L254.5,389.6 L257.0,389.3 L259.5,389.1 L262.0,388.9 L264.5,388.7 L267.0,388.5 L269.5,388.3 L272.0,388.1 L274.5,387.9 L277.0,387.8 L279.5,387.6 L282.0,387.4 L284.4,387.3 L286.9,387.1 L289.4,387.0 L291.9,386.8 L294.4,386.7 L296.9,386.5 L299.4,386.4 L301.9,386.3 L304.4,386.1 L306.9,386.0 L309.4,385.9 L311.9,385.8 L314.4,385.7 L316.9,385.6 L319.4,385.5 L321.9,385.4 L324.4,385.3 L326.9,385.2 L329.4,385.1 L331.9,385.0 L334.4,384.9 L336.9,384.8 L339.4,384.7 L341.9,384.6 L344.4,384.6 L346.8,384.5 L349.3,384.4 L351.8,384.3 L354.3,384.3 L356.8,384.2 L359.3,384.1 L361.8,384.1 L364.3,384.0 L366.8,384.0 L369.3,383.9 L371.8,383.8 L374.3,383.8 L376.8,383.7 L379.3,383.7 L381.8,383.6 L384.3,383.6 L386.8,383.5 L389.3,383.5 L391.8,383.5 L394.3,383.4 L396.8,383.4 L399.3,383.3 L401.8,383.3 L404.3,383.2 L406.8,383.2 L409.2,383.2 L411.7,383.1 L414.2,383.1 L416.7,383.1 L419.2,383.0 L421.7,383.0 L424.2,383.0 L426.7,383.0 L429.2,382.9 L431.7,382.9 L434.2,382.9 L436.7,382.8 L439.2,382.8 L441.7,382.8 L444.2,382.8 L446.7,382.8 L449.2,382.7 L451.7,382.7 L454.2,382.7 L456.7,382.7 L459.2,382.6" fill="none" stroke="#222222" stroke-width="1.6"/>
+<path d="M44.8,475.9 L47.3,473.1 L49.8,470.4 L52.3,467.8 L54.8,465.3 L57.3,462.8 L59.8,460.4 L62.3,458.0 L64.8,455.8 L67.3,453.7 L69.8,451.5 L72.3,449.5 L74.8,447.5 L77.3,445.6 L79.8,443.8 L82.3,442.0 L84.8,440.3 L87.3,438.6 L89.8,436.9 L92.3,435.2 L94.8,433.7 L97.2,432.1 L99.7,430.7 L102.2,429.2 L104.7,427.9 L107.2,426.5 L109.7,425.3 L112.2,424.0 L114.7,422.8 L117.2,421.6 L119.7,420.4 L122.2,419.3 L124.7,418.3 L127.2,417.3 L129.7,416.2 L132.2,415.2 L134.7,414.3 L137.2,413.3 L139.7,412.3 L142.2,411.4 L144.7,410.6 L147.2,409.8 L149.7,409.1 L152.2,408.2 L154.7,407.5 L157.2,406.7 L159.6,406.0 L162.1,405.3 L164.6,404.6 L167.1,404.0 L169.6,403.4 L172.1,402.7 L174.6,402.2 L177.1,401.6 L179.6,401.0 L182.1,400.4 L184.6,399.9 L187.1,399.3 L189.6,398.8 L192.1,398.3 L194.6,397.8 L197.1,397.4 L199.6,396.9 L202.1,396.5 L204.6,396.1 L207.1,395.6 L209.6,395.3 L212.1,394.8 L214.6,394.4 L217.1,394.0 L219.6,393.6 L222.0,393.3 L224.5,393.0 L227.0,392.6 L229.5,392.4 L232.0,392.1 L234.5,391.8 L237.0,391.4 L239.5,391.2 L242.0,390.9 L244.5,390.6 L247.0,390.5 L249.5,390.3 L252.0,390.0 L254.5,389.8 L257.0,389.6 L259.5,389.4 L262.0,389.1 L264.5,389.0 L267.0,388.7 L269.5,388.5 L272.0,388.3 L274.5,388.2 L277.0,388.0 L279.5,387.8 L282.0,387.6 L284.4,387.4 L286.9,387.3 L289.4,387.1 L291.9,387.0 L294.4,386.7 L296.9,386.6 L299.4,386.4 L301.9,386.3 L304.4,386.2 L306.9,386.1 L309.4,386.0 L311.9,385.8 L314.4,385.7 L316.9,385.6 L319.4,385.4 L321.9,385.3 L324.4,385.2 L326.9,385.1 L329.4,385.0 L331.9,385.0 L334.4,384.8 L336.9,384.8 L339.4,384.6 L341.9,384.6 L344.4,384.5 L346.8,384.4 L349.3,384.4 L351.8,384.3 L354.3,384.2 L356.8,384.1 L359.3,384.1 L361.8,384.0 L364.3,383.9 L366.8,383.8 L369.3,383.8 L371.8,383.8 L374.3,383.7 L376.8,383.7 L379.3,383.7 L381.8,383.6 L384.3,383.6 L386.8,383.5 L389.3,383.5 L391.8,383.5 L394.3,383.4 L396.8,383.4 L399.3,383.3 L401.8,383.3 L404.3,383.2 L406.8,383.2 L409.2,383.1 L411.7,383.1 L414.2,383.1 L416.7,383.1 L419.2,383.1 L421.7,383.0 L424.2,383.0 L426.7,383.0 L429.2,383.0 L431.7,382.9 L434.2,382.9 L436.7,382.9 L439.2,382.9 L441.7,382.8 L444.2,382.8 L446.7,382.8 L449.2,382.7 L451.7,382.7 L454.2,382.7 L456.7,382.7 L459.2,382.7" fill="none" stroke="#7c3aed" stroke-width="1.1" stroke-dasharray="5 3"/>
+<circle cx="62.3" cy="458.1" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="80.6" cy="443.1" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="98.9" cy="431.0" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="117.2" cy="421.4" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="135.5" cy="413.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="153.8" cy="407.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="172.1" cy="402.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="190.4" cy="398.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="208.7" cy="395.1" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="227.0" cy="392.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="245.3" cy="390.4" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="263.6" cy="388.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="282.0" cy="387.4" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="300.3" cy="386.4" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="318.6" cy="385.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="336.9" cy="384.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="355.2" cy="384.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="373.5" cy="383.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="391.8" cy="383.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="410.1" cy="383.2" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="428.4" cy="382.9" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="446.7" cy="382.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<text class="th2" text-anchor="start" x="480.0" y="392.0">Verweilzeit [s]</text>
+<text class="tn" text-anchor="start" x="480.0" y="408.0">Mittel / Std.-Abw.</text>
+<text class="tl" text-anchor="start" x="480.0" y="424.0">exakt: 8,00 / 9,78</text>
+<text class="tl" text-anchor="start" x="480.0" y="439.0">StoSiS Kontinuum: 8,00 / 9,78</text>
+<text class="tl" text-anchor="start" x="480.0" y="454.0">StoSiS Partikel: 8,06 / 9,86</text>
+</svg>

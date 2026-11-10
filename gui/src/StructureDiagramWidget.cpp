@@ -125,17 +125,23 @@ void StructureDiagramWidget::SetStructure(const stosis::CFlowsheetGraph& graph, 
         Place(root, 0, nextRow, layout);
     }
 
-    // Einheitliche Kastenbreite fuer den laengsten Namen.
+    // Einheitliche Kastenbreite: Streifen fuer den Schritt plus laengster Name.
     QFont nameFont = font();
     QFont numberFont = font();
     numberFont.setPointSizeF(nameFont.pointSizeF() * 0.85);
+    QFont stepLabelFont = font();
+    stepLabelFont.setPointSizeF(nameFont.pointSizeF() * 0.75);
+    QFont stepFont = font();
+    stepFont.setBold(true);
+    stepFont.setPointSizeF(nameFont.pointSizeF() * 1.25);
     QFont labelFont = font();
     labelFont.setBold(true);
     const QFontMetricsF nameMetrics(nameFont);
+    const double stepWidth = std::max(30.0, QFontMetricsF(stepLabelFont).horizontalAdvance("Schritt") + 10.0);
     double boxWidth = 96.0;
     for (const SLayout& entry : layout)
         if (entry.branch->kind == EKind::Unit)
-            boxWidth = std::max(boxWidth, nameMetrics.horizontalAdvance(nameOf(entry.branch->nodeId)) + 24.0);
+            boxWidth = std::max(boxWidth, stepWidth + nameMetrics.horizontalAdvance(nameOf(entry.branch->nodeId)) + 20.0);
     const double columnWidth = boxWidth + kGapX;
     const auto left = [columnWidth](int column) { return column * columnWidth; };
     const auto middle = [](double row) { return row * kRowHeight; };
@@ -207,17 +213,36 @@ void StructureDiagramWidget::SetStructure(const stosis::CFlowsheetGraph& graph, 
             QPainterPath box;
             box.addRoundedRect(QRectF(x, y - 0.5 * kBoxHeight, boxWidth, kBoxHeight), 6.0, 6.0);
             auto* boxItem = m_scene->addPath(box, QPen(color.darker(140), 1.5), QBrush(Tint(color, 0.35)));
+            // Links ein dunkler Streifen mit dem Schritt (Rechenreihenfolge wie
+            // in der Spalte "Schritt" des Reiters Text, Kapitel 3.3).
+            const double top = y - 0.5 * kBoxHeight;
+            QPainterPath stripArea;
+            stripArea.addRect(QRectF(x, top, stepWidth, kBoxHeight));
+            auto* strip = new QGraphicsPathItem(box.intersected(stripArea), boxItem);
+            strip->setPen(Qt::NoPen);
+            strip->setBrush(color.darker(170));
+            auto* stepLabel = new QGraphicsSimpleTextItem("Schritt", strip);
+            stepLabel->setFont(stepLabelFont);
+            stepLabel->setBrush(Qt::white);
+            stepLabel->setPos(x + 0.5 * (stepWidth - stepLabel->boundingRect().width()), top + 3.0);
+            auto* stepItem = new QGraphicsSimpleTextItem(QString::number(k + 1), strip);
+            stepItem->setFont(stepFont);
+            stepItem->setBrush(Qt::white);
+            stepItem->setPos(x + 0.5 * (stepWidth - stepItem->boundingRect().width()),
+                top + kBoxHeight - stepItem->boundingRect().height() - 3.0);
+            // Rechts der Name und darunter grau die ID aus der Datei.
+            const double textLeft = x + stepWidth;
+            const double textWidth = boxWidth - stepWidth;
             auto* nameItem = new QGraphicsSimpleTextItem(name, boxItem);
             nameItem->setFont(nameFont);
-            nameItem->setPos(x + 0.5 * (boxWidth - nameItem->boundingRect().width()), y - 0.5 * kBoxHeight + 5.0);
-            auto* numberItem = new QGraphicsSimpleTextItem("node " + QString::number(k), boxItem);
-            numberItem->setFont(numberFont);
-            numberItem->setBrush(GrayText());
-            numberItem->setPos(x + 0.5 * (boxWidth - numberItem->boundingRect().width()),
-                y + 0.5 * kBoxHeight - numberItem->boundingRect().height() - 4.0);
-            QString tip = name + " (" + (node ? stosis::GetNodeTypeLabel(node->type) : "?") + ")\n"
-                + "node " + QString::number(k) + " = Platz " + QString::number(k) + " in der Rechenreihenfolge (ab 0)\n"
-                + "In der Datei: \"id\": \"" + QString::fromStdString(branch.nodeId) + "\"";
+            nameItem->setPos(textLeft + 0.5 * (textWidth - nameItem->boundingRect().width()), top + 5.0);
+            auto* idItem = new QGraphicsSimpleTextItem(QString::fromStdString(branch.nodeId), boxItem);
+            idItem->setFont(numberFont);
+            idItem->setBrush(GrayText());
+            idItem->setPos(textLeft + 0.5 * (textWidth - idItem->boundingRect().width()),
+                top + kBoxHeight - idItem->boundingRect().height() - 4.0);
+            QString tip = name + " (" + (node ? stosis::GetNodeTypeLabel(node->type) : "?") + "), ID "
+                + QString::fromStdString(branch.nodeId) + "\nRechnet als " + QString::number(k + 1) + ". Unit je Zeitschritt";
             const int cycle = structure.GetCycle(branch.nodeId);
             if (cycle >= 0)
                 tip += "\nKreis " + QString::number(cycle + 1);
@@ -229,15 +254,14 @@ void StructureDiagramWidget::SetStructure(const stosis::CFlowsheetGraph& graph, 
         else
         {
             const bool cut = branch.kind == EKind::Cut;
-            auto* label = m_scene->addSimpleText(QString(QChar(0x2192)) + " " + QString::number(k), labelFont);
+            auto* label = m_scene->addSimpleText(QString(QChar(0x2192)) + " " + name, labelFont);
             label->setBrush(cut ? CutColor() : GrayText());
             label->setPos(x, y - 0.5 * label->boundingRect().height());
             const bool byHand = connection && connection->isRecycle;
             label->setToolTip(cut
                 ? via + "\nAufgeschnitten (" + (byHand ? "von Hand markiert, \"recycle\": \"manual\"" : "vom Graphen gewaehlt, \"recycle\": \"auto\"")
-                    + "):\n" + name + " (node " + QString::number(k) + ") liest hier den Strom des vorigen Zeitschritts."
-                : via + "\nLaeuft hier zusammen: " + name + " (node " + QString::number(k)
-                    + ") steht an anderer Stelle im Bild; nicht aufgeschnitten.");
+                    + "):\n" + name + " liest hier den Strom des vorigen Zeitschritts."
+                : via + "\nLaeuft hier zusammen; " + name + " steht an anderer Stelle im Bild.");
             item = label;
         }
         item->setData(kDataNode, QString::fromStdString(branch.nodeId));
@@ -246,7 +270,9 @@ void StructureDiagramWidget::SetStructure(const stosis::CFlowsheetGraph& graph, 
         item->setZValue(1.0);
     }
 
-    m_highlight = m_scene->addRect(QRectF(), Qt::NoPen, QBrush(QColor(255, 236, 179)));
+    QColor mark = palette().color(QPalette::Highlight); // durchscheinend, auch bei dunklem Farbschema lesbar
+    mark.setAlpha(60);
+    m_highlight = m_scene->addRect(QRectF(), Qt::NoPen, QBrush(mark));
     m_highlight->setZValue(-1.0);
     m_highlight->hide();
     setSceneRect(m_scene->itemsBoundingRect().adjusted(-24.0, -24.0, 24.0, 24.0));

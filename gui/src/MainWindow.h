@@ -44,6 +44,9 @@ private slots:
     void OnShowCards();
     void OnShowStructure();
     void OnSaveFlowsheet();
+    void OnSaveFlowsheetAs();
+    void OnNewFlowsheet();
+    void OnOpenFlowsheet();
     void OnNodeDoubleClicked(const QString& nodeId);
     void OnShowHeatmapDemo();
     void OnShowComparisonWindow();
@@ -53,6 +56,10 @@ private:
     void SetupMenuAndToolBar();
     void SetupCentralArea();
     void BuildTestFlowsheet();
+    static void ConfigureDefaultGrid(stosis::CFlowsheetGraph& graph);
+    // Ersetzt das Flowsheet (neu oder aus Datei) und setzt alle Ansichten darauf.
+    void ReplaceGraph(stosis::CFlowsheetGraph&& graph, int runs);
+    void SetCurrentFile(const QString& path);
     // Liest data/Materialien.json; Fehler landen in m_materialLoadError.
     void LoadMaterials();
     SettingsWindow* EnsureSettingsWindow();
@@ -67,10 +74,15 @@ private:
     stosis::SFlowsheetFileSettings CurrentFileSettings() const;
     // Fenster "Struktur" nach einer Aenderung am Flowsheet neu aufbauen.
     void RefreshStructureWindow();
+    // Oeffnet docs/<Datei> im Browser (neben der exe oder im Quellordner).
+    void OpenDocument(const QString& fileName);
 
     stosis::CFlowsheetGraph m_graph;
     stosis::CMaterialDatabase m_materials;
     QString m_materialLoadError;
+    // Datei des Flowsheets (geoeffnet oder gespeichert), leer bei neuem
+    // Flowsheet; nur ueber SetCurrentFile setzen (Titelleiste).
+    QString m_currentFile;
 
     FlowsheetCanvasWidget* m_canvas = nullptr;
     QDoubleSpinBox* m_durationSpin = nullptr;

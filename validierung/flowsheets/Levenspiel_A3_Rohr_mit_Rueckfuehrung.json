@@ -1,0 +1,96 @@
+{
+    "format": "StoSiS-Flowsheet",
+    "version": 2,
+    "program": "StoSiS 0.1.1",
+    "info": "Levenspiel (1999) Kap. 12: Rohr (Pfropfen, 2 s je Durchgang) mit Rueckfuehrung R = 1,5 (Splitter 40 % Ablauf, 60 % zurueck). Tracerpuls 1 kg. Exakt: Pulse 0,4 * 0,6^(k-1) bei k * 2 s, Mittel 5 s. StoSiS schneidet die Rueckfuehrung auf: jeder weitere Durchgang dauert dt laenger (Mittel 5 s + 1,5 dt).",
+    "simulation": {
+        "duration": 60.0,
+        "dt": 0.1,
+        "seed": 1,
+        "runs": 1,
+        "representation": "continuum",
+        "sizeGrid": { "type": "logarithmic", "classes": 30, "dMin": 1e-06, "dMax": 0.001 },
+        "cards": {
+            "perSlice": 2000,
+            "rule": "sum",
+            "numberShare": 0.5,
+            "exponent": 0.8,
+            "sliceLimits": true,
+            "upperFactor": 2.0,
+            "splitFactor": 5.0
+        }
+    },
+    "execution": { "detailedLog": false },
+    "units": [
+        {
+            "id": "node_0",
+            "type": "Inlet",
+            "name": "Tracerpuls",
+            "position": [0.0, 60.0],
+            "settings": {
+                "material": "Sand",
+                "temperature": 293.15,
+                "pressure": 101325.0,
+                "massFlow": [[0.0, 10.0], [0.1, 0.0]],
+                "sizeDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] }
+            }
+        }
+,
+        {
+            "id": "node_1",
+            "type": "Merger",
+            "name": "Zusammenfuehrung",
+            "position": [150.0, 60.0],
+            "inputs": 2
+        }
+,
+        {
+            "id": "node_2",
+            "type": "Vessel",
+            "name": "Rohr",
+            "position": [300.0, 60.0],
+            "settings": {
+                "mixing": "plug",
+                "residenceTime": 2.0,
+                "batch": false,
+                "cells": 3,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "empty",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_3",
+            "type": "Splitter",
+            "name": "Aufteilung",
+            "position": [450.0, 60.0],
+            "outputs": 2,
+            "settings": {
+                "fractions": [0.4, 0.6],
+                "stochastic": false,
+                "fluctuations": [{ "sigma": 0.05, "tau": 1.0 }]
+            }
+        }
+,
+        {
+            "id": "node_4",
+            "type": "Outlet",
+            "name": "Ablauf",
+            "position": [600.0, 20.0]
+        }
+    ],
+    "connections": [
+        { "from": "node_0", "output": 1, "to": "node_1", "input": 1, "recycle": "no" },
+        { "from": "node_1", "output": 1, "to": "node_2", "input": 1, "recycle": "no" },
+        { "from": "node_2", "output": 1, "to": "node_3", "input": 1, "recycle": "no" },
+        { "from": "node_3", "output": 1, "to": "node_4", "input": 1, "recycle": "no" },
+        { "from": "node_3", "output": 2, "to": "node_1", "input": 2, "recycle": "auto" }
+    ]
+}

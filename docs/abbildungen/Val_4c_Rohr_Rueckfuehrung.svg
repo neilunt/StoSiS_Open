@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="520" viewBox="0 0 680 520">
+<defs><marker id="mg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555555"/></marker>
+<marker id="mo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d2781e"/></marker>
+<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#9aa5b1" stroke-width="1.5"/></pattern></defs>
+<style>text { font-family: Calibri, Arial, sans-serif; } .th { font-size: 13px; font-weight: bold; fill: #222222; } .th2 { font-size: 11.5px; font-weight: bold; fill: #222222; } .tl { font-size: 10.5px; fill: #333333; } .tn { font-size: 9.5px; fill: #5b6470; } .tu { font-size: 10px; font-weight: bold; fill: #222222; } .ta { font-size: 9px; fill: #5b6470; }</style>
+<rect width="680" height="520" fill="#ffffff"/>
+<text class="th" text-anchor="start" x="8.0" y="16.0">c) Rohr mit Rückführung, R = 1,5 (Levenspiel 1999, Kap. 12)</text>
+<text class="th2" text-anchor="start" x="10.0" y="38.0">① Im Original: Kompartiment-Modell</text>
+<line x1="14.0" y1="100.0" x2="52.0" y2="100.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<text class="tn" text-anchor="start" x="18.0" y="94.0">v</text>
+<circle cx="56.0" cy="100.0" r="2.8" fill="#555555"/>
+<line x1="56.0" y1="100.0" x2="88.0" y2="100.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<rect x="90.0" y="90.0" width="120.0" height="20.0" rx="3" fill="#fbeedd" stroke="#a8692c" stroke-width="1.3"/>
+<line x1="116.0" y1="100.0" x2="124.0" y2="100.0" stroke="#a8692c" stroke-width="1.2"/>
+<line x1="146.0" y1="100.0" x2="154.0" y2="100.0" stroke="#a8692c" stroke-width="1.2"/>
+<line x1="176.0" y1="100.0" x2="184.0" y2="100.0" stroke="#a8692c" stroke-width="1.2"/>
+<text class="tl" text-anchor="middle" x="150.0" y="122.0">Rohr (Pfropfen), 2 s je Durchgang</text>
+<line x1="210.0" y1="100.0" x2="246.0" y2="100.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<circle cx="250.0" cy="100.0" r="2.8" fill="#555555"/>
+<line x1="250.0" y1="100.0" x2="318.0" y2="100.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<text class="tn" text-anchor="middle" x="290.0" y="94.0">v</text>
+<polyline points="250,100 250,150 56,150 56,106" fill="none" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<text class="tn" text-anchor="middle" x="150.0" y="162.0">Rückführung R·v = 1,5 v</text>
+<text class="tn" text-anchor="start" x="10.0" y="192.0">exakt: Pulse 0,4 · 0,6^(k−1) bei t = k · 2 s, Mittel (R+1) · 2 s = 5 s</text>
+<text class="th2" text-anchor="start" x="350.0" y="38.0">② In StoSiS (Levenspiel_A3_Rohr_mit_Rueckfuehrung.json)</text>
+<rect x="352.0" y="70.0" width="50.0" height="24" rx="5" fill="#d4ecd4" stroke="#4f8f4f" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="377.0" y="86.0">Inlet</text>
+<text class="tn" text-anchor="middle" x="377.0" y="106.0">Puls 1 kg</text>
+<line x1="402.0" y1="82.0" x2="412.0" y2="82.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<rect x="414.0" y="70.0" width="44.0" height="24" rx="5" fill="#cfe6e6" stroke="#3f7f7f" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="436.0" y="86.0">Merger</text>
+<line x1="458.0" y1="82.0" x2="468.0" y2="82.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<rect x="470.0" y="70.0" width="64.0" height="24" rx="5" fill="#ecd9d3" stroke="#8f4f3f" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="502.0" y="86.0">Behälter</text>
+<text class="tn" text-anchor="middle" x="502.0" y="106.0">Pfropfen 2 s</text>
+<line x1="534.0" y1="82.0" x2="544.0" y2="82.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<rect x="546.0" y="70.0" width="54.0" height="24" rx="5" fill="#e3d9ee" stroke="#6f4f97" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="573.0" y="86.0">Splitter</text>
+<text class="tn" text-anchor="middle" x="573.0" y="106.0">40 % / 60 %</text>
+<line x1="600.0" y1="82.0" x2="612.0" y2="82.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
+<rect x="614.0" y="70.0" width="50.0" height="24" rx="5" fill="#d4e4f4" stroke="#4f77a8" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="639.0" y="86.0">Outlet</text>
+<polyline points="573,118 573,140 436,140 436,96" fill="none" stroke="#d2781e" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#mo)"/>
+<text class="tn" text-anchor="middle" x="504.0" y="152.0">60 % zurück, aufgeschnitten: je Umlauf + Δt</text>
+<text class="tn" text-anchor="start" x="352.0" y="192.0">Δt = 0,1 s; 60 s; grau in ③ und ⑤: Levenspiel ohne Δt</text>
+<text class="th2" text-anchor="start" x="10.0" y="212.0">③ Exakte Lösung</text>
+<text class="tn" text-anchor="start" x="10.0" y="224.0">Linie: mit Totzeit Δt je Umlauf (wie StoSiS), grau: Levenspiel</text>
+<rect x="44.0" y="232.0" width="276.0" height="98.0" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
+<line x1="44.0" y1="330.0" x2="320.0" y2="330.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="333.0">0</text>
+<line x1="44.0" y1="281.0" x2="320.0" y2="281.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="284.0">0,5</text>
+<line x1="44.0" y1="232.0" x2="320.0" y2="232.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="235.0">1</text>
+<text class="ta" text-anchor="middle" x="44.0" y="342.0">0 s</text>
+<text class="ta" text-anchor="middle" x="113.0" y="342.0">4 s</text>
+<text class="ta" text-anchor="middle" x="182.0" y="342.0">8 s</text>
+<text class="ta" text-anchor="middle" x="251.0" y="342.0">12 s</text>
+<text class="ta" text-anchor="middle" x="320.0" y="342.0">16 s</text>
+<text class="ta" text-anchor="middle" x="18.0" y="281.0">F</text>
+<path d="M45.7,330.0 L49.2,330.0 L52.6,330.0 L56.1,330.0 L59.5,330.0 L63.0,330.0 L66.4,330.0 L69.9,330.0 L73.3,330.0 L76.8,330.0 L80.2,290.8 L83.7,290.8 L87.1,290.8 L90.6,290.8 L94.0,290.8 L97.5,290.8 L100.9,290.8 L104.4,290.8 L107.8,290.8 L111.3,290.8 L114.7,290.8 L118.2,267.3 L121.6,267.3 L125.1,267.3 L128.5,267.3 L132.0,267.3 L135.4,267.3 L138.9,267.3 L142.3,267.3 L145.8,267.3 L149.2,267.3 L152.7,253.2 L156.1,253.2 L159.6,253.2 L163.0,253.2 L166.5,253.2 L169.9,253.2 L173.4,253.2 L176.8,253.2 L180.3,253.2 L183.7,253.2 L187.2,253.2 L190.6,244.7 L194.1,244.7 L197.5,244.7 L201.0,244.7 L204.4,244.7 L207.9,244.7 L211.3,244.7 L214.8,244.7 L218.2,244.7 L221.7,244.7 L225.1,239.6 L228.6,239.6 L232.0,239.6 L235.5,239.6 L238.9,239.6 L242.4,239.6 L245.8,239.6 L249.3,239.6 L252.7,239.6 L256.2,239.6 L259.6,239.6 L263.1,236.6 L266.5,236.6 L270.0,236.6 L273.4,236.6 L276.9,236.6 L280.3,236.6 L283.8,236.6 L287.2,236.6 L290.7,236.6 L294.1,236.6 L297.6,234.7 L301.0,234.7 L304.5,234.7 L307.9,234.7 L311.4,234.7 L314.8,234.7 L318.3,234.7" fill="none" stroke="#222222" stroke-width="1.6"/>
+<path d="M45.7,330.0 L49.2,330.0 L52.6,330.0 L56.1,330.0 L59.5,330.0 L63.0,330.0 L66.4,330.0 L69.9,330.0 L73.3,330.0 L76.8,330.0 L80.2,290.8 L83.7,290.8 L87.1,290.8 L90.6,290.8 L94.0,290.8 L97.5,290.8 L100.9,290.8 L104.4,290.8 L107.8,290.8 L111.3,290.8 L114.7,267.3 L118.2,267.3 L121.6,267.3 L125.1,267.3 L128.5,267.3 L132.0,267.3 L135.4,267.3 L138.9,267.3 L142.3,267.3 L145.8,267.3 L149.2,253.2 L152.7,253.2 L156.1,253.2 L159.6,253.2 L163.0,253.2 L166.5,253.2 L169.9,253.2 L173.4,253.2 L176.8,253.2 L180.3,253.2 L183.7,244.7 L187.2,244.7 L190.6,244.7 L194.1,244.7 L197.5,244.7 L201.0,244.7 L204.4,244.7 L207.9,244.7 L211.3,244.7 L214.8,244.7 L218.2,239.6 L221.7,239.6 L225.1,239.6 L228.6,239.6 L232.0,239.6 L235.5,239.6 L238.9,239.6 L242.4,239.6 L245.8,239.6 L249.3,239.6 L252.7,236.6 L256.2,236.6 L259.6,236.6 L263.1,236.6 L266.5,236.6 L270.0,236.6 L273.4,236.6 L276.9,236.6 L280.3,236.6 L283.8,236.6 L287.2,234.7 L290.7,234.7 L294.1,234.7 L297.6,234.7 L301.0,234.7 L304.5,234.7 L307.9,234.7 L311.4,234.7 L314.8,234.7 L318.3,234.7" fill="none" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="5 3"/>
+<text class="th2" text-anchor="start" x="350.0" y="212.0">④ StoSiS: Ablauf am Outlet</text>
+<text class="tn" text-anchor="start" x="350.0" y="224.0">Kreise: Kontinuum, gestrichelt: Partikelmodus (2000 Karten)</text>
+<rect x="384.0" y="232.0" width="276.0" height="98.0" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
+<line x1="384.0" y1="330.0" x2="660.0" y2="330.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="380.0" y="333.0">0</text>
+<line x1="384.0" y1="281.0" x2="660.0" y2="281.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="380.0" y="284.0">0,5</text>
+<line x1="384.0" y1="232.0" x2="660.0" y2="232.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="380.0" y="235.0">1</text>
+<text class="ta" text-anchor="middle" x="384.0" y="342.0">0 s</text>
+<text class="ta" text-anchor="middle" x="453.0" y="342.0">4 s</text>
+<text class="ta" text-anchor="middle" x="522.0" y="342.0">8 s</text>
+<text class="ta" text-anchor="middle" x="591.0" y="342.0">12 s</text>
+<text class="ta" text-anchor="middle" x="660.0" y="342.0">16 s</text>
+<text class="ta" text-anchor="middle" x="358.0" y="281.0">F</text>
+<path d="M385.7,330.0 L389.2,330.0 L392.6,330.0 L396.1,330.0 L399.5,330.0 L403.0,330.0 L406.4,330.0 L409.9,330.0 L413.3,330.0 L416.8,330.0 L420.2,290.8 L423.7,290.8 L427.1,290.8 L430.6,290.8 L434.0,290.8 L437.5,290.8 L440.9,290.8 L444.4,290.8 L447.8,290.8 L451.3,290.8 L454.7,290.8 L458.2,267.3 L461.6,267.3 L465.1,267.3 L468.5,267.3 L472.0,267.3 L475.4,267.3 L478.9,267.3 L482.3,267.3 L485.8,267.3 L489.2,267.3 L492.7,253.2 L496.1,253.2 L499.6,253.2 L503.0,253.2 L506.5,253.2 L509.9,253.2 L513.4,253.2 L516.8,253.2 L520.3,253.2 L523.7,253.2 L527.2,253.2 L530.6,244.7 L534.1,244.7 L537.5,244.7 L541.0,244.7 L544.4,244.7 L547.9,244.7 L551.3,244.7 L554.8,244.7 L558.2,244.7 L561.7,244.7 L565.1,239.6 L568.6,239.6 L572.0,239.6 L575.5,239.6 L578.9,239.6 L582.4,239.6 L585.8,239.6 L589.3,239.6 L592.7,239.6 L596.2,239.6 L599.6,239.6 L603.1,236.6 L606.5,236.6 L610.0,236.6 L613.4,236.6 L616.9,236.6 L620.3,236.6 L623.8,236.6 L627.2,236.6 L630.7,236.6 L634.1,236.6 L637.6,234.7 L641.0,234.7 L644.5,234.7 L647.9,234.7 L651.4,234.7 L654.8,234.7 L658.3,234.7" fill="none" stroke="#7c3aed" stroke-width="1.1" stroke-dasharray="5 3"/>
+<circle cx="396.1" cy="330.0" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="408.1" cy="330.0" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="420.2" cy="290.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="432.3" cy="290.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="444.4" cy="290.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="456.4" cy="267.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="468.5" cy="267.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="480.6" cy="267.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="492.7" cy="253.2" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="504.8" cy="253.2" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="516.8" cy="253.2" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="528.9" cy="244.7" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="541.0" cy="244.7" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="553.0" cy="244.7" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="565.1" cy="239.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="577.2" cy="239.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="589.3" cy="239.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="601.4" cy="236.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="613.4" cy="236.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="625.5" cy="236.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="637.6" cy="234.7" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="649.7" cy="234.7" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<text class="th2" text-anchor="start" x="10.0" y="362.0">⑤ Übereinander: Exakte Lösung (Linie) und StoSiS</text>
+<rect x="44.0" y="382.0" width="416.0" height="118.0" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
+<line x1="44.0" y1="500.0" x2="460.0" y2="500.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="503.0">0</text>
+<line x1="44.0" y1="441.0" x2="460.0" y2="441.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="444.0">0,5</text>
+<line x1="44.0" y1="382.0" x2="460.0" y2="382.0" stroke="#eef2f6" stroke-width="1"/>
+<text class="ta" text-anchor="end" x="40.0" y="385.0">1</text>
+<text class="ta" text-anchor="middle" x="44.0" y="512.0">0 s</text>
+<text class="ta" text-anchor="middle" x="148.0" y="512.0">4 s</text>
+<text class="ta" text-anchor="middle" x="252.0" y="512.0">8 s</text>
+<text class="ta" text-anchor="middle" x="356.0" y="512.0">12 s</text>
+<text class="ta" text-anchor="middle" x="460.0" y="512.0">16 s</text>
+<text class="ta" text-anchor="middle" x="18.0" y="441.0">F</text>
+<path d="M46.6,500.0 L51.8,500.0 L57.0,500.0 L62.2,500.0 L67.4,500.0 L72.6,500.0 L77.8,500.0 L83.0,500.0 L88.2,500.0 L93.4,500.0 L98.6,452.8 L103.8,452.8 L109.0,452.8 L114.2,452.8 L119.4,452.8 L124.6,452.8 L129.8,452.8 L135.0,452.8 L140.2,452.8 L145.4,452.8 L150.6,424.5 L155.8,424.5 L161.0,424.5 L166.2,424.5 L171.4,424.5 L176.6,424.5 L181.8,424.5 L187.0,424.5 L192.2,424.5 L197.4,424.5 L202.6,407.5 L207.8,407.5 L213.0,407.5 L218.2,407.5 L223.4,407.5 L228.6,407.5 L233.8,407.5 L239.0,407.5 L244.2,407.5 L249.4,407.5 L254.6,397.3 L259.8,397.3 L265.0,397.3 L270.2,397.3 L275.4,397.3 L280.6,397.3 L285.8,397.3 L291.0,397.3 L296.2,397.3 L301.4,397.3 L306.6,391.2 L311.8,391.2 L317.0,391.2 L322.2,391.2 L327.4,391.2 L332.6,391.2 L337.8,391.2 L343.0,391.2 L348.2,391.2 L353.4,391.2 L358.6,387.5 L363.8,387.5 L369.0,387.5 L374.2,387.5 L379.4,387.5 L384.6,387.5 L389.8,387.5 L395.0,387.5 L400.2,387.5 L405.4,387.5 L410.6,385.3 L415.8,385.3 L421.0,385.3 L426.2,385.3 L431.4,385.3 L436.6,385.3 L441.8,385.3 L447.0,385.3 L452.2,385.3 L457.4,385.3" fill="none" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="5 3"/>
+<path d="M46.6,500.0 L51.8,500.0 L57.0,500.0 L62.2,500.0 L67.4,500.0 L72.6,500.0 L77.8,500.0 L83.0,500.0 L88.2,500.0 L93.4,500.0 L98.6,452.8 L103.8,452.8 L109.0,452.8 L114.2,452.8 L119.4,452.8 L124.6,452.8 L129.8,452.8 L135.0,452.8 L140.2,452.8 L145.4,452.8 L150.6,452.8 L155.8,424.5 L161.0,424.5 L166.2,424.5 L171.4,424.5 L176.6,424.5 L181.8,424.5 L187.0,424.5 L192.2,424.5 L197.4,424.5 L202.6,424.5 L207.8,407.5 L213.0,407.5 L218.2,407.5 L223.4,407.5 L228.6,407.5 L233.8,407.5 L239.0,407.5 L244.2,407.5 L249.4,407.5 L254.6,407.5 L259.8,407.5 L265.0,397.3 L270.2,397.3 L275.4,397.3 L280.6,397.3 L285.8,397.3 L291.0,397.3 L296.2,397.3 L301.4,397.3 L306.6,397.3 L311.8,397.3 L317.0,391.2 L322.2,391.2 L327.4,391.2 L332.6,391.2 L337.8,391.2 L343.0,391.2 L348.2,391.2 L353.4,391.2 L358.6,391.2 L363.8,391.2 L369.0,391.2 L374.2,387.5 L379.4,387.5 L384.6,387.5 L389.8,387.5 L395.0,387.5 L400.2,387.5 L405.4,387.5 L410.6,387.5 L415.8,387.5 L421.0,387.5 L426.2,385.3 L431.4,385.3 L436.6,385.3 L441.8,385.3 L447.0,385.3 L452.2,385.3 L457.4,385.3" fill="none" stroke="#222222" stroke-width="1.6"/>
+<path d="M46.6,500.0 L51.8,500.0 L57.0,500.0 L62.2,500.0 L67.4,500.0 L72.6,500.0 L77.8,500.0 L83.0,500.0 L88.2,500.0 L93.4,500.0 L98.6,452.8 L103.8,452.8 L109.0,452.8 L114.2,452.8 L119.4,452.8 L124.6,452.8 L129.8,452.8 L135.0,452.8 L140.2,452.8 L145.4,452.8 L150.6,452.8 L155.8,424.5 L161.0,424.5 L166.2,424.5 L171.4,424.5 L176.6,424.5 L181.8,424.5 L187.0,424.5 L192.2,424.5 L197.4,424.5 L202.6,424.5 L207.8,407.5 L213.0,407.5 L218.2,407.5 L223.4,407.5 L228.6,407.5 L233.8,407.5 L239.0,407.5 L244.2,407.5 L249.4,407.5 L254.6,407.5 L259.8,407.5 L265.0,397.3 L270.2,397.3 L275.4,397.3 L280.6,397.3 L285.8,397.3 L291.0,397.3 L296.2,397.3 L301.4,397.3 L306.6,397.3 L311.8,397.3 L317.0,391.2 L322.2,391.2 L327.4,391.2 L332.6,391.2 L337.8,391.2 L343.0,391.2 L348.2,391.2 L353.4,391.2 L358.6,391.2 L363.8,391.2 L369.0,391.2 L374.2,387.5 L379.4,387.5 L384.6,387.5 L389.8,387.5 L395.0,387.5 L400.2,387.5 L405.4,387.5 L410.6,387.5 L415.8,387.5 L421.0,387.5 L426.2,385.3 L431.4,385.3 L436.6,385.3 L441.8,385.3 L447.0,385.3 L452.2,385.3 L457.4,385.3" fill="none" stroke="#7c3aed" stroke-width="1.1" stroke-dasharray="5 3"/>
+<circle cx="62.2" cy="500.0" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="80.4" cy="500.0" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="98.6" cy="452.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="116.8" cy="452.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="135.0" cy="452.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="153.2" cy="424.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="171.4" cy="424.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="189.6" cy="424.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="207.8" cy="407.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="226.0" cy="407.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="244.2" cy="407.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="262.4" cy="397.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="280.6" cy="397.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="298.8" cy="397.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="317.0" cy="391.2" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="335.2" cy="391.2" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="353.4" cy="391.2" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="371.6" cy="387.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="389.8" cy="387.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="408.0" cy="387.5" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="426.2" cy="385.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<circle cx="444.4" cy="385.3" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
+<text class="th2" text-anchor="start" x="480.0" y="392.0">Verweilzeit [s]</text>
+<text class="tn" text-anchor="start" x="480.0" y="408.0">Mittel / Std.-Abw.</text>
+<text class="tl" text-anchor="start" x="480.0" y="424.0">exakt: 5,15 / 4,07</text>
+<text class="tl" text-anchor="start" x="480.0" y="439.0">StoSiS Kontinuum: 5,15 / 4,07</text>
+<text class="tl" text-anchor="start" x="480.0" y="454.0">StoSiS Partikel: 5,15 / 4,06</text>
+<text class="tn" text-anchor="start" x="480.0" y="469.0">Mittel um R·Δt = 0,15 s länger: Totzeit des Schnitts</text>
+</svg>

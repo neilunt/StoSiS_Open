@@ -1,0 +1,117 @@
+{
+    "format": "StoSiS-Flowsheet",
+    "version": 2,
+    "program": "StoSiS 0.1.1",
+    "info": "Engisch und Muzzio (2016), J. Pharm. Innov. 11: kontinuierlicher Mischer als Kessel in Reihe. Grundfall Mittel 41,6 s, Standardabweichung 12 s (n = (41,6/12)^2 = 12 Kessel); Beispielkurve des Mischers (Abb. 17 dort): Mittel 68,8 s, Standardabweichung 22,4 s (n = 9,4, hier 9 Kessel). Tracerpuls je 1 kg.",
+    "simulation": {
+        "duration": 400.0,
+        "dt": 0.2,
+        "seed": 1,
+        "runs": 1,
+        "representation": "continuum",
+        "sizeGrid": { "type": "logarithmic", "classes": 30, "dMin": 1e-06, "dMax": 0.001 },
+        "cards": {
+            "perSlice": 2000,
+            "rule": "sum",
+            "numberShare": 0.5,
+            "exponent": 0.8,
+            "sliceLimits": true,
+            "upperFactor": 2.0,
+            "splitFactor": 5.0
+        }
+    },
+    "execution": { "detailedLog": false },
+    "units": [
+        {
+            "id": "node_0",
+            "type": "Inlet",
+            "name": "Tracerpuls Grundfall",
+            "position": [0.0, 0.0],
+            "settings": {
+                "material": "Sand",
+                "temperature": 293.15,
+                "pressure": 101325.0,
+                "massFlow": [[0.0, 5.0], [0.2, 0.0]],
+                "sizeDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] }
+            }
+        }
+,
+        {
+            "id": "node_1",
+            "type": "Vessel",
+            "name": "Mischer Grundfall",
+            "position": [300.0, 0.0],
+            "settings": {
+                "mixing": "cascade",
+                "residenceTime": 41.6,
+                "batch": false,
+                "cells": 12,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "empty",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_2",
+            "type": "Outlet",
+            "name": "Ablauf Grundfall",
+            "position": [600.0, 0.0]
+        }
+,
+        {
+            "id": "node_3",
+            "type": "Inlet",
+            "name": "Tracerpuls Abb. 17",
+            "position": [0.0, 120.0],
+            "settings": {
+                "material": "Sand",
+                "temperature": 293.15,
+                "pressure": 101325.0,
+                "massFlow": [[0.0, 5.0], [0.2, 0.0]],
+                "sizeDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] }
+            }
+        }
+,
+        {
+            "id": "node_4",
+            "type": "Vessel",
+            "name": "Mischer Abb. 17",
+            "position": [300.0, 120.0],
+            "settings": {
+                "mixing": "cascade",
+                "residenceTime": 68.8,
+                "batch": false,
+                "cells": 9,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "empty",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_5",
+            "type": "Outlet",
+            "name": "Ablauf Abb. 17",
+            "position": [600.0, 120.0]
+        }
+    ],
+    "connections": [
+        { "from": "node_0", "output": 1, "to": "node_1", "input": 1, "recycle": "no" },
+        { "from": "node_1", "output": 1, "to": "node_2", "input": 1, "recycle": "no" },
+        { "from": "node_3", "output": 1, "to": "node_4", "input": 1, "recycle": "no" },
+        { "from": "node_4", "output": 1, "to": "node_5", "input": 1, "recycle": "no" }
+    ]
+}

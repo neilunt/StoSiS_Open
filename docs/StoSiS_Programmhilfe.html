@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StoSiS – Programmhilfe</title>
+<style>
+  :root { --text: #1f2328; --muted: #5b6470; --line: #dfe3e8; --bg: #ffffff; --panel: #f6f7f9; --accent: #2563eb; }
+  @media (prefers-color-scheme: dark) {
+    :root { --text: #e6e8eb; --muted: #a3abb5; --line: #343a42; --bg: #16191d; --panel: #1f2329; --accent: #6ea8fe; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 46rem; margin: 0 auto; padding: 2.5rem 1.2rem 4rem; }
+  h1 { font-size: 1.9rem; margin: 0 0 .3rem; }
+  .sub { color: var(--muted); margin: 0 0 1.5rem; }
+  h2 { font-size: 1.3rem; margin: 2.4rem 0 .5rem; padding-top: .4rem; border-top: 1px solid var(--line); }
+  h3 { font-size: 1.05rem; margin: 1.4rem 0 .3rem; }
+  p { margin: 0 0 .8rem; }
+  ul { margin: 0 0 .9rem; padding-left: 1.3rem; }
+  li { margin: .15rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  code { font-size: .92em; }
+  kbd { font-size: .85em; border: 1px solid var(--line); border-radius: .25rem; padding: 0 .3rem; background: var(--panel); }
+  nav { background: var(--panel); border-radius: .5rem; padding: .8rem 1.1rem; }
+</style>
+</head>
+<body>
+<main>
+<h1>StoSiS – Programmhilfe</h1>
+<p class="sub">Bedienung der Fenster. Was das Programm rechnet und warum, steht im Methodenhandbuch.</p>
+
+<nav>
+  <a href="#datei">Flowsheet als Datei</a> · <a href="#struktur">Fenster „Struktur“</a>
+</nav>
+
+<h2 id="datei">Flowsheet als Datei</h2>
+<ul>
+  <li><b>Neu:</b> Menü Flowsheet → „Neues Flowsheet“ (<kbd>Strg</kbd>+<kbd>N</kbd>) legt Inlet → Prozess → Outlet mit Standardeinstellungen an und rechnet sofort. Das bisherige Flowsheet wird nach einer Rückfrage ersetzt.</li>
+  <li><b>Öffnen:</b> Menü Flowsheet → „Flowsheet aus Datei öffnen …“ (<kbd>Strg</kbd>+<kbd>O</kbd>). Der Dialog beginnt im StoSiS-Ordner, danach im zuletzt benutzten Ordner; beim Speichern ebenso. Das bisherige Flowsheet wird nur ersetzt, wenn die Datei fehlerfrei gelesen wurde. Danach rechnet StoSiS sofort. Hinweise zu fehlenden oder unbekannten Feldern erscheinen in einem Fenster.</li>
+  <li><b>Speichern:</b> Menü Flowsheet → „Flowsheet speichern“ (<kbd>Strg</kbd>+<kbd>S</kbd>) überschreibt die Datei, aus der das Flowsheet geöffnet oder in die es zuletzt gespeichert wurde; ihr Name steht in der Titelleiste. Hat das Flowsheet noch keine Datei (Programmstart, <kbd>Strg</kbd>+<kbd>N</kbd>; Titelleiste „ohne Datei“), fragt es wie „Speichern unter“ nach dem Namen.</li>
+  <li><b>Speichern unter:</b> Menü Flowsheet → „Flowsheet speichern unter …“ (<kbd>Strg</kbd>+<kbd>Umschalt</kbd>+<kbd>S</kbd>) oder der Knopf im Fenster „Struktur“; danach gilt die neue Datei für <kbd>Strg</kbd>+<kbd>S</kbd>.</li>
+  <li><b>Beispiele:</b> Der Ordner <code>validierung/flowsheets</code> enthält die Validierungs-Flowsheets (Kompartiment-Modelle nach Levenspiel, Mischer nach Engisch &amp; Muzzio).</li>
+  <li><b>In der Datei:</b> alle Einstellungen von Simulation und Units, die Verbindungen und das ausführliche Laufzeitprotokoll. Nicht darin: Ergebnisse, Auswertung, Kartenansicht, Fensterlage. Stoffe stehen nur mit Namen darin.</li>
+  <li><b><code>"recycle"</code></b> je Verbindung: <code>"manual"</code> = von Hand als Rückführung markiert, <code>"auto"</code> = von StoSiS aufgeschnitten, <code>"no"</code> = nicht aufgeschnitten. <code>"auto"</code> ist nur Information; beim Öffnen schneidet StoSiS neu.</li>
+</ul>
+
+<h2 id="struktur">Fenster „Struktur“</h2>
+<p>Werkzeugleiste → „Struktur anzeigen“. Links steht, wie StoSiS das Flowsheet in jedem Zeitschritt abarbeitet, rechts das Flowsheet so, wie es in der Datei steht.</p>
+<h3>Reiter „Bild“</h3>
+<ul>
+  <li>Jeder Kasten ist eine Unit: oben ihr Name, darunter grau ihre ID aus der Datei.</li>
+  <li>Links im Kasten steht der Schritt, also der Platz in der Rechenreihenfolge (wie die Spalte Schritt im Reiter Text): Schritt 1 rechnet in jedem Zeitschritt zuerst. Rechts stehen der Name und darunter grau die ID aus der Datei.</li>
+  <li>Jede Unit steht rechts neben dem Vorgänger an ihrem ersten Eingang.</li>
+  <li><b>Orange „→ Name“:</b> Hier ist ein Kreis aufgeschnitten. Die genannte Unit bekommt an dieser Stelle den Strom aus dem vorigen Zeitschritt (Totzeit Δ<i>t</i>; im Flowsheet orange gestrichelt).</li>
+  <li><b>Graues „→ Name“:</b> ein weiterer Zulauf zu einer Unit, die an anderer Stelle im Bild steht, etwa der zweite Eingang eines Mergers.</li>
+  <li>Ein Klick auf einen Kasten oder ein „→“ markiert die passende Stelle in der Datei rechts. Mausrad zoomt, Ziehen verschiebt, Doppelklick passt das ganze Bild ein. Der Tooltip nennt Typ, ID, Kreis und Zulauf.</li>
+</ul>
+<h3>Reiter „Text“</h3>
+<ul>
+  <li>Derselbe Baum als Liste, mit den Spalten Schritt (Rechenreihenfolge), Typ, ID, Anschluss (Ausgang bzw. Eingang, wenn es mehrere gibt) und Hinweis (Kreis, Art des Schnitts).</li>
+  <li>✂ = aufgeschnittene Verbindung, → = weiterer Zulauf zu einer Unit an anderer Stelle.</li>
+</ul>
+</main>
+</body>
+</html>

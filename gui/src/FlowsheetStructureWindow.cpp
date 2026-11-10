@@ -1,8 +1,10 @@
 #include "FlowsheetStructureWindow.h"
 #include "StructureDiagramWidget.h"
+#include <QCoreApplication>
 #include <QDir>
 #include <QEvent>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QFontDatabase>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -12,7 +14,6 @@
 #include <QPushButton>
 #include <QScrollBar>
 #include <QSplitter>
-#include <QStandardPaths>
 #include <QTabWidget>
 #include <QTextBlock>
 #include <QTreeWidget>
@@ -22,7 +23,7 @@
 
 namespace
 {
-    enum EColumn { kColBranch, kColStep, kColType, kColPort, kColNote, kNumColumns };
+    enum EColumn { kColBranch, kColStep, kColType, kColId, kColPort, kColNote, kNumColumns };
 
     // Daten am Eintrag (Spalte 0): Knoten, Verbindung, Art (SStructureBranch::EKind).
     constexpr int kRoleNode = Qt::UserRole;
@@ -71,15 +72,10 @@ FlowsheetStructureWindow::FlowsheetStructureWindow(QWidget* parent)
     auto* layout = new QVBoxLayout(this);
     auto* splitter = new QSplitter(Qt::Horizontal, this);
 
-    // Links: Reihenfolge und Kreise, darunter die Reiter "Bild" und "Text".
+    // Links: die Reiter "Bild" und "Text" (Erklaerung in der Programmhilfe).
     auto* left = new QWidget(splitter);
     auto* leftLayout = new QVBoxLayout(left);
     leftLayout->setContentsMargins(0, 0, 0, 0);
-    m_summary = new QLabel(left);
-    m_summary->setWordWrap(true);
-    m_summary->setTextFormat(Qt::RichText);
-    m_summary->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    leftLayout->addWidget(m_summary);
     m_tabs = new QTabWidget(left);
     leftLayout->addWidget(m_tabs, 1);
 
@@ -88,16 +84,6 @@ FlowsheetStructureWindow::FlowsheetStructureWindow(QWidget* parent)
     auto* pictureLayout = new QVBoxLayout(picturePage);
     m_diagram = new StructureDiagramWidget(picturePage);
     pictureLayout->addWidget(m_diagram, 1);
-    auto* pictureLegend = new QLabel(picturePage);
-    pictureLegend->setWordWrap(true);
-    pictureLegend->setStyleSheet("color: gray;");
-    pictureLegend->setText("Kasten = Unit, darunter ihre Nummer \"node k\" = Platz in der Rechenreihenfolge ab 0 (bei "
-                           "jedem Anzeigen neu vergeben; die ID in der Datei bleibt). Jede Unit steht rechts neben dem "
-                           "Vorgaenger an ihrem ersten Eingang. " + kArrow + " k orange: aufgeschnittene Rueckfuehrung, "
-                           "Unit k liest dort den Strom des vorigen Zeitschritts. " + kArrow + " k grau: weiterer Zulauf "
-                           "zu Unit k, die an anderer Stelle im Bild steht. Mausrad zoomt, Ziehen verschiebt, "
-                           "Doppelklick passt ein.");
-    pictureLayout->addWidget(pictureLegend);
     m_tabs->addTab(picturePage, "Bild");
 
     // Reiter "Text": derselbe Baum als Liste.
@@ -105,36 +91,19 @@ FlowsheetStructureWindow::FlowsheetStructureWindow(QWidget* parent)
     auto* textLayout = new QVBoxLayout(textPage);
     m_tree = new QTreeWidget(textPage);
     m_tree->setColumnCount(kNumColumns);
-    m_tree->setHeaderLabels({ "Ast (in Stromrichtung)", "Nr.", "Typ", "Anschluss", "Hinweis" });
-    m_tree->headerItem()->setToolTip(kColStep, "node k = Platz in der Rechenreihenfolge ab 0 (wie im Bild): In jedem\n"
-                                               "Zeitschritt rechnen die Units in dieser Folge.");
+    m_tree->setHeaderLabels({ "Ast (in Stromrichtung)", "Schritt", "Typ", "ID", "Anschluss", "Hinweis" });
+    m_tree->headerItem()->setToolTip(kColStep, "Platz in der Rechenreihenfolge je Zeitschritt.");
     m_tree->headerItem()->setToolTip(kColPort, "Ausgang des Vorgaengers und Eingang dieser Unit, wenn es mehrere gibt.");
     m_tree->setUniformRowHeights(true);
     m_tree->header()->setStretchLastSection(true);
     textLayout->addWidget(m_tree, 1);
-    auto* legend = new QLabel(textPage);
-    legend->setWordWrap(true);
-    legend->setStyleSheet("color: gray;");
-    legend->setText("Jede Unit steht unter dem Vorgaenger an ihrem ersten Eingang. " + kScissors
-        + " aufgeschnittene Verbindung: Das Ziel liest den Strom aus dem vorigen Zeitschritt (Totzeit dt, im Flowsheet "
-          "orange gestrichelt). " + kArrow + " weitere Verbindung zu einer Unit, die an anderer Stelle im Baum steht "
-          "(z.B. zweiter Eingang eines Mergers).");
-    textLayout->addWidget(legend);
     m_tabs->addTab(textPage, "Text");
 
     // Rechts: das Flowsheet, wie es in der Datei steht.
     auto* right = new QWidget(splitter);
     auto* rightLayout = new QVBoxLayout(right);
     rightLayout->setContentsMargins(0, 0, 0, 0);
-    rightLayout->addWidget(new QLabel("<b>So steht das Flowsheet in der Datei (JSON)</b>", right));
-    auto* jsonNote = new QLabel(right);
-    jsonNote->setWordWrap(true);
-    jsonNote->setStyleSheet("color: gray;");
-    jsonNote->setText("Nur Eingaben: Simulation, Ausfuehrung, Units mit allen Einstellungen, Verbindungen. Bei jeder "
-                      "Verbindung \"recycle\": \"manual\" = von Hand als Rueckfuehrung markiert, \"auto\" = vom Graphen "
-                      "aufgeschnitten (beim Laden neu bestimmt), \"no\" = nicht aufgeschnitten. Die Rechenreihenfolge "
-                      "steht nicht darin. Stoffe nur mit Namen (Materialien.json). Ein Klick links markiert die Stelle hier.");
-    rightLayout->addWidget(jsonNote);
+    rightLayout->addWidget(new QLabel("<b>Flowsheet-Datei (JSON)</b>", right));
     m_json = new QPlainTextEdit(right);
     m_json->setReadOnly(true);
     m_json->setLineWrapMode(QPlainTextEdit::NoWrap);
@@ -159,8 +128,10 @@ FlowsheetStructureWindow::FlowsheetStructureWindow(QWidget* parent)
                 return;
             const QString path = SaveFlowsheetAs(this, *m_graph,
                 m_settingsProvider ? m_settingsProvider() : stosis::SFlowsheetFileSettings());
-            if (!path.isEmpty())
-                m_saveInfo->setText("Gespeichert: " + QDir::toNativeSeparators(path));
+            if (path.isEmpty())
+                return;
+            m_saveInfo->setText("Gespeichert: " + QDir::toNativeSeparators(path));
+            emit FlowsheetSaved(path);
         });
     bottom->addWidget(saveButton);
     layout->addLayout(bottom);
@@ -253,7 +224,6 @@ void FlowsheetStructureWindow::Rebuild()
     for (const stosis::SStructureBranch& root : structure.roots)
         collect(root, std::string());
 
-    m_summary->setText(DescribeSummary(structure));
     m_diagram->SetStructure(*m_graph, structure);
     m_tree->clear();
     for (const stosis::SStructureBranch& root : structure.roots)
@@ -301,8 +271,9 @@ void FlowsheetStructureWindow::AddBranch(QTreeWidgetItem* parent, const stosis::
         item->setText(kColPort, port.join(", "));
     }
 
-    // Nummer wie im Bild: Platz in der Rechenreihenfolge ab 0.
-    const QString number = QString::number(static_cast<int>(structure.GetStep(branch.nodeId)) - 1);
+    // Platz in der Rechenreihenfolge ab 1 (wie die Marke im Bild) und die ID aus der Datei.
+    const QString number = QString::number(structure.GetStep(branch.nodeId));
+    item->setText(kColId, QString::fromStdString(branch.nodeId));
     if (branch.kind == EKind::Unit)
     {
         item->setText(kColBranch, name);
@@ -321,7 +292,7 @@ void FlowsheetStructureWindow::AddBranch(QTreeWidgetItem* parent, const stosis::
     if (branch.kind == EKind::Cut)
     {
         const bool byHand = connection && connection->isRecycle;
-        item->setText(kColBranch, kScissors + " " + name + " (node " + number + ")");
+        item->setText(kColBranch, kScissors + " " + name);
         item->setText(kColNote, QString("aufgeschnitten (") + (byHand ? "von Hand markiert" : "vom Graphen gewaehlt")
             + "): liest den Strom des vorigen Zeitschritts");
         const QString tip = byHand
@@ -337,7 +308,7 @@ void FlowsheetStructureWindow::AddBranch(QTreeWidgetItem* parent, const stosis::
     }
 
     // Verweis: die Unit steht an anderer Stelle im Baum.
-    item->setText(kColBranch, kArrow + " " + name + " (node " + number + ")");
+    item->setText(kColBranch, kArrow + " " + name);
     const auto it = placedUnder.find(branch.nodeId);
     item->setText(kColNote, it != placedUnder.end() && !it->second.empty()
         ? "laeuft hier zusammen; " + name + " steht unter " + NodeName(it->second)
@@ -351,46 +322,6 @@ void FlowsheetStructureWindow::AddBranch(QTreeWidgetItem* parent, const stosis::
     }
 }
 
-QString FlowsheetStructureWindow::DescribeSummary(const stosis::SFlowsheetStructure& structure) const
-{
-    QStringList steps;
-    for (size_t i = 0; i < structure.order.size(); ++i)
-        steps << QString::number(i) + "&nbsp;" + NodeName(structure.order[i]).toHtmlEscaped();
-    QString text = "<b>Rechenreihenfolge je Zeitschritt:</b> " + (steps.isEmpty() ? QString("(leer)") : steps.join(" &rarr; "));
-
-    // Schnitte je Kreis; von Hand markierte Verbindungen ausserhalb eines Kreises extra.
-    std::vector<QStringList> cuts(structure.cycles.size());
-    QStringList outside;
-    for (const stosis::SFlowsheetConnection& c : m_graph->GetConnections())
-    {
-        if (!structure.lagged.count(c.id))
-            continue;
-        const stosis::SFlowsheetNode* target = m_graph->FindNode(c.targetNodeId);
-        QString what = NodeName(c.sourceNodeId).toHtmlEscaped() + " &rarr; " + NodeName(c.targetNodeId).toHtmlEscaped();
-        if (target && target->numInputs > 1)
-            what += " (Eingang " + QString::number(c.targetPort + 1) + ")";
-        what += c.isRecycle ? ", von Hand markiert" : ", vom Graphen gewaehlt";
-        const int cycle = structure.GetCycle(c.sourceNodeId);
-        if (cycle >= 0 && cycle == structure.GetCycle(c.targetNodeId))
-            cuts[static_cast<size_t>(cycle)] << what;
-        else
-            outside << what;
-    }
-    if (structure.cycles.empty())
-        text += "<br><b>Kreise:</b> keine";
-    for (size_t i = 0; i < structure.cycles.size(); ++i)
-    {
-        QStringList members;
-        for (const std::string& id : structure.cycles[i])
-            members << NodeName(id).toHtmlEscaped();
-        text += "<br><b>Kreis " + QString::number(i + 1) + ":</b> " + members.join(", ")
-            + " &ndash; aufgeschnitten: " + cuts[i].join("; ");
-    }
-    if (!outside.isEmpty())
-        text += "<br><b>Von Hand markiert, aber auf keinem Kreis:</b> " + outside.join("; ")
-            + " (wirkt trotzdem wie eine Totzeit von einem Zeitschritt)";
-    return text;
-}
 
 void FlowsheetStructureWindow::HighlightInJson(const QString& nodeId, const QString& connectionId, int kind)
 {
@@ -420,7 +351,10 @@ void FlowsheetStructureWindow::HighlightInJson(const QString& nodeId, const QStr
     {
         QTextEdit::ExtraSelection selection;
         selection.cursor = QTextCursor(block);
-        selection.format.setBackground(QColor(255, 236, 179));
+        // Durchscheinend in der Auswahlfarbe: lesbar auf hellem und dunklem Grund.
+        QColor mark = palette().color(QPalette::Highlight);
+        mark.setAlpha(70);
+        selection.format.setBackground(mark);
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
         selections.append(selection);
         if (block == last)
@@ -431,21 +365,48 @@ void FlowsheetStructureWindow::HighlightInJson(const QString& nodeId, const QStr
     m_json->centerCursor();
 }
 
+namespace
+{
+    QString g_flowsheetFolder;
+}
+
+QString FlowsheetStructureWindow::FlowsheetFolder()
+{
+    if (g_flowsheetFolder.isEmpty())
+    {
+        // Installiert liegt data/ neben der exe; sonst gilt der Quellordner.
+        const QString besideExe = QCoreApplication::applicationDirPath();
+        g_flowsheetFolder = QFileInfo::exists(besideExe + "/data")
+            ? besideExe
+            : QDir(QString(STOSIS_DATA_DIR) + "/..").absolutePath();
+    }
+    return g_flowsheetFolder;
+}
+
+void FlowsheetStructureWindow::RememberFlowsheetFolder(const QString& filePath)
+{
+    g_flowsheetFolder = QFileInfo(filePath).absolutePath();
+}
+
+bool FlowsheetStructureWindow::WriteFlowsheet(QWidget* parent, const QString& path,
+    const stosis::CFlowsheetGraph& graph, const stosis::SFlowsheetFileSettings& settings)
+{
+    std::string error;
+    if (stosis::SaveFlowsheetFile(path.toStdString(), graph, settings, error))
+        return true;
+    QMessageBox::warning(parent, "Flowsheet speichern", QString::fromStdString(error));
+    return false;
+}
+
 QString FlowsheetStructureWindow::SaveFlowsheetAs(QWidget* parent, const stosis::CFlowsheetGraph& graph,
     const stosis::SFlowsheetFileSettings& settings)
 {
-    static QString lastPath;
-    if (lastPath.isEmpty())
-        lastPath = QDir(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).filePath("Flowsheet.json");
-    const QString path = QFileDialog::getSaveFileName(parent, "Flowsheet speichern", lastPath, "StoSiS-Flowsheet (*.json)");
+    static QString lastName = "Flowsheet.json";
+    const QString path = QFileDialog::getSaveFileName(parent, "Flowsheet speichern unter",
+        QDir(FlowsheetFolder()).filePath(lastName), "StoSiS-Flowsheet (*.json)");
     if (path.isEmpty())
         return QString();
-    lastPath = path;
-    std::string error;
-    if (!stosis::SaveFlowsheetFile(path.toStdString(), graph, settings, error))
-    {
-        QMessageBox::warning(parent, "Flowsheet speichern", QString::fromStdString(error));
-        return QString();
-    }
-    return path;
+    RememberFlowsheetFolder(path);
+    lastName = QFileInfo(path).fileName();
+    return WriteFlowsheet(parent, path, graph, settings) ? path : QString();
 }

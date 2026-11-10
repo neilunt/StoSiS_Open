@@ -32,10 +32,23 @@ public:
     // etwas anders ist.
     void Refresh();
 
+    // Startordner der Dialoge "Flowsheet oeffnen" und "speichern": der zuletzt
+    // benutzte Ordner, anfangs der StoSiS-Ordner (installiert neben der exe,
+    // sonst der Quellordner).
+    static QString FlowsheetFolder();
+    static void RememberFlowsheetFolder(const QString& filePath);
+    // Schreibt die Datei ohne Dialog (vorhandene wird ueberschrieben);
+    // false bei Fehler, mit Meldung.
+    static bool WriteFlowsheet(QWidget* parent, const QString& path, const stosis::CFlowsheetGraph& graph,
+        const stosis::SFlowsheetFileSettings& settings);
     // Dialog "Flowsheet speichern unter"; liefert den Pfad, leer bei
     // Abbruch oder Fehler (Fehler mit Meldung).
     static QString SaveFlowsheetAs(QWidget* parent, const stosis::CFlowsheetGraph& graph,
         const stosis::SFlowsheetFileSettings& settings);
+
+signals:
+    // Nach "speichern unter" ueber den Knopf: die Datei ist jetzt die des Flowsheets.
+    void FlowsheetSaved(const QString& path);
 
 protected:
     void showEvent(QShowEvent* event) override;
@@ -45,7 +58,6 @@ private:
     void Rebuild();
     void AddBranch(QTreeWidgetItem* parent, const stosis::SStructureBranch& branch,
         const stosis::SFlowsheetStructure& structure, const std::map<std::string, std::string>& placedUnder);
-    QString DescribeSummary(const stosis::SFlowsheetStructure& structure) const;
     // Eintrag in der Datei hinterlegen: Unit (kind = Unit) bzw. Verbindung;
     // kind < 0 hebt die Markierung auf.
     void HighlightInJson(const QString& nodeId, const QString& connectionId, int kind);
@@ -54,7 +66,6 @@ private:
     stosis::CFlowsheetGraph* m_graph = nullptr;
     std::function<stosis::SFlowsheetFileSettings()> m_settingsProvider;
 
-    QLabel* m_summary = nullptr;
     QTabWidget* m_tabs = nullptr;
     StructureDiagramWidget* m_diagram = nullptr;
     QTreeWidget* m_tree = nullptr;
