@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(StoSiS VERSION 0.1.1 LANGUAGES CXX CUDA)
+project(StoSiS VERSION 0.2.0 LANGUAGES CXX CUDA)
 
 # CUDA ist aktiv: Die GPU-Kernel (z.B. First-Passage-Time-Transport) liegen
 # in der Bibliothek stosis_cuda, GPU-Architekturen siehe core/CMakeLists.txt
