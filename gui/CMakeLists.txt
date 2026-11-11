@@ -87,6 +87,7 @@ src/VesselEditorWidget.h
 src/FractionPreviewWidget.cpp
 src/FractionPreviewWidget.h
 src/ResultsEntryKey.h
+src/SaveLocations.h
 src/MaterialsPage.cpp
 src/MaterialsPage.h
 )

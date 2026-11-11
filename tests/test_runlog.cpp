@@ -214,6 +214,18 @@ int main()
         SSetup continuum(true);
         continuum.graph.RunSimulations(2);
         Check(continuum.graph.GetCardHistory(continuum.inlet, 0) == nullptr, "Kontinuum: kein Kartenspeicher");
+
+        // Switched off: no card view, but the same results as with it.
+        SSetup off(true);
+        off.UseCards(200);
+        off.graph.SetRecordCardHistory(false);
+        off.graph.RunSimulations(3);
+        const double withHistory = s.graph.GetStatistics(s.outletA, 0)->GetMean().IntegrateTotal();
+        const double withoutHistory = off.graph.GetStatistics(off.outletA, 0)->GetMean().IntegrateTotal();
+        Check(off.graph.GetCardHistory(off.inlet, 0) == nullptr && off.graph.GetCardHistory(off.splitter, 0) == nullptr
+            && CountLines(off.graph.GetSimulationLog(), "Karten fuer die Kartenansicht gespeichert") == 0,
+            "Kartenspeicher aus: keine Karten gespeichert, keine Zeile im Protokoll");
+        Check(withHistory > 0.0 && withHistory == withoutHistory, "Kartenspeicher aus: Ergebnisse bitgleich");
     }
 
     // --- 5) Speichergrenze: weniger Schritte, Kartenzahl vollstaendig ------

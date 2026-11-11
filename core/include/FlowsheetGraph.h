@@ -464,6 +464,8 @@ namespace stosis
         bool IsEmpty() const { return m_nodes.empty() && m_connections.empty(); }
 
         const CStreamProcessorRegistry& GetProcessorRegistry() const { return m_processorRegistry; }
+        // Writable, to register further processor types (e.g. in tests).
+        CStreamProcessorRegistry& GetProcessorRegistry() { return m_processorRegistry; }
 
         // Tauscht den Prozessortyp eines Knotens aus. Die alte Instanz wird
         // zerstoert; die Ergebnisse liegen im Graphen und bleiben gueltig.
@@ -816,6 +818,10 @@ namespace stosis
         // Ausfuehrlich: in Lauf 1 jede Unit in jedem Zeitschritt (Start und Ende).
         void SetDetailedLog(bool detailed) { m_detailedLog = detailed; }
         bool IsDetailedLog() const { return m_detailedLog; }
+        // Store the cards of run 1 for the card view (particle mode only; up to
+        // SCardSettings::historyBudgetBytes). Off: no card view, less memory.
+        void SetRecordCardHistory(bool record) { m_recordCardHistory = record; }
+        bool IsRecordCardHistory() const { return m_recordCardHistory; }
 
         // Karten eines Eintrags aus GetResultsEntries() in Lauf 1 (nur im
         // Partikelmodus; beim Outlet die ankommenden Karten). nullptr, wenn
@@ -1149,7 +1155,7 @@ namespace stosis
         void ResetCardHistories()
         {
             m_cardHistories.clear();
-            if (m_grid.representation != ERepresentation::Particles)
+            if (m_grid.representation != ERepresentation::Particles || !m_recordCardHistory)
                 return;
             const std::vector<SResultsEntry> entries = GetResultsEntries();
             const size_t budget = m_grid.cards.historyBudgetBytes / std::max<size_t>(entries.size(), 1);
@@ -1468,6 +1474,7 @@ namespace stosis
         std::map<std::string, size_t> m_timingIndex; // Knoten-ID -> Eintrag in m_timing.units
         size_t m_runIndex = 0;      // laufender Lauf im Ensemble (0 = Lauf 1)
         bool m_detailedLog = false; // Lauf 1: jede Unit in jedem Zeitschritt protokollieren
+        bool m_recordCardHistory = true; // cards of run 1 for the card view
         double m_progressInterval = 0.05; // s zwischen zwei Fortschrittsmeldungen
         // Karten von Lauf 1 je Eintrag aus GetResultsEntries() (Partikelmodus)
         std::map<std::string, std::vector<CCardHistory>> m_cardHistories;

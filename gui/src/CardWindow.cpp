@@ -1,6 +1,8 @@
 #include "CardWindow.h"
 #include "CardPlotWidget.h"
 #include "ResultsEntryKey.h"
+#include "SaveLocations.h"
+#include <QCheckBox>
 #include <QComboBox>
 #include <QFile>
 #include <QFileDialog>
@@ -93,6 +95,18 @@ CardWindow::CardWindow(QWidget* parent)
     controls->addWidget(densityRadio);
     controls->addWidget(m_cumulativeRadio);
     controls->addStretch(1);
+    m_recordCheck = new QCheckBox("Karten speichern (Lauf 1)", this);
+    m_recordCheck->setChecked(true);
+    m_recordCheck->setToolTip(QString("Gilt ab der naechsten Simulation. Gespeichert werden die Karten von Lauf 1 an allen Stroemen,\n"
+                                      "hoechstens %1 MB. Aus: keine Kartenansicht, dafuer weniger Speicher; die Ergebnisse bleiben gleich.")
+                                  .arg(stosis::SCardSettings().historyBudgetBytes >> 20));
+    connect(m_recordCheck, &QCheckBox::toggled, this, [this](bool on)
+        {
+            if (m_graph)
+                m_graph->SetRecordCardHistory(on);
+            UpdateViews();
+        });
+    controls->addWidget(m_recordCheck);
     layout->addLayout(controls);
 
     m_info = new QLabel(this);
@@ -151,6 +165,12 @@ CardWindow::CardWindow(QWidget* parent)
 void CardWindow::SetGraph(stosis::CFlowsheetGraph* graph)
 {
     m_graph = graph;
+    if (m_graph)
+    {
+        m_recordCheck->blockSignals(true);
+        m_recordCheck->setChecked(m_graph->IsRecordCardHistory());
+        m_recordCheck->blockSignals(false);
+    }
     RefreshNodeList();
 }
 
@@ -192,9 +212,12 @@ void CardWindow::UpdateViews()
     if (!history || history->GetNumSteps() == 0)
     {
         const bool particles = m_graph && m_graph->GetGrid().representation == stosis::ERepresentation::Particles;
-        const QString message = particles
+        const bool recording = !m_graph || m_graph->IsRecordCardHistory();
+        const QString message = !particles
+            ? "Die Kartenansicht gibt es im Partikelmodus: Darstellung \"Partikel (Karten)\" waehlen und simulieren."
+            : recording
             ? "Noch keine Karten gespeichert - \"Simulieren\" druecken."
-            : "Die Kartenansicht gibt es im Partikelmodus: Darstellung \"Partikel (Karten)\" waehlen und simulieren.";
+            : "Karten werden nicht gespeichert - \"Karten speichern\" ankreuzen und neu simulieren.";
         for (CardPlotWidget* plot : { m_distribution, m_rug, m_classes, m_timeMap, m_counts, m_cloud })
             plot->ShowMessage(message);
         m_axisHistory = nullptr;
@@ -453,7 +476,7 @@ void CardWindow::ExportCsv()
         QMessageBox::information(this, "Karten als CSV", "Keine Karten zu diesem Zeitpunkt.");
         return;
     }
-    const QString path = QFileDialog::getSaveFileName(this, "Karten als CSV", "StoSiS_Karten.csv", "CSV (*.csv)");
+    const QString path = QFileDialog::getSaveFileName(this, "Karten als CSV", save_locations::SuggestedName("Karten", "csv"), "CSV (*.csv)");
     if (path.isEmpty())
         return;
     QFile file(path);

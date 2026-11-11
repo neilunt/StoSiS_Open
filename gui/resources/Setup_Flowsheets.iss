@@ -1,6 +1,7 @@
-; Zusatz zum Installationsprogramm (CPACK_INNOSETUP_EXTRA_SCRIPTS im
-; Haupt-CMakeLists): Der Ordner Flowsheets im Programmordner wird fuer alle
-; Nutzer beschreibbar angelegt. Der Programmordner unter "Programme" ist sonst
-; schreibgeschuetzt, und Speichern dort schluege fehl.
+; Addition to the installer (CPACK_INNOSETUP_EXTRA_SCRIPTS in the top-level
+; CMakeLists): the folders Flowsheets and Laufzeiten in the program folder are
+; created writable for all users. The program folder under "Program Files" is
+; read-only otherwise, and saving there would fail.
 [Dirs]
 Name: "{app}\Flowsheets"; Permissions: users-modify
+Name: "{app}\Laufzeiten"; Permissions: users-modify

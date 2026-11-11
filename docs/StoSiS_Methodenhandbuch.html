@@ -121,7 +121,7 @@
 </ul>
 <p>Der Rechenkern ist reines C++ ohne Abhängigkeit von der Oberfläche; er läuft auch in automatischen Tests und im Batchbetrieb. Die Oberfläche (Qt) dient zum Aufbauen, Einstellen und Auswerten. Ein Flowsheet lässt sich mit allen Einstellungen als JSON-Datei speichern (Kapitel 3).</p>
 <h4>Umfang</h4>
-<p>Verfügbare Units: Inlet, Outlet, Merger, Splitter (fest oder schwankend), Behälter (vier Mischungen oder Charge) und eine größenabhängige Verzögerung. Im Partikelmodus rechnen alle Units außer der Verzögerung. Prozesse, die Partikel verändern – Koagulation, Bruch, Wachstum, Keimbildung –, sind nicht enthalten.</p>
+<p>Verfügbare Units: Inlet, Outlet, Merger, Splitter (fest oder schwankend), Behälter (vier Mischungen oder Charge) und eine größenabhängige Verzögerung. Im Partikelmodus rechnen alle Units. Prozesse, die Partikel verändern – Koagulation, Bruch, Wachstum, Keimbildung –, sind nicht enthalten.</p>
 
 
 <h2 id="k2"><span class="nr">2</span>Grundannahmen</h2>
@@ -298,7 +298,8 @@
 <h3 id="k7-3"><span class="nr">7.3</span>Größenabhängige Verzögerung</h3>
 <p>Die Verzögerung hält Material je Größe unterschiedlich lange zurück:</p>
 <p class="formel"><i>t</i><sub>delay</sub>(<i>d</i>) = <i>t</i><sub>ref</sub> · (<i>d</i> / <i>d</i><sub>ref</sub>)<sup><i>p</i></sup></p>
-<p>Ihr Hold-up ist ein Ringpuffer der letzten Eingänge; zwischen den Zeitpunkten wird linear interpoliert. Jeder Platz im Puffer merkt sich Temperatur und Druck seines Materials, und gleichzeitig ankommendes Material wird wie im Merger gemischt. Die Unit ist ein Platzhalter für Transportmodelle auf Basis von Verweilzeitverteilungen und rechnet nur im Kontinuum.</p>
+<p>Ihr Hold-up ist ein Ringpuffer der letzten Eingänge; zwischen den Zeitpunkten wird linear interpoliert. Jeder Platz im Puffer merkt sich Temperatur und Druck seines Materials, und gleichzeitig ankommendes Material wird wie im Merger gemischt. Die Unit ist ein Platzhalter für Transportmodelle auf Basis von Verweilzeitverteilungen.</p>
+<p>Im Partikelmodus hat jede Karte die Verzögerung ihrer eigenen Größe, in Zeitschritten <i>t</i><sub>delay</sub>/Δ<i>t</i> = <i>q</i> + <i>r</i> mit ganzen Schritten <i>q</i> und dem Rest 0 ≤ <i>r</i> &lt; 1. Vom Zulauf eines Schritts geht der Anteil 1 − <i>r</i> nach <i>q</i> Schritten, der Rest <i>r</i> nach <i>q</i> + 1, wie bei der Pfropfenströmung im Behälter (7.4). Karten werden dabei nicht geteilt: Das Konto-Verfahren schickt jede ganze Karte „früh“ oder „spät“ (Kapitel 9.4). Die Karten warten in Fächern, eines je Austrittsschritt, und tragen Temperatur und Druck ihres Eintrittsschritts mit. Reicht die Verzögerung einer Karte über das Ende der Simulation hinaus, bleibt sie als Hold-up in der Unit.</p>
 
 <h3 id="k7-4"><span class="nr">7.4</span>Behälter</h3>
 <h4>Zweck</h4>
@@ -447,7 +448,7 @@
 <p>Die Platzierung stimmt mit einer unabhängigen Rechnung überein; bei der Summe ohne Abflachung bleiben Masse und Partikelzahl je Karte unter den Schranken. Am Inlet trägt jede Karte im Inneren auf 0,1 % genau den Anteil 1/<i>N</i> an der Kartendichte.</p>
 
 <h3 id="k9-4"><span class="nr">9.4</span>Konto-Verfahren</h3>
-<p>Splitter und Behälter verteilen ganze Karten auf ihre Ziele, ohne sie zu kopieren oder je Karte zu würfeln (Abbildung 9.6). Die Karten eines Schritts werden nach Stoff und darin nach Größe geordnet und ab einer zufälligen Startposition einmal ringsum durchgegangen. Jede Karte zahlt auf das Konto jedes Ziels ein und geht ganz dorthin, wo am meisten steht; dieses Konto wird belastet. Die Konten laufen über die Schritte weiter, ihre Summe bleibt null. Die Ordnung nach Stoff sorgt dafür, dass jeder Stoff für sich im richtigen Verhältnis geteilt wird. In der Statistik heißt diese Auswahl systematische Stichprobe: gleiche Chance für jede Karte wie beim Würfeln, aber ohne dessen Streuung in der Zahl.</p>
+<p>Splitter, Behälter und Verzögerung verteilen ganze Karten auf ihre Ziele, ohne sie zu kopieren oder je Karte zu würfeln (Abbildung 9.6). Die Karten eines Schritts werden nach Stoff und darin nach Größe geordnet und ab einer zufälligen Startposition einmal ringsum durchgegangen. Jede Karte zahlt auf das Konto jedes Ziels ein und geht ganz dorthin, wo am meisten steht; dieses Konto wird belastet. Die Konten laufen über die Schritte weiter, ihre Summe bleibt null. Die Ordnung nach Stoff sorgt dafür, dass jeder Stoff für sich im richtigen Verhältnis geteilt wird. In der Statistik heißt diese Auswahl systematische Stichprobe: gleiche Chance für jede Karte wie beim Würfeln, aber ohne dessen Streuung in der Zahl.</p>
 <figure>
   <img src="abbildungen/MC_24_Konto_Verfahren.svg" alt="Konto-Verfahren Schritt für Schritt am Splitter und im Behälter">
   <figcaption>Abbildung 9.6 – Konto-Verfahren: a) ein Schritt am Splitter 30/70 mit zehn gleich schweren Karten – Ausgang A erhält genau 3 von 10, über alle Größen verteilt; b) sechs Schritte mit zufälligem Start gegen Zufall je Karte (3 ± 1,4 Karten je Schritt); c) im Behälter mit den Konten „bleibt“ und „geht“.</figcaption>
@@ -458,6 +459,9 @@
 <h4>Behälter</h4>
 <p>Die Konten heißen „geht“ und „bleibt“: Jede Karte zahlt <i>a</i> bzw. 1 − <i>a</i> ein (Kapitel 7.4), und das gewählte Konto wird um eine ganze Karte belastet. So hat jede Karte unabhängig von ihrem Gewicht dieselbe Austrittswahrscheinlichkeit; mit Anteilen an der Kartendichte gingen schwere Karten zwischen leichten seltener. Die Karten jedes Bereichs sind nach Stoff und Größe geordnet, nicht nach Alter, und Karten gleicher Größe werden vor jedem Durchgang neu ausgelost, damit der Austritt nicht vom Alter abhängt. Der Zulauf eines Schritts hat ein eigenes Konto mit dem Anteil <i>b</i>.</p>
 <p>Würfeln je Karte gäbe im Mittel dasselbe, streute aber mit der Zahl der Karten statt mit der Zahl der echten Partikel. Im Standardfall (2000 Karten je Schritt, τ = 10 s, Δ<i>t</i> = 0,2 s) schwankte der Ablauf so um 2,2 % je Schritt, mit dem Konto-Verfahren bei gleich schweren Karten um 0,05 %; die echten Partikel – rund 10<sup>9</sup> je Schritt – schwanken um 0,003 %.</p>
+<h4>Verzögerung</h4>
+<p>Die Konten heißen „früh“ und „spät“ (Kapitel 7.3). Jede Karte zahlt 1 − <i>r</i> bzw. <i>r</i> ein, wobei <i>r</i> der Rest ihrer eigenen Verzögerung ist, und das gewählte Konto wird um eine ganze Karte belastet. Beide Konten gelten für alle Karten; wie viele Schritte „früh“ und „spät“ bedeuten, steht in der Karte. Weil die beiden Konten zusammen null ergeben, genügt ein Kontostand <i>l</i> für „spät“: Eine Karte geht „spät“, wenn nach ihrer Einzahlung <i>l</i> &gt; ½ gilt. Damit ist die Zahl der „späten“ Karten unter den ersten <i>i</i> genau die gerundete Summe der Reste, <i>L<sub>i</sub></i> = ⌈<i>l</i><sub>0</sub> + <i>r</i><sub>1</sub> + … + <i>r<sub>i</sub></i> − ½⌉.</p>
+<p>Im Ausgang eines Schritts treffen Karten verschiedener Größe aus verschiedenen Eintrittsschritten zusammen. Jede Gruppe gleicher ganzer Verzögerung <i>q</i> ist nur innerhalb ihres Eintrittsschritts ausgeglichen; je Ausgangsschritt weicht deshalb jede Gruppe um etwa eine Karte ab, nicht der ganze Strom. Im Standardfall (2000 Karten, etwa 25 Gruppen) liegt der Ablauf je Schritt bis zu 0,5 % neben dem Kontinuum, ohne systematischen Fehler; die Masse bleibt exakt erhalten.</p>
 <h4>Grenzen</h4>
 <p>Sind die Karten verschieden schwer, etwa bei schwankendem Zulauf, streut der Ablauf eines Behälters etwa wie bei zufälliger Auswahl der Karten (0,83 % bei σ/μ = 0,167 und 400 Karten je Schritt). Ein einzelner Puls aus <i>N</i> verschieden schweren Karten zeigt in der nach Masse gewichteten Verweilzeit ein Rauschen von etwa σ<sub><i>T</i></sub> · CV / √<i>N</i>; im laufenden Betrieb mittelt es sich über die Karten im Vorrat.</p>
 
@@ -480,6 +484,7 @@
   <li>Sehr ungleich schwere Karten (Splitter 70/30): Die feinsten 5 % der Partikel gehen zu 69,97 % der Karten und 69,92 % der Masse in den 70-%-Ausgang, und kein Ausgang bleibt in einem Schritt ohne feine Karte.</li>
   <li>Dosierwaage (Kapitel 11): Mittelwert und Streuung im Partikelmodus wie im Kontinuum.</li>
   <li>Behälter (Kapitel 7.4): alle vier Mischungen gegen ihre geschlossene Verweilzeitverteilung, Massenbilanz exakt, Vorrat nach Little, Losnummer bei gleich großen, verschieden schweren Karten und schwankendem Zulauf.</li>
+  <li>Verzögerung (Kapitel 7.3): Bei gleicher Verzögerung 2,3 Δ<i>t</i> für alle Karten kommen nach 2 Schritten 70 % des Zulaufs an, danach je Schritt der ganze Zulauf; die Kartenzahl bleibt (± 2). Ein Puls aus 2000 Karten mit größenabhängiger Verzögerung kommt vollständig an, jede Karte nach <i>q</i> oder <i>q</i> + 1 Schritten; die mittlere Ankunft trifft die mittlere Verzögerung (10,3173 gegen 10,3174 Schritte), und in jedem Fünftel der Größen gehen so viele Karten „spät“, wie die Reste zusammen ergeben (höchstens 0,95 Karten daneben). Im Flowsheet gilt Zulauf = Ablauf + Inhalt auf 10<sup>−15</sup>; mit der Verzögerung in einer Rückführung (Splitter 70/30) liegt der Outlet stationär höchstens 0,63 % neben dem Kontinuum, und der Merger bleibt unter 2<i>N</i> Karten.</li>
 </ul>
 
 

@@ -20,7 +20,7 @@
             "splitFactor": 5.0
         }
     },
-    "execution": { "detailedLog": false },
+    "execution": { "detailedLog": false, "cardHistory": true },
     "units": [
         {
             "id": "node_0",

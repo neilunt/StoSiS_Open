@@ -1,4 +1,5 @@
 #include "SimulationLogWindow.h"
+#include "SaveLocations.h"
 #include <QCheckBox>
 #include <QFile>
 #include <QFileDialog>
@@ -16,6 +17,19 @@
 #include <QTextStream>
 #include <QVBoxLayout>
 #include <algorithm>
+
+namespace
+{
+    // Folder of the last saved runtime file; at first the folder "Laufzeiten".
+    QString g_runtimeFolder;
+
+    QString RuntimeFolder()
+    {
+        if (g_runtimeFolder.isEmpty())
+            g_runtimeFolder = save_locations::Subfolder("Laufzeiten");
+        return g_runtimeFolder;
+    }
+}
 
 namespace
 {
@@ -215,10 +229,11 @@ void SimulationLogWindow::SaveLog()
 {
     if (!m_graph)
         return;
-    const QString path = QFileDialog::getSaveFileName(this, "Protokoll speichern", "StoSiS_Laufzeitprotokoll.txt",
-                                                      "Text (*.txt)");
+    const QString path = QFileDialog::getSaveFileName(this, "Protokoll speichern",
+        QDir(RuntimeFolder()).filePath(save_locations::SuggestedName("Laufzeitprotokoll", "txt")), "Text (*.txt)");
     if (path.isEmpty())
         return;
+    g_runtimeFolder = QFileInfo(path).absolutePath();
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
@@ -234,9 +249,11 @@ void SimulationLogWindow::SaveTableCsv()
 {
     if (!m_graph)
         return;
-    const QString path = QFileDialog::getSaveFileName(this, "Tabelle als CSV", "StoSiS_Laufzeiten.csv", "CSV (*.csv)");
+    const QString path = QFileDialog::getSaveFileName(this, "Tabelle als CSV",
+        QDir(RuntimeFolder()).filePath(save_locations::SuggestedName("Laufzeiten", "csv")), "CSV (*.csv)");
     if (path.isEmpty())
         return;
+    g_runtimeFolder = QFileInfo(path).absolutePath();
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {

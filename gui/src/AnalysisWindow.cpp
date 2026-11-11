@@ -1,6 +1,7 @@
 #include "AnalysisWindow.h"
 #include "AnalysisPlotWidget.h"
 #include "ResultsEntryKey.h"
+#include "SaveLocations.h"
 #include "SignalAnalysis.h"
 #include <QCheckBox>
 #include <QComboBox>
@@ -435,7 +436,7 @@ void AnalysisWindow::ExportCsv()
 {
     if (m_windowMeans.empty())
         return;
-    const QString path = QFileDialog::getSaveFileName(this, "Fenstermittel als CSV speichern", "auswertung.csv",
+    const QString path = QFileDialog::getSaveFileName(this, "Fenstermittel als CSV speichern", save_locations::SuggestedName("Auswertung", "csv"),
         "CSV-Dateien (*.csv)");
     if (path.isEmpty())
         return;

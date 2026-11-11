@@ -8,6 +8,7 @@
 #include "CardWindow.h"
 #include "SimulationLogWindow.h"
 #include "FlowsheetStructureWindow.h"
+#include "SaveLocations.h"
 #include "ResultsHeatmapWindow.h"
 #include "SettingsWindow.h"
 #include "MaterialsPage.h"
@@ -621,6 +622,7 @@ void MainWindow::SetCurrentFile(const QString& path)
 {
     // Titelleiste: Dateiname, in den Strg+S schreibt, bzw. "ohne Datei".
     m_currentFile = path;
+    save_locations::SetCurrentFlowsheet(path); // suggested names when saving other files
     const QString base = stosis::IsDebugBuild() ? "StoSiS [Debug-Fassung]" : "StoSiS";
     setWindowTitle(base + " " + QChar(0x2013) + " " + (path.isEmpty() ? QString("ohne Datei") : QFileInfo(path).fileName()));
 }

@@ -31,7 +31,7 @@
 <p class="sub">Bedienung der Fenster. Was das Programm rechnet und warum, steht im Methodenhandbuch.</p>
 
 <nav>
-  <a href="#datei">Flowsheet als Datei</a> · <a href="#struktur">Fenster „Struktur“</a>
+  <a href="#datei">Flowsheet als Datei</a> · <a href="#export">Weitere Dateien speichern</a> · <a href="#struktur">Fenster „Struktur“</a>
 </nav>
 
 <h2 id="datei">Flowsheet als Datei</h2>
@@ -39,10 +39,18 @@
   <li><b>Neu:</b> Menü Flowsheet → „Neues Flowsheet“ (<kbd>Strg</kbd>+<kbd>N</kbd>) legt Inlet → Prozess → Outlet mit Standardeinstellungen an und rechnet sofort. Das bisherige Flowsheet wird nach einer Rückfrage ersetzt.</li>
   <li><b>Öffnen:</b> Menü Flowsheet → „Flowsheet aus Datei öffnen …“ (<kbd>Strg</kbd>+<kbd>O</kbd>). Der Dialog beginnt im Ordner <code>Flowsheets</code> im StoSiS-Ordner, danach im zuletzt benutzten Ordner; beim Speichern ebenso. Das bisherige Flowsheet wird nur ersetzt, wenn die Datei fehlerfrei gelesen wurde. Danach rechnet StoSiS sofort. Hinweise zu fehlenden oder unbekannten Feldern erscheinen in einem Fenster.</li>
   <li><b>Speichern:</b> Menü Flowsheet → „Flowsheet speichern“ (<kbd>Strg</kbd>+<kbd>S</kbd>) überschreibt die Datei, aus der das Flowsheet geöffnet oder in die es zuletzt gespeichert wurde; ihr Name steht in der Titelleiste. Hat das Flowsheet noch keine Datei (Programmstart, <kbd>Strg</kbd>+<kbd>N</kbd>; Titelleiste „ohne Datei“), fragt es wie „Speichern unter“ nach dem Namen.</li>
-  <li><b>Speichern unter:</b> Menü Flowsheet → „Flowsheet speichern unter …“ (<kbd>Strg</kbd>+<kbd>Umschalt</kbd>+<kbd>S</kbd>) oder der Knopf im Fenster „Struktur“; danach gilt die neue Datei für <kbd>Strg</kbd>+<kbd>S</kbd>.</li>
+  <li><b>Speichern unter:</b> Menü Flowsheet → „Flowsheet speichern unter …“ (<kbd>Strg</kbd>+<kbd>Umschalt</kbd>+<kbd>S</kbd>) oder der Knopf im Fenster „Struktur“; danach gilt die neue Datei für <kbd>Strg</kbd>+<kbd>S</kbd>. Vorgeschlagen wird der Name der offenen Datei.</li>
   <li><b>Beispiele:</b> Der Ordner <code>Flowsheets/Validierungs-Flowsheets</code> enthält die Validierungs-Flowsheets (Kompartiment-Modelle nach Levenspiel, Mischer nach Engisch &amp; Muzzio).</li>
-  <li><b>In der Datei:</b> alle Einstellungen von Simulation und Units, die Verbindungen und das ausführliche Laufzeitprotokoll. Nicht darin: Ergebnisse, Auswertung, Kartenansicht, Fensterlage. Stoffe stehen nur mit Namen darin.</li>
+  <li><b>In der Datei:</b> alle Einstellungen von Simulation und Units, die Verbindungen, das ausführliche Laufzeitprotokoll und „Karten speichern“ der Kartenansicht. Nicht darin: Ergebnisse, Auswertung, Kartenansicht, Fensterlage. Stoffe stehen nur mit Namen darin.</li>
   <li><b><code>"recycle"</code></b> je Verbindung: <code>"manual"</code> = von Hand als Rückführung markiert, <code>"auto"</code> = von StoSiS aufgeschnitten, <code>"no"</code> = nicht aufgeschnitten. <code>"auto"</code> ist nur Information; beim Öffnen schneidet StoSiS neu.</li>
+</ul>
+
+<h2 id="export">Weitere Dateien speichern</h2>
+<ul>
+  <li><b>Vorgeschlagener Name:</b> <code>StoSiS_&lt;Art&gt;_&lt;Flowsheet&gt;</code>, zum Beispiel <code>StoSiS_Laufzeiten_Flowsheet_test1.csv</code>. <code>&lt;Flowsheet&gt;</code> ist der Name der offenen Datei aus der Titelleiste; ohne Datei fällt er weg.</li>
+  <li><b>Laufzeitprotokoll und Laufzeit-Tabelle</b> (Fenster „Laufzeitprotokoll“): Der Dialog beginnt im Ordner <code>Laufzeiten</code> im StoSiS-Ordner, danach im zuletzt benutzten Ordner. Fehlt der Ordner, legt StoSiS ihn an.</li>
+  <li><b>Karten als CSV</b> (Kartenansicht, Reiter „Tabelle“) und <b>Fenstermittel als CSV</b> (Auswertung): Name wie oben.</li>
+  <li><b>„Karten speichern (Lauf 1)“</b> in der Kartenansicht: Aus = keine Kartenansicht, weniger Arbeitsspeicher, gleiche Ergebnisse. Gilt ab der nächsten Simulation.</li>
 </ul>
 
 <h2 id="struktur">Fenster „Struktur“</h2>

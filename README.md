@@ -43,16 +43,16 @@ Implemented:
   check status). Streams carry a mass flow density per compound and size
   class as well as T and p; mixing follows the energy balance.
 - **Particle mode:** streams carry weighted Monte Carlo particles ("cards");
-  inlet, outlet, merger, splitter and vessel compute with them. The inlet
-  places the cards according to an adjustable card density from mass and
-  number, splitter and vessel divide them with an account method, limits per
-  stream slice keep the number of cards small; for display the cards are
+  all units compute with them. The inlet places the cards according to an
+  adjustable card density from mass and number; splitter, vessel and
+  size-dependent delay distribute whole cards with an account method; limits
+  per stream slice keep the number of cards small; for display the cards are
   projected onto the grid.
 
 Not yet implemented:
 
-- Particle mode for the size-dependent delay; vessel content as a result;
-  coagulator with coagulation, breakage, growth and nucleation
+- Vessel content as a result; coagulator with coagulation, breakage, growth
+  and nucleation
 - Running a flowsheet file without the user interface; translator from
   Dyssol flowsheets (`.dflw`, HDF5 format) into this file
 - Editing materials in the user interface, export to the Dyssol format

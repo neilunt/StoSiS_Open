@@ -737,6 +737,7 @@ namespace stosis
         root["simulation"] = SimulationToJson(graph, settings);
         json execution = json::object();
         execution["detailedLog"] = graph.IsDetailedLog();
+        execution["cardHistory"] = graph.IsRecordCardHistory();
         root["execution"] = std::move(execution);
         json units = json::array();
         for (const SFlowsheetNode& node : graph.GetNodes())
@@ -786,10 +787,13 @@ namespace stosis
                 ReadSimulation(reader, *simulation, graph, result.settings);
             if (const json* execution = reader.Optional(root, "execution", where))
             {
-                reader.Object(*execution, "execution", { "detailedLog" });
+                reader.Object(*execution, "execution", { "detailedLog", "cardHistory" });
                 bool detailed = graph.IsDetailedLog();
                 reader.ReadBool(*execution, "detailedLog", "execution", detailed);
                 graph.SetDetailedLog(detailed);
+                bool cardHistory = graph.IsRecordCardHistory();
+                reader.ReadBool(*execution, "cardHistory", "execution", cardHistory);
+                graph.SetRecordCardHistory(cardHistory);
             }
             const json& units = reader.Required(root, "units", where);
             if (!units.is_array())

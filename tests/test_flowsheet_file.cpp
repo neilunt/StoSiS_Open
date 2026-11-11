@@ -32,6 +32,7 @@ namespace
         g.SetCardSettings(cards);
         g.SetRepresentation(particles ? ERepresentation::Particles : ERepresentation::Continuum);
         g.SetDetailedLog(true);
+        g.SetRecordCardHistory(false); // not the default, so the round trip shows it
 
         const std::string a = g.AddInletNode("Zulauf A", 0, 10);
         g.GetInlet(a)->SetTimeProfile({ {0, 2}, {3, 6}, {8, 1}, {12, 4} });
@@ -236,7 +237,8 @@ namespace
         Check(a.sizeGridType == b.sizeGridType && a.numSizeClasses == b.numSizeClasses && a.sizeMin == b.sizeMin
             && a.sizeMax == b.sizeMax && a.numTimeSteps == b.numTimeSteps && a.totalTime == b.totalTime
             && a.GetDt() == b.GetDt() && a.randomSeed == b.randomSeed && a.representation == b.representation
-            && g1.IsDetailedLog() == g2.IsDetailedLog(), mode + ": Raster, Zeit, Seed, Darstellung, Protokoll gleich");
+            && g1.IsDetailedLog() == g2.IsDetailedLog() && g1.IsRecordCardHistory() == g2.IsRecordCardHistory(),
+            mode + ": Raster, Zeit, Seed, Darstellung, Protokoll, Kartenspeicher gleich");
         Check(a.cards.cardsPerSlice == b.cards.cardsPerSlice && a.cards.rule == b.cards.rule
             && a.cards.numberShare == b.cards.numberShare && a.cards.exponent == b.cards.exponent
             && a.cards.sliceLimits == b.cards.sliceLimits && a.cards.upperFactor == b.cards.upperFactor

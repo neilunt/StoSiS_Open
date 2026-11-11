@@ -5,12 +5,31 @@
 #include "CardProjection.h"
 #include "CardDistribution.h"
 #include <cmath>
+#include <memory>
 #include <cstdio>
 
 #include "TestSupport.h"
 
 using namespace stosis;
 using namespace stosis_test;
+
+// A process without particle support. All built-in units support cards; the
+// check of the graph (no simulation in particle mode while a unit cannot)
+// is tested with this stand-in for future units.
+class CContinuumOnlyProcessor : public IStreamProcessor
+{
+public:
+    std::string GetTypeName() const override { return "Test: nur Kontinuum"; }
+    std::vector<SParameterDescriptor> GetParameterDescriptors() const override { return {}; }
+    void SetParameter(const std::string&, double) override {}
+    double GetParameterValue(const std::string&) const override { return 0.0; }
+    void Initialize(const SSimulationGrid&, std::uint64_t) override {}
+    void Step(const SStepContext&, const std::vector<const CStreamSlice*>& inputs, std::vector<CStreamSlice>& outputs) override
+    {
+        if (!inputs.empty() && inputs[0] && !outputs.empty())
+            outputs[0].AssignScaled(*inputs[0], 1.0);
+    }
+};
 
 // Summe w_i * q_i eines Stoffs - so integrieren auch Anzeige und Statistik.
 static double Integrate(const CStreamSlice& slice, size_t compound, const std::vector<double>& weights)
@@ -202,12 +221,20 @@ int main()
         const std::string splitter = graph.AddSplitterNode("Splitter1", 2, 1, 0);
         const std::string outA = graph.AddOutletNode("Outlet1", 2, 0);
         const std::string outB = graph.AddOutletNode("Outlet2", 2, 1);
-        const std::string process = graph.AddProcessNode("Prozess1", 1, 1); // Verzoegerung: noch ohne Karten
+        const std::string process = graph.AddProcessNode("Prozess1", 1, 1);
         graph.AddConnection(inlet, 0, splitter, 0);
         graph.AddConnection(splitter, 0, outA, 0);
         graph.AddConnection(process, 0, outB, 0);
         graph.AddConnection(splitter, 1, process, 0);
         graph.ConfigureGrid(50, 1e-6, 1e-3, 11, 10.0);
+
+        // The built-in delay supports cards; a stand-in without card support
+        // takes its place for this check.
+        graph.SetRepresentation(ERepresentation::Particles);
+        Check(graph.GetUnitsWithoutParticleSupport().empty(), "Partikelmodus: Verzoegerung kann Karten, keine Einwaende");
+        graph.SetRepresentation(ERepresentation::Continuum);
+        graph.GetProcessorRegistry().RegisterProcessor("Test: nur Kontinuum", []() { return std::make_unique<CContinuumOnlyProcessor>(); });
+        Check(graph.SetProcessorType(process, "Test: nur Kontinuum"), "Prozess auf eine Unit ohne Karten umgestellt");
 
         Check(graph.GetRepresentation() == ERepresentation::Continuum && graph.GetUnitsWithoutParticleSupport().empty(),
             "Standard Kontinuum: keine Einwaende");
@@ -217,7 +244,7 @@ int main()
         graph.SetRepresentation(ERepresentation::Particles);
         const std::vector<std::string> names = graph.GetUnitsWithoutParticleSupport();
         Check(names.size() == 1 && names[0] == "Prozess1 (Prozess)",
-            "Partikelmodus: Verzoegerung gemeldet, Inlet, Splitter und Outlets nicht");
+            "Partikelmodus: Unit ohne Karten gemeldet, Inlet, Splitter und Outlets nicht");
         Check(graph.RunSimulations(1) == 0, "Partikelmodus: Simulation nicht gestartet");
         const std::vector<std::string> warnings = graph.GetSimulationWarnings();
         std::printf("      Hinweis: %s\n", warnings.empty() ? "-" : warnings[0].c_str());

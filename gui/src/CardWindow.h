@@ -3,6 +3,7 @@
 #include <vector>
 #include "FlowsheetGraph.h"
 
+class QCheckBox;
 class QComboBox;
 class QLabel;
 class QRadioButton;
@@ -51,6 +52,7 @@ private:
     QLabel* m_stepLabel = nullptr;
     QComboBox* m_classCombo = nullptr;
     QRadioButton* m_cumulativeRadio = nullptr;
+    QCheckBox* m_recordCheck = nullptr;
     QLabel* m_info = nullptr;
     CardPlotWidget* m_distribution = nullptr;
     CardPlotWidget* m_rug = nullptr;

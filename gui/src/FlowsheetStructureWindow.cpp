@@ -1,5 +1,6 @@
 #include "FlowsheetStructureWindow.h"
 #include "StructureDiagramWidget.h"
+#include "SaveLocations.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QEvent>
@@ -374,12 +375,8 @@ QString FlowsheetStructureWindow::FlowsheetFolder()
 {
     if (g_flowsheetFolder.isEmpty())
     {
-        // StoSiS-Ordner: installiert liegt data/ neben der exe, sonst gilt der
-        // Quellordner. Darin der Ordner Flowsheets (mit Validierungs-Flowsheets).
-        const QString besideExe = QCoreApplication::applicationDirPath();
-        const QString root = QFileInfo::exists(besideExe + "/data")
-            ? besideExe
-            : QDir(QString(STOSIS_DATA_DIR) + "/..").absolutePath();
+        // Folder Flowsheets (with the validation flowsheets) in the StoSiS folder.
+        const QString root = save_locations::StoSiSFolder();
         g_flowsheetFolder = QFileInfo::exists(root + "/Flowsheets") ? root + "/Flowsheets" : root;
     }
     return g_flowsheetFolder;
@@ -403,12 +400,13 @@ bool FlowsheetStructureWindow::WriteFlowsheet(QWidget* parent, const QString& pa
 QString FlowsheetStructureWindow::SaveFlowsheetAs(QWidget* parent, const stosis::CFlowsheetGraph& graph,
     const stosis::SFlowsheetFileSettings& settings)
 {
-    static QString lastName = "Flowsheet.json";
+    // Suggests the name of the open file (Ctrl+S target), otherwise "Flowsheet.json".
+    const QString current = save_locations::CurrentFlowsheetName();
     const QString path = QFileDialog::getSaveFileName(parent, "Flowsheet speichern unter",
-        QDir(FlowsheetFolder()).filePath(lastName), "StoSiS-Flowsheet (*.json)");
+        QDir(FlowsheetFolder()).filePath((current.isEmpty() ? QString("Flowsheet") : current) + ".json"),
+        "StoSiS-Flowsheet (*.json)");
     if (path.isEmpty())
         return QString();
     RememberFlowsheetFolder(path);
-    lastName = QFileInfo(path).fileName();
     return WriteFlowsheet(parent, path, graph, settings) ? path : QString();
 }

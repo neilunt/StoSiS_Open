@@ -1,10 +1,11 @@
-// Merger und Splitter im Partikelmodus (Methodenhandbuch 9.4, 9.7):
+// Merger, Splitter und Verzoegerung im Partikelmodus (Methodenhandbuch 7.3, 9.4, 9.7):
 // Karten aneinanderhaengen, Konto-Verfahren, Vergleich mit dem Kontinuum.
 #include "FlowsheetGraph.h"
 #include "CardPlacement.h"
 #include "CardDistribution.h"
 #include "CardLimits.h"
 #include "SignalAnalysis.h"
+#include "SizeDependentDelayProcessor.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -624,6 +625,218 @@ int main()
             largest > 0.0 ? worstDiff / largest : 0.0);
         Check(allWithin && splitTiming.cardsAdded > 0.0, "Flowsheet: jeder Splitterausgang in jedem Schritt innerhalb der Grenzen");
         Check(largest > 0.0 && worstDiff <= 1e-12 * largest, "Flowsheet: Teilen aendert das Ergebnis am Outlet nicht (1e-12)");
+    }
+
+    // 8) Size-dependent delay in particle mode (methods handbook 7.3, 9.4):
+    //    every whole card leaves "early" after q steps or "late" after q + 1
+    //    (D/dt = q + r), chosen by the account method; nothing is split.
+    {
+        // a) Same delay for all cards (p = 0), D = 2.3 dt, the same 2000 cards
+        //    in every step: of each inflow step 70 % leave after 2 steps and
+        //    30 % after 3. Mass and number of cards are kept, T is carried.
+        const size_t steps = 101;
+        const SSimulationGrid grid = MakeGrid(1, steps, 20.0);
+        const double dt = grid.GetDt();
+        CSizeDependentDelayProcessor delay;
+        delay.SetParameter("delayRef", 2.3 * dt);
+        delay.SetParameter("sizeExponent", 0.0);
+        delay.Initialize(grid, 7);
+        CStreamSlice input;
+        input.Resize(300, 1, ERepresentation::Particles);
+        AddCards(input, standard, 2000, 0, 1.0);
+        input.SetTemperature(350.0);
+        const double massIn = input.GetCardsMassFlow();
+        const double cardMax = MaxCardMass(input);
+        std::vector<CStreamSlice> outputs(1);
+        double sumIn = 0.0, sumOut = 0.0, worstFirst = 0.0, worstSteady = 0.0, worstAccount = 0.0, worstT = 0.0;
+        size_t worstCount = 0;
+        bool earlyEmpty = true;
+        for (size_t k = 0; k < steps; ++k)
+        {
+            outputs[0].Resize(300, 1, ERepresentation::Particles);
+            delay.Step({ k, dt * static_cast<double>(k), dt }, { &input }, outputs);
+            const CStreamSlice& out = outputs[0];
+            sumIn += massIn * dt;
+            sumOut += out.GetCardsMassFlow() * dt;
+            if (k < 2)
+                earlyEmpty = earlyEmpty && out.GetNumCards() == 0;
+            else if (k == 2)
+                worstFirst = std::abs(out.GetCardsMassFlow() - 0.7 * massIn);
+            else
+            {
+                worstSteady = std::max(worstSteady, std::abs(out.GetCardsMassFlow() - massIn));
+                const size_t count = out.GetNumCards();
+                worstCount = std::max(worstCount, count > 2000 ? count - 2000 : 2000 - count);
+            }
+            if (out.GetNumCards() > 0)
+                worstT = std::max(worstT, std::abs(out.GetTemperature() - 350.0));
+            const double account = delay.GetLateAccount();
+            worstAccount = std::max(worstAccount, account > 0.5 ? account - 0.5 : (account <= -0.5 ? -0.5 - account : 0.0));
+        }
+        const double balance = std::abs(sumIn - sumOut - delay.GetContentMass()) / sumIn;
+        std::printf("      Verzoegerung 2,3 dt: Schritt 2 traegt %.4f statt 0,7 des Zulaufs; danach hoechstens %.2e kg/s "
+            "(groesste Karte %.2e) und %zu Karten neben dem Zulauf; Bilanz %.1e\n",
+            (0.7 * massIn + worstFirst) / massIn, worstSteady, cardMax, worstCount, balance);
+        Check(earlyEmpty, "Verzoegerung: in den ersten zwei Schritten kommt nichts an");
+        Check(worstFirst <= 3.0 * cardMax, "Verzoegerung: nach 2 Schritten 70 % des Zulaufs (hoechstens drei Karten daneben)");
+        Check(worstSteady <= 3.0 * cardMax && worstCount <= 2, "Verzoegerung: danach je Schritt der ganze Zulauf (drei Karten), Kartenzahl bleibt (+-2)");
+        Check(balance < 1e-12, "Verzoegerung: Zulauf = Ablauf + Inhalt (1e-12)");
+        Check(worstAccount == 0.0, "Verzoegerung: Konto \"spaet\" bleibt zwischen -1/2 und 1/2");
+        Check(worstT < 1e-9, "Verzoegerung: Temperatur wandert mit den Karten");
+    }
+    {
+        // b) Size-dependent delay (p = 1, 2 s at 100 um, dt = 0.2 s), one pulse
+        //    of 2000 cards in step 0: every card arrives after q or q + 1
+        //    steps; mass-weighted mean arrival = mass-weighted mean D/dt; in
+        //    every fifth of the sizes the number of late cards equals the sum
+        //    of their remainders r within two cards.
+        const size_t steps = 101;
+        const SSimulationGrid grid = MakeGrid(1, steps, 20.0);
+        const double dt = grid.GetDt();
+        CSizeDependentDelayProcessor delay;
+        delay.Initialize(grid, 3);
+        const auto stepsOf = [&delay, dt](double size)
+        {
+            return delay.GetParameterValue("delayRef") * std::pow(size / delay.GetParameterValue("referenceSize"),
+                delay.GetParameterValue("sizeExponent")) / dt;
+        };
+        CStreamSlice pulse, empty;
+        pulse.Resize(300, 1, ERepresentation::Particles);
+        empty.Resize(300, 1, ERepresentation::Particles);
+        AddCards(pulse, standard, 2000, 0, 1.0);
+        double massIn = 0.0, expected = 0.0;
+        for (size_t c = 0; c < pulse.GetNumCards(); ++c)
+        {
+            massIn += pulse.GetCardMassFlow(c);
+            expected += pulse.GetCardMassFlow(c) * stepsOf(pulse.GetCardSize(c));
+        }
+        expected /= massIn;
+        // Per card (sorted by size): remainder r and whether it arrived late.
+        std::vector<std::pair<double, int>> lateBySize; // size, late (1) or early (0)
+        std::vector<double> remainders;
+        std::vector<CStreamSlice> outputs(1);
+        double massOut = 0.0, moment = 0.0;
+        size_t cardsOut = 0;
+        bool onTime = true;
+        for (size_t k = 0; k < steps; ++k)
+        {
+            outputs[0].Resize(300, 1, ERepresentation::Particles);
+            delay.Step({ k, dt * static_cast<double>(k), dt }, { k == 0 ? &pulse : &empty }, outputs);
+            const CStreamSlice& out = outputs[0];
+            for (size_t c = 0; c < out.GetNumCards(); ++c)
+            {
+                const double q = std::floor(stepsOf(out.GetCardSize(c)));
+                const bool late = static_cast<double>(k) > q;
+                onTime = onTime && (static_cast<double>(k) == q || static_cast<double>(k) == q + 1.0);
+                lateBySize.emplace_back(out.GetCardSize(c), late ? 1 : 0);
+                massOut += out.GetCardMassFlow(c);
+                moment += out.GetCardMassFlow(c) * static_cast<double>(k);
+                ++cardsOut;
+            }
+        }
+        std::sort(lateBySize.begin(), lateBySize.end());
+        double worstBand = 0.0;
+        const size_t bands = 5, perBand = lateBySize.size() / bands;
+        for (size_t b = 0; b < bands; ++b)
+        {
+            double late = 0.0, sumR = 0.0;
+            for (size_t i = b * perBand; i < (b + 1) * perBand; ++i)
+            {
+                const double s = stepsOf(lateBySize[i].first);
+                sumR += s - std::floor(s);
+                late += lateBySize[i].second;
+            }
+            worstBand = std::max(worstBand, std::abs(late - sumR));
+        }
+        const double mean = moment / massOut;
+        std::printf("      Puls, Verzoegerung je Groesse: mittlere Ankunft %.4f Schritte, Erwartung %.4f; "
+            "spaete Karten je Fuenftel hoechstens %.2f neben der Summe der Reste\n", mean, expected, worstBand);
+        Check(cardsOut == 2000 && NearRel(massOut, massIn, 1e-12) && delay.GetContentCards() == 0,
+            "Puls: alle 2000 Karten kommen ganz an, Masse exakt (1e-12)");
+        Check(onTime, "Puls: jede Karte kommt nach q oder q + 1 Schritten an");
+        Check(NearAbs(mean, expected, 0.01), "Puls: mittlere Ankunft = mittlere Verzoegerung (0,01 Schritte)");
+        Check(worstBand <= 2.0, "Puls: je Groessenfuenftel so viele spaete Karten wie die Summe der Reste (+-2)");
+    }
+    {
+        // c) Flowsheet Inlet -> delay (standard settings) -> Outlet, 40 s,
+        //    dt = 0.2 s: runs in particle mode, inflow = outflow + content,
+        //    and in steady state the outlet equals the continuum.
+        CFlowsheetGraph graph;
+        const std::string in = graph.AddInletNode("Inlet1", 0, 0);
+        const std::string pr = graph.AddProcessNode("Prozess1", 1, 0);
+        const std::string out = graph.AddOutletNode("Outlet1", 2, 0);
+        graph.GetInlet(in)->SetTimeProfile({ { 0.0, 2.0 }, { 100.0, 2.0 } });
+        graph.AddConnection(in, 0, pr, 0);
+        graph.AddConnection(pr, 0, out, 0);
+        graph.ConfigureGrid(300, 1e-6, 1e-3, 201, 40.0);
+        graph.RunSimulations(1);
+        const CSimulationResults continuum = *graph.GetDisplayResults(out, 0);
+        graph.SetRepresentation(ERepresentation::Particles);
+        Check(graph.GetUnitsWithoutParticleSupport().empty() && graph.RunSimulations(1) == 1,
+            "Flowsheet Inlet -> Verzoegerung -> Outlet laeuft im Partikelmodus");
+        const CSimulationResults& cards = *graph.GetDisplayResults(out, 0);
+        const CSimulationResults& feed = *graph.GetDisplayResults(in, 0);
+        const double dt = graph.GetGrid().GetDt();
+        const auto* delay = dynamic_cast<const CSizeDependentDelayProcessor*>(graph.GetProcessor(pr));
+        double massIn = 0.0, massOut = 0.0, massContinuum = 0.0, worstSteady = 0.0, worstStart = 0.0;
+        for (size_t k = 0; k < 201; ++k)
+        {
+            massIn += feed.IntegrateOverSize(k) * dt;
+            massOut += cards.IntegrateOverSize(k) * dt;
+            massContinuum += continuum.IntegrateOverSize(k) * dt;
+            const double diff = std::abs(cards.IntegrateOverSize(k) - continuum.IntegrateOverSize(k));
+            if (k >= 40) // 8 s, longer than every delay of this distribution (about 5 s)
+                worstSteady = std::max(worstSteady, diff);
+            else
+                worstStart = std::max(worstStart, diff);
+        }
+        const double balance = delay ? std::abs(massIn - massOut - delay->GetContentMass()) / massIn : 1.0;
+        // Cards of different q come from different inflow steps, and each
+        // group of equal q is balanced only within its own inflow step: per
+        // output step the deviation is about one card per group (here some
+        // 25 groups), not one card in total as in the vessel.
+        std::printf("      Flowsheet: stationaer hoechstens %.2e kg/s (%.2f %%) neben dem Kontinuum, im Anlauf %.2e kg/s; "
+            "Bilanz %.1e; Ablauf bis 40 s: Karten %.4f kg, Kontinuum %.4f kg\n",
+            worstSteady, 100.0 * worstSteady / 2.0, worstStart, balance, massOut, massContinuum);
+        Check(balance < 1e-12, "Flowsheet: Zulauf = Ablauf + Inhalt der Verzoegerung (1e-12)");
+        Check(worstSteady <= 0.01 * 2.0, "Flowsheet: stationaer wie das Kontinuum (je Schritt hoechstens 1 %)");
+    }
+    {
+        // d) Start flowsheet of the user interface: Inlet -> Merger ->
+        //    Splitter 70/30 -> Outlet, 30 % back through the delay into the
+        //    merger, with constant inflow. Runs in particle mode; in steady state
+        //    the outlet carries the inflow, as in the continuum, and the cards in the loop stay
+        //    within the limits per stream slice.
+        CFlowsheetGraph graph;
+        const std::string in = graph.AddInletNode("Inlet1", 0, 0);
+        const std::string mg = graph.AddMergerNode("Merger1", 2, 1, 0);
+        const std::string sp = graph.AddSplitterNode("Splitter1", 2, 2, 0);
+        const std::string out = graph.AddOutletNode("Outlet1", 3, 0);
+        const std::string pr = graph.AddProcessNode("Prozess1", 3, 1);
+        graph.GetSplitter(sp)->SetFractions({ 0.7, 0.3 });
+        graph.GetInlet(in)->SetTimeProfile({ { 0.0, 2.0 }, { 100.0, 2.0 } }); // constant, so that "steady" holds
+        graph.AddConnection(in, 0, mg, 0);
+        graph.AddConnection(mg, 0, sp, 0);
+        graph.AddConnection(sp, 0, out, 0);
+        graph.AddConnection(sp, 1, pr, 0);
+        graph.AddConnection(pr, 0, mg, 1);
+        graph.ConfigureGrid(300, 1e-6, 1e-3, 201, 40.0);
+        graph.RunSimulations(1);
+        const CSimulationResults continuum = *graph.GetDisplayResults(out, 0);
+        graph.SetRepresentation(ERepresentation::Particles);
+        Check(graph.RunSimulations(1) == 1, "Start-Flowsheet mit Verzoegerung in der Rueckfuehrung laeuft im Partikelmodus");
+        const CSimulationResults& cards = *graph.GetDisplayResults(out, 0);
+        const double feed = 2.0;
+        double worst = 0.0;
+        for (size_t k = 150; k < 201; ++k) // 30 s and later: the loop has settled
+            worst = std::max(worst, std::abs(cards.IntegrateOverSize(k) - continuum.IntegrateOverSize(k)) / feed);
+        size_t maxLoopCards = 0;
+        for (const CCardHistory::SSnapshot& snapshot : graph.GetCardHistory(mg, 0)->GetSnapshots())
+            maxLoopCards = std::max(maxLoopCards, snapshot.sizes.size());
+        std::printf("      Start-Flowsheet: Outlet ab 30 s hoechstens %.2f %% neben dem Kontinuum, Merger hoechstens %zu Karten\n",
+            100.0 * worst, maxLoopCards);
+        Check(worst < 0.01, "Start-Flowsheet: Outlet stationaer wie im Kontinuum (1 %)");
+        Check(maxLoopCards <= 2 * graph.GetCardSettings().cardsPerSlice, "Start-Flowsheet: Merger innerhalb der Grenze 2 N");
     }
 
     return Summary();
