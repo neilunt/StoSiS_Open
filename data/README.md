@@ -1,77 +1,75 @@
-# Materialdatei von StoSiS
+# StoSiS material file
 
-`Materialien.json` enthält die Stoffdaten, mit denen StoSiS rechnet. Jeder Wert hat eine
-Quelle (`source`) und einen Prüfstatus (`status`). Ziel: Jede Zahl, die in eine Simulation
-eingeht, ist belegt.
+`Materialien.json` contains the material data StoSiS computes with. Every value has a
+source (`source`) and a check status (`status`). Goal: every number that enters a
+simulation is documented.
 
-Der Startinhalt stammt aus der Materialdatenbank von Dyssol (`Materials.dmdb`, BSD-3-Lizenz,
-siehe `LICENSE_Dyssol.txt`). Umgewandelt wurde er mit
-`tools/dmdb_to_json.pl`. Die JSON-Datei wird von Hand gepflegt; das Skript dient der
-Nachvollziehbarkeit.
+The initial content comes from the Dyssol material database (`Materials.dmdb`, BSD-3
+license, see `LICENSE_Dyssol.txt`). It was converted with `tools/dmdb_to_json.pl`. The
+JSON file is maintained by hand; the script is kept for traceability.
 
-## Aufbau
+## Layout
 
 ```
-materials[]                  ein Eintrag je Stoff
-  name, dyssol_key           dyssol_key bleibt erhalten: Dyssol-Flowsheets (.dflw)
-                             sprechen Stoffe über diesen Schlüssel an
+materials[]                  one entry per compound
+  name, dyssol_key           dyssol_key is kept: Dyssol flowsheets (.dflw)
+                             refer to compounds by this key
   state                      gas / liquid / solid
-  warnings                   Auffälligkeiten aus der Erstprüfung - dort zuerst nachsehen
-  constants                  feste Werte (Molmasse, Siedepunkt, Bond-Index ...)
-  properties                 Werte, die von T und p abhängen (Dichte, c_p, Viskosität ...)
-interactions[]               Eigenschaften zweier Stoffe (Grenzflächenspannung)
+  warnings                   issues found in the first check - look here first
+  constants                  fixed values (molar mass, boiling point, Bond index ...)
+  properties                 values depending on T and p (density, c_p, viscosity ...)
+interactions[]               properties of two compounds (interfacial tension)
 ```
 
-Eine Eigenschaft in `properties` ist eine Liste. Mehrere Einträge gelten für verschiedene
-Temperatur- oder Druckbereiche (`T_range`, `p_range`).
+A property in `properties` is a list. Several entries apply to different temperature or
+pressure ranges (`T_range`, `p_range`).
 
-Alle Werte in SI-Einheiten: T in K, p in Pa, Dichte in kg/m3, c_p in J/(kg K).
-Ausnahme: `bond_work_index` in kWh/t.
+All values in SI units: T in K, p in Pa, density in kg/m3, c_p in J/(kg K).
+Exception: `bond_work_index` in kWh/t.
 
-## Arten von Einträgen (`type`)
+## Entry types (`type`)
 
-| type | Bedeutung |
+| type | Meaning |
 |---|---|
-| `constant` | `value` gilt im ganzen Bereich |
-| `table_T` | Messpunkte `[T, Wert]`, dazwischen linear interpoliert |
-| `table_relative_humidity` | Messpunkte `[relative Luftfeuchte 0..1, Wert]` (Gleichgewichtsfeuchte) |
-| `ideal_gas` | ρ = M·p/(R·T) mit Molmasse `molar_mass` |
-| `sutherland` | y = y_ref·(T_ref + S)/(T + S)·(T/T_ref)^1,5 (Gasviskosität, Wärmeleitfähigkeit) |
-| `antoine` | Dampfdruck p = 1e5·10^(A − B/(T + C)) Pa |
+| `constant` | `value` holds in the whole range |
+| `table_T` | data points `[T, value]`, linearly interpolated in between |
+| `table_relative_humidity` | data points `[relative humidity 0..1, value]` (equilibrium moisture) |
+| `ideal_gas` | ρ = M·p/(R·T) with molar mass `molar_mass` |
+| `sutherland` | y = y_ref·(T_ref + S)/(T + S)·(T/T_ref)^1.5 (gas viscosity, thermal conductivity) |
+| `antoine` | vapor pressure p = 1e5·10^(A − B/(T + C)) Pa |
 | `polynomial` | y = a0 + a1·T + a2·T² + … (`coefficients`) |
 | `polynomial_cp` | y = a + b·T + c·T² + d·T³ + e/T² (`coefficients`) |
 
-## Festlegungen
+## Conventions
 
-- **Dichte** (`density`) ist die Feststoffdichte. Partikel gelten zunächst als unporös; die
-  Porosität kommt später als Partikeleigenschaft an den Inlet.
-- **Wärme:** Gespeichert wird nur die Wärmekapazität `heat_capacity`, also c_p(T). Die
-  Enthalpie h(T) = ∫ c_p dT berechnet StoSiS selbst. Wo Dyssol nur eine Enthalpie hat
-  (CaCO3, CaO, CO2, O2, SO2, Al2O3), wurde c_p = dh/dT abgeleitet; `source` sagt das dann.
-  Bei Stoffen mit beiden Angaben steht in `note` die Steigung der Dyssol-Enthalpie zum
-  Vergleich.
+- **Density** (`density`) is the solid density. Particles are non-porous for now; porosity
+  will be added later as a particle property at the inlet.
+- **Heat:** only the heat capacity `heat_capacity`, i.e. c_p(T), is stored. StoSiS
+  computes the enthalpy h(T) = ∫ c_p dT itself. Where Dyssol only has an enthalpy
+  (CaCO3, CaO, CO2, O2, SO2, Al2O3), c_p = dh/dT was derived; `source` says so. For
+  compounds with both, `note` gives the slope of the Dyssol enthalpy for comparison.
 
-## Werte prüfen
+## Checking values
 
-1. Wert mit einer Quelle vergleichen (Datenblatt, NIST WebBook, VDI-Wärmeatlas …).
-2. Bei Bedarf `value` bzw. die Parameter korrigieren.
-3. `source` auf die eigene Quelle setzen und `status` von `"unchecked"` auf `"checked"` ändern.
+1. Compare the value with a source (data sheet, NIST WebBook, VDI Heat Atlas …).
+2. If needed, correct `value` or the parameters.
+3. Set `source` to your source and change `status` from `"unchecked"` to `"checked"`.
 
-Die Datei ist reiner Text (UTF-8) und lässt sich mit jedem Editor bearbeiten. JSON ist streng:
-Zwischen zwei Einträgen steht ein Komma, nach dem letzten keines, und Kommentare sind nicht
-erlaubt. StoSiS meldet Fehler beim Einlesen mit Zeile und Spalte (Reiter "Materialien", "Neu laden").
+The file is plain text (UTF-8) and can be edited with any editor. JSON is strict: entries
+are separated by a comma, there is none after the last one, and comments are not allowed.
+StoSiS reports reading errors with line and column ("Materialien" tab, "Neu laden").
 
-## Auffälligkeiten aus der Erstprüfung
+## Issues from the first check
 
-Steht jeweils auch unter `warnings` beim Stoff:
+Also listed under `warnings` for each compound:
 
-- **Wärmekapazität fehlt:** Coal (Dyssol-Enthalpie ist konstant), NaCl (Enthalpie nur für die
-  Gasphase bei 2500–6000 K), Cellets (Parameter sind unumgerechnete Werte von Wasser).
-- **Abgeleitete c_p weichen von der Literatur ab:** CaCO3 (+72 %), Al2O3 (+16 %), CO2 (+12 %).
-- **Dichte ist vermutlich keine Feststoffdichte:** Milk (Schüttdichte), Al2O3, FCC, Cellets
-  (poröse Partikel).
-- **Platzhalter-Konstanten:** Milk und Al2O3 (von Sand übernommen), Cellets und FCC (von
-  Wasser übernommen), Coal.
-- **Sonstiges:** H2O_gas-Viskosität etwa 100-fach zu klein; Permittivität 4 F/m bei Milk,
-  Al2O3, Cellets und FCC (vermutlich relative Permittivität); Viskositäten bei Sand und Urea
-  ohne Bedeutung.
+- **Heat capacity missing:** Coal (Dyssol enthalpy is constant), NaCl (enthalpy only for
+  the gas phase at 2500–6000 K), Cellets (parameters are unconverted values of water).
+- **Derived c_p deviate from literature:** CaCO3 (+72 %), Al2O3 (+16 %), CO2 (+12 %).
+- **Density probably not a solid density:** Milk (bulk density), Al2O3, FCC, Cellets
+  (porous particles).
+- **Placeholder constants:** Milk and Al2O3 (taken from sand), Cellets and FCC (taken
+  from water), Coal.
+- **Other:** H2O_gas viscosity about 100 times too small; permittivity 4 F/m for Milk,
+  Al2O3, Cellets and FCC (probably relative permittivity); viscosities of sand and urea
+  without meaning.

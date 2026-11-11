@@ -1,154 +1,153 @@
 # StoSiS – Stochastic Simulation of Solids
 
-C++-Fließschemasimulation für die Feststoffverfahrenstechnik. Ziel ist eine
-stochastische Lösung mit gewichteten Monte-Carlo-Partikeln, beschleunigt auf
-GPUs (CUDA, Großrechner amplitUDE mit NVIDIA H100) und kompatibel zu
-Dyssol Open.
+C++ flowsheet simulation for solids process engineering. The goal is a
+stochastic solution with weighted Monte Carlo particles, accelerated on GPUs
+(CUDA, amplitUDE cluster with NVIDIA H100) and compatible with Dyssol Open.
 
-Modell, Annahmen und Verfahren beschreibt das Methodenhandbuch
-[`docs/StoSiS_Methodenhandbuch.html`](docs/StoSiS_Methodenhandbuch.html), als PDF
-[`docs/StoSiS_Methodenhandbuch.pdf`](docs/StoSiS_Methodenhandbuch.pdf). Diese Datei gibt nur
-einen Überblick.
+The model, assumptions and methods are described in the methods handbook
+[`docs/StoSiS_Methodenhandbuch.html`](docs/StoSiS_Methodenhandbuch.html), as PDF
+[`docs/StoSiS_Methodenhandbuch.pdf`](docs/StoSiS_Methodenhandbuch.pdf) (in German). This file only gives
+an overview.
 
-## Funktionsumfang
+## Features
 
-Umgesetzt:
+Implemented:
 
-- **Flowsheet-Editor:** Block-Palette mit Drag & Drop, Ports, orthogonale
-  Kabel, Zoom und Verschieben, Einstellungsfenster je Block, Ergebnisse als
-  Kurven und Heatmap (mit Randverteilungen, je Stoff umschaltbar).
-- **Units:** Inlet (Zeitprofil; Größenverteilung Log-Normal, RRSB, GGS,
-  Tabelle oder Normal; Stoff, T, p), Outlet, Splitter (2 oder 3 Ausgänge,
-  deterministisch oder stochastisch nach Ornstein-Uhlenbeck), Merger (2 oder
-  3 Eingänge), Behälter (ideal durchmischt, Pfropfenströmung, Kaskade,
-  Kernfluss oder Charge; Anfangsfüllung leer, wie im Dauerbetrieb oder
-  vorgegeben), größenabhängige Verzögerung als Platzhalter-Prozess.
-- **Größenraster:** logarithmisch (Standard 1 µm – 1 mm, 300 Klassen) oder
-  linear; intern SI-Einheiten, Anzeige in µm.
-- **Rechenablauf:** Makroschritte, Units der Reihe nach (Gauß-Seidel),
-  Rückführungen werden an einer Verbindung aufgeschnitten. Das Fenster
-  „Struktur“ zeigt Reihenfolge, Kreise und Schnitte als Bild und als Baum.
-- **Flowsheet als Datei:** JSON mit allen Eingaben (Simulation, Units mit
-  allen Einstellungen, Verbindungen); neu (Strg+N), öffnen und speichern in der Oberfläche,
-  abgesichert durch einen Rundlauftest. Beispiele in `Flowsheets/Validierungs-Flowsheets`:
-  Kompartiment-Modelle nach Levenspiel und ein Mischer, gegen ihre exakte
-  Verweilzeitverteilung geprüft (`test_levenspiel`).
-- **Mehrere Läufe:** globaler Seed mit separatem Zufallsstrom je Unit,
-  Mittelwert und Streuung nach Welford, Bänder und Perzentile; validiert
-  gegen eine analytische Lösung.
-- **Auswertung schwankender Ströme:** Fenstermittel, Ausreißerfilter,
-  Histogramm, Wahrscheinlichkeitsnetz und Zeitverlauf; Vergleich mit
-  Messdaten einer Dosierwaage.
-- **Materialien:** Materialdatei [`data/Materialien.json`](data/README.md)
-  (18 Stoffe, Startinhalt aus Dyssol, jeder Wert mit Quelle und Prüfstatus).
-  Ströme tragen je Stoff und Größenklasse eine Massenstromdichte sowie T
-  und p; beim Mischen gilt die Energiebilanz.
-- **Partikelmodus:** Ströme tragen gewichtete Monte-Carlo-Partikel
-  („Karten“); Inlet, Outlet, Merger, Splitter und Behälter rechnen damit.
-  Das Inlet verteilt die Karten nach einer einstellbaren Kartendichte aus
-  Masse und Anzahl, Splitter und Behälter teilen sie nach einem
-  Konto-Verfahren auf, Grenzen je Stromscheibe halten die Kartenzahl klein;
-  für die Anzeige werden die Karten aufs Raster umgerechnet.
+- **Flowsheet editor:** block palette with drag & drop, ports, orthogonal
+  wires, zoom and pan, a settings window per block, results as curves and
+  heatmap (with marginal distributions, switchable per compound).
+- **Units:** inlet (time profile; size distribution log-normal, RRSB, GGS,
+  table or normal; compound, T, p), outlet, splitter (2 or 3 outputs,
+  deterministic or stochastic after Ornstein-Uhlenbeck), merger (2 or 3
+  inputs), vessel (ideally mixed, plug flow, cascade, core flow or batch;
+  initial filling empty, steady-state or given), size-dependent delay as a
+  placeholder process.
+- **Size grid:** logarithmic (default 1 µm – 1 mm, 300 classes) or linear;
+  SI units internally, display in µm.
+- **Calculation sequence:** macro steps, units one after another
+  (Gauss-Seidel), recycles are torn at one connection. The "Struktur"
+  window shows order, cycles and tear streams as a diagram and as a tree.
+- **Flowsheet as a file:** JSON with all inputs (simulation, units with all
+  settings, connections); new (Ctrl+N), open and save in the user interface,
+  secured by a round-trip test. Examples in `Flowsheets/Validierungs-Flowsheets`:
+  compartment models after Levenspiel and a blender, checked against their
+  exact residence time distribution (`test_levenspiel`).
+- **Multiple runs:** global seed with a separate random stream per unit,
+  mean and spread after Welford, bands and percentiles; validated against an
+  analytical solution.
+- **Analysis of fluctuating streams:** window means, outlier filter,
+  histogram, probability plot and time series; comparison with measured data
+  of a loss-in-weight feeder.
+- **Materials:** material file [`data/Materialien.json`](data/README.md)
+  (18 compounds, initial content from Dyssol, every value with source and
+  check status). Streams carry a mass flow density per compound and size
+  class as well as T and p; mixing follows the energy balance.
+- **Particle mode:** streams carry weighted Monte Carlo particles ("cards");
+  inlet, outlet, merger, splitter and vessel compute with them. The inlet
+  places the cards according to an adjustable card density from mass and
+  number, splitter and vessel divide them with an account method, limits per
+  stream slice keep the number of cards small; for display the cards are
+  projected onto the grid.
 
-Noch nicht umgesetzt:
+Not yet implemented:
 
-- Partikelmodus für die größenabhängige Verzögerung; Inhalt eines Behälters
-  als Ergebnis; Koagulator mit Koagulation, Bruch, Wachstum und Keimbildung
-- Ohne Oberfläche aus einer Flowsheet-Datei rechnen; Übersetzer für
-  Dyssol-Flowsheets (`.dflw`, Format HDF5) in diese Datei
-- Materialien bearbeiten in der Oberfläche, Export ins Dyssol-Format
-- 3D-Darstellung der Heatmap (Qt Graphs)
+- Particle mode for the size-dependent delay; vessel content as a result;
+  coagulator with coagulation, breakage, growth and nucleation
+- Running a flowsheet file without the user interface; translator from
+  Dyssol flowsheets (`.dflw`, HDF5 format) into this file
+- Editing materials in the user interface, export to the Dyssol format
+- 3D display of the heatmap (Qt Graphs)
 
-Die isolierten Transportmodelle (Tanks-in-Series, Diffusion/Drift, First
-Passage Time, auch auf der GPU) sind über das Menü „Entwicklung“ erreichbar
-und noch nicht ins Flowsheet eingebunden.
+The isolated transport models (tanks-in-series, diffusion/drift, first
+passage time, also on the GPU) are available in the "Entwicklung" menu and
+not yet part of the flowsheet.
 
-## Struktur
+## Structure
 
 ```
 StoSiS/
-├── core/          stosis_core: Rechenkern, reines C++17, keine Qt-Abhängigkeit
-│   ├── include/   Units, Flowsheet-Graph, Ströme, Statistik, Materialien
-│   ├── src/       u. a. CUDA-Kernel (Bibliothek stosis_cuda)
-│   └── third_party/nlohmann_json   JSON-Bibliothek (MIT)
-├── gui/src/       stosis_gui: Oberfläche (Qt 6 Widgets), Programm StoSiS.exe
-├── data/          Materialdatei mit Anleitung und Dyssol-Lizenzhinweis
-├── docs/          Methodenhandbuch (HTML und PDF), Programmhilfe, Abbildungen
-├── tests/         automatische Tests des Rechenkerns (CTest)
-├── Flowsheets/    Flowsheet-Dateien; darin Validierungs-Flowsheets (zum Öffnen in StoSiS)
-├── tools/         dmdb_to_json.pl (Umwandlung der Dyssol-Materialdatenbank)
+├── core/          stosis_core: computational core, plain C++17, no Qt dependency
+│   ├── include/   units, flowsheet graph, streams, statistics, materials
+│   ├── src/       among others CUDA kernels (library stosis_cuda)
+│   └── third_party/nlohmann_json   JSON library (MIT)
+├── gui/src/       stosis_gui: user interface (Qt 6 Widgets), program StoSiS.exe
+├── data/          material file with instructions and Dyssol license notice
+├── docs/          methods handbook (HTML and PDF), program help, figures
+├── tests/         automatic tests of the computational core (CTest)
+├── Flowsheets/    flowsheet files; inside, the validation flowsheets (to open in StoSiS)
+├── tools/         dmdb_to_json.pl (conversion of the Dyssol material database)
 └── CMakeLists.txt
 ```
 
-## Installation ohne Entwicklungsumgebung
+## Installation without a development environment
 
-Unter [Releases](https://github.com/neilunt/StoSiS_Open/releases/latest) liegt
-das Installationsprogramm `StoSiS-<Version>-win64.exe` (Windows 10/11, 64 Bit).
-Herunterladen und ausführen: Es installiert StoSiS mit allen Bibliotheken
-nach `C:\Program Files\StoSiS` (im Explorer „Programme“) und legt
-Verknüpfungen im Startmenü und auf dem Desktop an. Visual Studio, Qt, CUDA
-und CMake sind dafür nicht nötig; nur die GPU-Rechnungen im Menü
-„Entwicklung“ brauchen eine NVIDIA-Grafikkarte. Entfernen über
-Einstellungen → Apps.
+[Releases](https://github.com/neilunt/StoSiS_Open/releases/latest) contains the
+installer `StoSiS-<version>-win64.exe` (Windows 10/11, 64 bit). Download and
+run it: it installs StoSiS with all libraries to `C:\Program Files\StoSiS`
+and creates shortcuts in the start menu and on the desktop. Visual Studio,
+Qt, CUDA and CMake are not required; only the GPU calculations in the
+"Entwicklung" menu need an NVIDIA graphics card. Uninstall via
+Settings → Apps.
 
-Das Installationsprogramm ist nicht signiert. Windows SmartScreen meldet
-deshalb „Der Computer wurde durch Windows geschützt“; über „Weitere
-Informationen“ → „Trotzdem ausführen“ geht es weiter. Die Installation
-braucht Administratorrechte; ohne sie die ZIP-Datei aus demselben Release
-entpacken und `StoSiS.exe` im entpackten Ordner starten.
+The installer is not signed. Windows SmartScreen therefore reports "Windows
+protected your PC"; continue via "More info" → "Run anyway". Installing needs
+administrator rights; without them, unpack the ZIP file from the same release
+and start `StoSiS.exe` in the unpacked folder.
 
-## Voraussetzungen zum Bauen
+The user interface and the documentation are currently in German.
 
-- Windows, Visual Studio 2022 mit „Desktopentwicklung mit C++“(https://visualstudio.microsoft.com/de/vs/older-downloads/)
+## Requirements for building
+
+- Windows, Visual Studio 2022 with "Desktop development with C++" (https://visualstudio.microsoft.com/vs/older-downloads/)
 - CMake ≥ 3.20 (https://cmake.org/download/)
-- Qt 6 (Modul Widgets, Kit msvc2022_64). Der Pfad steht in
-  `gui/CMakeLists.txt` (`CMAKE_PREFIX_PATH`, derzeit
-  `C:/Qt/6.11.1/msvc2022_64`) und muss bei anderer Installation angepasst
-  werden.(https://www.qt.io/development/qt-framework/qt6)
-- CUDA Toolkit (11.8 oder 12.x). Die GPU-Architekturen stehen in
-  `core/CMakeLists.txt` (`CUDA_ARCHITECTURES`).(https://developer.nvidia.com/cuda-toolkit-archive)
+- Qt 6 (module Widgets, kit msvc2022_64). The path is set in
+  `gui/CMakeLists.txt` (`CMAKE_PREFIX_PATH`, currently
+  `C:/Qt/6.11.1/msvc2022_64`) and has to be adapted for a different
+  installation (https://www.qt.io/development/qt-framework/qt6)
+- CUDA Toolkit (11.8 or 12.x). The GPU architectures are set in
+  `core/CMakeLists.txt` (`CUDA_ARCHITECTURES`) (https://developer.nvidia.com/cuda-toolkit-archive)
 
-## Bauen
+## Building
 
 ```bat
 cmake -S . -B build -G "Visual Studio 17 2022" -A x64
 ```
 
-Danach `build/StoSiS.sln` in Visual Studio öffnen und mit F5 starten
-(`stosis_gui` ist Startprojekt). Nach dem Bauen kopiert `windeployqt` die
-Qt-DLLs neben `StoSiS.exe`, sodass das Programm auch ohne Visual Studio
-läuft.
+Then open `build/StoSiS.sln` in Visual Studio and start with F5
+(`stosis_gui` is the startup project). After building, `windeployqt` copies
+the Qt DLLs next to `StoSiS.exe`, so the program also runs without Visual
+Studio.
 
-Die Materialdatei wird direkt aus `data/` im Quellordner gelesen. Nach
-Änderungen genügt im Reiter „Materialien“ der Knopf „Neu laden“, ohne neu
-zu bauen.
+The material file is read directly from `data/` in the source folder. After
+changes, the "Neu laden" button in the "Materialien" tab is enough; no
+rebuild is needed.
 
-Findet CMake Qt nicht (`Could not find a package configuration file
-provided by "Qt6"`): prüfen, ob `CMAKE_PREFIX_PATH` auf den Ordner zeigt, der
-`lib/cmake/Qt6` enthält, und ob im Qt-Installer das zum Compiler passende
-Kit (msvc2022_64) installiert ist.
+If CMake does not find Qt (`Could not find a package configuration file
+provided by "Qt6"`): check that `CMAKE_PREFIX_PATH` points to the folder
+containing `lib/cmake/Qt6`, and that the kit matching the compiler
+(msvc2022_64) is installed in the Qt installer.
 
 ## Tests
 
-Die Prüfungen aus dem Methodenhandbuch liegen als Testprogramme in
-`tests/` (Größenverteilungen, Graph und Rückführungen, OU-Splitter,
-Mehrfachläufe gegen die analytische Lösung, Materialien, Ströme mit Stoff/T/p,
-Karten, Behälter gegen die geschlossenen Verweilzeitverteilungen und ein
-Regressionstest über alle Ergebnisse). Ausführen nach dem Bauen:
+The checks from the methods handbook are test programs in `tests/` (size
+distributions, graph and recycles, OU splitter, multiple runs against the
+analytical solution, materials, streams with compound/T/p, cards, vessel
+against the closed-form residence time distributions, and a regression test
+over all results). Run them after building:
 
 ```bat
 cmake --build build --config Release
 ctest --test-dir build -C Release --output-on-failure
 ```
 
-Stochastische Tests nutzen feste Seeds und sind reproduzierbar. Ändert sich
-die Rechnung bewusst, gibt `test_regression --update` neue Referenzwerte aus.
-`analysis_convergence` erzeugt die Daten zur Konvergenz über die Zahl der
-Läufe neu. Mit `-DSTOSIS_BUILD_TESTS=OFF` lassen sich die Tests
-abschalten.
+Stochastic tests use fixed seeds and are reproducible. If the calculation
+changes on purpose, `test_regression --update` prints new reference values.
+`analysis_convergence` regenerates the convergence data over the number of
+runs. With `-DSTOSIS_BUILD_TESTS=OFF` the tests can be switched
+off.
 
-## Lizenzen
+## Licenses
 
-- `core/third_party/nlohmann_json`: MIT-Lizenz
-- Startinhalt von `data/Materialien.json`: aus Dyssol (BSD-3-Lizenz), siehe
+- `core/third_party/nlohmann_json`: MIT license
+- Initial content of `data/Materialien.json`: from Dyssol (BSD-3 license), see
   `data/LICENSE_Dyssol.txt`
