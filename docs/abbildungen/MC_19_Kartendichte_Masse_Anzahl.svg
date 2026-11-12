@@ -11,7 +11,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <view id="teil3" viewBox="0 848 680 540"/>
 <view id="teil4" viewBox="0 1388 680 316"/>
 <rect x="0" y="0" width="680" height="1704" fill="#FFFFFF"/>
-<text class="th" x="20" y="24">① Woher die Sprünge in Diagramm C kommen: Kartendichte = Masse × Karten je Masse</text>
+<text class="th" x="20" y="24">Woher die Sprünge in Diagramm C kommen: Kartendichte = Masse × Karten je Masse</text>
 <text class="ts" x="20" y="42">Standard-Inlet: Log-Normal d50 = 100 µm, σ = 0,25; 2000 Karten je Schritt, Mindestzahl 134 je belegtem Bereich.</text>
 <text class="ts" x="233.3" y="64" text-anchor="middle">32–64 µm</text>
 <text class="tv" x="233.3" y="80" text-anchor="middle">3,7 %</text>
@@ -104,7 +104,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <rect x="150" y="424" width="14" height="10" fill="#534AB7" fill-opacity="0.55"/><text class="ts" x="170" y="433">jetzt: je Bereich alle Karten gleich schwer</text>
 <line x1="420" y1="429" x2="442" y2="429" stroke="#5F5E5A" stroke-width="1.5" stroke-dasharray="5 3"/><text class="ts" x="448" y="433">nur nach Masse (überall gleich schwer)</text>
 <line x1="20" y1="452" x2="660" y2="452" stroke="#D3D1C7"/>
-<text class="th" x="20" y="476">② Dieselben Partikel zweimal gezählt – und zwei Mischungen daraus</text>
+<text class="th" x="20" y="476">Dieselben Partikel zweimal gezählt – und zwei Mischungen daraus</text>
 <text class="ts" x="20" y="494">Standard-Inlet; jede Kurve ist eine Dichte über ln d mit der Fläche 1 (f = 20 %).</text>
 <text class="pt" x="20" y="520">a) Massenverteilung q<tspan class="sub" dy="3">3</tspan><tspan dy="-3">*</tspan> und Anzahlverteilung q<tspan class="sub" dy="3">0</tspan><tspan dy="-3">*</tspan></text>
 <rect x="150" y="528" width="500" height="70" fill="none" stroke="#D3D1C7"/>
@@ -152,7 +152,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <line x1="650.0" y1="822" x2="650.0" y2="826" stroke="#5F5E5A"/><text class="ts" x="650.0" y="838" text-anchor="middle">256</text>
 <text class="ts" x="132" y="838" text-anchor="end">d in µm</text>
 <line x1="20" y1="852" x2="660" y2="852" stroke="#D3D1C7"/>
-<text class="th" x="20" y="876">③ Karten je Klasse wie in Diagramm C (16 Klassen je Oktave) – vier Regeln untereinander</text>
+<text class="th" x="20" y="876">Karten je Klasse wie in Diagramm C (16 Klassen je Oktave) – vier Regeln untereinander</text>
 <text class="ts" x="20" y="894">Gestrichelt in jedem Feld: alle Karten gleich schwer (nur Masse, 74 / 1602 / 323 Karten je Oktave 32–64 / 64–128 / 128–256 µm).</text>
 <text class="pt" x="20" y="920">a) jetzt: Bereiche mit Faktor 2, Mindestzahl 134 – 194 / 1414 / 392 Karten je Oktave</text>
 <rect x="150" y="928" width="500" height="70" fill="none" stroke="#D3D1C7"/>
@@ -413,7 +413,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <line x1="650.0" y1="1346" x2="650.0" y2="1350" stroke="#5F5E5A"/><text class="ts" x="650.0" y="1362" text-anchor="middle">256</text>
 <text class="ts" x="132" y="1362" text-anchor="end">d in µm</text>
 <line x1="20" y1="1392" x2="660" y2="1392" stroke="#D3D1C7"/>
-<text class="th" x="20" y="1416">④ Breite Verteilung (d50 = 100 µm, σ = 1): Wo landen die Karten?</text>
+<text class="th" x="20" y="1416">Breite Verteilung (d50 = 100 µm, σ = 1): Wo landen die Karten?</text>
 <text class="ts" x="20" y="1434">Grau hinterlegt: über 100 µm liegt die Hälfte der Masse. Türkis die Masse, Linie die Kartendichte (beide mit der Fläche 1).</text>
 <text class="pt" x="20" y="1460">a) Summe 0,8 · Masse + 0,2 · Anzahl: über 100 µm 40 % der Karten</text>
 <rect x="483.3" y="1468" width="166.7" height="80" fill="#F1EFE8"/>

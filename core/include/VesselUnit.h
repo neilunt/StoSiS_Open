@@ -228,20 +228,21 @@ namespace stosis
     // was im Schritt austritt, geteilt durch dt. So bleibt die Masse exakt
     // erhalten: Summe Zulauf = Summe Ablauf + Zunahme des Inhalts.
     //
-    // Im Partikelmodus setzt das Konto-Verfahren die Anteile mit ganzen
-    // Karten um (Walk): Jede Karte zahlt den Anteil jedes Ziels auf dessen
-    // Konto ein und geht dorthin, wo am meisten steht; dieses Konto wird um
-    // eine Karte belastet. Anders als im Splitter zaehlt jede Karte 1, nicht
-    // ihr Anteil an der Kartendichte: Jede Karte soll unabhaengig von ihrem
-    // Gewicht mit derselben Wahrscheinlichkeit gehen - mit Anteilen gingen
-    // schwere Karten zwischen leichten seltener und blieben laenger. Die
-    // Karten jedes Bereichs sind nach Stoff und Groesse geordnet, nicht nach
-    // Alter, und der Start ist je Schritt zufaellig: Der Austritt haengt so
-    // nicht vom Alter ab, und jede Groessengegend verliert ihren Anteil. Der
-    // Vorrat fasst hoechstens stockFactor x N Karten; darueber werden die
-    // neu hinzukommenden Karten paarweise zusammengelegt (LimitIncoming).
-    // Temperatur und Druck je Bereich folgen aus der Energiebilanz wie im
-    // Merger (MixConditions).
+    // In particle mode the account method moves whole cards: every card pays
+    // the share of each target into that target's account and goes where
+    // most is standing; that account is charged one card. Unlike in the
+    // splitter every card counts 1, not its share of the card density, so
+    // that every card leaves with the same probability whatever its weight.
+    // The cards of a region lie in compartments per compound and size class
+    // (SCardStore); the account walk over the stock is done in one jump
+    // (StoreDraw): the positions where the account "goes" fires follow
+    // directly from the account, they give how many cards leave each
+    // compartment, and which cards of a compartment leave is drawn at random.
+    // A step therefore only touches the cards that move, and leaving does
+    // not depend on age. The stock holds (tau/dt + 2) slices of cards
+    // (StockCap), at most 10 million cards; beyond that newly arriving cards
+    // are merged in pairs (LimitIncoming). Temperature and pressure of each
+    // region follow from the energy balance as in the merger (MixConditions).
     class CVesselUnit : public IFlowsheetUnit
     {
     public:
@@ -280,8 +281,8 @@ namespace stosis
             m_particles = grid.representation == ERepresentation::Particles;
             m_cardSettings = grid.cards;
             m_countMin = grid.GetCardCountMin();
-            const double cap = std::floor(std::max(m_settings.stockFactor, 1.0) * static_cast<double>(std::max<size_t>(grid.cards.cardsPerSlice, 1)) + 1e-9);
-            m_cap = static_cast<size_t>(std::max(cap, 1.0));
+            m_cap = StockCap(grid);
+            SetupClasses();
             m_missingHeatCapacity.clear();
             m_mergedCards = 0;
             m_maxMergeRatio = 1.0;
@@ -347,7 +348,7 @@ namespace stosis
             if (m_fillCompoundMissing)
                 warnings.push_back("Der Stoff der Anfangsfuellung (" + m_settings.fillMaterial + ") ist kein aktiver Stoff - die Fuellung fehlt.");
             if (m_mergedCards > 0)
-                warnings.push_back("Vorrat voll (hoechstens " + FormatNumber(m_settings.stockFactor, 6) + " x N Karten): Karten im Zulauf bis "
+                warnings.push_back("Vorrat voll (hoechstens " + std::to_string(m_cap) + " Karten): Karten im Zulauf bis "
                     + FormatDecimal(m_maxMergeRatio, 1) + " : 1 zusammengelegt, der Ablauf traegt dadurch weniger Karten.");
             return warnings;
         }
@@ -384,7 +385,12 @@ namespace stosis
             if (m_settings.fill == EVesselFill::Prescribed)
                 text += " (" + FormatNumber(m_settings.fillMass, 6) + " kg " + m_settings.fillMaterial + ")";
             if (m_particles)
-                text += ", Vorrat hoechstens " + FormatNumber(m_settings.stockFactor, 6) + " x N = " + std::to_string(m_cap) + " Karten";
+            {
+                text += ", Vorrat bis " + std::to_string(m_cap) + " Karten";
+                text += m_capWanted > static_cast<double>(m_cap) + 0.5
+                    ? " (begrenzt; tau/dt + 2 Zulaufschritte braeuchten " + FormatNumber(m_capWanted, 4) + ")"
+                    : " (tau/dt + 2 Zulaufschritte)";
+            }
             return text;
         }
 
@@ -441,12 +447,19 @@ namespace stosis
         {
             size_t cards = 0;
             for (const SRegion& region : m_regions)
-                cards += region.cards.Count();
+                cards += region.store.Count();
             return cards;
         }
 
         size_t GetCardCap() const { return m_cap; }
         size_t GetMergedCards() const { return m_mergedCards; }
+
+        // Upper limit of the stock in cards (default kDefaultStockLimit);
+        // applies from the next Initialize. Lower values e.g. in tests.
+        void SetStockLimit(size_t cards) { m_stockLimit = std::max<size_t>(cards, 1); }
+
+        static constexpr size_t kDefaultStockLimit = 10000000;
+        static constexpr double kStockClassesPerDecade = 100.0;
 
     private:
         // Karten eines Bereichs, geordnet nach Stoff und darin nach Groesse;
@@ -466,18 +479,70 @@ namespace stosis
             }
         };
 
+        // Cards of a region in compartments, one per compound and size class
+        // (SetupClasses), unordered inside a compartment. Adding a card and
+        // taking one out cost the same whatever the size of the stock, so a
+        // step only touches the cards that move. weights follows every card
+        // that comes or goes (for temperature and pressure); StoreWeights
+        // sums exactly.
+        struct SCardStore
+        {
+            std::vector<SCardBin> bins;  // [compound * classes + class]
+            std::vector<double> weights; // mass flow per compound
+            size_t count = 0;
+            size_t Count() const { return count; }
+        };
+
         // Ein Bereich des Behaelters: Bestand, Kessel, Randzone oder die
         // Karten, die in einem bestimmten Schritt austreten. Inhalt in der
         // Einheit eines Zulaufschritts (Massenstromdichte; mal dt = Masse).
         struct SRegion
         {
             std::vector<double> values; // Kontinuum: [Stoff * numS + Klasse]
-            SCardBin cards;             // Partikelmodus
+            SCardStore store;           // particle mode
             double temperature = kRoomTemperature;
             double pressure = kRoomPressure;
         };
 
         static constexpr size_t kMaxMerge = 50; // hoechstens so viele Zulaufkarten zu einer
+
+        // Room of the stock in particle mode: (tau/dt + 2) slices of at most
+        // upperFactor x N cards each (2 N without slice limits), so that in
+        // steady operation no card has to be merged; at least stockFactor x N,
+        // at most the stock limit. For a batch the whole simulation counts
+        // instead of tau.
+        size_t StockCap(const SSimulationGrid& grid)
+        {
+            const double N = static_cast<double>(std::max<size_t>(grid.cards.cardsPerSlice, 1));
+            const double perSlice = (grid.cards.sliceLimits ? std::max(grid.cards.upperFactor, 1.0) : 2.0) * N;
+            const double dt = grid.GetDt();
+            const double steps = m_settings.batch ? static_cast<double>(grid.numTimeSteps)
+                : (dt > 0.0 ? m_settings.residenceTime / dt : 0.0);
+            m_capWanted = (steps + 2.0) * perSlice;
+            const double cap = std::min(static_cast<double>(m_stockLimit),
+                std::max(std::max(m_settings.stockFactor, 1.0) * N, m_capWanted));
+            return static_cast<size_t>(std::max(std::floor(cap + 1e-9), 1.0));
+        }
+
+        // Size classes of the compartments: kStockClassesPerDecade per decade
+        // over the size grid, plus one below and one above it.
+        void SetupClasses()
+        {
+            const double dMax = m_sizes.sizeMax > 0.0 ? m_sizes.sizeMax : 1.0;
+            const double dMin = (m_sizes.sizeMin > 0.0 && m_sizes.sizeMin < dMax) ? m_sizes.sizeMin : dMax * 1e-6;
+            m_logSizeMin = std::log10(dMin);
+            m_numClasses = static_cast<size_t>(std::ceil(std::log10(dMax / dMin) * kStockClassesPerDecade)) + 2;
+        }
+
+        size_t ClassOf(double size) const
+        {
+            if (!(size > 0.0))
+                return 0;
+            const double x = (std::log10(size) - m_logSizeMin) * kStockClassesPerDecade;
+            if (!(x >= 0.0))
+                return 0;
+            return std::min(static_cast<size_t>(x) + 1, m_numClasses - 1);
+        }
 
         // ---------------- Anteile je Schritt ----------------
 
@@ -528,6 +593,7 @@ namespace stosis
                     pmf[m] = lambda > 0.0 ? std::exp(-lambda + static_cast<double>(m) * std::log(lambda) - std::lgamma(static_cast<double>(m) + 1.0))
                                           : (m == 0 ? 1.0 : 0.0);
                 m_cellFractions.assign(n, {});
+                m_cellDraws.assign(n, {});
                 for (size_t j = 0; j < n; ++j)
                 {
                     // Ziele: m = 0 (bleibt), 1, ..., n - 1 - j Kessel weiter, dann Austritt.
@@ -535,6 +601,20 @@ namespace stosis
                     for (size_t m = 0; m + j < n; ++m)
                         f.push_back(pmf[m]);
                     f.push_back(PoissonTail(n - 1 - j, lambda));
+                    // Particle mode: one draw "goes / stays" per target, first
+                    // the exit, then 1, 2, ... cells on, each from what is
+                    // still in the cell (share relative to the rest), so each
+                    // target is right to one card.
+                    double rest = 1.0;
+                    const auto draw = [&](size_t t)
+                    {
+                        const double share = rest > 0.0 ? std::min(f[t] / rest, 1.0) : 0.0;
+                        m_cellDraws[j].push_back({ t, share });
+                        rest -= f[t];
+                    };
+                    draw(f.size() - 1);
+                    for (size_t t = 1; t + 1 < f.size(); ++t)
+                        draw(t);
                 }
                 double sum = 0.0;
                 for (size_t m = 0; m < n; ++m)
@@ -596,19 +676,27 @@ namespace stosis
                 break;
             }
             m_regions.assign(regions, SRegion());
-            if (!m_particles)
-                for (SRegion& region : m_regions)
+            for (SRegion& region : m_regions)
+            {
+                if (m_particles)
+                    SetupStore(region.store);
+                else
                     region.values.assign(m_numC * m_numS, 0.0);
+            }
             // Puffer fuer neue Karten einmal in voller Zahl, damit Verweise
             // darauf innerhalb eines Schritts gueltig bleiben.
             m_incoming.assign(std::max<size_t>(3, 2 * m_cellFractions.size()), SCardBin());
             m_inside = 0;
             m_accounts.assign(sources, {});
+            m_drawAccounts.clear();
             if (m_mode == EVesselMixing::Cascade)
             {
                 for (size_t j = 0; j < m_cellFractions.size(); ++j)
                     m_accounts[j].assign(m_cellFractions[j].size(), 0.0);
                 m_accounts.back().assign(m_inflowFractions.size(), 0.0);
+                m_drawAccounts.resize(m_cellDraws.size());
+                for (size_t j = 0; j < m_cellDraws.size(); ++j)
+                    m_drawAccounts[j].assign(m_cellDraws[j].size(), std::vector<double>(2, 0.0));
             }
             else if (m_mode == EVesselMixing::Plug)
                 m_accounts[0].assign(m_inflowFractions.size(), 0.0);
@@ -681,7 +769,8 @@ namespace stosis
                     for (size_t s = 0; s < m_numS && s < m_sizeWeights.size(); ++s)
                         weights[c] += m_sizeWeights[s] * region.values[c * m_numS + s];
             }
-            AddBinWeights(region.cards, weights);
+            for (const SCardBin& bin : region.store.bins)
+                AddBinWeights(bin, weights);
             return weights;
         }
 
@@ -802,8 +891,7 @@ namespace stosis
                         part.flows.push_back(c == compound ? entry.second * unitFlow * placement.massFractions[k] : 0.0);
                 }
                 SRegion& region = m_regions[entry.first];
-                SortBin(part);
-                Rebuild(region.cards, nullptr, 0, part);
+                StoreAddAll(region.store, part);
                 region.temperature = T;
                 region.pressure = p;
             }
@@ -869,9 +957,8 @@ namespace stosis
                     for (size_t k = 0; k < merged.Count(); ++k)
                         PushCard(part, merged, k, entry.second);
                 }
-                SortBin(part);
                 SRegion& region = m_regions[entry.first];
-                Rebuild(region.cards, nullptr, 0, part);
+                StoreAddAll(region.store, part);
                 region.temperature = temperature;
                 region.pressure = pressure;
             }
@@ -984,39 +1071,126 @@ namespace stosis
             bin = std::move(result);
         }
 
-        // Neuer Inhalt eines Bereichs in einem Durchgang: die Karten mit
-        // target == keep (alle, wenn target nullptr) und die geordneten
-        // Karten aus incoming, zusammen wieder geordnet.
-        void Rebuild(SCardBin& bin, const std::vector<std::uint16_t>* target, std::uint16_t keep, const SCardBin& incoming)
+        // ---------------- Stock in compartments ----------------
+
+        void SetupStore(SCardStore& store) const
         {
-            SCardBin& result = m_scratch;
-            result.Clear();
-            const size_t n = bin.Count(), m = incoming.Count();
-            result.sizes.reserve(n + m);
-            result.compounds.reserve(n + m);
-            result.flows.reserve((n + m) * m_numC);
-            const auto nextKept = [&](size_t i)
+            store.bins.assign(m_numC * m_numClasses, SCardBin());
+            store.weights.assign(m_numC, 0.0);
+            store.count = 0;
+        }
+
+        void StoreAdd(SCardStore& store, const SCardBin& from, size_t k, double scale = 1.0) const
+        {
+            const size_t b = static_cast<size_t>(from.compounds[k]) * m_numClasses + ClassOf(from.sizes[k]);
+            PushCard(store.bins[b], from, k, scale);
+            for (size_t c = 0; c < m_numC; ++c)
+                store.weights[c] += from.flows[k * m_numC + c] * scale;
+            ++store.count;
+        }
+
+        void StoreAddAll(SCardStore& store, const SCardBin& from) const
+        {
+            for (size_t k = 0; k < from.Count(); ++k)
+                StoreAdd(store, from, k);
+        }
+
+        // All cards to "to" (in the order of the compartments); empty afterwards.
+        void StoreTakeAll(SCardStore& store, SCardBin& to) const
+        {
+            for (SCardBin& bin : store.bins)
             {
-                while (i < n && target && (*target)[i] != keep)
-                    ++i;
-                return i;
-            };
-            size_t i = nextKept(0), j = 0;
-            while (i < n || j < m)
-            {
-                const bool takeOld = j >= m || (i < n && !CardBefore(incoming.compounds[j], incoming.sizes[j], bin.compounds[i], bin.sizes[i]));
-                if (takeOld)
-                {
-                    PushCard(result, bin, i);
-                    i = nextKept(i + 1);
-                }
-                else
-                {
-                    PushCard(result, incoming, j);
-                    ++j;
-                }
+                for (size_t i = 0; i < bin.Count(); ++i)
+                    PushCard(to, bin, i);
+                bin.Clear();
             }
-            std::swap(bin, result); // der alte Inhalt bleibt als Puffer fuer das naechste Mal
+            std::fill(store.weights.begin(), store.weights.end(), 0.0);
+            store.count = 0;
+        }
+
+        // Card i of compartment b to "to" (its mass flows added to
+        // toWeights); the last card of the compartment fills the gap.
+        void StoreTake(SCardStore& store, size_t b, size_t i, SCardBin& to, std::vector<double>& toWeights) const
+        {
+            SCardBin& bin = store.bins[b];
+            PushCard(to, bin, i);
+            for (size_t c = 0; c < m_numC; ++c)
+            {
+                const double w = bin.flows[i * m_numC + c];
+                toWeights[c] += w;
+                store.weights[c] -= w;
+            }
+            const size_t last = bin.Count() - 1;
+            if (i != last)
+            {
+                bin.sizes[i] = bin.sizes[last];
+                bin.compounds[i] = bin.compounds[last];
+                std::copy(bin.flows.begin() + static_cast<std::ptrdiff_t>(last * m_numC),
+                    bin.flows.begin() + static_cast<std::ptrdiff_t>((last + 1) * m_numC),
+                    bin.flows.begin() + static_cast<std::ptrdiff_t>(i * m_numC));
+            }
+            bin.sizes.pop_back();
+            bin.compounds.pop_back();
+            bin.flows.resize(last * m_numC);
+            if (--store.count == 0)
+                std::fill(store.weights.begin(), store.weights.end(), 0.0); // no rounding remainder
+        }
+
+        // Running weights without small negative remainders of rounding.
+        std::vector<double> StoreKeptWeights(const SCardStore& store) const
+        {
+            std::vector<double> weights(store.weights);
+            for (double& w : weights)
+                w = std::max(w, 0.0);
+            return weights;
+        }
+
+        // Account method with the accounts "stays" and "goes" (fraction f of
+        // the stock leaves), done in one jump instead of card by card. Walking
+        // the n cards once from a random start, a card goes when, after its
+        // payment, "goes" exceeds "stays"; with g = goes - 1/2 (both accounts
+        // add up to 0) the k-th card goes at walk position
+        //   j_k = floor((k - 1 - g) / f) + 1,   k = 1, 2, ... while j_k <= n,
+        // and afterwards g = g + n f - (number gone), as after the walk card by
+        // card. The walk runs over the compartments in their order (compound,
+        // size), so the positions give how many cards leave each compartment;
+        // which cards of a compartment leave is drawn at random (lot), so that
+        // leaving does not depend on age or weight.
+        void StoreDraw(SCardStore& store, double f, std::vector<double>& accounts, SCardBin& to, std::vector<double>& toWeights)
+        {
+            const size_t n = store.Count();
+            if (n == 0 || !(f > 0.0) || accounts.size() < 2)
+                return;
+            const double g0 = accounts[1] - 0.5;
+            const size_t start = std::min(static_cast<size_t>(m_random.Uniform() * static_cast<double>(n)), n - 1);
+            const size_t numBins = store.bins.size();
+            m_binStart.resize(numBins + 1);
+            m_binStart[0] = 0;
+            for (size_t b = 0; b < numBins; ++b)
+                m_binStart[b + 1] = m_binStart[b] + store.bins[b].Count();
+            m_leaveCount.assign(numBins, 0);
+            size_t gone = 0;
+            for (size_t k = 1;; ++k)
+            {
+                const double x = (static_cast<double>(k) - 1.0 - g0) / f;
+                if (!(x < static_cast<double>(n)))
+                    break;
+                const size_t j = static_cast<size_t>(std::floor(x)) + 1; // walk position 1 .. n
+                const size_t position = (start + j - 1) % n;
+                const size_t b = static_cast<size_t>(std::upper_bound(m_binStart.begin(), m_binStart.end(), position) - m_binStart.begin()) - 1;
+                ++m_leaveCount[b];
+                ++gone;
+            }
+            const double g = g0 + static_cast<double>(n) * f - static_cast<double>(gone);
+            accounts[1] = g + 0.5;
+            accounts[0] = -accounts[1];
+            for (size_t b = 0; b < numBins; ++b)
+                for (size_t r = 0; r < m_leaveCount[b]; ++r)
+                {
+                    const size_t size = store.bins[b].Count();
+                    const size_t i = std::min(static_cast<size_t>(m_lotRandom.Uniform() * static_cast<double>(size)), size - 1);
+                    StoreTake(store, b, i, to, toWeights);
+                }
         }
 
         // Konto-Verfahren mit ganzen Karten: Jede Karte zahlt den Anteil
@@ -1157,9 +1331,11 @@ namespace stosis
             case EVesselMixing::CoreFlow:
             {
                 SRegion& wall = m_regions[WallRegion()];
-                Walk(wall.cards, m_stockFractions, m_accounts[0], m_target);
-                std::vector<double> keptW(m_numC, 0.0), outW(m_numC, 0.0);
-                MoveOut(wall.cards, m_target, 1, keptW, outW);
+                std::vector<double> outW(m_numC, 0.0);
+                const size_t wallBefore = wall.store.Count();
+                StoreDraw(wall.store, m_stockFractions[1], m_accounts[0], m_outCards, outW);
+                const size_t wallLeft = wallBefore - wall.store.Count(); // gehen in diesem Schritt
+                const std::vector<double> keptW = StoreKeptWeights(wall.store);
                 AddOutPart(outW, wall.temperature, wall.pressure);
 
                 Walk(inflow, m_inflowFractions, m_accounts[1], m_targetIn);
@@ -1182,16 +1358,12 @@ namespace stosis
                     }
                 }
                 AddOutPart(inOutW, inT, inP);
-                size_t wallLeft = 0;
-                for (std::uint16_t t : m_target)
-                    if (t == 1)
-                        ++wallLeft; // gehen in diesem Schritt
                 const size_t remaining = m_inside - std::min(m_inside, wallLeft + DueCards(k));
                 LimitIncoming({ &early, &late, &stay }, remaining);
                 AddToRing(k + m_delaySteps, early, inT, inP);
                 AddToRing(k + m_delaySteps + 1, late, inT, inP);
                 MixRegion(wall, keptW, { MakePart(BinWeights(stay), inT, inP) });
-                Rebuild(wall.cards, &m_target, 0, stay);
+                StoreAddAll(wall.store, stay);
                 m_inside = m_inside - std::min(m_inside, wallLeft) + early.Count() + late.Count() + stay.Count();
                 m_inside -= std::min(m_inside, DueCards(k));
                 ReleaseRing(k);
@@ -1201,9 +1373,9 @@ namespace stosis
             default:
             {
                 SRegion& stock = m_regions[0];
-                Walk(stock.cards, m_stockFractions, m_accounts[0], m_target);
-                std::vector<double> keptW(m_numC, 0.0), outW(m_numC, 0.0);
-                MoveOut(stock.cards, m_target, 1, keptW, outW);
+                std::vector<double> outW(m_numC, 0.0);
+                StoreDraw(stock.store, m_stockFractions[1], m_accounts[0], m_outCards, outW);
+                const std::vector<double> keptW = StoreKeptWeights(stock.store);
                 AddOutPart(outW, stock.temperature, stock.pressure);
 
                 Walk(inflow, m_inflowFractions, m_accounts[1], m_targetIn);
@@ -1221,36 +1393,17 @@ namespace stosis
                         PushCard(stay, inflow, i);
                 }
                 AddOutPart(inOutW, inT, inP);
-                size_t kept = 0;
-                for (std::uint16_t t : m_target)
-                    if (t == 0)
-                        ++kept;
+                const size_t kept = stock.store.Count();
                 LimitIncoming({ &stay }, kept);
                 MixRegion(stock, keptW, { MakePart(BinWeights(stay), inT, inP) });
-                Rebuild(stock.cards, &m_target, 0, stay);
-                m_inside = kept + stay.Count();
+                StoreAddAll(stock.store, stay);
+                m_inside = stock.store.Count();
                 break;
             }
             }
 
             out.SetCards(std::move(m_outCards.sizes), std::move(m_outCards.flows));
             m_outCards.Clear();
-        }
-
-        // Karten mit target == leave gehen in den Ablauf (outW), die uebrigen
-        // bleiben (keptW); der Bereich selbst aendert sich erst mit Rebuild.
-        void MoveOut(const SCardBin& bin, const std::vector<std::uint16_t>& target, std::uint16_t leave,
-            std::vector<double>& keptW, std::vector<double>& outW)
-        {
-            for (size_t i = 0; i < bin.Count(); ++i)
-            {
-                const bool goes = target[i] == leave;
-                if (goes)
-                    PushCard(m_outCards, bin, i);
-                std::vector<double>& w = goes ? outW : keptW;
-                for (size_t c = 0; c < m_numC; ++c)
-                    w[c] += bin.flows[i * m_numC + c];
-            }
         }
 
         // Puffer fuer neu hinzukommende Karten (geleert). Die Zahl der Puffer
@@ -1265,7 +1418,7 @@ namespace stosis
         // Karten, die im Schritt k aus dem Ring gehen.
         size_t DueCards(size_t k) const
         {
-            return (k < m_numT && m_ring > 0) ? m_regions[RingRegion(k)].cards.Count() : 0;
+            return (k < m_numT && m_ring > 0) ? m_regions[RingRegion(k)].store.Count() : 0;
         }
 
         // Karten, die im Schritt e austreten, in den Ring legen.
@@ -1274,9 +1427,8 @@ namespace stosis
             if (cards.Count() == 0)
                 return;
             SRegion& region = m_regions[RingRegion(e)];
-            MixRegion(region, BinWeights(region.cards), { MakePart(BinWeights(cards), temperature, pressure) });
-            for (size_t i = 0; i < cards.Count(); ++i)
-                PushCard(region.cards, cards, i);
+            MixRegion(region, StoreKeptWeights(region.store), { MakePart(BinWeights(cards), temperature, pressure) });
+            StoreAddAll(region.store, cards);
         }
 
         // Was im Schritt k faellig ist, geht ganz in den Ablauf.
@@ -1285,12 +1437,10 @@ namespace stosis
             if (k >= m_numT || m_ring == 0)
                 return;
             SRegion& due = m_regions[RingRegion(k)];
-            if (due.cards.Count() == 0)
+            if (due.store.Count() == 0)
                 return;
-            AddOutPart(BinWeights(due.cards), due.temperature, due.pressure);
-            for (size_t i = 0; i < due.cards.Count(); ++i)
-                PushCard(m_outCards, due.cards, i);
-            due.cards.Clear();
+            AddOutPart(StoreKeptWeights(due.store), due.temperature, due.pressure);
+            StoreTakeAll(due.store, m_outCards);
             due.temperature = kRoomTemperature;
             due.pressure = kRoomPressure;
         }
@@ -1298,37 +1448,40 @@ namespace stosis
         void StepCascadeCards(SCardBin& inflow, double inT, double inP)
         {
             const size_t n = m_cellFractions.size();
-            m_cellTargets.resize(n);
             // Ziele je Kessel: 0 = bleibt, t = t Kessel weiter, n - j = Austritt.
             std::vector<std::vector<double>> moveW(n);
             for (size_t j = 0; j < n; ++j)
-            {
-                Walk(m_regions[j].cards, m_cellFractions[j], m_accounts[j], m_cellTargets[j]);
                 moveW[j].assign((n - j + 1) * m_numC, 0.0);
-            }
             Walk(inflow, m_inflowFractions, m_accounts[n], m_targetIn);
 
             // Bewegte Karten je Zielkessel sammeln: Index 0 .. n-1 aus den
             // Kesseln, n .. 2n-1 frisch aus dem Zulauf (nur diese zusammenlegen).
+            // Each cell draws one target after the other (m_cellDraws: exit
+            // first, then 1, 2, ... cells on) straight from its stock. Moved
+            // cards are collected first and only enter their cell at the end,
+            // so every cell draws from its content of the previous step.
             for (size_t j = 0; j < 2 * n; ++j)
                 Incoming(j);
+            size_t stock = 0;
             for (size_t j = 0; j < n; ++j)
             {
-                const SCardBin& cell = m_regions[j].cards;
-                const std::vector<std::uint16_t>& target = m_cellTargets[j];
+                SCardStore& cell = m_regions[j].store;
                 const size_t exitIndex = n - j;
-                for (size_t i = 0; i < cell.Count(); ++i)
+                for (size_t d = 0; d < m_cellDraws[j].size(); ++d)
                 {
-                    const size_t t = target[i];
+                    const size_t t = m_cellDraws[j][d].first;
+                    SCardBin& to = t >= exitIndex ? m_outCards : m_incoming[j + t];
+                    const size_t before = to.Count();
+                    std::vector<double> drawnW(m_numC, 0.0);
+                    StoreDraw(cell, m_cellDraws[j][d].second, m_drawAccounts[j][d], to, drawnW);
                     for (size_t c = 0; c < m_numC; ++c)
-                        moveW[j][t * m_numC + c] += cell.flows[i * m_numC + c];
-                    if (t == 0)
-                        continue;
-                    if (t >= exitIndex)
-                        PushCard(m_outCards, cell, i);
-                    else
-                        PushCard(m_incoming[j + t], cell, i);
+                        moveW[j][t * m_numC + c] += drawnW[c];
+                    if (t < exitIndex)
+                        stock += to.Count() - before;
                 }
+                stock += cell.Count(); // bleibt im Behaelter
+                const std::vector<double> stayW = StoreKeptWeights(cell);
+                std::copy(stayW.begin(), stayW.end(), moveW[j].begin());
                 const size_t exitOffset = exitIndex * m_numC;
                 AddOutPart(std::vector<double>(moveW[j].begin() + static_cast<std::ptrdiff_t>(exitOffset),
                     moveW[j].begin() + static_cast<std::ptrdiff_t>(exitOffset + m_numC)), m_regions[j].temperature, m_regions[j].pressure);
@@ -1348,11 +1501,6 @@ namespace stosis
             }
             AddOutPart(inOutW, inT, inP);
 
-            size_t stock = 0;
-            for (size_t j = 0; j < n; ++j)
-                for (std::uint16_t t : m_cellTargets[j])
-                    if (t < n - j)
-                        ++stock; // bleibt im Behaelter
             std::vector<SCardBin*> fresh;
             for (size_t j = 0; j < n; ++j)
                 fresh.push_back(&m_incoming[n + j]);
@@ -1383,12 +1531,8 @@ namespace stosis
             }
             for (size_t target = 0; target < n; ++target)
             {
-                SCardBin& moved = m_incoming[target];
-                const SCardBin& fromInflow = m_incoming[n + target];
-                for (size_t i = 0; i < fromInflow.Count(); ++i)
-                    PushCard(moved, fromInflow, i);
-                SortBin(moved);
-                Rebuild(m_regions[target].cards, &m_cellTargets[target], 0, moved);
+                StoreAddAll(m_regions[target].store, m_incoming[target]);
+                StoreAddAll(m_regions[target].store, m_incoming[n + target]);
                 m_regions[target].temperature = newT[target];
                 m_regions[target].pressure = newP[target];
             }
@@ -1561,6 +1705,10 @@ namespace stosis
         SCardSettings m_cardSettings;
         double m_countMin = 0.0;
         size_t m_cap = 1;
+        size_t m_stockLimit = kDefaultStockLimit;
+        double m_capWanted = 0.0;   // (tau/dt + 2) slices of cards
+        double m_logSizeMin = 0.0;  // compartments: lower bound of class 1 (log10 m)
+        size_t m_numClasses = 2;    // size classes per compound
         CRandom m_random;
         CRandom m_lotRandom; // Losnummer: gleich grosse Karten neu mischen (DrawLots)
 
@@ -1569,6 +1717,7 @@ namespace stosis
         std::vector<double> m_stockFractions;              // ideal durchmischt / Randzone: bleibt, geht
         std::vector<double> m_inflowFractions;             // Zulauf, Ziele je nach Typ
         std::vector<std::vector<double>> m_cellFractions;  // Kaskade: je Kessel bleibt, +1, ..., Austritt
+        std::vector<std::vector<std::pair<size_t, double>>> m_cellDraws; // cascade, particle mode: target and share per draw
         size_t m_delaySteps = 0;                           // Pfropfen / Kern: ganze Schritte q
         double m_delayRest = 0.0;                          // und Rest r
         size_t m_ring = 0;                                 // Plaetze im Ring der Austrittsschritte
@@ -1576,6 +1725,7 @@ namespace stosis
         // Zustand
         std::vector<SRegion> m_regions;
         std::vector<std::vector<double>> m_accounts; // Konten je Quelle
+        std::vector<std::vector<std::vector<double>>> m_drawAccounts; // cascade: "stays" / "goes" per draw
         size_t m_inside = 0;                         // Karten im Behaelter (laufend mitgezaehlt)
         bool m_filled = false;
         double m_initialMass = 0.0;
@@ -1583,9 +1733,9 @@ namespace stosis
         // wiederverwendete Puffer
         SCardBin m_inflow, m_outCards, m_scratch;
         std::vector<SCardBin> m_incoming;
-        std::vector<std::uint16_t> m_target, m_targetIn;
-        std::vector<std::vector<std::uint16_t>> m_cellTargets;
+        std::vector<std::uint16_t> m_targetIn;
         std::vector<size_t> m_order;
+        std::vector<size_t> m_binStart, m_leaveCount; // StoreDraw
         std::vector<double> m_u, m_outValues;
         std::vector<SMixPart> m_outParts;
         std::vector<std::pair<size_t, SCardPlacement>> m_placements;

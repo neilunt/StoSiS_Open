@@ -113,7 +113,7 @@ namespace
 
     // Behaelter allein, Zulauf inflow(k) [kg/s] aus Stoff compound.
     SRun Run(const SVesselSettings& settings, const SSimulationGrid& grid, const std::function<double(size_t)>& inflow,
-        size_t compound = 0, double temperature = kRoomTemperature)
+        size_t compound = 0, double temperature = kRoomTemperature, size_t stockLimit = 0)
     {
         SRun run;
         CVesselUnit vessel;
@@ -122,6 +122,8 @@ namespace
             Check(false, "Einstellungen gueltig: " + settings.Check());
             return run;
         }
+        if (stockLimit > 0)
+            vessel.SetStockLimit(stockLimit);
         vessel.Initialize(grid, 4711);
         run.log = vessel.DescribeForLog();
         const std::vector<double> weights = grid.GetSizeGrid().GetWeights();
@@ -400,14 +402,13 @@ int main()
         Check(out == 0.0 && BalanceError(run, dt) < 1e-12, "Charge: kein Ablauf, Zulauf bleibt vollstaendig im Behaelter");
     }
 
-    // 6) Vorrat voll: tau/dt = 100 bei hoechstens 10 x N Karten -> Zulauf
+    // 6) Vorrat voll: tau/dt = 100, stock limited to 10 x N cards -> Zulauf
     //    etwa 10 : 1 zusammengelegt. Masse exakt, Ablauf im Mittel = Zulauf.
     {
         SVesselSettings s = Settings(EVesselMixing::Mixed, 20.0, EVesselFill::SteadyState);
-        s.stockFactor = 10.0;
         const size_t few = 100;
         const SSimulationGrid cards = MakeGrid(ERepresentation::Particles, few, 80.0, dt);
-        const SRun run = Run(s, cards, [](size_t) { return 10.0; });
+        const SRun run = Run(s, cards, [](size_t) { return 10.0; }, 0, kRoomTemperature, 10 * few);
         double mean = 0.0;
         const size_t from = run.out.size() / 2;
         for (size_t k = from; k < run.out.size(); ++k)
@@ -418,6 +419,15 @@ int main()
         Check(run.maxCards <= run.cap + 2 && run.merged > 0, "Vorrat voll: Kartenzahl bleibt an der Grenze, Zulauf wird zusammengelegt");
         Check(BalanceError(run, dt) < 1e-12 && NearRel(mean, 10.0 * run.feed, 0.03), "Vorrat voll: Masse exakt, Ablauf im Mittel = Zulauf (3 %)");
         Check(run.warnings.size() == 1 && run.warnings[0].find("Vorrat voll") != std::string::npos, "Vorrat voll: Hinweis");
+
+        // Without the limit the stock grows with tau/dt: room for
+        // (tau/dt + 2) x 2 N cards, nothing merged, N tau/dt cards inside.
+        const SRun free = Run(s, cards, [](size_t) { return 10.0; });
+        std::printf("      Vorrat nach tau/dt: Grenze %zu Karten (erwartet %d), %zu zusammengelegt, %zu Karten im Vorrat\n",
+            free.cap, (100 + 2) * 2 * static_cast<int>(few), free.merged, free.finalCards);
+        Check(free.cap + 1 >= (100 + 2) * 2 * few && free.cap <= (100 + 2) * 2 * few && free.merged == 0 && free.warnings.empty(),
+            "Vorrat waechst mit tau/dt: (tau/dt + 2) x 2 N Karten, nichts zusammengelegt");
+        Check(NearRel(static_cast<double>(free.finalCards), 100.0 * few, 0.02), "Vorrat nach tau/dt: N tau/dt Karten im Behaelter (2 %)");
     }
 
     // 7) Temperatur: Behaelter mit 293,15 K gefuellt, Zulauf mit 393,15 K

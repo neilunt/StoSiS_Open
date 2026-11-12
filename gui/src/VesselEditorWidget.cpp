@@ -139,7 +139,7 @@ void VesselEditorWidget::SetupUi()
     m_stockSpin->setRange(1.0, 100000.0);
     m_stockSpin->setDecimals(0);
     m_stockSpin->setSingleStep(10.0);
-    stockForm->addRow("Hoechstens [x N Karten]:", m_stockSpin);
+    stockForm->addRow("Mindestens [x N Karten]:", m_stockSpin);
     stockLayout->addLayout(stockForm);
     m_stockInfo = MakeInfoLabel(stockGroup);
     stockLayout->addWidget(m_stockInfo);
@@ -379,17 +379,18 @@ void VesselEditorWidget::OnValuesChanged()
     fillText += "\nFaustregel: Statistik und Schwankungen - wie im Dauerbetrieb; Anfahren - leer; Charge und Auswaschversuch - vorgegeben.";
     m_fillInfo->setText(fillText);
 
-    // ---- Vorrat.
+    // ---- Vorrat: room for (tau/dt + 2) inflow steps, as in CVesselUnit::StockCap.
     QString stockText;
-    if (batch)
-        stockText = QString("Charge: Der Vorrat waechst mit jedem Zulaufschritt um bis zu N = %1 Karten, bis zur Grenze.").arg(N);
-    else
     {
-        stockText = QString("Im Dauerbetrieb liegen tau/dt = %1 Zulaufschritte im Behaelter, im Partikelmodus also etwa %1 x N "
-                            "Karten (N = %2). Mehr als die Grenze haelt der Vorrat nicht: Darueber werden neue Karten paarweise "
-                            "zusammengelegt, und der Ablauf traegt weniger Karten.").arg(Short(steps, 4)).arg(N);
-        if (steps > settings.stockFactor)
-            stockText += QString(" Hier etwa %1 : 1.").arg(Num(steps / settings.stockFactor, 1));
+        const stosis::SCardSettings cards = m_graph ? m_graph->GetCardSettings() : stosis::SCardSettings();
+        const double perSlice = (cards.sliceLimits ? std::max(cards.upperFactor, 1.0) : 2.0) * static_cast<double>(N);
+        const double slices = (batch ? static_cast<double>(m_graph ? m_graph->GetGrid().numTimeSteps : 0) : steps) + 2.0;
+        const double limit = static_cast<double>(stosis::CVesselUnit::kDefaultStockLimit);
+        const double wanted = std::max(settings.stockFactor * static_cast<double>(N), slices * perSlice);
+        stockText = QString("Der Vorrat waechst mit tau/dt: Platz fuer %1 Zulaufschritte mit je hoechstens %2 Karten, "
+                            "also %3 Karten (hoechstens 10 Mio.).").arg(Short(slices, 4)).arg(Num(perSlice, 0)).arg(Num(std::min(wanted, limit), 0));
+        if (wanted > limit)
+            stockText += QString(" Hier wird begrenzt: Neue Karten werden etwa %1 : 1 zusammengelegt.").arg(Num(wanted / limit, 1));
     }
     m_stockInfo->setText(stockText);
 

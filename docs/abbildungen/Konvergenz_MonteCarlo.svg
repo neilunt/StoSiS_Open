@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 450" width="660" height="450" font-family="Calibri, Arial, sans-serif">
-<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">① Konvergenz mit der Zahl der Läufe: relativer Fehler von Streuung und Mittelwert</text>
+<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">Konvergenz mit der Zahl der Läufe: relativer Fehler von Streuung und Mittelwert</text>
 <g transform="translate(0,30)">
 <rect width="660" height="420" fill="#ffffff"/>
 <line x1="110.2" y1="50" x2="110.2" y2="340" stroke="#e1e0d9"/>

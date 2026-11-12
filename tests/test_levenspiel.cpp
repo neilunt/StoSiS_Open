@@ -5,12 +5,18 @@
 // Partikelmodus. Mit einem Ordner als Argument schreibt das Programm je
 // Ablauf eine CSV-Datei (t; exakt; Kontinuum; Partikel; jeweils E und F).
 //
+// B2: dry granulation line after Martinetz et al. (2018), API mass fraction
+// after a step 10 -> 20 % at the roller compactor and the tablet press against
+// the line model of the paper (lags in series plus dead time, closed form).
+//
 // Bezug: Der Puls fuellt das Intervall [0, dt], Ausgang k ist die Masse,
 // die in [k dt, (k + 1) dt] austritt, geteilt durch dt. Exakt ist damit
 //   r_k = 1/dt^2 * Integral_0^dt (F((k+1) dt - u) - F(k dt - u)) du
 // fuer den stetigen Teil und w/dt im Schritt T/dt fuer einen Puls w bei T.
 #include "FlowsheetFile.h"
 #include "TestSupport.h"
+#include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <fstream>
@@ -159,6 +165,93 @@ namespace
         return 1.0 - std::exp(-x) * sum;
     }
 
+    // B2 (Martinetz et al. 2018): step response of first-order lags in series
+    // with distinct time constants, F(t) = 1 - sum_i c_i exp(-t / tau_i) with
+    // c_i = prod_{j != i} tau_i / (tau_i - tau_j); zero for t <= 0.
+    double LagsStep(const std::vector<double>& taus, double t)
+    {
+        if (t <= 0.0)
+            return 0.0;
+        double f = 1.0;
+        for (size_t i = 0; i < taus.size(); ++i)
+        {
+            double c = 1.0;
+            for (size_t j = 0; j < taus.size(); ++j)
+                if (j != i)
+                    c *= taus[i] / (taus[i] - taus[j]);
+            f -= c * std::exp(-t / taus[i]);
+        }
+        return f;
+    }
+
+    struct SLineCase
+    {
+        std::string file;
+        std::string label;
+        std::string csv;
+        std::vector<double> lagsRC; // blender T1, T2, roller compactor T1, T2 [s]
+        double deadRC = 0.0;        // blender Td + bucket conveyor + roller compactor Td [s]
+        double pressLag = 0.0;      // tablet press T [s]
+        double deadPress = 0.0;     // pneumatic conveyor + tablet press Td [s]
+    };
+
+    // API mass fraction [%] after the roller compactor ("Kompaktor Totzeit")
+    // and at the tablet press ("Tabletten") in every time step.
+    bool SimulateLine(const std::string& file, bool particles, size_t cards, double& dt,
+        std::vector<double>& rc, std::vector<double>& press, std::string& error)
+    {
+        CFlowsheetGraph graph;
+        const SFlowsheetReadResult read = LoadFlowsheetFile(std::string(STOSIS_VALIDATION_DIR) + "/" + file, graph);
+        if (!read.ok || !read.warnings.empty())
+        {
+            error = read.ok ? "Hinweise beim Lesen: " + read.warnings.front() : read.error;
+            return false;
+        }
+        if (particles)
+        {
+            graph.SetRepresentation(ERepresentation::Particles);
+            SCardSettings settings = graph.GetCardSettings();
+            settings.cardsPerSlice = cards;
+            graph.SetCardSettings(settings);
+            graph.SetRecordCardHistory(false);
+        }
+        graph.RunSimulations(1);
+        dt = graph.GetGrid().GetDt();
+        const std::vector<std::string> compounds = graph.GetActiveCompounds();
+        size_t api = compounds.size();
+        for (size_t c = 0; c < compounds.size(); ++c)
+            if (compounds[c] == "Urea")
+                api = c;
+        std::string idRC, idPress;
+        for (const SFlowsheetNode& node : graph.GetNodes())
+        {
+            if (node.name == "Kompaktor Totzeit")
+                idRC = node.id;
+            if (node.name == "Tabletten")
+                idPress = node.id;
+        }
+        const CStreamRecord* recordRC = idRC.empty() ? nullptr : graph.GetDisplayRecord(idRC, 0);
+        const CStreamRecord* recordPress = idPress.empty() ? nullptr : graph.GetDisplayRecord(idPress, 0);
+        if (api == compounds.size() || !recordRC || !recordPress)
+        {
+            error = "Wirkstoff (Urea), Kompaktor Totzeit oder Tabletten fehlen";
+            return false;
+        }
+        const auto fraction = [api](const CStreamRecord& record, size_t k)
+        {
+            const double total = record.GetTotal().IntegrateOverSize(k);
+            return total > 0.0 ? 100.0 * record.GetCompound(api).IntegrateOverSize(k) / total : 0.0;
+        };
+        rc.clear();
+        press.clear();
+        for (size_t k = 0; k < recordRC->GetTotal().GetNumTimeSteps(); ++k)
+        {
+            rc.push_back(fraction(*recordRC, k));
+            press.push_back(fraction(*recordPress, k));
+        }
+        return true;
+    }
+
     struct SCase
     {
         std::string file;
@@ -288,6 +381,91 @@ int main(int argc, char* argv[])
             g.mean, g.sd, f.mean, f.sd);
         Check(std::abs(g.mean - 41.6) < 0.05 && std::abs(g.sd - 12.0) < 0.1, "B1 Grundfall: Mittel und Standardabweichung wie im Paper");
         Check(std::abs(f.mean - 68.8) < 0.05 && std::abs(f.sd - 22.4) < 0.6, "B1 Abb. 17: Mittel wie im Paper, Standardabweichung mit 9 statt 9,4 Kesseln");
+    }
+
+    // B2: dry granulation line after Martinetz et al. (2018), Tab. 2 there.
+    // API mass fraction after a step 10 -> 20 % against the line model of the
+    // paper (lags in series plus dead time). The step lies between the
+    // samples 99.5 s and 100 s; time in the paper is counted from 99.75 s.
+    {
+        const double stepTime = 99.75;
+        const std::vector<SLineCase> lines = {
+            { "Martinetz2018_B2_Linie_08kgh.json", "8 kg/h", "B2_Martinetz_08kgh", { 24.41, 0.80, 0.34, 770.12 }, 6.96 + 45.0 + 190.79, 174.32, 7.5 + 110.23 },
+            { "Martinetz2018_B2_Linie_10kgh.json", "10 kg/h", "B2_Martinetz_10kgh", { 21.50, 0.64, 0.29, 641.43 }, 6.13 + 30.0 + 181.83, 172.33, 7.5 + 101.83 },
+            { "Martinetz2018_B2_Linie_12_5kgh.json", "12,5 kg/h", "B2_Martinetz_12_5kgh", { 18.27, 0.45, 0.24, 498.43 }, 5.20 + 30.0 + 171.86, 170.12, 7.5 + 88.63 },
+            { "Martinetz2018_B2_Linie_15kgh.json", "15 kg/h", "B2_Martinetz_15kgh", { 14.71, 0.25, 0.19, 341.13 }, 4.19 + 22.5 + 160.90, 167.68, 7.5 + 76.12 },
+        };
+        // Particle mode: all lines with the cards of the file (2000) when writing
+        // the CSV files for the figures; in the regular test run only 10 kg/h
+        // with 250 cards (a line takes about 30 s with 500 cards).
+        const size_t cards = csvDir.empty() ? 250 : 2000;
+        for (const SLineCase& line : lines)
+        {
+            double dt = 0.5;
+            std::vector<double> rcC, pressC, rcP, pressP;
+            std::string error;
+            const auto t0 = std::chrono::steady_clock::now();
+            const bool okC = SimulateLine(line.file, false, 0, dt, rcC, pressC, error);
+            const auto t1 = std::chrono::steady_clock::now();
+            const bool particles = !csvDir.empty() || line.label == "10 kg/h";
+            const bool okP = !particles || (okC && SimulateLine(line.file, true, cards, dt, rcP, pressP, error));
+            if (!particles)
+            {
+                rcP = rcC;
+                pressP = pressC;
+            }
+            const auto t2 = std::chrono::steady_clock::now();
+            if (!okC || !okP)
+            {
+                Check(false, "B2 " + line.label + ": Datei laden und rechnen - " + error);
+                continue;
+            }
+            std::vector<double> lagsPress = line.lagsRC;
+            lagsPress.push_back(line.pressLag);
+            double before = 0.0, devRC = 0.0, devPress = 0.0, sqP = 0.0, meanP = 0.0;
+            size_t nP = 0;
+            std::vector<double> modelRC(rcC.size()), modelPress(rcC.size());
+            for (size_t k = 0; k < rcC.size(); ++k)
+            {
+                const double t = static_cast<double>(k) * dt - stepTime;
+                modelRC[k] = 10.0 + 10.0 * LagsStep(line.lagsRC, t - line.deadRC);
+                modelPress[k] = 10.0 + 10.0 * LagsStep(lagsPress, t - line.deadRC - line.deadPress);
+                if (t < 0.0)
+                    before = std::max({ before, std::abs(rcC[k] - 10.0), std::abs(pressC[k] - 10.0) });
+                else if (t <= 2000.0)
+                {
+                    devRC = std::max(devRC, std::abs(rcC[k] - modelRC[k]));
+                    devPress = std::max(devPress, std::abs(pressC[k] - modelPress[k]));
+                    sqP += (rcP[k] - modelRC[k]) * (rcP[k] - modelRC[k]) + (pressP[k] - modelPress[k]) * (pressP[k] - modelPress[k]);
+                    meanP += (rcP[k] - modelRC[k]) + (pressP[k] - modelPress[k]);
+                    nP += 2;
+                }
+            }
+            const double rmsP = std::sqrt(sqP / static_cast<double>(nP));
+            meanP /= static_cast<double>(nP);
+            std::printf("      B2 %-9s Kontinuum gegen Linienmodell: Kompaktor %.2e, Presse %.2e %%-Punkte; vor dem Sprung %.1e; Rechenzeit %.1f s\n",
+                line.label.c_str(), devRC, devPress, before, std::chrono::duration<double>(t1 - t0).count());
+            if (particles)
+                std::printf("         Partikelmodus (%zu Karten): RMS %.3f, Mittel %+.3f %%-Punkte gegen das Linienmodell; Rechenzeit %.1f s\n",
+                    cards, rmsP, meanP, std::chrono::duration<double>(t2 - t1).count());
+            Check(before < 1e-9, "B2 " + line.label + ": vor dem Sprung im Dauerbetrieb mit 10 % Wirkstoff");
+            Check(devRC < 0.05 && devPress < 0.05, "B2 " + line.label + ": Kontinuum folgt dem Linienmodell des Papers (0,05 %-Punkte)");
+            if (particles)
+                Check(rmsP < 2.0 && std::abs(meanP) < 0.5, "B2 " + line.label + ": Partikelmodus streut um das Linienmodell ohne Versatz");
+            if (!csvDir.empty())
+            {
+                std::ofstream file(csvDir + "/" + line.csv + ".csv");
+                file << "t_s;Modell_Kompaktor;Modell_Presse;Kontinuum_Kompaktor;Kontinuum_Presse;Partikel_Kompaktor;Partikel_Presse\n";
+                for (size_t k = 0; k < rcC.size(); ++k)
+                {
+                    const double t = static_cast<double>(k) * dt - stepTime;
+                    if (t < -50.0 || t > 2000.0)
+                        continue;
+                    file << t << ";" << modelRC[k] << ";" << modelPress[k] << ";" << rcC[k] << ";" << pressC[k] << ";"
+                         << rcP[k] << ";" << pressP[k] << "\n";
+                }
+            }
+        }
     }
     return Summary();
 }

@@ -26,7 +26,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <view id="teil3" viewBox="0 502 680 188"/>
 <text class="th" x="20" y="24">Dosierwaagen-Versuch (Engisch &amp; Muzzio 2012) und das StoSiS-Flowsheet, das ihn nachbildet</text>
 <text class="ts" x="20" y="42">Gleiche Farbe = gleiche Aufgabe: Grün liefert und schwankt, Lila misst, Orange wertet aus, Grau ist nicht nachgebildet.</text>
-<text class="th" x="20" y="70">② Versuchsaufbau im Paper (nach Abb. 1 und 4 dort, vereinfacht)</text>
+<text class="th" x="20" y="70">Versuchsaufbau im Paper (nach Abb. 1 und 4 dort, vereinfacht)</text>
 <polygon points="95,85 215,85 180,140 130,140" fill="#D3D1C7" stroke="#5F5E5A" stroke-width="0.8"/>
 <text class="ts" x="155" y="108" text-anchor="middle" style="fill:#444441">Vorrats-</text><text class="ts" x="155" y="122" text-anchor="middle" style="fill:#444441">trichter</text>
 <rect x="105" y="140" width="100" height="38" rx="3" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
@@ -65,7 +65,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <text class="ts" x="432" y="208">• Eimerwechsel und Nachfüllen werden</text>
 <text class="ts" x="442" y="223">später herausgefiltert.</text>
 
-<text class="th" x="20" y="335">③ StoSiS-Flowsheet, das den Versuch nachbildet</text>
+<text class="th" x="20" y="335">StoSiS-Flowsheet, das den Versuch nachbildet</text>
 <g class="c-teal"><rect x="30" y="355" width="125" height="50" rx="6" stroke-width="0.8"/><text class="t" x="92.5" y="376" text-anchor="middle">Inlet „Dosierer“</text><text class="ts" x="92.5" y="394" text-anchor="middle">100 kg/h, konstant</text></g>
 <line x1="155" y1="380" x2="198" y2="380" class="arr" marker-end="url(#arrow)"/>
 <g class="c-teal"><rect x="200" y="345" width="165" height="70" rx="6" stroke-width="0.8"/><text class="t" x="282.5" y="366" text-anchor="middle">Splitter „Schwankung“</text><text class="ts" x="282.5" y="384" text-anchor="middle">Ausgang 1: Anteil μ = 0,6944</text><text class="ts" x="282.5" y="401" text-anchor="middle">OU: σ = 0,81 kg/h, τ = 0,3 s</text></g>
@@ -79,7 +79,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <text class="ts" x="30" y="470">Warum ein Splitter? In StoSiS schwankt nur der Splitter (OU-Prozess). Vor einem Outlet macht er aus dem</text>
 <text class="ts" x="30" y="485">konstanten Zulauf einen schwankenden Strom – wie die Dosierwaage. Der Rest-Ausgang dient nur der Massenbilanz.</text>
 
-<text class="th" x="20" y="520">④ Was entspricht was?</text>
+<text class="th" x="20" y="520">Was entspricht was?</text>
 <text class="ts" x="45" y="540" style="font-weight:bold">Im Versuch</text><text class="ts" x="365" y="540" style="font-weight:bold">In StoSiS</text>
 <line x1="28" y1="546" x2="665" y2="546" stroke="#D3D1C7" stroke-width="0.8"/>
 <rect x="28" y="553" width="10" height="10" rx="2" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/><text class="t" x="45" y="562" style="font-size:12.5px">Trichter und Doppelschnecke liefern das Pulver</text><text class="t" x="365" y="562" style="font-size:12.5px">Inlet „Dosierer“, 100 kg/h konstant</text>

@@ -31,7 +31,9 @@ Implemented:
   settings, connections); new (Ctrl+N), open and save in the user interface,
   secured by a round-trip test. Examples in `Flowsheets/Validierungs-Flowsheets`:
   compartment models after Levenspiel and a blender, checked against their
-  exact residence time distribution (`test_levenspiel`).
+  exact residence time distribution, and a dry granulation line after
+  Martinetz et al. (2018) at four throughputs, checked against the line model
+  and the measured step response of the paper (`test_levenspiel`).
 - **Multiple runs:** global seed with a separate random stream per unit,
   mean and spread after Welford, bands and percentiles; validated against an
   analytical solution.

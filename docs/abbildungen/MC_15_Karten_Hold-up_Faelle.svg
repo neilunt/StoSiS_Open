@@ -27,7 +27,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <text class="th" x="20" y="24">Wo sich Karten sammeln – drei Fälle (Frage B)</text>
 <text class="ts" x="20" y="42">Little'sches Gesetz: Karten im Inneren einer Unit = Kartenrate × Verweilzeit τ (im Dauerzustand, Zulauf = Ablauf).</text>
 
-<text class="th" x="20" y="70">④ Durchmischt (Rührkessel, Wirbelschicht, Agglomerator): ein Vorrat</text>
+<text class="th" x="20" y="70">Durchmischt (Rührkessel, Wirbelschicht, Agglomerator): ein Vorrat</text>
 <rect x="70" y="85" width="140" height="105" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
 <g fill="#0F6E56" fill-opacity="0.45"><circle cx="119" cy="153" r="3.3"/><circle cx="103" cy="138" r="3.4"/><circle cx="106" cy="156" r="2.5"/><circle cx="99" cy="161" r="5.2"/><circle cx="150" cy="169" r="3.4"/><circle cx="136" cy="101" r="2.7"/><circle cx="129" cy="137" r="4.4"/><circle cx="184" cy="160" r="4.5"/><circle cx="101" cy="148" r="2.6"/><circle cx="109" cy="107" r="4.7"/><circle cx="125" cy="176" r="2.5"/><circle cx="125" cy="122" r="4.1"/><circle cx="166" cy="125" r="4.9"/><circle cx="158" cy="163" r="3.2"/><circle cx="160" cy="136" r="4.7"/><circle cx="123" cy="160" r="2.7"/><circle cx="88" cy="144" r="3.1"/><circle cx="157" cy="118" r="3.4"/><circle cx="161" cy="164" r="4.6"/><circle cx="118" cy="109" r="2.6"/><circle cx="88" cy="157" r="3.0"/><circle cx="182" cy="143" r="5.3"/></g>
 <text class="ts" x="140" y="200" text-anchor="middle" style="fill:#085041">Vorrat (gut gemischt)</text>
@@ -40,7 +40,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <text class="ts" x="262" y="163">• voll? neue Karten mit ähnlichen zusammenlegen</text>
 <text class="ts" x="270" y="179">(gleiche Stoffe, ähnliche Größe; Bereichsgrenzen aus Frage A)</text>
 
-<text class="th" x="20" y="228">⑤ Ohne Durchmischung (Rohr, Verzögerung, Band): Vorrat mit Alter</text>
+<text class="th" x="20" y="228">Ohne Durchmischung (Rohr, Verzögerung, Band): Vorrat mit Alter</text>
 <path d="M150,252 L150,246 L210,246 L210,252" fill="none" stroke="#854F0B" stroke-width="1.2"/>
 <text class="ts" x="180" y="241" text-anchor="middle" style="fill:#633806">Altersfenster, z. B. 0,5 s</text>
 <g stroke="#FFFFFF" stroke-width="1.5">
@@ -59,7 +59,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <text class="ts" x="362" y="337">• dazwischen: Tanks in Reihe (TIS) =</text>
 <text class="ts" x="370" y="352">Rohr mit etwas Rückvermischung</text>
 
-<text class="th" x="20" y="380">⑥ Rückführung: keine Sonderregel</text>
+<text class="th" x="20" y="380">Rückführung: keine Sonderregel</text>
 <g class="c-green"><rect x="30" y="395" width="64" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="62" y="414" text-anchor="middle">Inlet</text></g>
 <g class="c-teal"><rect x="124" y="395" width="70" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="159" y="414" text-anchor="middle">Merger</text></g>
 <g class="c-gray"><rect x="224" y="395" width="84" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="266" y="414" text-anchor="middle">Unit (A oder B)</text></g>

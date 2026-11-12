@@ -4,8 +4,8 @@
 <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#9aa5b1" stroke-width="1.5"/></pattern></defs>
 <style>text { font-family: Calibri, Arial, sans-serif; } .th { font-size: 13px; font-weight: bold; fill: #222222; } .th2 { font-size: 11.5px; font-weight: bold; fill: #222222; } .tl { font-size: 10.5px; fill: #333333; } .tn { font-size: 9.5px; fill: #5b6470; } .tu { font-size: 10px; font-weight: bold; fill: #222222; } .ta { font-size: 9px; fill: #5b6470; }</style>
 <rect width="680" height="520" fill="#ffffff"/>
-<text class="th" text-anchor="start" x="8.0" y="16.0">a) Durchmischter Kessel mit Bypass und Totzone (Levenspiel 1999, Kap. 12)</text>
-<text class="th2" text-anchor="start" x="10.0" y="38.0">① Im Original: Kompartiment-Modell</text>
+<text class="th" text-anchor="start" x="8.0" y="16.0">Durchmischter Kessel mit Bypass und Totzone (Levenspiel 1999, Kap. 12)</text>
+<text class="th2" text-anchor="start" x="10.0" y="38.0">a) Im Original: Kompartiment-Modell</text>
 <line x1="14.0" y1="110.0" x2="52.0" y2="110.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
 <text class="tn" text-anchor="start" x="20.0" y="104.0">v</text>
 <circle cx="56.0" cy="110.0" r="2.8" fill="#555555"/>
@@ -22,7 +22,7 @@
 <circle cx="250.0" cy="110.0" r="2.8" fill="#555555"/>
 <line x1="250.0" y1="110.0" x2="318.0" y2="110.0" stroke="#555555" stroke-width="1.4" marker-end="url(#mg)"/>
 <text class="tn" text-anchor="start" x="10.0" y="190.0">V/v = 10 s; exakt: E(t) = b·δ(t) + (1−b)²/(m·V/v) · exp(−(1−b) t/(m·V/v))</text>
-<text class="th2" text-anchor="start" x="350.0" y="38.0">② In StoSiS (Levenspiel_A1_Bypass_Totzone.json)</text>
+<text class="th2" text-anchor="start" x="350.0" y="38.0">b) In StoSiS (Levenspiel_A1_Bypass_Totzone.json)</text>
 <rect x="352.0" y="64.0" width="60.0" height="24" rx="5" fill="#d4ecd4" stroke="#4f8f4f" stroke-width="1.3"/>
 <text class="tu" text-anchor="middle" x="382.0" y="80.0">Inlet</text>
 <text class="tn" text-anchor="middle" x="382.0" y="100.0">Puls 1 kg</text>
@@ -45,8 +45,8 @@
 <rect x="628.0" y="64.0" width="42.0" height="24" rx="5" fill="#d4e4f4" stroke="#4f77a8" stroke-width="1.3"/>
 <text class="tu" text-anchor="middle" x="649.0" y="80.0">Outlet</text>
 <text class="tn" text-anchor="start" x="352.0" y="166.0">τ = m·V/((1−b)v) = 0,8 · 10 s / 0,8 = 10 s; Δt = 0,1 s; 100 s</text>
-<text class="th2" text-anchor="start" x="10.0" y="212.0">③ Exakte Lösung</text>
-<text class="tn" text-anchor="start" x="10.0" y="224.0">Referenz ist die Formel aus ①, keine Messung</text>
+<text class="th2" text-anchor="start" x="10.0" y="212.0">c) Exakte Lösung</text>
+<text class="tn" text-anchor="start" x="10.0" y="224.0">Referenz ist die Formel aus a), keine Messung</text>
 <rect x="44.0" y="232.0" width="276.0" height="98.0" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
 <line x1="44.0" y1="330.0" x2="320.0" y2="330.0" stroke="#eef2f6" stroke-width="1"/>
 <text class="ta" text-anchor="end" x="40.0" y="333.0">0</text>
@@ -61,7 +61,7 @@
 <text class="ta" text-anchor="middle" x="320.0" y="342.0">50 s</text>
 <text class="ta" text-anchor="middle" x="18.0" y="281.0">F</text>
 <path d="M44.6,310.0 L46.2,307.7 L47.9,305.5 L49.5,303.3 L51.2,301.2 L52.8,299.1 L54.5,297.2 L56.1,295.2 L57.8,293.4 L59.5,291.6 L61.1,289.8 L62.8,288.1 L64.4,286.4 L66.1,284.8 L67.7,283.3 L69.4,281.7 L71.0,280.3 L72.7,278.8 L74.4,277.5 L76.0,276.1 L77.7,274.8 L79.3,273.5 L81.0,272.3 L82.6,271.1 L84.3,270.0 L86.0,268.8 L87.6,267.8 L89.3,266.7 L90.9,265.7 L92.6,264.7 L94.2,263.7 L95.9,262.8 L97.5,261.9 L99.2,261.0 L100.9,260.1 L102.5,259.3 L104.2,258.5 L105.8,257.7 L107.5,256.9 L109.1,256.2 L110.8,255.5 L112.4,254.8 L114.1,254.1 L115.8,253.5 L117.4,252.8 L119.1,252.2 L120.7,251.6 L122.4,251.0 L124.0,250.5 L125.7,249.9 L127.4,249.4 L129.0,248.9 L130.7,248.4 L132.3,247.9 L134.0,247.4 L135.6,247.0 L137.3,246.5 L138.9,246.1 L140.6,245.7 L142.3,245.3 L143.9,244.9 L145.6,244.5 L147.2,244.1 L148.9,243.8 L150.5,243.4 L152.2,243.1 L153.8,242.8 L155.5,242.5 L157.2,242.1 L158.8,241.8 L160.5,241.6 L162.1,241.3 L163.8,241.0 L165.4,240.7 L167.1,240.5 L168.8,240.2 L170.4,240.0 L172.1,239.7 L173.7,239.5 L175.4,239.3 L177.0,239.1 L178.7,238.9 L180.3,238.7 L182.0,238.5 L183.7,238.3 L185.3,238.1 L187.0,237.9 L188.6,237.7 L190.3,237.6 L191.9,237.4 L193.6,237.2 L195.2,237.1 L196.9,236.9 L198.6,236.8 L200.2,236.6 L201.9,236.5 L203.5,236.4 L205.2,236.2 L206.8,236.1 L208.5,236.0 L210.2,235.9 L211.8,235.8 L213.5,235.7 L215.1,235.5 L216.8,235.4 L218.4,235.3 L220.1,235.2 L221.7,235.1 L223.4,235.1 L225.1,235.0 L226.7,234.9 L228.4,234.8 L230.0,234.7 L231.7,234.6 L233.3,234.6 L235.0,234.5 L236.6,234.4 L238.3,234.3 L240.0,234.3 L241.6,234.2 L243.3,234.1 L244.9,234.1 L246.6,234.0 L248.2,233.9 L249.9,233.9 L251.6,233.8 L253.2,233.8 L254.9,233.7 L256.5,233.7 L258.2,233.6 L259.8,233.6 L261.5,233.5 L263.1,233.5 L264.8,233.4 L266.5,233.4 L268.1,233.4 L269.8,233.3 L271.4,233.3 L273.1,233.2 L274.7,233.2 L276.4,233.2 L278.0,233.1 L279.7,233.1 L281.4,233.1 L283.0,233.0 L284.7,233.0 L286.3,233.0 L288.0,232.9 L289.6,232.9 L291.3,232.9 L293.0,232.9 L294.6,232.8 L296.3,232.8 L297.9,232.8 L299.6,232.8 L301.2,232.7 L302.9,232.7 L304.5,232.7 L306.2,232.7 L307.9,232.7 L309.5,232.6 L311.2,232.6 L312.8,232.6 L314.5,232.6 L316.1,232.6 L317.8,232.6 L319.4,232.5" fill="none" stroke="#222222" stroke-width="1.6"/>
-<text class="th2" text-anchor="start" x="350.0" y="212.0">④ StoSiS: Ablauf am Outlet</text>
+<text class="th2" text-anchor="start" x="350.0" y="212.0">d) StoSiS: Ablauf am Outlet</text>
 <text class="tn" text-anchor="start" x="350.0" y="224.0">Kreise: Kontinuum, gestrichelt: Partikelmodus (2000 Karten)</text>
 <rect x="384.0" y="232.0" width="276.0" height="98.0" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
 <line x1="384.0" y1="330.0" x2="660.0" y2="330.0" stroke="#eef2f6" stroke-width="1"/>
@@ -99,7 +99,7 @@
 <circle cx="626.9" cy="233.0" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
 <circle cx="639.0" cy="232.8" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
 <circle cx="651.2" cy="232.6" r="2.6" fill="none" stroke="#ea580c" stroke-width="1.2"/>
-<text class="th2" text-anchor="start" x="10.0" y="362.0">⑤ Übereinander: Exakte Lösung (Linie) und StoSiS</text>
+<text class="th2" text-anchor="start" x="10.0" y="362.0">e) Übereinander: Exakte Lösung (Linie) und StoSiS</text>
 <rect x="44.0" y="382.0" width="416.0" height="118.0" fill="#ffffff" stroke="#cbd5e1" stroke-width="0.8"/>
 <line x1="44.0" y1="500.0" x2="460.0" y2="500.0" stroke="#eef2f6" stroke-width="1"/>
 <text class="ta" text-anchor="end" x="40.0" y="503.0">0</text>

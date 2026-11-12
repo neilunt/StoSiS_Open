@@ -1,0 +1,303 @@
+{
+    "format": "StoSiS-Flowsheet",
+    "version": 2,
+    "program": "StoSiS 0.1.1",
+    "info": "Martinetz et al. (2018), Int. J. Pharm. 547, 469-479, Tab. 2: Trockengranulier-Linie bei 7,92 kg/h (8 kg/h, Kennwerte dort extrapoliert). Mischer und Walzenkompaktor je zwei Kessel und Totzeit, Becherfoerderer und pneumatische Foerderung als Totzeit (halbe Sammelzeit), Tablettenpresse ein Kessel und Totzeit (T1 = T2 = T3 dort). Sprung des Wirkstoffanteils 10 -> 20 % bei t = 100 s (zwischen 99,5 und 100 s), Gesamtstrom gleich. Urea steht fuer den Wirkstoff, Lactose fuer die Hilfsstoffe.",
+    "simulation": {
+        "duration": 2100.0,
+        "dt": 0.5,
+        "seed": 1,
+        "runs": 1,
+        "representation": "continuum",
+        "sizeGrid": { "type": "logarithmic", "classes": 30, "dMin": 1e-06, "dMax": 0.001 },
+        "cards": {
+            "perSlice": 2000,
+            "rule": "sum",
+            "numberShare": 0.5,
+            "exponent": 0.8,
+            "sliceLimits": true,
+            "upperFactor": 2.0,
+            "splitFactor": 5.0
+        }
+    },
+    "execution": { "detailedLog": false, "cardHistory": true },
+    "units": [
+        {
+            "id": "node_0",
+            "type": "Inlet",
+            "name": "Wirkstoff",
+            "position": [0.0, 0.0],
+            "settings": {
+                "material": "Urea",
+                "temperature": 293.15,
+                "pressure": 101325.0,
+                "massFlow": [[0.0, 0.00022], [99.8, 0.00022], [99.9, 0.00044], [2100.0, 0.00044]],
+                "sizeDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] }
+            }
+        }
+,
+        {
+            "id": "node_1",
+            "type": "Inlet",
+            "name": "Hilfsstoffe",
+            "position": [0.0, 120.0],
+            "settings": {
+                "material": "Lactose",
+                "temperature": 293.15,
+                "pressure": 101325.0,
+                "massFlow": [[0.0, 0.00198], [99.8, 0.00198], [99.9, 0.00176], [2100.0, 0.00176]],
+                "sizeDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] }
+            }
+        }
+,
+        {
+            "id": "node_2",
+            "type": "Merger",
+            "name": "Merger",
+            "position": [150.0, 60.0],
+            "inputs": 2
+        }
+,
+        {
+            "id": "node_3",
+            "type": "Vessel",
+            "name": "Mischer Kessel 1",
+            "position": [300.0, 60.0],
+            "settings": {
+                "mixing": "mixed",
+                "residenceTime": 24.41,
+                "batch": false,
+                "cells": 3,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "steadyState",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_4",
+            "type": "Vessel",
+            "name": "Mischer Kessel 2",
+            "position": [450.0, 60.0],
+            "settings": {
+                "mixing": "mixed",
+                "residenceTime": 0.80,
+                "batch": false,
+                "cells": 3,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "steadyState",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_5",
+            "type": "Vessel",
+            "name": "Mischer Totzeit",
+            "position": [600.0, 60.0],
+            "settings": {
+                "mixing": "plug",
+                "residenceTime": 6.96,
+                "batch": false,
+                "cells": 3,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "steadyState",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_6",
+            "type": "Vessel",
+            "name": "Becherfoerderer",
+            "position": [750.0, 60.0],
+            "settings": {
+                "mixing": "plug",
+                "residenceTime": 45.0,
+                "batch": false,
+                "cells": 3,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "steadyState",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_7",
+            "type": "Vessel",
+            "name": "Kompaktor Kessel 1",
+            "position": [900.0, 60.0],
+            "settings": {
+                "mixing": "mixed",
+                "residenceTime": 0.34,
+                "batch": false,
+                "cells": 3,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "steadyState",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_8",
+            "type": "Vessel",
+            "name": "Kompaktor Kessel 2",
+            "position": [1050.0, 60.0],
+            "settings": {
+                "mixing": "mixed",
+                "residenceTime": 770.12,
+                "batch": false,
+                "cells": 3,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "steadyState",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_9",
+            "type": "Vessel",
+            "name": "Kompaktor Totzeit",
+            "position": [1200.0, 60.0],
+            "settings": {
+                "mixing": "plug",
+                "residenceTime": 190.79,
+                "batch": false,
+                "cells": 3,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "steadyState",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_10",
+            "type": "Vessel",
+            "name": "Pneumatik",
+            "position": [1350.0, 60.0],
+            "settings": {
+                "mixing": "plug",
+                "residenceTime": 7.5,
+                "batch": false,
+                "cells": 3,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "steadyState",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_11",
+            "type": "Vessel",
+            "name": "Presse Kessel",
+            "position": [1500.0, 60.0],
+            "settings": {
+                "mixing": "mixed",
+                "residenceTime": 174.32,
+                "batch": false,
+                "cells": 3,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "steadyState",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_12",
+            "type": "Vessel",
+            "name": "Presse Totzeit",
+            "position": [1650.0, 60.0],
+            "settings": {
+                "mixing": "plug",
+                "residenceTime": 110.23,
+                "batch": false,
+                "cells": 3,
+                "coreShare": 0.6,
+                "coreTime": 0.3,
+                "fill": "steadyState",
+                "fillMass": 100.0,
+                "fillMaterial": "Sand",
+                "fillDistribution": { "type": "lognormal", "position": 0.0001, "width": 0.25, "points": [] },
+                "fillTemperature": 293.15,
+                "fillPressure": 101325.0,
+                "stockFactor": 100.0
+            }
+        }
+,
+        {
+            "id": "node_13",
+            "type": "Outlet",
+            "name": "Tabletten",
+            "position": [1800.0, 60.0]
+        }
+    ],
+    "connections": [
+        { "from": "node_0", "output": 1, "to": "node_2", "input": 1, "recycle": "no" },
+        { "from": "node_1", "output": 1, "to": "node_2", "input": 2, "recycle": "no" },
+        { "from": "node_2", "output": 1, "to": "node_3", "input": 1, "recycle": "no" },
+        { "from": "node_3", "output": 1, "to": "node_4", "input": 1, "recycle": "no" },
+        { "from": "node_4", "output": 1, "to": "node_5", "input": 1, "recycle": "no" },
+        { "from": "node_5", "output": 1, "to": "node_6", "input": 1, "recycle": "no" },
+        { "from": "node_6", "output": 1, "to": "node_7", "input": 1, "recycle": "no" },
+        { "from": "node_7", "output": 1, "to": "node_8", "input": 1, "recycle": "no" },
+        { "from": "node_8", "output": 1, "to": "node_9", "input": 1, "recycle": "no" },
+        { "from": "node_9", "output": 1, "to": "node_10", "input": 1, "recycle": "no" },
+        { "from": "node_10", "output": 1, "to": "node_11", "input": 1, "recycle": "no" },
+        { "from": "node_11", "output": 1, "to": "node_12", "input": 1, "recycle": "no" },
+        { "from": "node_12", "output": 1, "to": "node_13", "input": 1, "recycle": "no" }
+    ]
+}

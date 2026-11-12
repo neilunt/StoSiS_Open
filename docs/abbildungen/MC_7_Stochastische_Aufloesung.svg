@@ -17,7 +17,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 .c-green text { fill: #27500A; }
 </style>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
-<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">① Stochastische Auflösung: dieselben zwei Karten mit drei Lupen</text>
+<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">Stochastische Auflösung: dieselben zwei Karten mit drei Lupen</text>
 <g transform="translate(0,30)">
 <text class="th" x="340" y="26" text-anchor="middle">Zwei Karten mit unterschiedlichem Gewicht</text>
 <g class="c-amber"><rect x="220" y="38" width="110" height="44" rx="4" stroke-width="0.5"/><text class="th" x="275" y="54" text-anchor="middle" dominant-baseline="central">Sand</text><text class="ts" x="275" y="71" text-anchor="middle" dominant-baseline="central">w = 10 000</text></g>

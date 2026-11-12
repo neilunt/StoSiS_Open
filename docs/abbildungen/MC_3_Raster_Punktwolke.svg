@@ -13,7 +13,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 .arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
 </style>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
-<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">② Raster gegen Punktwolke: dieselben 75 Rechenpartikel</text>
+<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">Raster gegen Punktwolke: dieselben 75 Rechenpartikel</text>
 <g transform="translate(0,30)">
 <text class="th" x="210" y="34" text-anchor="middle">Raster: 10 × 10 = 100 Fächer</text>
 <text class="ts" x="210" y="52" text-anchor="middle">20 belegt, 80 leer</text>

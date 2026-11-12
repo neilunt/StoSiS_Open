@@ -13,7 +13,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 .arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
 </style>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
-<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">② Ein Koagulationsereignis: Totalkoagulation gegen SWA</text>
+<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">Ein Koagulationsereignis: Totalkoagulation gegen SWA</text>
 <g transform="translate(0,24)">
 <text class="th" x="340" y="34" text-anchor="middle">Vorher: je 10 000 echte Körner</text>
 <g class="c-amber"><rect x="230" y="50" width="100" height="52" rx="4" stroke-width="0.5"/><text class="th" x="280" y="69" text-anchor="middle" dominant-baseline="central">Sand</text><text class="ts" x="280" y="88" text-anchor="middle" dominant-baseline="central">w = 10 000</text></g>

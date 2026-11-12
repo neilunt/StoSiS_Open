@@ -25,7 +25,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <view id="teil2" viewBox="0 182 680 272"/>
 <view id="teil3" viewBox="0 454 680 110"/>
 <view id="teil4" viewBox="0 564 680 240"/>
-<text class="th" x="20" y="22">④ Inlet: stetige Verteilung – Standard Log-Normal, d50 = 100 µm, σln = 0,25</text>
+<text class="th" x="20" y="22">Inlet: stetige Verteilung – Standard Log-Normal, d50 = 100 µm, σln = 0,25</text>
 <line x1="157.9" y1="36" x2="157.9" y2="140" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="3 3"/>
 <line x1="287.4" y1="36" x2="287.4" y2="140" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="3 3"/>
 <line x1="417.0" y1="36" x2="417.0" y2="140" stroke="#854F0B" stroke-width="0.8" stroke-dasharray="3 3"/>
@@ -47,7 +47,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <text class="ts" x="630.0" y="153" text-anchor="middle">400</text>
 <text class="ts" x="630" y="166" text-anchor="end">Größe d [µm], logarithmisch; gestrichelt: Siebsatz 1 µm · 2^k</text>
 <text class="ts" x="20" y="166" style="fill:#7A7870">SizeDistribution.h: Dichte, Q3, Quantil</text>
-<text class="th" x="20" y="200">⑤ Karten verteilen – zur Anschauung 20 statt 2000 Karten</text>
+<text class="th" x="20" y="200">Karten verteilen – zur Anschauung 20 statt 2000 Karten</text>
 <text class="ts" x="20" y="220" style="font-weight:bold">Bereich</text>
 <text class="ts" x="260" y="220" style="font-weight:bold">32–64 µm</text>
 <text class="ts" x="360" y="220" style="font-weight:bold">64–128 µm</text>
@@ -115,7 +115,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <text class="ts" x="630.0" y="427" text-anchor="middle">400</text>
 <text class="ts" x="630" y="440" text-anchor="end">jede Karte an ihrem Quantil (Abb. 13.21.2), Höhe = Masse je Karte</text>
 <text class="ts" x="20" y="440" style="fill:#7A7870">CardSettings.h, CardPlacement.h, InletUnit.h</text>
-<text class="th" x="20" y="472">⑥ Durch die Units: Karten bleiben Karten</text>
+<text class="th" x="20" y="472">Durch die Units: Karten bleiben Karten</text>
 <g class="c-green"><rect x="30" y="484" width="150" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="105" y="503" text-anchor="middle">Inlet</text></g>
 <g class="c-purple"><rect x="250" y="484" width="150" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="325" y="503" text-anchor="middle">Splitter</text></g>
 <g class="c-amber"><rect x="470" y="484" width="150" height="30" rx="4" stroke-width="0.8"/><text class="ts" x="545" y="503" text-anchor="middle">Outlet</text></g>
@@ -133,7 +133,7 @@ text { font-family: Calibri, Arial, sans-serif; }
 <circle cx="241" cy="491" r="2.5" fill="#534AB7"/>
 <text class="ts" x="20" y="532">Im Strom wandern die Karten selbst (Größe + Massenstrom je Stoff); der Splitter verteilt ganze Karten (Konto-Verfahren, 13.22).</text>
 <text class="ts" x="20" y="548" style="fill:#7A7870">StreamSlice.h (Karten im Strom), FlowsheetGraph.h (reicht die Scheiben weiter, prüft, ob jede Unit Karten kann)</text>
-<text class="th" x="20" y="582">⑦ Für die Anzeige: Karten zurück aufs Raster (jeder Ausgang, jeder Zeitschritt)</text>
+<text class="th" x="20" y="582">Für die Anzeige: Karten zurück aufs Raster (jeder Ausgang, jeder Zeitschritt)</text>
 <rect x="30" y="604" width="190" height="104" rx="5" fill="#F7F6F2" stroke="#B4B2A9"/>
 <line x1="40" y1="682" x2="210" y2="682" stroke="#B4B2A9"/>
 <line x1="60" y1="640" x2="60" y2="682" stroke="#0F6E56" stroke-width="5"/>
