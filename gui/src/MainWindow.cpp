@@ -16,6 +16,7 @@
 #include <QToolBar>
 #include <QStatusBar>
 #include <QSplitter>
+#include <QTabWidget>
 #include <QLabel>
 #include <QPushButton>
 #include <QDoubleSpinBox>
@@ -305,24 +306,21 @@ void MainWindow::SetupCentralArea()
                 m_settingsWindow->RefreshPreviews();
         });
 
-    // --- Rechts: Kurven ueber Heatmap --------------------------------
-    // Beide gleich breit, damit die Zeitachsen exakt untereinander liegen.
+    // --- Right: curves and heatmap as tabs ----------------------------
+    // The curves get the whole height; the heatmap is one click away.
     m_resultsCurveView = new ResultsCurveWindow(this);
     m_resultsCurveView->SetGraph(&m_graph);
     m_resultsHeatmapView = new ResultsHeatmapWindow(this);
     m_resultsHeatmapView->SetGraph(&m_graph);
 
-    auto* resultsSplitter = new QSplitter(Qt::Vertical, this);
-    resultsSplitter->addWidget(m_resultsCurveView);
-    resultsSplitter->addWidget(m_resultsHeatmapView);
-    resultsSplitter->setStretchFactor(0, 1);
-    resultsSplitter->setStretchFactor(1, 1);
-    resultsSplitter->setSizes({ 500, 500 });
+    auto* resultsTabs = new QTabWidget(this);
+    resultsTabs->addTab(m_resultsCurveView, "Kurven");
+    resultsTabs->addTab(m_resultsHeatmapView, "Heatmap");
 
     // --- Gesamtaufteilung: ~35 % Flowsheet, ~65 % Ergebnisse ---------
     auto* mainSplitter = new QSplitter(Qt::Horizontal, this);
     mainSplitter->addWidget(flowsheetPanel);
-    mainSplitter->addWidget(resultsSplitter);
+    mainSplitter->addWidget(resultsTabs);
     mainSplitter->setStretchFactor(0, 35);
     mainSplitter->setStretchFactor(1, 65);
     mainSplitter->setSizes({ 350, 650 });

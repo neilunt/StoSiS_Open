@@ -31,7 +31,7 @@
 <p class="sub">Bedienung der Fenster. Was das Programm rechnet und warum, steht im Methodenhandbuch.</p>
 
 <nav>
-  <a href="#datei">Flowsheet als Datei</a> · <a href="#export">Weitere Dateien speichern</a> · <a href="#struktur">Fenster „Struktur“</a>
+  <a href="#datei">Flowsheet als Datei</a> · <a href="#export">Weitere Dateien speichern</a> · <a href="#struktur">Fenster „Struktur“</a> · <a href="#kurven">Kurven und Heatmap</a>
 </nav>
 
 <h2 id="datei">Flowsheet als Datei</h2>
@@ -40,7 +40,7 @@
   <li><b>Öffnen:</b> Menü Flowsheet → „Flowsheet aus Datei öffnen …“ (<kbd>Strg</kbd>+<kbd>O</kbd>). Der Dialog beginnt im Ordner <code>Flowsheets</code> im StoSiS-Ordner, danach im zuletzt benutzten Ordner; beim Speichern ebenso. Das bisherige Flowsheet wird nur ersetzt, wenn die Datei fehlerfrei gelesen wurde. Danach rechnet StoSiS sofort. Hinweise zu fehlenden oder unbekannten Feldern erscheinen in einem Fenster.</li>
   <li><b>Speichern:</b> Menü Flowsheet → „Flowsheet speichern“ (<kbd>Strg</kbd>+<kbd>S</kbd>) überschreibt die Datei, aus der das Flowsheet geöffnet oder in die es zuletzt gespeichert wurde; ihr Name steht in der Titelleiste. Hat das Flowsheet noch keine Datei (Programmstart, <kbd>Strg</kbd>+<kbd>N</kbd>; Titelleiste „ohne Datei“), fragt es wie „Speichern unter“ nach dem Namen.</li>
   <li><b>Speichern unter:</b> Menü Flowsheet → „Flowsheet speichern unter …“ (<kbd>Strg</kbd>+<kbd>Umschalt</kbd>+<kbd>S</kbd>) oder der Knopf im Fenster „Struktur“; danach gilt die neue Datei für <kbd>Strg</kbd>+<kbd>S</kbd>. Vorgeschlagen wird der Name der offenen Datei.</li>
-  <li><b>Beispiele:</b> Der Ordner <code>Flowsheets/Validierungs-Flowsheets</code> enthält die Validierungs-Flowsheets (Kompartiment-Modelle nach Levenspiel, Mischer nach Engisch &amp; Muzzio, Trockengranulier-Linie nach Martinetz et al. bei vier Durchsätzen).</li>
+  <li><b>Beispiele:</b> Der Ordner <code>Flowsheets/Validierungs-Flowsheets</code> enthält die Validierungs-Flowsheets (Kompartiment-Modelle nach Levenspiel, Mischer nach Engisch &amp; Muzzio, Trockengranulier-Linie nach Martinetz et al. bei vier Durchsätzen, Störfälle am Wirkstoffdosierer nach Kruisz et al., Durchlaufmischer mit gemessenem Dosierstrom nach Gao et al.).</li>
   <li><b>In der Datei:</b> alle Einstellungen von Simulation und Units, die Verbindungen, das ausführliche Laufzeitprotokoll und „Karten speichern“ der Kartenansicht. Nicht darin: Ergebnisse, Auswertung, Kartenansicht, Fensterlage. Stoffe stehen nur mit Namen darin.</li>
   <li><b><code>"recycle"</code></b> je Verbindung: <code>"manual"</code> = von Hand als Rückführung markiert, <code>"auto"</code> = von StoSiS aufgeschnitten, <code>"no"</code> = nicht aufgeschnitten. <code>"auto"</code> ist nur Information; beim Öffnen schneidet StoSiS neu.</li>
 </ul>
@@ -49,7 +49,7 @@
 <ul>
   <li><b>Vorgeschlagener Name:</b> <code>StoSiS_&lt;Art&gt;_&lt;Flowsheet&gt;</code>, zum Beispiel <code>StoSiS_Laufzeiten_Flowsheet_test1.csv</code>. <code>&lt;Flowsheet&gt;</code> ist der Name der offenen Datei aus der Titelleiste; ohne Datei fällt er weg.</li>
   <li><b>Laufzeitprotokoll und Laufzeit-Tabelle</b> (Fenster „Laufzeitprotokoll“): Der Dialog beginnt im Ordner <code>Laufzeiten</code> im StoSiS-Ordner, danach im zuletzt benutzten Ordner. Fehlt der Ordner, legt StoSiS ihn an.</li>
-  <li><b>Karten als CSV</b> (Kartenansicht, Reiter „Tabelle“) und <b>Fenstermittel als CSV</b> (Auswertung): Name wie oben.</li>
+  <li><b>Karten als CSV</b> (Kartenansicht, Reiter „Tabelle“), <b>Fenstermittel als CSV</b> (Auswertung) und <b>Kurven als CSV</b> (Reiter „Kurven“): Name wie oben.</li>
   <li><b>„Karten speichern (Lauf 1)“</b> in der Kartenansicht: Aus = keine Kartenansicht, weniger Arbeitsspeicher, gleiche Ergebnisse. Gilt ab der nächsten Simulation.</li>
 </ul>
 
@@ -68,6 +68,19 @@
 <ul>
   <li>Derselbe Baum als Liste, mit den Spalten Schritt (Rechenreihenfolge), Typ, ID, Anschluss (Ausgang bzw. Eingang, wenn es mehrere gibt) und Hinweis (Kreis, Art des Schnitts).</li>
   <li>✂ = aufgeschnittene Verbindung, → = weiterer Zulauf zu einer Unit an anderer Stelle.</li>
+</ul>
+
+<h2 id="kurven">Kurven und Heatmap</h2>
+<p>Rechts neben dem Flowsheet stehen die Ergebnisse in zwei Reitern: „Kurven“ (Verlauf über die Zeit) und „Heatmap“ (Verteilung über Größe und Zeit).</p>
+<h3>Reiter „Kurven“</h3>
+<ul>
+  <li><b>Auswahl:</b> In „Einheiten“ und „Stoffe“ markiert <kbd>Strg</kbd>+Klick mehrere Einträge, <kbd>Umschalt</kbd>+Klick einen Bereich. Je Einheit und Stoff entsteht eine Kurve; „alle Stoffe“ ist die Summe. Die Stoffe gelten nur für den Massenstrom.</li>
+  <li><b>Verschieben:</b> mit gedrückter linker Maustaste ziehen.</li>
+  <li><b>Ausschnitt vergrößern:</b> mit gedrückter rechter Maustaste ein Rechteck aufziehen; beim Loslassen füllt es das Diagramm. Das Mausrad zoomt um den Punkt unter dem Mauszeiger.</li>
+  <li><b>Alles zeigen:</b> Doppelklick ins Diagramm oder Knopf „Gesamtansicht“. Ein anderes Streuband oder eine neue Simulation behält den Ausschnitt; andere Einheiten oder Stoffe zeigen wieder alles.</li>
+  <li><b>Hilfslinien:</b> gestrichelt an den beschrifteten Werten beider Achsen, gepunktet an je drei Zwischenmarken dazwischen.</li>
+  <li><b>Legende</b> unter dem Diagramm: Die Farbe steht für die Einheit, die Linienart für den Stoff (durchgezogen = „alle Stoffe“, dann gestrichelt, gepunktet …, in der Reihenfolge der Stoffliste). Lange Namen brechen in die nächste Zeile um.</li>
+  <li><b>Kurven als CSV …:</b> speichert die gezeigten Kurven mit allen Zeitschritten, unabhängig vom Ausschnitt: Spalte <code>t_s</code>, dann je Kurve der Mittelwert über die Läufe, bei Streuband auch „unten“ und „oben“, bei „Einzelläufe zeigen“ jeder gezeichnete Lauf. Trennzeichen Semikolon, Dezimalpunkt; Kopfzeilen mit <code>#</code> nennen Größe, Einheit, Läufe und Zeitschritt. Der Dialog beginnt im Ordner <code>Kurven</code> im StoSiS-Ordner, danach im zuletzt benutzten Ordner; fehlt der Ordner, legt StoSiS ihn an.</li>
 </ul>
 </main>
 </body>

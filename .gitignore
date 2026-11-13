@@ -19,5 +19,6 @@ CMakeUserPresets.json
 # Aus den HTML-Dokumenten in docs/ erzeugte PDFs (bei Bedarf selbst drucken)
 docs/*.pdf
 
-# Saved runtime logs and tables of the user (folder is created by the program)
+# Saved runtime logs, tables and curves of the user (folders are created by the program)
 Laufzeiten/
+Kurven/
