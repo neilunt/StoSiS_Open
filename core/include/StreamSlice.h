@@ -32,9 +32,11 @@ namespace stosis
     // Stoffe sind ueber ihren Index in SSimulationGrid::compounds
     // angesprochen (die aktiven Stoffe des Flowsheets).
     //
-    // Karten (nur im Partikelmodus): Jede Karte steht fuer viele gleiche
-    // Partikel und hat eine Groesse d [m] und einen Massenstrom je Stoff
-    // [kg/s] - die Masse, die sie in einer Sekunde durch den Strom traegt.
+    // Cards (particle mode only): every card stands for a package of many
+    // equal particles and has a size d [m] and a mass per compound [kg] - the
+    // mass in this package, i.e. what the stream carries during one time step
+    // dt. Rates arise only where a flow is needed (results, diagrams, Dyssol):
+    // mass flow = mass / dt.
     // Mehrere Stoffe in einer Karte entstehen erst durch Koagulation; bis
     // dahin hat jede Karte genau einen Stoff. Die Partikelzahl (das
     // "Gewicht" der Karte) folgt aus Masse, Groesse und Dichte und wird erst
@@ -51,7 +53,7 @@ namespace stosis
             m_representation = representation;
             m_values.assign(m_numCompounds * m_numSizeClasses, 0.0);
             m_cardSizes.clear();
-            m_cardMassFlows.clear();
+            m_cardMasses.clear();
             ResetConditions();
         }
 
@@ -60,7 +62,7 @@ namespace stosis
         {
             std::fill(m_values.begin(), m_values.end(), 0.0);
             m_cardSizes.clear(); // Speicher bleibt reserviert
-            m_cardMassFlows.clear();
+            m_cardMasses.clear();
             ResetConditions();
         }
 
@@ -146,36 +148,36 @@ namespace stosis
         size_t GetNumCards() const { return m_cardSizes.size(); }
         double GetCardSize(size_t card) const { return m_cardSizes[card]; }
 
-        double GetCardMassFlow(size_t card, size_t compound) const
+        double GetCardMass(size_t card, size_t compound) const
         {
-            return m_cardMassFlows[card * m_numCompounds + compound];
+            return m_cardMasses[card * m_numCompounds + compound];
         }
 
-        // Massenstrom einer Karte ueber alle Stoffe.
-        double GetCardMassFlow(size_t card) const
+        // Mass of a card over all compounds [kg].
+        double GetCardMass(size_t card) const
         {
             double sum = 0.0;
             for (size_t c = 0; c < m_numCompounds; ++c)
-                sum += m_cardMassFlows[card * m_numCompounds + c];
+                sum += m_cardMasses[card * m_numCompounds + c];
             return sum;
         }
 
         // Neue Karte aus einem einzigen Stoff (so erzeugen sie die Inlets).
-        void AddCard(double size, size_t compound, double massFlow)
+        void AddCard(double size, size_t compound, double mass)
         {
             m_cardSizes.push_back(size);
-            m_cardMassFlows.insert(m_cardMassFlows.end(), m_numCompounds, 0.0);
+            m_cardMasses.insert(m_cardMasses.end(), m_numCompounds, 0.0);
             if (compound < m_numCompounds)
-                m_cardMassFlows[(m_cardSizes.size() - 1) * m_numCompounds + compound] = massFlow;
+                m_cardMasses[(m_cardSizes.size() - 1) * m_numCompounds + compound] = mass;
         }
 
-        // Neue Karte mit Massenstrom je Stoff (nach Koagulation); fehlende
+        // New card with a mass per compound [kg] (after coagulation); missing
         // Stoffe zaehlen als 0, ueberzaehlige werden ignoriert.
-        void AddCard(double size, const std::vector<double>& compoundMassFlows)
+        void AddCard(double size, const std::vector<double>& compoundMasses)
         {
             m_cardSizes.push_back(size);
             for (size_t c = 0; c < m_numCompounds; ++c)
-                m_cardMassFlows.push_back(c < compoundMassFlows.size() ? compoundMassFlows[c] : 0.0);
+                m_cardMasses.push_back(c < compoundMasses.size() ? compoundMasses[c] : 0.0);
         }
 
         // Eine Karte aus einer anderen Scheibe uebernehmen (Splitter). Bei
@@ -184,7 +186,7 @@ namespace stosis
         {
             m_cardSizes.push_back(from.m_cardSizes[card]);
             for (size_t c = 0; c < m_numCompounds; ++c)
-                m_cardMassFlows.push_back(c < from.m_numCompounds ? from.m_cardMassFlows[card * from.m_numCompounds + c] : 0.0);
+                m_cardMasses.push_back(c < from.m_numCompounds ? from.m_cardMasses[card * from.m_numCompounds + c] : 0.0);
         }
 
         // Alle Karten einer anderen Scheibe anhaengen (Merger).
@@ -193,7 +195,7 @@ namespace stosis
             if (from.m_numCompounds == m_numCompounds)
             {
                 m_cardSizes.insert(m_cardSizes.end(), from.m_cardSizes.begin(), from.m_cardSizes.end());
-                m_cardMassFlows.insert(m_cardMassFlows.end(), from.m_cardMassFlows.begin(), from.m_cardMassFlows.end());
+                m_cardMasses.insert(m_cardMasses.end(), from.m_cardMasses.begin(), from.m_cardMasses.end());
                 return;
             }
             for (size_t card = 0; card < from.GetNumCards(); ++card)
@@ -201,29 +203,29 @@ namespace stosis
         }
 
         // Alle Karten ersetzen (Grenzen je Stromscheibe): Groessen [m] und
-        // Massenstroeme als [Karte * Stoffe + Stoff].
-        void SetCards(std::vector<double> sizes, std::vector<double> massFlows)
+        // masses [kg] as [card * compounds + compound].
+        void SetCards(std::vector<double> sizes, std::vector<double> masses)
         {
             m_cardSizes = std::move(sizes);
-            m_cardMassFlows = std::move(massFlows);
-            m_cardMassFlows.resize(m_cardSizes.size() * m_numCompounds, 0.0);
+            m_cardMasses = std::move(masses);
+            m_cardMasses.resize(m_cardSizes.size() * m_numCompounds, 0.0);
         }
 
-        // Massenstrom eines Stoffs ueber alle Karten.
-        double GetCardsMassFlow(size_t compound) const
+        // Mass of a compound over all cards [kg].
+        double GetCardsMass(size_t compound) const
         {
             double sum = 0.0;
             for (size_t card = 0; card < m_cardSizes.size(); ++card)
-                sum += m_cardMassFlows[card * m_numCompounds + compound];
+                sum += m_cardMasses[card * m_numCompounds + compound];
             return sum;
         }
 
-        // Massenstrom aller Karten und Stoffe.
-        double GetCardsMassFlow() const
+        // Mass of all cards and compounds [kg].
+        double GetCardsMass() const
         {
             double sum = 0.0;
-            for (double massFlow : m_cardMassFlows)
-                sum += massFlow;
+            for (double mass : m_cardMasses)
+                sum += mass;
             return sum;
         }
 
@@ -239,9 +241,9 @@ namespace stosis
         ERepresentation m_representation = ERepresentation::Continuum;
         // [Stoff * numSizeClasses + Groessenklasse]
         std::vector<double> m_values;
-        // Karten: Groesse [m] je Karte, Massenstrom [kg/s] als [Karte * numCompounds + Stoff]
+        // Cards: size [m] per card, mass [kg] as [card * numCompounds + compound]
         std::vector<double> m_cardSizes;
-        std::vector<double> m_cardMassFlows;
+        std::vector<double> m_cardMasses;
         double m_temperature = kRoomTemperature; // K
         double m_pressure = kRoomPressure;       // Pa
     };

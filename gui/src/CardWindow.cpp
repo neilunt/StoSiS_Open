@@ -46,7 +46,7 @@ namespace
         std::vector<double> masses(snapshot.sizes.size(), 0.0);
         for (size_t k = 0; k < masses.size(); ++k)
             for (size_t c = 0; c < numC; ++c)
-                masses[k] += snapshot.massFlows[k * numC + c];
+                masses[k] += snapshot.masses[k * numC + c];
         return masses;
     }
 }
@@ -281,9 +281,9 @@ void CardWindow::UpdateViews()
         card.mass = masses[k];
         double best = -1.0;
         for (size_t c = 0; c < numC; ++c)
-            if (snapshot->massFlows[k * numC + c] > best)
+            if (snapshot->masses[k * numC + c] > best)
             {
-                best = snapshot->massFlows[k * numC + c];
+                best = snapshot->masses[k * numC + c];
                 card.compound = static_cast<int>(c);
             }
     }
@@ -420,8 +420,8 @@ void CardWindow::FillTable(const stosis::CCardHistory::SSnapshot& snapshot, size
     const stosis::SCardSettings& settings = m_graph->GetCardSettings();
     QStringList headers = { "Nr", "Groesse [" + Unit() + "]", "Bereich [" + Unit() + "]" };
     for (size_t c = 0; c < numC; ++c)
-        headers << CompoundName(grid, c) + " [kg/s]";
-    headers << "Summe [kg/s]" << "Anteil [%]";
+        headers << CompoundName(grid, c) + " [kg]";
+    headers << "Summe [kg]" << "Anteil [%]";
 
     // Nach Groesse sortiert; die Nummer ist die Stelle im Strom.
     const size_t numCards = snapshot.sizes.size();
@@ -429,7 +429,7 @@ void CardWindow::FillTable(const stosis::CCardHistory::SSnapshot& snapshot, size
     std::iota(order.begin(), order.end(), size_t(0));
     std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) { return snapshot.sizes[a] < snapshot.sizes[b]; });
     double total = 0.0;
-    for (double m : snapshot.massFlows)
+    for (double m : snapshot.masses)
         total += m;
 
     m_table->setUpdatesEnabled(false);
@@ -450,7 +450,7 @@ void CardWindow::FillTable(const stosis::CCardHistory::SSnapshot& snapshot, size
                 + Num(stosis::GetCardRangeLower(range + 1, settings) * stosis::kSizeDisplayFactor) };
         for (size_t c = 0; c < numC; ++c)
         {
-            const double m = snapshot.massFlows[k * numC + c];
+            const double m = snapshot.masses[k * numC + c];
             sum += m;
             texts << Num(m, 5);
         }
@@ -494,8 +494,8 @@ void CardWindow::ExportCsv()
         << QString::number(static_cast<double>(snapshot->step) * history->GetDt(), 'g', 10) << "\n# Karten;"
         << snapshot->sizes.size() << "\nGroesse [m];Bereich unten [m];Bereich oben [m]";
     for (size_t c = 0; c < numC; ++c)
-        out << ';' << CompoundName(grid, c) << " [kg/s]";
-    out << ";Summe [kg/s]\n";
+        out << ';' << CompoundName(grid, c) << " [kg]";
+    out << ";Summe [kg]\n";
     for (size_t k = 0; k < snapshot->sizes.size(); ++k)
     {
         const int range = stosis::GetCardRangeIndex(snapshot->sizes[k], settings);
@@ -505,7 +505,7 @@ void CardWindow::ExportCsv()
         double sum = 0.0;
         for (size_t c = 0; c < numC; ++c)
         {
-            const double m = snapshot->massFlows[k * numC + c];
+            const double m = snapshot->masses[k * numC + c];
             sum += m;
             out << ';' << QString::number(m, 'g', 10);
         }

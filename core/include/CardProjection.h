@@ -24,12 +24,13 @@ namespace stosis
     // Karten -> Groessenraster, damit Heatmap, Kurven, Statistik und das
     // Fenster "Auswertung" im Partikelmodus unveraendert weiterarbeiten
     // (Methodenhandbuch 9.6). Jede Karte gibt ihren Massenstrom je Stoff
+    // (Masse im Paket / dt)
     // an die beiden benachbarten Stuetzstellen ab, aufgeteilt nach ihrer Lage
     // dazwischen (linear in d bzw. in ln d): liegt sie zu 30 % des Wegs von
     // d_i nach d_i+1, gehen 70 % an d_i und 30 % an d_i+1. Geteilt durch das
     // Trapezgewicht w_i (SSizeGrid::GetWeight) ergibt das die
     // Massenstromdichte. Dadurch gilt exakt
-    //   Summe_i w_i * q_i = Summe der Kartenmassenstroeme   (Massenerhaltung)
+    //   Summe_i w_i * q_i = Summe der Kartenmassen / dt   (Massenerhaltung)
     // und der massengewichtete Mittelwert von d (linear) bzw. ln d
     // (logarithmisch) bleibt erhalten. Karten ausserhalb [d_min, d_max]
     // landen ganz auf der Randstuetzstelle: ihre Masse bleibt, sie erscheint
@@ -37,9 +38,10 @@ namespace stosis
     //
     // out wird zu einer Kontinuums-Scheibe mit numClasses x Stoffe der
     // Karten (Speicher wird wiederverwendet), Temperatur und Druck uebernommen.
-    // weights = grid.GetWeights(), vom Aufrufer einmal berechnet.
+    // weights = grid.GetWeights(), vom Aufrufer einmal berechnet; dt = Dauer
+    // eines Zeitschritts [s] (Karten tragen Massen, das Raster Massenstroeme).
     inline void ProjectCards(const CStreamSlice& cards, const SSizeGrid& grid,
-        const std::vector<double>& weights, CStreamSlice& out)
+        const std::vector<double>& weights, double dt, CStreamSlice& out)
     {
         const size_t numS = grid.numClasses;
         const size_t numC = cards.GetNumCompounds();
@@ -49,8 +51,9 @@ namespace stosis
             out.Clear();
         out.SetTemperature(cards.GetTemperature());
         out.SetPressure(cards.GetPressure());
-        if (numS == 0 || weights.size() < numS)
+        if (numS == 0 || weights.size() < numS || !(dt > 0.0))
             return;
+        const double perSecond = 1.0 / dt;
 
         for (size_t k = 0; k < cards.GetNumCards(); ++k)
         {
@@ -73,7 +76,7 @@ namespace stosis
             }
             for (size_t c = 0; c < numC; ++c)
             {
-                const double massFlow = cards.GetCardMassFlow(k, c);
+                const double massFlow = cards.GetCardMass(k, c) * perSecond;
                 if (massFlow == 0.0)
                     continue;
                 out.SetValue(c, i, out.GetValue(c, i) + massFlow * (1.0 - upper) / weights[i]);

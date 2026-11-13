@@ -17,7 +17,7 @@ class CardPlotWidget;
 // Summenkurve Q3 aus den Karten mit Vergleichskurve, Kartenteppich
 // und Karten je Klasse auf gemeinsamer d-Achse; "Zeitverlauf":
 // Verteilung ueber der Zeit und Kartenzahl je Zeitschritt;
-// "Gewichte": Groesse gegen Massenstrom je Karte; "Tabelle": alle
+// "Gewichte": Groesse gegen Masse je Karte; "Tabelle": alle
 // Karten mit CSV-Export. Daten aus CFlowsheetGraph::GetCardHistory
 // (Methodenhandbuch 9.6).
 class CardWindow : public QWidget

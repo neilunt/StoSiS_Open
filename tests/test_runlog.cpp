@@ -182,12 +182,13 @@ int main()
             for (const CCardHistory::SSnapshot& snapshot : in->GetSnapshots())
             {
                 double sum = 0.0;
-                for (double m : snapshot.massFlows)
+                for (double m : snapshot.masses)
                     sum += m;
-                mass = mass && NearRel(sum, s.graph.GetInlet(s.inlet)->GetMassFlowAtTime(static_cast<double>(snapshot.step) * dt), 1e-12);
+                // cards carry the mass of one step: mass flow times dt
+                mass = mass && NearRel(sum, s.graph.GetInlet(s.inlet)->GetMassFlowAtTime(static_cast<double>(snapshot.step) * dt) * dt, 1e-12);
                 sizes = sizes && snapshot.sizes == placed;
             }
-            Check(mass && sizes, "gespeicherte Inlet-Karten: Groessen wie platziert, Massenstrom je Schritt exakt");
+            Check(mass && sizes, "gespeicherte Inlet-Karten: Groessen wie platziert, Masse je Schritt = Massenstrom * dt exakt");
 
             // Gespeichert ist Lauf 1: derselbe Verlauf wie ein Einzellauf mit dem Seed.
             SSetup single(true);

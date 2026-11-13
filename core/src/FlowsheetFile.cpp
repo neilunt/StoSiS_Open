@@ -33,7 +33,8 @@ namespace stosis
 
         constexpr SEnumKey<ENodeType> kNodeTypes[] = {
             { ENodeType::Inlet, "Inlet" }, { ENodeType::Outlet, "Outlet" }, { ENodeType::Process, "Process" },
-            { ENodeType::Splitter, "Splitter" }, { ENodeType::Merger, "Merger" }, { ENodeType::Vessel, "Vessel" } };
+            { ENodeType::Splitter, "Splitter" }, { ENodeType::Merger, "Merger" }, { ENodeType::Vessel, "Vessel" },
+            { ENodeType::Screen, "Screen" } };
         constexpr SEnumKey<ESizeGridType> kSizeGridTypes[] = {
             { ESizeGridType::Logarithmic, "logarithmic" }, { ESizeGridType::Linear, "linear" } };
         constexpr SEnumKey<ERepresentation> kRepresentations[] = {
@@ -50,6 +51,9 @@ namespace stosis
         constexpr SEnumKey<EVesselFill> kVesselFills[] = {
             { EVesselFill::Empty, "empty" }, { EVesselFill::SteadyState, "steadyState" },
             { EVesselFill::Prescribed, "prescribed" } };
+        constexpr SEnumKey<EScreenModel> kScreenModels[] = {
+            { EScreenModel::Plitt, "plitt" }, { EScreenModel::MolerusHoffmann, "molerusHoffmann" },
+            { EScreenModel::TeipelHennig, "teipelHennig" } };
 
         // "recycle" einer Verbindung: von Hand markiert, vom Graphen
         // aufgeschnitten oder nicht aufgeschnitten (Unknown nur beim Lesen).
@@ -183,6 +187,18 @@ namespace stosis
                     settings["fillTemperature"] = v.fillTemperature;
                     settings["fillPressure"] = v.fillPressure;
                     settings["stockFactor"] = v.stockFactor;
+                    j["settings"] = std::move(settings);
+                }
+                break;
+            case ENodeType::Screen:
+                if (const CScreenUnit* screen = graph.GetScreen(node.id))
+                {
+                    const SScreenSettings& s = screen->GetSettings();
+                    settings["model"] = KeyOf(kScreenModels, s.model);
+                    settings["cutSize"] = s.cutSize;
+                    settings["alpha"] = s.alpha;
+                    settings["beta"] = s.beta;
+                    settings["offset"] = s.offset;
                     j["settings"] = std::move(settings);
                 }
                 break;
@@ -618,6 +634,19 @@ namespace stosis
                 reader.Fail(where, v.Check());
         }
 
+        void ReadScreen(CReader& reader, const json& s, const std::string& where, CScreenUnit& screen)
+        {
+            reader.Object(s, where, { "model", "cutSize", "alpha", "beta", "offset" });
+            SScreenSettings v = screen.GetSettings();
+            reader.ReadEnum(s, "model", where, kScreenModels, v.model);
+            reader.ReadNumber(s, "cutSize", where, v.cutSize);
+            reader.ReadNumber(s, "alpha", where, v.alpha);
+            reader.ReadNumber(s, "beta", where, v.beta);
+            reader.ReadNumber(s, "offset", where, v.offset);
+            if (!screen.SetSettings(v))
+                reader.Fail(where, v.Check());
+        }
+
         void ReadUnit(CReader& reader, const json& unit, size_t index, CFlowsheetGraph& graph)
         {
             const std::string at = "Unit " + std::to_string(index + 1);
@@ -636,7 +665,7 @@ namespace stosis
             if (type == ENodeType::Merger)
                 known.push_back("inputs");
             const bool hasSettings = type == ENodeType::Inlet || type == ENodeType::Splitter
-                || type == ENodeType::Process || type == ENodeType::Vessel;
+                || type == ENodeType::Process || type == ENodeType::Vessel || type == ENodeType::Screen;
             if (hasSettings)
                 known.push_back("settings");
             reader.Object(unit, where, known);
@@ -682,6 +711,9 @@ namespace stosis
                 break;
             case ENodeType::Vessel:
                 ReadVessel(reader, *settings, in, *graph.GetVessel(id));
+                break;
+            case ENodeType::Screen:
+                ReadScreen(reader, *settings, in, *graph.GetScreen(id));
                 break;
             default:
                 break;

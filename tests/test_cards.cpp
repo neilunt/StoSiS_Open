@@ -76,12 +76,12 @@ int main()
         slice.AddCard(200e-6, std::vector<double>{ 0.25, 0.75 });
         slice.SetTemperature(350.0);
         Check(slice.GetNumCards() == 3, "drei Karten");
-        Check(slice.GetCardMassFlow(0, 0) == 2.0 && slice.GetCardMassFlow(0, 1) == 0.0, "Karte aus einem Stoff: nur dieser Stoff");
-        Check(slice.GetCardMassFlow(2) == 1.0 && slice.GetCardSize(2) == 200e-6, "gemischte Karte: Summe der Stoffe, Groesse");
-        Check(slice.GetCardsMassFlow(0) == 2.25 && slice.GetCardsMassFlow(1) == 1.25 && slice.GetCardsMassFlow() == 3.5,
+        Check(slice.GetCardMass(0, 0) == 2.0 && slice.GetCardMass(0, 1) == 0.0, "Karte aus einem Stoff: nur dieser Stoff");
+        Check(slice.GetCardMass(2) == 1.0 && slice.GetCardSize(2) == 200e-6, "gemischte Karte: Summe der Stoffe, Groesse");
+        Check(slice.GetCardsMass(0) == 2.25 && slice.GetCardsMass(1) == 1.25 && slice.GetCardsMass() == 3.5,
             "Massenstrom je Stoff und gesamt ueber alle Karten");
         slice.Clear();
-        Check(slice.GetNumCards() == 0 && slice.GetCardsMassFlow() == 0.0 && slice.GetTemperature() == kRoomTemperature,
+        Check(slice.GetNumCards() == 0 && slice.GetCardsMass() == 0.0 && slice.GetTemperature() == kRoomTemperature,
             "Clear: keine Karten, Raumtemperatur");
         Check(slice.HasCards(), "Clear behaelt die Darstellung");
 
@@ -116,7 +116,7 @@ int main()
             lnMoment += massFlow * (grid.IsLogarithmic() ? std::log(size) : size);
         }
         CStreamSlice projected;
-        ProjectCards(cards, grid, weights, projected);
+        ProjectCards(cards, grid, weights, 1.0, projected);
         Check(!projected.HasCards() && projected.GetNumSizeClasses() == grid.numClasses && projected.GetNumCompounds() == 2,
             std::string(name) + ": Ergebnis ist eine Kontinuums-Scheibe passender Groesse");
         Check(NearRel(Integrate(projected, 0, weights), expected[0], 1e-12)
@@ -125,13 +125,18 @@ int main()
         Check(NearRel(MeanCoordinate(projected, grid, weights), lnMoment / mass, 1e-12),
             std::string(name) + (grid.IsLogarithmic() ? ": mittleres ln d erhalten" : ": mittleres d erhalten"));
 
+        // Cards carry the mass of one time step: with dt = 0.25 s the grid shows four times the flow.
+        ProjectCards(cards, grid, weights, 0.25, projected);
+        Check(NearRel(Integrate(projected, 0, weights), 4.0 * expected[0], 1e-12) && NearRel(Integrate(projected, 1, weights), 4.0 * expected[1], 1e-12),
+            std::string(name) + ": Kartenmasse / dt = Massenstrom auf dem Raster");
+
         // Karten unter d_min und ueber d_max: Masse auf der Randstuetzstelle.
         CStreamSlice outside;
         outside.Resize(grid.numClasses, 1, ERepresentation::Particles);
         outside.AddCard(grid.IsLogarithmic() ? 0.1e-6 : -5e-6, 0, 3.0);
         outside.AddCard(5e-3, 0, 1.0);
         outside.AddCard(0.0, 0, 0.5); // d = 0: auf dem log-Raster ungueltig -> unterer Rand
-        ProjectCards(outside, grid, weights, projected);
+        ProjectCards(outside, grid, weights, 1.0, projected);
         const size_t last = grid.numClasses - 1;
         Check(NearRel(weights[0] * projected.GetValue(0), 3.5, 1e-12) && NearRel(weights[last] * projected.GetValue(last), 1.0, 1e-12)
             && NearRel(Integrate(projected, 0, weights), 4.5, 1e-12),
@@ -145,14 +150,14 @@ int main()
         CStreamSlice cards, projected;
         cards.Resize(grid.numClasses, 1, ERepresentation::Particles);
         cards.AddCard(grid.GetSizeAt(10), 0, 2.0);
-        ProjectCards(cards, grid, weights, projected);
+        ProjectCards(cards, grid, weights, 1.0, projected);
         Check(NearRel(weights[10] * projected.GetValue(10), 2.0, 1e-9) && std::abs(projected.GetValue(11)) < 1e-9 * projected.GetValue(10),
             "Karte auf d_10: ganze Masse an d_10");
 
         cards.Clear();
         const double size = std::exp(0.3 * std::log(grid.GetSizeAt(21)) + 0.7 * std::log(grid.GetSizeAt(20)));
         cards.AddCard(size, 0, 1.0);
-        ProjectCards(cards, grid, weights, projected);
+        ProjectCards(cards, grid, weights, 1.0, projected);
         Check(NearRel(weights[20] * projected.GetValue(20), 0.7, 1e-9) && NearRel(weights[21] * projected.GetValue(21), 0.3, 1e-9),
             "Karte bei 30 % des Wegs (in ln d) von d_20 nach d_21: 70 % / 30 %");
     }
@@ -192,7 +197,7 @@ int main()
         cards.Resize(grid.numClasses, 1, ERepresentation::Particles);
         for (int k = 0; k < numCards; ++k)
             cards.AddCard(Quantile(distribution, (k + 0.5) / numCards), 0, 1.0 / numCards);
-        ProjectCards(cards, grid, weights, projected);
+        ProjectCards(cards, grid, weights, 1.0, projected);
         double massBelow = 0.0, continuumBelow = 0.0, meanCards = 0.0, meanContinuum = 0.0, continuumMass = 0.0;
         for (size_t s = 0; s < grid.numClasses; ++s)
         {

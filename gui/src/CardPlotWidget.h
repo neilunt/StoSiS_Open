@@ -14,7 +14,7 @@ class QPainter;
 //   Classes      - Karten je feiner Klasse mit Warnschwelle,
 //   TimeMap      - Verteilung ueber der Zeit als Farbbild,
 //   Counts       - Kartenzahl je Zeitschritt,
-//   Cloud        - Groesse gegen Massenstrom jeder Karte.
+//   Cloud        - Groesse gegen Masse jeder Karte (im Paket).
 // Distribution, Rug, Classes und Cloud teilen die d-Achse (SetSizeAxis),
 // TimeMap und Counts die Zeitachse; gleiche Raender links und rechts halten
 // untereinander stehende Diagramme deckungsgleich. Rechnet selbst nur
@@ -37,7 +37,7 @@ public:
     struct SCard
     {
         double size = 0.0;  // m
-        double mass = 0.0;  // Massenstrom der Karte, kg/s
+        double mass = 0.0;  // Masse der Karte im Paket, kg
         int compound = 0;   // Stoff mit der groessten Masse
     };
 

@@ -37,6 +37,7 @@ namespace stosis
             m_pressure.assign(grid.numTimeSteps, kRoomPressure);
             m_sizes = grid.GetSizeGrid();
             m_sizeWeights = m_sizes.GetWeights();
+            m_dt = dt;
         }
 
         // Im Partikelmodus werden die Karten vorher aufs Groessenraster
@@ -45,7 +46,7 @@ namespace stosis
         {
             if (slice.HasCards())
             {
-                ProjectCards(slice, m_sizes, m_sizeWeights, m_projected);
+                ProjectCards(slice, m_sizes, m_sizeWeights, m_dt, m_projected);
                 Record(timeIdx, m_projected);
                 return;
             }
@@ -78,6 +79,7 @@ namespace stosis
         std::vector<double> m_pressure;
         SSizeGrid m_sizes;
         std::vector<double> m_sizeWeights; // Trapezgewichte von m_sizes
+        double m_dt = 1.0;                 // time step [s]: card masses -> mass flows
         CStreamSlice m_projected;          // Karten aufs Raster umgerechnet (wiederverwendet)
     };
 

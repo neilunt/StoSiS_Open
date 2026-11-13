@@ -322,6 +322,37 @@ int main()
     RoundTrip(false);
     RoundTrip(true);
 
+    // 1b) Screen: inlet -> screen -> coarse and fines, Teipel-Hennig with all
+    //     four values off the defaults.
+    {
+        CFlowsheetGraph g1;
+        const std::string in = g1.AddInletNode("Zulauf", 0, 0);
+        const std::string sc = g1.AddScreenNode("Sieb1", 120, 0);
+        SScreenSettings s;
+        s.model = EScreenModel::TeipelHennig;
+        s.cutSize = 4e-3;
+        s.alpha = 2.5;
+        s.beta = 0.75;
+        s.offset = 0.05;
+        g1.GetScreen(sc)->SetSettings(s);
+        g1.AddConnection(in, 0, sc, 0);
+        g1.AddConnection(sc, 0, g1.AddOutletNode("Grobgut", 240, -40), 0);
+        g1.AddConnection(sc, 1, g1.AddOutletNode("Feingut", 240, 40), 0);
+        const std::string text1 = WriteFlowsheetJson(g1, SFlowsheetFileSettings());
+        CFlowsheetGraph g2;
+        const SFlowsheetReadResult read = ReadFlowsheetJson(text1, g2);
+        const CScreenUnit* screen = read.ok ? g2.GetScreen(sc) : nullptr;
+        const bool same = screen && screen->GetSettings().model == s.model && screen->GetSettings().cutSize == s.cutSize
+            && screen->GetSettings().alpha == s.alpha && screen->GetSettings().beta == s.beta
+            && screen->GetSettings().offset == s.offset;
+        Check(read.ok && read.warnings.empty() && same && WriteFlowsheetJson(g2, read.settings) == text1
+            && Contains(text1, "\"type\": \"Screen\"") && Contains(text1, "\"model\": \"teipelHennig\""),
+            "Sieb: Rundlauf mit Modell, x_cut, alpha, beta und Offset");
+        CFlowsheetGraph g3;
+        Check(!ReadFlowsheetJson(Replace(text1, "\"teipelHennig\"", "\"rundloch\""), g3).ok,
+            "Sieb: unbekanntes Modell ist ein Fehler");
+    }
+
     // 2) So sieht die Datei aus (Kontinuum-Flowsheet, Ausschnitte).
     CFlowsheetGraph g;
     BuildAll(g, false);

@@ -47,7 +47,7 @@ namespace
         {
             const SCardPlacement placement = PlaceCardsAtQuantiles(distribution, grid.cards, grid.GetCardCountMin());
             for (size_t k = 0; k < placement.sizes.size(); ++k)
-                slice.AddCard(placement.sizes[k], compound, placement.massFractions[k]);
+                slice.AddCard(placement.sizes[k], compound, placement.massFractions[k] * grid.GetDt()); // 1 kg/s: mass per step
         }
         else
         {
@@ -70,7 +70,7 @@ namespace
                 {
                     std::vector<double> flows(feed.GetNumCompounds());
                     for (size_t c = 0; c < flows.size(); ++c)
-                        flows[c] = factor * feed.GetCardMassFlow(k, c);
+                        flows[c] = factor * feed.GetCardMass(k, c);
                     slice.AddCard(feed.GetCardSize(k), flows);
                 }
         }
@@ -80,14 +80,15 @@ namespace
         return slice;
     }
 
-    double MassFlow(const CStreamSlice& slice, const std::vector<double>& weights)
+    // Mass flow [kg/s]: cards carry the mass of one step, so divided by dt.
+    double MassFlow(const CStreamSlice& slice, const std::vector<double>& weights, double dt)
     {
-        return slice.HasCards() ? slice.GetCardsMassFlow() : slice.GetTotalWeight(weights);
+        return slice.HasCards() ? slice.GetCardsMass() / dt : slice.GetTotalWeight(weights);
     }
 
-    double MassFlow(const CStreamSlice& slice, size_t compound, const std::vector<double>& weights)
+    double MassFlow(const CStreamSlice& slice, size_t compound, const std::vector<double>& weights, double dt)
     {
-        return slice.HasCards() ? slice.GetCardsMassFlow(compound) : slice.GetCompoundWeight(compound, weights);
+        return slice.HasCards() ? slice.GetCardsMass(compound) / dt : slice.GetCompoundWeight(compound, weights);
     }
 
     // Massengewichtete mittlere Groesse der Karten einer Scheibe.
@@ -96,8 +97,8 @@ namespace
         double mass = 0.0, moment = 0.0;
         for (size_t k = 0; k < slice.GetNumCards(); ++k)
         {
-            mass += slice.GetCardMassFlow(k);
-            moment += slice.GetCardMassFlow(k) * slice.GetCardSize(k);
+            mass += slice.GetCardMass(k);
+            moment += slice.GetCardMass(k) * slice.GetCardSize(k);
         }
         return mass > 0.0 ? moment / mass : 0.0;
     }
@@ -128,7 +129,7 @@ namespace
         run.log = vessel.DescribeForLog();
         const std::vector<double> weights = grid.GetSizeGrid().GetWeights();
         const CStreamSlice feed = MakeFeed(grid, compound);
-        run.feed = MassFlow(feed, weights);
+        run.feed = MassFlow(feed, weights, grid.GetDt());
         run.feedSize = feed.HasCards() ? MeanCardSize(feed) : 0.0;
         const double dt = grid.GetDt();
         std::vector<CStreamSlice> outputs(1);
@@ -141,9 +142,9 @@ namespace
             context.dt = dt;
             context.time = static_cast<double>(k) * dt;
             vessel.Step(context, { &input }, outputs);
-            run.in.push_back(MassFlow(input, weights));
-            run.out.push_back(MassFlow(outputs[0], weights));
-            run.outB.push_back(MassFlow(outputs[0], 1, weights));
+            run.in.push_back(MassFlow(input, weights, dt));
+            run.out.push_back(MassFlow(outputs[0], weights, dt));
+            run.outB.push_back(MassFlow(outputs[0], 1, weights, dt));
             run.outT.push_back(outputs[0].GetTemperature());
             run.outSize.push_back(outputs[0].HasCards() ? MeanCardSize(outputs[0]) : 0.0);
             run.maxCards = std::max(run.maxCards, vessel.GetContentCards());
@@ -588,10 +589,10 @@ int main()
             {
                 std::vector<double> flows(single.GetNumCompounds());
                 for (size_t c = 0; c < flows.size(); ++c)
-                    flows[c] = factor * single.GetCardMassFlow(k, c);
+                    flows[c] = factor * single.GetCardMass(k, c);
                 pairs.AddCard(single.GetCardSize(k), flows);
             }
-        const double in = pairs.GetCardsMassFlow();
+        const double in = pairs.GetCardsMass();
         std::vector<CStreamSlice> outputs(1);
         double worst = 0.0;
         for (size_t k = 0; k < grid.numTimeSteps; ++k)
@@ -603,7 +604,7 @@ int main()
             context.time = static_cast<double>(k) * dt;
             vessel.Step(context, { &pairs }, outputs);
             if (k > 51)
-                worst = std::max(worst, std::abs(outputs[0].GetCardsMassFlow() / in - 1.0));
+                worst = std::max(worst, std::abs(outputs[0].GetCardsMass() / in - 1.0));
         }
         std::printf("      Losnummer, Pfropfen mit Kartenpaaren 10 : 1: Ablauf je Schritt hoechstens %.1f %% neben dem Zulauf\n", 100.0 * worst);
         Check(worst < 0.2, "Losnummer: gleich grosse Karten 10 : 1 bei 50/50, Ablauf je Schritt hoechstens 20 % neben dem Zulauf");

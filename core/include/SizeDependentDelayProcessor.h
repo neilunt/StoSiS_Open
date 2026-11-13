@@ -172,8 +172,8 @@ namespace stosis
         {
             double mass = 0.0;
             for (const auto& entry : m_pending)
-                for (double flow : entry.second.flows)
-                    mass += flow * m_dt;
+                for (double m : entry.second.masses)
+                    mass += m;
             return mass;
         }
 
@@ -277,7 +277,7 @@ namespace stosis
         struct SPendingBin
         {
             std::vector<double> sizes;
-            std::vector<double> flows;      // [card * numCompounds + compound], kg/s
+            std::vector<double> masses;     // [card * numCompounds + compound], kg
             std::vector<SMixPart> parts;
             std::vector<size_t> partSteps;  // inflow step of each part
         };
@@ -293,7 +293,7 @@ namespace stosis
             if (due == m_pending.end())
                 return;
             SPendingBin& bin = due->second;
-            out.SetCards(std::move(bin.sizes), std::move(bin.flows));
+            out.SetCards(std::move(bin.sizes), std::move(bin.masses));
             m_parts = std::move(bin.parts);
             m_pending.erase(due);
         }
@@ -313,7 +313,7 @@ namespace stosis
             {
                 size_t best = 0;
                 for (size_t c = 1; c < inC; ++c)
-                    if (input.GetCardMassFlow(i, c) > input.GetCardMassFlow(i, best))
+                    if (input.GetCardMass(i, c) > input.GetCardMass(i, best))
                         best = c;
                 m_dominant[i] = static_cast<std::uint32_t>(best);
             }
@@ -377,9 +377,9 @@ namespace stosis
                 bin.sizes.push_back(input.GetCardSize(card));
                 for (size_t c = 0; c < numC; ++c)
                 {
-                    const double flow = c < inC ? input.GetCardMassFlow(card, c) : 0.0;
-                    bin.flows.push_back(flow);
-                    part.compoundWeights[c] += flow;
+                    const double mass = c < inC ? input.GetCardMass(card, c) : 0.0;
+                    bin.masses.push_back(mass);
+                    part.compoundWeights[c] += mass;
                 }
             }
         }

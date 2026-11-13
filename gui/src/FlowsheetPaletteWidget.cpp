@@ -5,9 +5,7 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QApplication>
-#include <QScrollArea>
-#include <QScrollBar>
-#include <QFrame>
+#include <algorithm>
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -70,16 +68,18 @@ void PaletteTile::mouseMoveEvent(QMouseEvent* event)
     drag->exec(Qt::CopyAction);
 }
 
+namespace
+{
+    constexpr int kMarginX = 6;   // left and right
+    constexpr int kMarginY = 4;   // top and bottom
+    constexpr int kGroupGap = 21; // between groups in a row, the line in the middle
+    constexpr int kRowGap = 6;    // between rows
+}
+
 FlowsheetPaletteWidget::FlowsheetPaletteWidget(QWidget* parent)
     : QWidget(parent)
 {
-    auto* content = new QWidget();
-    auto* contentLayout = new QHBoxLayout(content);
-    contentLayout->setContentsMargins(6, 4, 6, 4);
-    contentLayout->setSpacing(10);
-
-    // Kacheln gruppenweise: kleine Ueberschrift, darunter die Kacheln,
-    // zwischen den Gruppen eine senkrechte Trennlinie.
+    // One widget per group: small caption, the tiles below.
     const std::vector<SNodeTemplate>& templates = GetNodeTemplates();
     QString currentGroup;
     QHBoxLayout* tileRow = nullptr;
@@ -87,18 +87,12 @@ FlowsheetPaletteWidget::FlowsheetPaletteWidget(QWidget* parent)
     {
         if (templates[i].group != currentGroup || !tileRow)
         {
-            if (tileRow)
-            {
-                auto* separator = new QFrame(content);
-                separator->setFrameShape(QFrame::VLine);
-                separator->setFrameShadow(QFrame::Sunken);
-                contentLayout->addWidget(separator);
-            }
             currentGroup = templates[i].group;
-
-            auto* groupLayout = new QVBoxLayout();
+            auto* group = new QWidget(this);
+            auto* groupLayout = new QVBoxLayout(group);
+            groupLayout->setContentsMargins(0, 0, 0, 0);
             groupLayout->setSpacing(2);
-            auto* caption = new QLabel(currentGroup, content);
+            auto* caption = new QLabel(currentGroup, group);
             QFont font = caption->font();
             font.setPointSizeF(font.pointSizeF() * 0.85);
             caption->setFont(font);
@@ -107,23 +101,80 @@ FlowsheetPaletteWidget::FlowsheetPaletteWidget(QWidget* parent)
             tileRow = new QHBoxLayout();
             tileRow->setSpacing(4);
             groupLayout->addLayout(tileRow);
-            contentLayout->addLayout(groupLayout);
+            m_groups.push_back(group);
         }
-        tileRow->addWidget(new PaletteTile(i, content));
+        tileRow->addWidget(new PaletteTile(i, m_groups.back()));
     }
-    contentLayout->addStretch();
+    for (QWidget* group : m_groups)
+        group->resize(group->sizeHint());
 
-    auto* scrollArea = new QScrollArea(this);
-    scrollArea->setWidget(content);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setFrameShape(QFrame::NoFrame);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    // Feste Hoehe: Inhalt plus Platz fuer eine evtl. noetige Scrollleiste.
-    scrollArea->setFixedHeight(content->sizeHint().height()
-        + scrollArea->horizontalScrollBar()->sizeHint().height());
+    // Not Fixed: a fixed policy caps the height at sizeHint (one row) and the
+    // layout would centre that row in the space reserved for all rows.
+    QSizePolicy policy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    policy.setHeightForWidth(true);
+    setSizePolicy(policy);
+}
 
-    auto* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(scrollArea);
+int FlowsheetPaletteWidget::ArrangeGroups(int width, bool apply) const
+{
+    int x = kMarginX, y = kMarginY, rowHeight = 0;
+    for (QWidget* group : m_groups)
+    {
+        const QSize size = group->sizeHint();
+        if (x > kMarginX && x + size.width() > width - kMarginX)
+        {
+            x = kMarginX;
+            y += rowHeight + kRowGap;
+            rowHeight = 0;
+        }
+        if (apply)
+            group->setGeometry(x, y, size.width(), size.height());
+        x += size.width() + kGroupGap;
+        rowHeight = std::max(rowHeight, size.height());
+    }
+    return y + rowHeight + kMarginY;
+}
+
+QSize FlowsheetPaletteWidget::sizeHint() const
+{
+    int width = 2 * kMarginX;
+    for (size_t i = 0; i < m_groups.size(); ++i)
+        width += m_groups[i]->sizeHint().width() + (i > 0 ? kGroupGap : 0);
+    return QSize(width, heightForWidth(width));
+}
+
+QSize FlowsheetPaletteWidget::minimumSizeHint() const
+{
+    // Narrow down to the widest group; the bar then has one group per row.
+    int width = 0;
+    for (QWidget* group : m_groups)
+        width = std::max(width, group->sizeHint().width());
+    return QSize(width + 2 * kMarginX, heightForWidth(sizeHint().width()));
+}
+
+int FlowsheetPaletteWidget::heightForWidth(int width) const
+{
+    return ArrangeGroups(width, false);
+}
+
+void FlowsheetPaletteWidget::resizeEvent(QResizeEvent* event)
+{
+    ArrangeGroups(width(), true);
+    QWidget::resizeEvent(event);
+}
+
+void FlowsheetPaletteWidget::paintEvent(QPaintEvent* /*event*/)
+{
+    // Line between neighbouring groups of the same row.
+    QPainter painter(this);
+    painter.setPen(palette().color(QPalette::Mid));
+    for (size_t i = 0; i + 1 < m_groups.size(); ++i)
+    {
+        const QRect a = m_groups[i]->geometry();
+        const QRect b = m_groups[i + 1]->geometry();
+        if (a.y() != b.y())
+            continue;
+        const int x = (a.right() + b.left()) / 2;
+        painter.drawLine(x, a.top(), x, std::max(a.bottom(), b.bottom()));
+    }
 }

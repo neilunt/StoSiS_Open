@@ -20,6 +20,7 @@
 #include "SplitterUnit.h"
 #include "MergerUnit.h"
 #include "VesselUnit.h"
+#include "ScreenUnit.h"
 #include "StreamProcessorRegistry.h"
 #include "BuiltinStreamProcessors.h"
 
@@ -35,7 +36,8 @@ namespace stosis
         Process,
         Splitter,
         Merger,
-        Vessel
+        Vessel,
+        Screen
     };
 
     // Anzeigename eines Knotentyps - an einer Stelle, damit alle Listen
@@ -50,6 +52,7 @@ namespace stosis
         case ENodeType::Splitter: return "Splitter";
         case ENodeType::Merger:   return "Merger";
         case ENodeType::Vessel:   return "Behaelter";
+        case ENodeType::Screen:   return "Sieb";
         }
         return "?";
     }
@@ -188,6 +191,12 @@ namespace stosis
             return AddNode(name, ENodeType::Vessel, 1, 1, posX, posY, std::make_unique<CVesselUnit>());
         }
 
+        // Screen with grade efficiency (coarse = output 1, fines = output 2).
+        std::string AddScreenNode(const std::string& name, double posX, double posY)
+        {
+            return AddNode(name, ENodeType::Screen, 1, 2, posX, posY, std::make_unique<CScreenUnit>());
+        }
+
         // Knoten mit vorgegebener ID (Flowsheet-Datei, Methodenhandbuch 3.4):
         // Aus der ID leitet sich der Zufallsstrom der Unit ab (GetUnitSeed),
         // deshalb behaelt ein geladenes Flowsheet seine IDs. numPorts = Zahl
@@ -217,6 +226,8 @@ namespace stosis
                     : std::string();
             case ENodeType::Vessel:
                 return AddNode(name, type, 1, 1, posX, posY, std::make_unique<CVesselUnit>(), id);
+            case ENodeType::Screen:
+                return AddNode(name, type, 1, 2, posX, posY, std::make_unique<CScreenUnit>(), id);
             }
             return std::string();
         }
@@ -454,11 +465,13 @@ namespace stosis
         CSplitterUnit* GetSplitter(const std::string& nodeId) { return FindUnit<CSplitterUnit>(nodeId); }
         CMergerUnit* GetMerger(const std::string& nodeId) { return FindUnit<CMergerUnit>(nodeId); }
         CVesselUnit* GetVessel(const std::string& nodeId) { return FindUnit<CVesselUnit>(nodeId); }
+        CScreenUnit* GetScreen(const std::string& nodeId) { return FindUnit<CScreenUnit>(nodeId); }
         // Nur lesen (z.B. zum Schreiben der Flowsheet-Datei).
         const CInletUnit* GetInlet(const std::string& nodeId) const { return FindUnit<CInletUnit>(nodeId); }
         const IStreamProcessor* GetProcessor(const std::string& nodeId) const { return FindUnit<IStreamProcessor>(nodeId); }
         const CSplitterUnit* GetSplitter(const std::string& nodeId) const { return FindUnit<CSplitterUnit>(nodeId); }
         const CVesselUnit* GetVessel(const std::string& nodeId) const { return FindUnit<CVesselUnit>(nodeId); }
+        const CScreenUnit* GetScreen(const std::string& nodeId) const { return FindUnit<CScreenUnit>(nodeId); }
 
         // Noch keine Knoten und keine Verbindungen (Laden einer Datei).
         bool IsEmpty() const { return m_nodes.empty() && m_connections.empty(); }
@@ -547,6 +560,11 @@ namespace stosis
                 {
                     for (size_t port = 0; port < node.numOutputs; ++port)
                         entries.push_back({ node.id, port, base + ", Ausgang " + std::to_string(port + 1) + ")" });
+                }
+                else if (node.type == ENodeType::Screen)
+                {
+                    entries.push_back({ node.id, 0, base + ", Grobgut)" });
+                    entries.push_back({ node.id, 1, base + ", Feingut)" });
                 }
                 else
                 {
@@ -1372,10 +1390,10 @@ namespace stosis
         }
 
         // Trennapparate: hier beginnt physikalisch ein Rueckfuehrstrom
-        // (heute nur der Splitter, spaeter auch Sieb, Sichter, Zyklon, ...).
+        // (Splitter und Sieb, spaeter auch Sichter, Zyklon, ...).
         static bool IsSeparatorType(ENodeType type)
         {
-            return type == ENodeType::Splitter;
+            return type == ENodeType::Splitter || type == ENodeType::Screen;
         }
 
         // Welcher noch offene Knoten soll seine Eingaenge aufschneiden?

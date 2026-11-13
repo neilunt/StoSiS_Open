@@ -239,7 +239,7 @@ namespace stosis
             {
                 size_t best = 0;
                 for (size_t c = 1; c < input.GetNumCompounds(); ++c)
-                    if (input.GetCardMassFlow(card, c) > input.GetCardMassFlow(card, best))
+                    if (input.GetCardMass(card, c) > input.GetCardMass(card, best))
                         best = c;
                 return best;
             };
@@ -258,7 +258,7 @@ namespace stosis
             for (size_t k = 0; k < numCards; ++k)
             {
                 m_sizes[k] = input.GetCardSize(k);
-                m_masses[k] = input.GetCardMassFlow(k);
+                m_masses[k] = input.GetCardMass(k);
             }
             std::vector<double> shares = ComputeCardShares(m_sizes, m_masses, m_cardSettings, m_countMin);
             if (!(std::accumulate(shares.begin(), shares.end(), 0.0) > 0.0))

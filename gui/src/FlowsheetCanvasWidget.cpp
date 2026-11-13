@@ -305,6 +305,8 @@ void FlowsheetCanvasWidget::AddNodeFromTemplate(const SNodeTemplate& tmpl, QPoin
         nodeId = m_graph->AddMergerNode(name, tmpl.numPorts, point.x(), point.y()); break;
     case stosis::ENodeType::Vessel:
         nodeId = m_graph->AddVesselNode(name, point.x(), point.y()); break;
+    case stosis::ENodeType::Screen:
+        nodeId = m_graph->AddScreenNode(name, point.x(), point.y()); break;
     }
 
     FlowsheetNodeItem* item = CreateNodeItem(nodeId, name, tmpl.type, point);

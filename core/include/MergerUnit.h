@@ -54,7 +54,7 @@ namespace stosis
                 part.pressure = input->GetPressure();
                 part.compoundWeights.resize(input->GetNumCompounds());
                 for (size_t c = 0; c < part.compoundWeights.size(); ++c)
-                    part.compoundWeights[c] = input->HasCards() ? input->GetCardsMassFlow(c)
+                    part.compoundWeights[c] = input->HasCards() ? input->GetCardsMass(c)
                                                                 : input->GetCompoundWeight(c, m_sizeWeights);
                 m_parts.push_back(std::move(part));
             }

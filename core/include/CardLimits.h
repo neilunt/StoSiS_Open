@@ -49,7 +49,7 @@ namespace stosis
         const double heaviest = std::max(settings.splitFactor, 1.0) / numCards;
         const size_t numC = slice.GetNumCompounds();
 
-        // Arbeitskopie: Groesse, Masse, Stoffkombination (Bit je Stoff), Massenstrom je Stoff.
+        // Arbeitskopie: Groesse, Masse, Stoffkombination (Bit je Stoff), Masse je Stoff.
         std::vector<double> size(n), mass(n, 0.0), flow(n * numC);
         std::vector<uint64_t> key(n, 0);
         for (size_t k = 0; k < n; ++k)
@@ -57,7 +57,7 @@ namespace stosis
             size[k] = slice.GetCardSize(k);
             for (size_t c = 0; c < numC; ++c)
             {
-                const double f = slice.GetCardMassFlow(k, c);
+                const double f = slice.GetCardMass(k, c);
                 flow[k * numC + c] = f;
                 mass[k] += f;
                 if (f > 0.0)

@@ -31,7 +31,7 @@
 <p class="sub">Bedienung der Fenster. Was das Programm rechnet und warum, steht im Methodenhandbuch.</p>
 
 <nav>
-  <a href="#datei">Flowsheet als Datei</a> · <a href="#export">Weitere Dateien speichern</a> · <a href="#struktur">Fenster „Struktur“</a> · <a href="#kurven">Kurven und Heatmap</a>
+  <a href="#datei">Flowsheet als Datei</a> · <a href="#export">Weitere Dateien speichern</a> · <a href="#struktur">Fenster „Struktur“</a> · <a href="#kurven">Kurven und Heatmap</a> · <a href="#sieb">Sieb</a>
 </nav>
 
 <h2 id="datei">Flowsheet als Datei</h2>
@@ -81,6 +81,15 @@
   <li><b>Hilfslinien:</b> gestrichelt an den beschrifteten Werten beider Achsen, gepunktet an je drei Zwischenmarken dazwischen.</li>
   <li><b>Legende</b> unter dem Diagramm: Die Farbe steht für die Einheit, die Linienart für den Stoff (durchgezogen = „alle Stoffe“, dann gestrichelt, gepunktet …, in der Reihenfolge der Stoffliste). Lange Namen brechen in die nächste Zeile um.</li>
   <li><b>Kurven als CSV …:</b> speichert die gezeigten Kurven mit allen Zeitschritten, unabhängig vom Ausschnitt: Spalte <code>t_s</code>, dann je Kurve der Mittelwert über die Läufe, bei Streuband auch „unten“ und „oben“, bei „Einzelläufe zeigen“ jeder gezeichnete Lauf. Trennzeichen Semikolon, Dezimalpunkt; Kopfzeilen mit <code>#</code> nennen Größe, Einheit, Läufe und Zeitschritt. Der Dialog beginnt im Ordner <code>Kurven</code> im StoSiS-Ordner, danach im zuletzt benutzten Ordner; fehlt der Ordner, legt StoSiS ihn an.</li>
+</ul>
+<h2 id="sieb">Sieb</h2>
+<p>Das Sieb steht in der Palette unter „Trennen“. Ausgang 1 führt das Grobgut, Ausgang 2 das Feingut; so heißen die beiden auch in den Ergebnissen. Ein Mehrdecksieb entsteht aus mehreren Sieben hintereinander, das Feingut des einen in den Zulauf des nächsten.</p>
+<ul>
+  <li><b>Modell:</b> Plitt, Molerus-Hoffmann oder Teipel-Hennig; die Formeln stehen im Methodenhandbuch, Kapitel 7.5.</li>
+  <li><b>Trenngröße x_cut</b> in µm und <b>Trennschärfe α</b>; je größer α, desto steiler die Kurve. <b>β</b> und <b>Offset</b> erscheinen nur bei Teipel-Hennig.</li>
+  <li><b>Vorschau:</b> der Trenngrad T(d) über dem Größenbereich des Rasters, Größe logarithmisch (linear, wenn das Raster bei 0 beginnt), x_cut gestrichelt. Sie folgt jeder Eingabe sofort, auch vor „Übernehmen“.</li>
+  <li><b>Übernehmen</b> schreibt die Werte in das Sieb; ungültige Werte nennt eine rote Zeile, der Knopf ist dann gesperrt.</li>
+</ul>
 </ul>
 </main>
 </body>

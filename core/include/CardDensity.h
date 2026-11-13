@@ -53,7 +53,7 @@ namespace stosis
 
     // Anteil jeder Karte an der Kartendichte einer Stromscheibe (Summe 1),
     // fuer die Grenzen je Stromscheibe (CardLimits.h) und die Kartenansicht.
-    // sizes in m, masses in beliebiger Einheit (z.B. kg/s); Partikelzahl wie
+    // sizes in m, masses in beliebiger Einheit (z.B. kg im Paket); Partikelzahl wie
     // am Inlet (CardNumberWeight). Je Karte a_i = M(m_i / Summe m, n_i /
     // Summe n). Abflachung (gamma < 1): w_i = a_i * rho^(gamma - 1) mit der
     // Dichte rho = Summe a an der Groesse der Karte / Breite ihrer Zelle in

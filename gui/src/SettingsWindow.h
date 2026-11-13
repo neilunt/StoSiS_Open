@@ -14,6 +14,7 @@ class InletEditorWidget;
 class ProcessNodeEditorWidget;
 class SplitterEditorWidget;
 class VesselEditorWidget;
+class ScreenEditorWidget;
 class QSlider;
 class MaterialsPage;
 class SieveGridWidget;
@@ -95,7 +96,8 @@ private:
         PageOutlet,
         PageSplitter,
         PageMerger,
-        PageVessel
+        PageVessel,
+        PageScreen
     };
 
     stosis::CFlowsheetGraph* m_graph = nullptr;
@@ -110,6 +112,7 @@ private:
     ProcessNodeEditorWidget* m_processEditor = nullptr;
     SplitterEditorWidget* m_splitterEditor = nullptr;
     VesselEditorWidget* m_vesselEditor = nullptr;
+    ScreenEditorWidget* m_screenEditor = nullptr;
 
     QComboBox* m_gridTypeCombo = nullptr;
     QSpinBox* m_numClassesSpin = nullptr;

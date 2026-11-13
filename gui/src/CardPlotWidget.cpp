@@ -542,7 +542,7 @@ void CardPlotWidget::PaintRug(QPainter& p, const QRect& plot)
         p.drawEllipse(center, 2.0, 2.0);
         const QString compound = card.compound < m_compounds.size() ? m_compounds[card.compound] : QString();
         m_hits.push_back({ QRectF(center.x() - 3, center.y() - 3, 6, 6),
-            QString("Karte %1\nd = %2 %3\n%4 kg/s%5").arg(k + 1).arg(Micro(card.size), Unit(), Num(card.mass, 4),
+            QString("Karte %1\nd = %2 %3\n%4 kg%5").arg(k + 1).arg(Micro(card.size), Unit(), Num(card.mass, 4),
                 compound.isEmpty() ? QString() : "\n" + compound) });
     }
     p.restore();
@@ -738,7 +738,7 @@ void CardPlotWidget::PaintCounts(QPainter& p, const QRect& plot)
 
 void CardPlotWidget::PaintCloud(QPainter& p, const QRect& plot)
 {
-    DrawTitle(p, plot, "Gewicht je Karte - Groesse gegen Massenstrom (Diagnose)");
+    DrawTitle(p, plot, "Gewicht je Karte - Groesse gegen Masse im Paket (Diagnose)");
     double mMin = 0.0, mMax = 0.0;
     for (const SCard& card : m_cards)
         if (card.mass > 0.0)
@@ -774,7 +774,7 @@ void CardPlotWidget::PaintCloud(QPainter& p, const QRect& plot)
             p.drawText(QRectF(0, y - 8, kMarginLeft - 8, 16), Qt::AlignRight | Qt::AlignVCenter, Num(value, 3));
         }
     DrawFrame(p, plot);
-    DrawYTitle(p, plot, "Massenstrom je Karte [kg/s]");
+    DrawYTitle(p, plot, "Masse je Karte im Paket [kg]");
 
     // Karten als Punkte. Ohne Rand: Karten eines Bereichs tragen dieselbe
     // Masse und liegen dicht an dicht auf einer Linie, ein heller Rand liesse
@@ -794,7 +794,7 @@ void CardPlotWidget::PaintCloud(QPainter& p, const QRect& plot)
         p.drawEllipse(center, 3.5, 3.5);
         const QString compound = card.compound < m_compounds.size() ? m_compounds[card.compound] : QString();
         m_hits.push_back({ QRectF(center.x() - 4, center.y() - 4, 8, 8),
-            QString("d = %1 %2\n%3 kg/s%4").arg(Micro(card.size), Unit(), Num(card.mass, 4),
+            QString("d = %1 %2\n%3 kg%4").arg(Micro(card.size), Unit(), Num(card.mass, 4),
                 compound.isEmpty() ? QString() : "\n" + compound) });
     }
     p.restore();

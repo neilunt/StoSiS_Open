@@ -42,7 +42,7 @@ static double MaxCardMass(const CStreamSlice& slice)
 {
     double m = 0.0;
     for (size_t k = 0; k < slice.GetNumCards(); ++k)
-        m = std::max(m, slice.GetCardMassFlow(k));
+        m = std::max(m, slice.GetCardMass(k));
     return m;
 }
 
@@ -52,8 +52,8 @@ static double MeanSize(const CStreamSlice& slice)
     double mass = 0.0, moment = 0.0;
     for (size_t k = 0; k < slice.GetNumCards(); ++k)
     {
-        mass += slice.GetCardMassFlow(k);
-        moment += slice.GetCardMassFlow(k) * slice.GetCardSize(k);
+        mass += slice.GetCardMass(k);
+        moment += slice.GetCardMass(k) * slice.GetCardSize(k);
     }
     return mass > 0.0 ? moment / mass : 0.0;
 }
@@ -80,7 +80,7 @@ int main()
         merger.Step({ 1, 0.1, 0.1 }, { &sand, &coal }, outputs);
         const CStreamSlice& out = outputs[0];
         Check(out.GetNumCards() == 4000, "Merger: 2000 + 2000 Karten = 4000 Karten");
-        Check(NearRel(out.GetCardsMassFlow(0), 3.0, 1e-12) && NearRel(out.GetCardsMassFlow(1), 1.0, 1e-12),
+        Check(NearRel(out.GetCardsMass(0), 3.0, 1e-12) && NearRel(out.GetCardsMass(1), 1.0, 1e-12),
             "Merger: Massenstrom je Stoff exakt (3 kg/s Sand, 1 kg/s Kohle)");
         Check(NearAbs(out.GetTemperature(), (3.0 * 300.0 + 1.0 * 400.0) / 4.0, 1e-9),
             "Merger: Mischtemperatur 325 K (nach Masse, ohne Materialdatei)");
@@ -109,25 +109,25 @@ int main()
             for (CStreamSlice& o : outputs)
                 o.Resize(300, 1, ERepresentation::Particles);
             splitter.Step({ k, 0.1 * k, 0.1 }, { &input }, outputs);
-            const double massA = outputs[0].GetCardsMassFlow();
+            const double massA = outputs[0].GetCardsMass();
             countsOk = countsOk && outputs[0].GetNumCards() + outputs[1].GetNumCards() == input.GetNumCards();
-            worstStep = std::max(worstStep, std::abs(massA - 0.3 * input.GetCardsMassFlow()));
+            worstStep = std::max(worstStep, std::abs(massA - 0.3 * input.GetCardsMass()));
             sumA += massA;
-            sumIn += input.GetCardsMassFlow();
+            sumIn += input.GetCardsMass();
             worstTotal = std::max(worstTotal, std::abs(sumA - 0.3 * sumIn));
             worstMean = std::max(worstMean, std::abs(MeanSize(outputs[0]) - inputMean) / inputMean);
             const std::vector<double>& accounts = splitter.GetCardAccounts();
             worstAccounts = std::max(worstAccounts, std::abs(accounts[0] + accounts[1]));
             for (size_t c = 0; c < outputs[0].GetNumCards(); ++c)
-                rangeA[GetCardRangeIndex(outputs[0].GetCardSize(c), settings) + 10] += outputs[0].GetCardMassFlow(c);
+                rangeA[GetCardRangeIndex(outputs[0].GetCardSize(c), settings) + 10] += outputs[0].GetCardMass(c);
             for (size_t c = 0; c < input.GetNumCards(); ++c)
-                rangeIn[GetCardRangeIndex(input.GetCardSize(c), settings) + 10] += input.GetCardMassFlow(c);
+                rangeIn[GetCardRangeIndex(input.GetCardSize(c), settings) + 10] += input.GetCardMass(c);
         }
         double worstRange = 0.0;
         for (size_t r = 0; r < rangeIn.size(); ++r)
             if (rangeIn[r] > 0.01 * sumIn)
                 worstRange = std::max(worstRange, std::abs(rangeA[r] / rangeIn[r] - 0.3));
-        std::printf("      groesste Karte %.2e kg/s; Abweichung je Schritt hoechstens %.2e kg/s, aufsummiert hoechstens %.2e kg/s\n",
+        std::printf("      groesste Karte %.2e kg; Abweichung je Schritt hoechstens %.2e kg, aufsummiert hoechstens %.2e kg\n",
             cardMax, worstStep, worstTotal);
         std::printf("      mittlere Groesse in A: hoechstens %.2f %% neben dem Eingang; Anteil nach A je Groessenbereich: hoechstens %.1e neben 30 %%\n",
             worstMean * 100.0, worstRange);
@@ -166,8 +166,8 @@ int main()
         double fineMassIn = 0.0, lightest = 1.0;
         for (size_t c = 0; c < input.GetNumCards(); ++c)
         {
-            fineMassIn += input.GetCardSize(c) < fineSize ? input.GetCardMassFlow(c) : 0.0;
-            lightest = std::min(lightest, input.GetCardMassFlow(c) * static_cast<double>(input.GetNumCards()));
+            fineMassIn += input.GetCardSize(c) < fineSize ? input.GetCardMass(c) : 0.0;
+            lightest = std::min(lightest, input.GetCardMass(c) * static_cast<double>(input.GetNumCards()));
         }
         std::vector<CStreamSlice> outputs(2);
         double fineCardsA = 0.0, fineCardsAll = 0.0, fineMassA = 0.0;
@@ -182,7 +182,7 @@ int main()
                 if (outputs[0].GetCardSize(c) < fineSize)
                 {
                     ++inA;
-                    fineMassA += outputs[0].GetCardMassFlow(c);
+                    fineMassA += outputs[0].GetCardMass(c);
                 }
             for (size_t c = 0; c < outputs[1].GetNumCards(); ++c)
                 inB += outputs[1].GetCardSize(c) < fineSize ? 1 : 0;
@@ -216,10 +216,10 @@ int main()
             for (CStreamSlice& o : outputs)
                 o.Resize(300, 2, ERepresentation::Particles);
             splitter.Step({ k, 0.1 * k, 0.1 }, { &input }, outputs);
-            worst = std::max(worst, std::abs(outputs[0].GetCardsMassFlow(0) - 0.5));
-            worst = std::max(worst, std::abs(outputs[0].GetCardsMassFlow(1) - 0.5));
+            worst = std::max(worst, std::abs(outputs[0].GetCardsMass(0) - 0.5));
+            worst = std::max(worst, std::abs(outputs[0].GetCardsMass(1) - 0.5));
         }
-        std::printf("      zwei Stoffe, 50/50: Sand und Kohle in A hoechstens %.2e kg/s neben 0,5 kg/s\n", worst);
+        std::printf("      zwei Stoffe, 50/50: Sand und Kohle in A hoechstens %.2e kg neben 0,5 kg\n", worst);
         Check(worst <= 2.0 * MaxCardMass(input), "Splitter: zwei Stoffe gleicher Groesse - jeder Stoff je Schritt zur Haelfte in A");
     }
 
@@ -241,12 +241,12 @@ int main()
             for (CStreamSlice& o : outputs)
                 o.Resize(300, 1, ERepresentation::Particles);
             splitter.Step({ k, 0.1 * k, 0.1 }, { &input }, outputs);
-            sumIn += input.GetCardsMassFlow();
+            sumIn += input.GetCardsMass();
             const double f[3] = { 0.5, 0.3, 0.2 };
             for (size_t i = 0; i < 3; ++i)
             {
-                worstStep = std::max(worstStep, std::abs(outputs[i].GetCardsMassFlow() - f[i] * input.GetCardsMassFlow()));
-                sums[i] += outputs[i].GetCardsMassFlow();
+                worstStep = std::max(worstStep, std::abs(outputs[i].GetCardsMass() - f[i] * input.GetCardsMass()));
+                sums[i] += outputs[i].GetCardsMass();
                 worst = std::max(worst, std::abs(sums[i] - f[i] * sumIn));
             }
         }
@@ -285,7 +285,7 @@ int main()
                 splitter.Step({ k, 0.1 * k, 0.1 }, { &merged[0] }, split);
                 recycled = split[1];
                 loopCards = merged[0].GetNumCards();
-                outMass = split[0].GetCardsMassFlow();
+                outMass = split[0].GetCardsMass();
             }
             const double expected = 2000.0 / (1.0 - recycle);
             std::printf("      Rueckfuehrung R = %.1f: %zu Karten im Kreis (erwartet %.0f), Austrag %.6f kg/s bei 1 kg/s Zulauf\n",
@@ -399,14 +399,14 @@ int main()
         {
             std::vector<double> v(s.GetNumCards());
             for (size_t k = 0; k < v.size(); ++k)
-                v[k] = s.GetCardMassFlow(k);
+                v[k] = s.GetCardMass(k);
             return v;
         };
         const auto numberOf = [](const CStreamSlice& s)
         {
             double n = 0.0;
             for (size_t k = 0; k < s.GetNumCards(); ++k)
-                n += s.GetCardMassFlow(k) / std::pow(s.GetCardSize(k), 3.0);
+                n += s.GetCardMass(k) / std::pow(s.GetCardSize(k), 3.0);
             return n;
         };
         // Innerhalb der Grenzen: hoechstens 2 N Karten, kein Anteil ueber 5 / N.
@@ -423,7 +423,7 @@ int main()
         {
             std::vector<std::pair<double, double>> v;
             for (size_t k = 0; k < s.GetNumCards(); ++k)
-                v.push_back({ s.GetCardSize(k), s.GetCardMassFlow(k) });
+                v.push_back({ s.GetCardSize(k), s.GetCardMass(k) });
             std::sort(v.begin(), v.end());
             std::vector<std::pair<double, double>> merged;
             for (const auto& entry : v)
@@ -445,7 +445,7 @@ int main()
         const SLimitCounts none = ApplySliceLimits(same, settings, countMin);
         bool identical = same.GetNumCards() == inlet.GetNumCards();
         for (size_t k = 0; identical && k < inlet.GetNumCards(); ++k)
-            identical = same.GetCardSize(k) == inlet.GetCardSize(k) && same.GetCardMassFlow(k, 0) == inlet.GetCardMassFlow(k, 0);
+            identical = same.GetCardSize(k) == inlet.GetCardSize(k) && same.GetCardMass(k, 0) == inlet.GetCardMass(k, 0);
         Check(identical && none.added == 0 && none.removed == 0, "Grenzen: Inlet-Karten bleiben unveraendert");
         Check(*lightest * 2000.0 > 0.5 && *heaviestInlet * 2000.0 < 2.0, "Inlet: jede Karte traegt zwischen 1/(2N) und 2/N");
 
@@ -453,7 +453,7 @@ int main()
         CStreamSlice few;
         few.Resize(300, 1, ERepresentation::Particles);
         for (size_t k = 50; k < inlet.GetNumCards(); k += 100)
-            few.AddCard(inlet.GetCardSize(k), 0, inlet.GetCardMassFlow(k, 0));
+            few.AddCard(inlet.GetCardSize(k), 0, inlet.GetCardMass(k, 0));
         CStreamSlice split = few;
         const SLimitCounts added = ApplySliceLimits(split, settings, countMin);
         std::printf("      Teilen: %zu Karten -> %zu (je Karte hoechstens 5 / N)\n", few.GetNumCards(), split.GetNumCards());
@@ -466,7 +466,7 @@ int main()
         for (size_t i = 0; sameMassBySize && i < beforeSizes.size(); ++i)
             sameMassBySize = beforeSizes[i].first == afterSizes[i].first
                 && NearRel(afterSizes[i].second, beforeSizes[i].second, 1e-12);
-        Check(sameMassBySize && NearRel(split.GetCardsMassFlow(), few.GetCardsMassFlow(), 1e-14),
+        Check(sameMassBySize && NearRel(split.GetCardsMass(), few.GetCardsMass(), 1e-14),
             "Teilen: nur Stuecke gleicher Groesse, Masse je Groesse genau erhalten (Raster unveraendert)");
         // Stueckzahl je Karte nach ihrem Anteil: nur nach Masse (f = 0, ohne
         // Abflachung), N = 100, also hoechstens 0,05 je Karte.
@@ -486,7 +486,7 @@ int main()
                 at100 += two.GetCardSize(k) == 100e-6 ? 1 : 0;
                 at200 += two.GetCardSize(k) == 200e-6 ? 1 : 0;
             }
-            Check(at100 == 18 && at200 == 2 && NearRel(two.GetCardsMassFlow(), 1.0, 1e-14),
+            Check(at100 == 18 && at200 == 2 && NearRel(two.GetCardsMass(), 1.0, 1e-14),
                 "Teilen je Karte nach ihrem Anteil: 0,9 -> 18 Stuecke, 0,1 -> 2 Stuecke (je hoechstens 5 / N)");
         }
 
@@ -519,7 +519,7 @@ int main()
             "Zusammenlegen: hoechstens 2 N Karten");
         Check(coarseShare(merged) >= 0.7 * coarseShare(many),
             "Zusammenlegen: die Randkarten bleiben anteilig erhalten (nach Anteil an der Kartendichte, nicht nach Masse)");
-        Check(NearRel(merged.GetCardsMassFlow(), many.GetCardsMassFlow(), 1e-12) && NearRel(numberOf(merged), numberOf(many), 1e-10),
+        Check(NearRel(merged.GetCardsMass(), many.GetCardsMass(), 1e-12) && NearRel(numberOf(merged), numberOf(many), 1e-10),
             "Zusammenlegen: Masse und Partikelzahl genau erhalten");
         Check(worstQuantile < 0.005, "Zusammenlegen: d10, d50, d90 verschieben sich um weniger als 0,5 %");
 
@@ -535,10 +535,10 @@ int main()
         ApplySliceLimits(mixedMerged, settings, countMin);
         bool pure = true;
         for (size_t k = 0; k < mixedMerged.GetNumCards(); ++k)
-            pure = pure && (mixedMerged.GetCardMassFlow(k, 0) == 0.0 || mixedMerged.GetCardMassFlow(k, 1) == 0.0);
+            pure = pure && (mixedMerged.GetCardMass(k, 0) == 0.0 || mixedMerged.GetCardMass(k, 1) == 0.0);
         Check(pure && mixedMerged.GetNumCards() < mixed.GetNumCards()
-            && NearRel(mixedMerged.GetCardsMassFlow(0), mixed.GetCardsMassFlow(0), 1e-12)
-            && NearRel(mixedMerged.GetCardsMassFlow(1), mixed.GetCardsMassFlow(1), 1e-12),
+            && NearRel(mixedMerged.GetCardsMass(0), mixed.GetCardsMass(0), 1e-12)
+            && NearRel(mixedMerged.GetCardsMass(1), mixed.GetCardsMass(1), 1e-12),
             "Zwei Stoffe: jede Karte bleibt aus einem Stoff, Masse je Stoff genau erhalten");
 
         // e) Rueckfuehrung R = 0,9 wie in 5), jetzt mit Grenzen nach Merger und Splitter.
@@ -567,7 +567,7 @@ int main()
             recycled = outputs[1];
             loopCards = loop[0].GetNumCards();
             maxLoopCards = std::max(maxLoopCards, loopCards);
-            outMass = outputs[0].GetCardsMassFlow();
+            outMass = outputs[0].GetCardsMass();
         }
         std::printf("      Rueckfuehrung R = 0,9 mit Grenzen: %zu Karten im Kreis (hoechstens %zu; ohne Grenzen 20000), "
             "Austrag %.6f kg/s\n", loopCards, maxLoopCards, outMass);
@@ -614,7 +614,7 @@ int main()
             std::vector<double> masses(snapshot.sizes.size(), 0.0);
             for (size_t k = 0; k < masses.size(); ++k)
                 for (size_t c = 0; c < numC; ++c)
-                    masses[k] += snapshot.massFlows[k * numC + c];
+                    masses[k] += snapshot.masses[k * numC + c];
             allWithin = allWithin && snapshot.sizes.size() <= 2 * on.cardsPerSlice;
             for (double share : ComputeCardShares(snapshot.sizes, masses, on, countMin))
                 allWithin = allWithin && share <= heaviest * (1.0 + 1e-9);
@@ -645,7 +645,7 @@ int main()
         input.Resize(300, 1, ERepresentation::Particles);
         AddCards(input, standard, 2000, 0, 1.0);
         input.SetTemperature(350.0);
-        const double massIn = input.GetCardsMassFlow();
+        const double massIn = input.GetCardsMass();
         const double cardMax = MaxCardMass(input);
         std::vector<CStreamSlice> outputs(1);
         double sumIn = 0.0, sumOut = 0.0, worstFirst = 0.0, worstSteady = 0.0, worstAccount = 0.0, worstT = 0.0;
@@ -656,15 +656,15 @@ int main()
             outputs[0].Resize(300, 1, ERepresentation::Particles);
             delay.Step({ k, dt * static_cast<double>(k), dt }, { &input }, outputs);
             const CStreamSlice& out = outputs[0];
-            sumIn += massIn * dt;
-            sumOut += out.GetCardsMassFlow() * dt;
+            sumIn += massIn; // cards carry the mass of one step
+            sumOut += out.GetCardsMass();
             if (k < 2)
                 earlyEmpty = earlyEmpty && out.GetNumCards() == 0;
             else if (k == 2)
-                worstFirst = std::abs(out.GetCardsMassFlow() - 0.7 * massIn);
+                worstFirst = std::abs(out.GetCardsMass() - 0.7 * massIn);
             else
             {
-                worstSteady = std::max(worstSteady, std::abs(out.GetCardsMassFlow() - massIn));
+                worstSteady = std::max(worstSteady, std::abs(out.GetCardsMass() - massIn));
                 const size_t count = out.GetNumCards();
                 worstCount = std::max(worstCount, count > 2000 ? count - 2000 : 2000 - count);
             }
@@ -674,7 +674,7 @@ int main()
             worstAccount = std::max(worstAccount, account > 0.5 ? account - 0.5 : (account <= -0.5 ? -0.5 - account : 0.0));
         }
         const double balance = std::abs(sumIn - sumOut - delay.GetContentMass()) / sumIn;
-        std::printf("      Verzoegerung 2,3 dt: Schritt 2 traegt %.4f statt 0,7 des Zulaufs; danach hoechstens %.2e kg/s "
+        std::printf("      Verzoegerung 2,3 dt: Schritt 2 traegt %.4f statt 0,7 des Zulaufs; danach hoechstens %.2e kg "
             "(groesste Karte %.2e) und %zu Karten neben dem Zulauf; Bilanz %.1e\n",
             (0.7 * massIn + worstFirst) / massIn, worstSteady, cardMax, worstCount, balance);
         Check(earlyEmpty, "Verzoegerung: in den ersten zwei Schritten kommt nichts an");
@@ -707,8 +707,8 @@ int main()
         double massIn = 0.0, expected = 0.0;
         for (size_t c = 0; c < pulse.GetNumCards(); ++c)
         {
-            massIn += pulse.GetCardMassFlow(c);
-            expected += pulse.GetCardMassFlow(c) * stepsOf(pulse.GetCardSize(c));
+            massIn += pulse.GetCardMass(c);
+            expected += pulse.GetCardMass(c) * stepsOf(pulse.GetCardSize(c));
         }
         expected /= massIn;
         // Per card (sorted by size): remainder r and whether it arrived late.
@@ -729,8 +729,8 @@ int main()
                 const bool late = static_cast<double>(k) > q;
                 onTime = onTime && (static_cast<double>(k) == q || static_cast<double>(k) == q + 1.0);
                 lateBySize.emplace_back(out.GetCardSize(c), late ? 1 : 0);
-                massOut += out.GetCardMassFlow(c);
-                moment += out.GetCardMassFlow(c) * static_cast<double>(k);
+                massOut += out.GetCardMass(c);
+                moment += out.GetCardMass(c) * static_cast<double>(k);
                 ++cardsOut;
             }
         }

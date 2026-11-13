@@ -418,7 +418,8 @@ namespace stosis
 
         // --- Fuer Tests und Anzeige ------------------------------------------
 
-        // Inhalt [kg] je Stoff bzw. insgesamt.
+        // Inhalt [kg] je Stoff bzw. insgesamt (cards carry masses, the
+        // continuum mass flows times dt).
         double GetContentMass(size_t compound) const
         {
             double sum = 0.0;
@@ -428,7 +429,7 @@ namespace stosis
                 if (compound < weights.size())
                     sum += weights[compound];
             }
-            return sum * m_dt;
+            return m_particles ? sum : sum * m_dt;
         }
 
         double GetContentMass() const
@@ -468,13 +469,13 @@ namespace stosis
         struct SCardBin
         {
             std::vector<double> sizes;
-            std::vector<double> flows;            // [Karte * Stoffe + Stoff], Massenstrom wie im Strom
+            std::vector<double> masses;           // [card * compounds + compound], mass [kg] as in the stream
             std::vector<std::uint32_t> compounds; // vorherrschender Stoff (Ordnung)
             size_t Count() const { return sizes.size(); }
             void Clear()
             {
                 sizes.clear();
-                flows.clear();
+                masses.clear();
                 compounds.clear();
             }
         };
@@ -759,7 +760,9 @@ namespace stosis
 
         // ---------------- Hilfen fuer Mengen und Temperatur ----------------
 
-        // Stoffmengen eines Bereichs (Massenstrom-Aequivalent; mal dt = kg).
+        // Amounts of a region per compound: continuum mass flow (times dt =
+        // kg), cards their mass [kg]. Only the ratios matter for the mixing; for
+        // the content in kg see GetContentMass.
         std::vector<double> RegionWeights(const SRegion& region) const
         {
             std::vector<double> weights(m_numC, 0.0);
@@ -779,7 +782,7 @@ namespace stosis
             const size_t n = bin.Count();
             for (size_t k = 0; k < n; ++k)
                 for (size_t c = 0; c < m_numC; ++c)
-                    weights[c] += bin.flows[k * m_numC + c];
+                    weights[c] += bin.masses[k * m_numC + c];
         }
 
         std::vector<double> BinWeights(const SCardBin& bin) const
@@ -888,7 +891,7 @@ namespace stosis
                     part.sizes.push_back(placement.sizes[k]);
                     part.compounds.push_back(static_cast<std::uint32_t>(compound));
                     for (size_t c = 0; c < m_numC; ++c)
-                        part.flows.push_back(c == compound ? entry.second * unitFlow * placement.massFractions[k] : 0.0);
+                        part.masses.push_back(c == compound ? entry.second * unitFlow * m_dt * placement.massFractions[k] : 0.0); // [kg]
                 }
                 SRegion& region = m_regions[entry.first];
                 StoreAddAll(region.store, part);
@@ -1007,9 +1010,9 @@ namespace stosis
                     const size_t span = i - first + 1;
                     const size_t j = first + std::min(static_cast<size_t>(m_lotRandom.Uniform() * static_cast<double>(span)), span - 1);
                     if (j != i)
-                        std::swap_ranges(bin.flows.begin() + static_cast<std::ptrdiff_t>(i * m_numC),
-                            bin.flows.begin() + static_cast<std::ptrdiff_t>((i + 1) * m_numC),
-                            bin.flows.begin() + static_cast<std::ptrdiff_t>(j * m_numC));
+                        std::swap_ranges(bin.masses.begin() + static_cast<std::ptrdiff_t>(i * m_numC),
+                            bin.masses.begin() + static_cast<std::ptrdiff_t>((i + 1) * m_numC),
+                            bin.masses.begin() + static_cast<std::ptrdiff_t>(j * m_numC));
                 }
                 first = last;
             }
@@ -1020,14 +1023,14 @@ namespace stosis
             to.sizes.push_back(from.sizes[k]);
             to.compounds.push_back(from.compounds[k]);
             for (size_t c = 0; c < m_numC; ++c)
-                to.flows.push_back(from.flows[k * m_numC + c] * scale);
+                to.masses.push_back(from.masses[k * m_numC + c] * scale);
         }
 
-        std::uint32_t DominantCompound(const double* flows) const
+        std::uint32_t DominantCompound(const double* masses) const
         {
             size_t best = 0;
             for (size_t c = 1; c < m_numC; ++c)
-                if (flows[c] > flows[best])
+                if (masses[c] > masses[best])
                     best = c;
             return static_cast<std::uint32_t>(best);
         }
@@ -1038,13 +1041,13 @@ namespace stosis
             const size_t n = slice.GetNumCards();
             bin.sizes.reserve(n);
             bin.compounds.reserve(n);
-            bin.flows.reserve(n * m_numC);
+            bin.masses.reserve(n * m_numC);
             for (size_t k = 0; k < n; ++k)
             {
                 bin.sizes.push_back(slice.GetCardSize(k));
                 for (size_t c = 0; c < m_numC; ++c)
-                    bin.flows.push_back(c < slice.GetNumCompounds() ? slice.GetCardMassFlow(k, c) : 0.0);
-                bin.compounds.push_back(DominantCompound(&bin.flows[k * m_numC]));
+                    bin.masses.push_back(c < slice.GetNumCompounds() ? slice.GetCardMass(k, c) : 0.0);
+                bin.compounds.push_back(DominantCompound(&bin.masses[k * m_numC]));
             }
         }
 
@@ -1065,7 +1068,7 @@ namespace stosis
             SCardBin result;
             result.sizes.reserve(n);
             result.compounds.reserve(n);
-            result.flows.reserve(n * m_numC);
+            result.masses.reserve(n * m_numC);
             for (size_t k : m_order)
                 PushCard(result, bin, k);
             bin = std::move(result);
@@ -1085,7 +1088,7 @@ namespace stosis
             const size_t b = static_cast<size_t>(from.compounds[k]) * m_numClasses + ClassOf(from.sizes[k]);
             PushCard(store.bins[b], from, k, scale);
             for (size_t c = 0; c < m_numC; ++c)
-                store.weights[c] += from.flows[k * m_numC + c] * scale;
+                store.weights[c] += from.masses[k * m_numC + c] * scale;
             ++store.count;
         }
 
@@ -1108,7 +1111,7 @@ namespace stosis
             store.count = 0;
         }
 
-        // Card i of compartment b to "to" (its mass flows added to
+        // Card i of compartment b to "to" (its masses added to
         // toWeights); the last card of the compartment fills the gap.
         void StoreTake(SCardStore& store, size_t b, size_t i, SCardBin& to, std::vector<double>& toWeights) const
         {
@@ -1116,7 +1119,7 @@ namespace stosis
             PushCard(to, bin, i);
             for (size_t c = 0; c < m_numC; ++c)
             {
-                const double w = bin.flows[i * m_numC + c];
+                const double w = bin.masses[i * m_numC + c];
                 toWeights[c] += w;
                 store.weights[c] -= w;
             }
@@ -1125,13 +1128,13 @@ namespace stosis
             {
                 bin.sizes[i] = bin.sizes[last];
                 bin.compounds[i] = bin.compounds[last];
-                std::copy(bin.flows.begin() + static_cast<std::ptrdiff_t>(last * m_numC),
-                    bin.flows.begin() + static_cast<std::ptrdiff_t>((last + 1) * m_numC),
-                    bin.flows.begin() + static_cast<std::ptrdiff_t>(i * m_numC));
+                std::copy(bin.masses.begin() + static_cast<std::ptrdiff_t>(last * m_numC),
+                    bin.masses.begin() + static_cast<std::ptrdiff_t>((last + 1) * m_numC),
+                    bin.masses.begin() + static_cast<std::ptrdiff_t>(i * m_numC));
             }
             bin.sizes.pop_back();
             bin.compounds.pop_back();
-            bin.flows.resize(last * m_numC);
+            bin.masses.resize(last * m_numC);
             if (--store.count == 0)
                 std::fill(store.weights.begin(), store.weights.end(), 0.0); // no rounding remainder
         }
@@ -1235,7 +1238,7 @@ namespace stosis
                 return 0;
             CStreamSlice slice;
             slice.Resize(0, m_numC, ERepresentation::Particles);
-            slice.SetCards(bin.sizes, bin.flows);
+            slice.SetCards(bin.sizes, bin.masses);
             SCardSettings settings = m_cardSettings;
             settings.cardsPerSlice = std::max<size_t>(numCards, 1);
             settings.upperFactor = 1.0;
@@ -1246,8 +1249,8 @@ namespace stosis
             {
                 bin.sizes.push_back(slice.GetCardSize(k));
                 for (size_t c = 0; c < m_numC; ++c)
-                    bin.flows.push_back(slice.GetCardMassFlow(k, c));
-                bin.compounds.push_back(DominantCompound(&bin.flows[k * m_numC]));
+                    bin.masses.push_back(slice.GetCardMass(k, c));
+                bin.compounds.push_back(DominantCompound(&bin.masses[k * m_numC]));
             }
             SortBin(bin);
             return counts.removed;
@@ -1299,7 +1302,7 @@ namespace stosis
             if (!m_filled)
             {
                 m_filled = true;
-                if (inflow.Count() == 0 || !(input && input->GetCardsMassFlow() > 0.0))
+                if (inflow.Count() == 0 || !(input && input->GetCardsMass() > 0.0))
                     m_zeroSteadyInflow = true;
                 else
                     FillSteadyCards(inflow, inT, inP);
@@ -1352,7 +1355,7 @@ namespace stosis
                     case 2:
                         PushCard(m_outCards, inflow, i);
                         for (size_t c = 0; c < m_numC; ++c)
-                            inOutW[c] += inflow.flows[i * m_numC + c];
+                            inOutW[c] += inflow.masses[i * m_numC + c];
                         break;
                     default: PushCard(stay, inflow, i); break;
                     }
@@ -1387,7 +1390,7 @@ namespace stosis
                     {
                         PushCard(m_outCards, inflow, i);
                         for (size_t c = 0; c < m_numC; ++c)
-                            inOutW[c] += inflow.flows[i * m_numC + c];
+                            inOutW[c] += inflow.masses[i * m_numC + c];
                     }
                     else
                         PushCard(stay, inflow, i);
@@ -1402,7 +1405,7 @@ namespace stosis
             }
             }
 
-            out.SetCards(std::move(m_outCards.sizes), std::move(m_outCards.flows));
+            out.SetCards(std::move(m_outCards.sizes), std::move(m_outCards.masses));
             m_outCards.Clear();
         }
 
@@ -1494,7 +1497,7 @@ namespace stosis
                 {
                     PushCard(m_outCards, inflow, i);
                     for (size_t c = 0; c < m_numC; ++c)
-                        inOutW[c] += inflow.flows[i * m_numC + c];
+                        inOutW[c] += inflow.masses[i * m_numC + c];
                 }
                 else
                     PushCard(m_incoming[n + t], inflow, i);

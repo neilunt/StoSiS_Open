@@ -9,7 +9,7 @@ namespace stosis
 {
     // Karten eines Stroms ueber die Zeit fuer die Kartenansicht (Methodenhandbuch
     // 9.6): die Kartenzahl in jedem Zeitschritt und die Karten selbst
-    // (Groesse, Massenstrom je Stoff). Gespeichert wird nur ein Lauf (Lauf 1).
+    // (Groesse, Masse je Stoff im Paket). Gespeichert wird nur ein Lauf (Lauf 1).
     // Damit der Speicher begrenzt bleibt, gibt es eine Obergrenze: Wird sie
     // ueberschritten, bleibt nur noch jeder zweite gespeicherte Schritt
     // (Abstand verdoppelt), und es wird mit dem neuen Abstand weiter
@@ -21,7 +21,7 @@ namespace stosis
         {
             size_t step = 0;
             std::vector<double> sizes;      // m
-            std::vector<double> massFlows;  // kg/s, [Karte * Stoffe + Stoff]
+            std::vector<double> masses;     // kg, [Karte * Stoffe + Stoff]
         };
 
         // dt = Abstand der Zeitschritte in s (fuer die Zeitachse der Anzeige).
@@ -47,13 +47,13 @@ namespace stosis
             SSnapshot snapshot;
             snapshot.step = step;
             snapshot.sizes.resize(numCards);
-            snapshot.massFlows.assign(numCards * m_numCompounds, 0.0);
+            snapshot.masses.assign(numCards * m_numCompounds, 0.0);
             const size_t numC = std::min(m_numCompounds, slice.GetNumCompounds());
             for (size_t k = 0; k < numCards; ++k)
             {
                 snapshot.sizes[k] = slice.GetCardSize(k);
                 for (size_t c = 0; c < numC; ++c)
-                    snapshot.massFlows[k * m_numCompounds + c] = slice.GetCardMassFlow(k, c);
+                    snapshot.masses[k * m_numCompounds + c] = slice.GetCardMass(k, c);
             }
             m_bytes += GetBytes(snapshot);
             m_snapshots.push_back(std::move(snapshot));
@@ -87,7 +87,7 @@ namespace stosis
     private:
         static size_t GetBytes(const SSnapshot& snapshot)
         {
-            return sizeof(SSnapshot) + (snapshot.sizes.size() + snapshot.massFlows.size()) * sizeof(double);
+            return sizeof(SSnapshot) + (snapshot.sizes.size() + snapshot.masses.size()) * sizeof(double);
         }
 
         void Thin()

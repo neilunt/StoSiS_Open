@@ -84,6 +84,8 @@ src/SplitterEditorWidget.cpp
 src/SplitterEditorWidget.h
 src/VesselEditorWidget.cpp
 src/VesselEditorWidget.h
+src/ScreenEditorWidget.cpp
+src/ScreenEditorWidget.h
 src/FractionPreviewWidget.cpp
 src/FractionPreviewWidget.h
 src/ResultsEntryKey.h

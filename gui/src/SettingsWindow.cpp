@@ -3,6 +3,7 @@
 #include "ProcessNodeEditorWidget.h"
 #include "SplitterEditorWidget.h"
 #include "VesselEditorWidget.h"
+#include "ScreenEditorWidget.h"
 #include "MaterialsPage.h"
 #include "SieveGridWidget.h"
 #include "CardDensityPreviewWidget.h"
@@ -97,12 +98,16 @@ QWidget* SettingsWindow::CreateNodeTab()
     m_vesselEditor = new VesselEditorWidget(m_pages);
     m_pages->insertWidget(PageVessel, m_vesselEditor);
 
+    m_screenEditor = new ScreenEditorWidget(m_pages);
+    m_pages->insertWidget(PageScreen, m_screenEditor);
+
     layout->addWidget(m_pages, 1);
 
     connect(m_inletEditor, &InletEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
     connect(m_processEditor, &ProcessNodeEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
     connect(m_splitterEditor, &SplitterEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
     connect(m_vesselEditor, &VesselEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
+    connect(m_screenEditor, &ScreenEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
     connect(m_processEditor, &ProcessNodeEditorWidget::ModelTypeChanged, this, &SettingsWindow::ModelTypeChanged);
 
     return tab;
@@ -614,6 +619,7 @@ void SettingsWindow::SetGraph(stosis::CFlowsheetGraph* graph)
     m_processEditor->SetGraph(graph);
     m_splitterEditor->SetGraph(graph);
     m_vesselEditor->SetGraph(graph);
+    m_screenEditor->SetGraph(graph);
     LoadGridValues();
     if (graph)
         LoadCardValues(graph->GetCardSettings());
@@ -711,6 +717,10 @@ void SettingsWindow::OnNodeSelectionChanged(int index)
             m_vesselEditor->SetNode(nodeId);
             m_pages->setCurrentIndex(PageVessel);
             break;
+        case stosis::ENodeType::Screen:
+            m_screenEditor->SetNode(nodeId);
+            m_pages->setCurrentIndex(PageScreen);
+            break;
         }
         return;
     }
@@ -757,5 +767,6 @@ void SettingsWindow::RefreshPreviews()
     m_inletEditor->RefreshGridPreview();
     m_splitterEditor->UpdatePreview();
     m_vesselEditor->UpdateHints();
+    m_screenEditor->UpdatePreview();
     UpdateCardPreview();
 }

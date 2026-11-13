@@ -20,8 +20,9 @@ Implemented:
   table or normal; compound, T, p), outlet, splitter (2 or 3 outputs,
   deterministic or stochastic after Ornstein-Uhlenbeck), merger (2 or 3
   inputs), vessel (ideally mixed, plug flow, cascade, core flow or batch;
-  initial filling empty, steady-state or given), size-dependent delay as a
-  placeholder process.
+  initial filling empty, steady-state or given), screen (coarse and fines
+  after the grade efficiency of Plitt, Molerus-Hoffmann or Teipel-Hennig),
+  size-dependent delay as a placeholder process.
 - **Size grid:** logarithmic (default 1 µm – 1 mm, 300 classes) or linear;
   SI units internally, display in µm.
 - **Calculation sequence:** macro steps, units one after another
@@ -46,8 +47,8 @@ Implemented:
   class as well as T and p; mixing follows the energy balance.
 - **Particle mode:** streams carry weighted Monte Carlo particles ("cards");
   all units compute with them. The inlet places the cards according to an
-  adjustable card density from mass and number; splitter, vessel and
-  size-dependent delay distribute whole cards with an account method; limits
+  adjustable card density from mass and number; splitter, vessel, screen
+  and size-dependent delay distribute whole cards with an account method; limits
   per stream slice keep the number of cards small; for display the cards are
   projected onto the grid.
 
@@ -134,8 +135,9 @@ containing `lib/cmake/Qt6`, and that the kit matching the compiler
 The checks from the methods handbook are test programs in `tests/` (size
 distributions, graph and recycles, OU splitter, multiple runs against the
 analytical solution, materials, streams with compound/T/p, cards, vessel
-against the closed-form residence time distributions, and a regression test
-over all results). Run them after building:
+against the closed-form residence time distributions, screen against the
+grade efficiency curves of Dyssol, and a regression test over all results).
+Run them after building:
 
 ```bat
 cmake --build build --config Release
