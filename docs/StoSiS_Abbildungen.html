@@ -712,18 +712,27 @@ canvas.anim { display: block; width: 100%; max-width: 100%; background: var(--pa
     <div class="figrow">
       <figure>
         <svg class="fig-svg" viewBox="0 0 340 344" role="img" aria-label="Windsichter: Steigrohr mit Luft nach oben">
-          <path d="M130 292 L130 30 L322 30" class="s-ink f-none"/>
+          <!-- feed chute and air inlet -->
+          <path d="M48 103 L131 136 L131 166 L48 133 z" class="f-panel"/>
+          <path d="M48 103 L130 136 M48 133 L130 166" class="s-ink f-none"/>
+          <rect x="70" y="263" width="61" height="22" class="f-air"/>
+          <path d="M70 262 L130 262 M70 286 L130 286" class="s-ink f-none"/>
+          <path d="M130 292 L130 286 M130 262 L130 166 M130 136 L130 30 L322 30" class="s-ink f-none"/>
           <path d="M200 292 L200 70 L322 70" class="s-ink f-none"/>
           <rect x="131" y="31" width="68" height="261" class="f-air"/>
           <rect x="199" y="31" width="122" height="38" class="f-air"/>
           <path d="M130 292 L152 318 M200 292 L178 318" class="s-ink f-none"/>
           <!-- air -->
           <path d="M150 284 L150 236 M165 284 L165 230 M180 284 L180 236" class="s-acc f-none" marker-end="url(#ah-acc)"/>
-          <text x="20" y="258" class="lbl-s">Luft, <tspan class="lbl-math">u</tspan></text>
-          <path d="M66 274 L126 274" class="s-acc f-none" marker-end="url(#ah-acc)"/>
+          <text x="16" y="279" class="lbl-s">Luft, <tspan class="lbl-math">u</tspan></text>
+          <path d="M76 274 L140 274" class="s-acc f-none" marker-end="url(#ah-acc)"/>
           <!-- feed -->
-          <path d="M40 112 L126 150" class="s-ink f-none" marker-end="url(#ah-ink)"/>
-          <text x="20" y="100" class="lbl-s">Zulauf</text>
+          <path d="M12 103.6 L44 116.4" class="s-ink f-none" marker-end="url(#ah-ink)"/>
+          <text x="18" y="92" class="lbl-s">Zulauf</text>
+          <circle cx="70" cy="126" r="6" class="f-out1"/>
+          <circle cx="86" cy="134" r="2.6" class="f-out2"/>
+          <circle cx="101" cy="139" r="5" class="f-out1"/>
+          <circle cx="117" cy="146" r="3" class="f-out2"/>
           <!-- heavy particles -->
           <circle cx="160" cy="190" r="8" class="f-out1"/>
           <circle cx="183" cy="222" r="6.5" class="f-out1"/>
@@ -740,7 +749,7 @@ canvas.anim { display: block; width: 100%; max-width: 100%; background: var(--pa
           <text x="132" y="20" class="lbl-o2">Leichtgut · Ausgang 2</text>
           <text x="165" y="334" text-anchor="middle" class="lbl-o1">Schwergut · Ausgang 1</text>
         </svg>
-        <figcaption>Windsichter (Steigrohr). Luft strömt mit <span class="math"><i>u</i></span> nach oben. Ein Korn mit <span class="math"><i>w</i><sub>s</sub> &gt; <i>u</i></span> fällt gegen den Strom, eines mit <span class="math"><i>w</i><sub>s</sub> &lt; <i>u</i></span> wird mitgerissen. Also <span class="math"><i>w</i><sub>cut</sub> = <i>u</i></span>. Turbulenz und Stöße verschmieren die Grenze, daher eine Trennkurve statt einer Stufe.</figcaption>
+        <figcaption>Windsichter (Steigrohr). Der Zulauf rutscht seitlich ins Rohr, die Luft strömt von unten mit der Luftgeschwindigkeit <span class="math"><i>u</i></span> nach oben. Ein Korn mit <span class="math"><i>w</i><sub>s</sub> &gt; <i>u</i></span> fällt gegen den Strom, eines mit <span class="math"><i>w</i><sub>s</sub> &lt; <i>u</i></span> wird mitgerissen. Also <span class="math"><i>w</i><sub>cut</sub> = <i>u</i></span>. Turbulenz und Stöße verschmieren die Grenze, daher eine Trennkurve statt einer Stufe.</figcaption>
       </figure>
       <figure>
         <svg class="fig-svg" viewBox="0 0 470 290" role="img" aria-label="Absetzbecken mit Bahnen sinkender Körner">
