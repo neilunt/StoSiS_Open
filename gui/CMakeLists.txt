@@ -86,6 +86,12 @@ src/VesselEditorWidget.cpp
 src/VesselEditorWidget.h
 src/ScreenEditorWidget.cpp
 src/ScreenEditorWidget.h
+src/CompoundSeparatorEditorWidget.cpp
+src/CompoundSeparatorEditorWidget.h
+src/ClassifierEditorWidget.cpp
+src/ClassifierEditorWidget.h
+src/GradeEfficiencyPreview.cpp
+src/GradeEfficiencyPreview.h
 src/FractionPreviewWidget.cpp
 src/FractionPreviewWidget.h
 src/ResultsEntryKey.h

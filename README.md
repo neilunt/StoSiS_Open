@@ -6,6 +6,8 @@ stochastic solution with weighted Monte Carlo particles, accelerated on GPUs
 
 The model, assumptions and methods are described in the methods handbook
 [`docs/StoSiS_Methodenhandbuch.html`](docs/StoSiS_Methodenhandbuch.html), as PDF
+the figures of its chapter 7 with interactive versions and animations of the units are in
+[`docs/StoSiS_Abbildungen.html`](docs/StoSiS_Abbildungen.html);
 [`docs/StoSiS_Methodenhandbuch.pdf`](docs/StoSiS_Methodenhandbuch.pdf) (in German). This file only gives
 an overview.
 
@@ -22,7 +24,9 @@ Implemented:
   inputs), vessel (ideally mixed, plug flow, cascade, core flow or batch;
   initial filling empty, steady-state or given), screen (coarse and fines
   after the grade efficiency of Plitt, Molerus-Hoffmann or Teipel-Hennig),
-  size-dependent delay as a placeholder process.
+  compound separator (fixed share per compound, e.g. a magnet), classifier
+  (heavy and light product by settling velocity in air or water, drag after
+  Kaskas), size-dependent delay as a placeholder process.
 - **Size grid:** logarithmic (default 1 µm – 1 mm, 300 classes) or linear;
   SI units internally, display in µm.
 - **Calculation sequence:** macro steps, units one after another
@@ -47,8 +51,8 @@ Implemented:
   class as well as T and p; mixing follows the energy balance.
 - **Particle mode:** streams carry weighted Monte Carlo particles ("cards");
   all units compute with them. The inlet places the cards according to an
-  adjustable card density from mass and number; splitter, vessel, screen
-  and size-dependent delay distribute whole cards with an account method; limits
+  adjustable card density from mass and number; splitter, vessel, the three
+  separators and size-dependent delay distribute whole cards with an account method; limits
   per stream slice keep the number of cards small; for display the cards are
   projected onto the grid.
 
@@ -75,7 +79,7 @@ StoSiS/
 │   └── third_party/nlohmann_json   JSON library (MIT)
 ├── gui/src/       stosis_gui: user interface (Qt 6 Widgets), program StoSiS.exe
 ├── data/          material file with instructions and Dyssol license notice
-├── docs/          methods handbook (HTML and PDF), program help, figures
+├── docs/          methods handbook (HTML and PDF), figure page, program help, figures
 ├── tests/         automatic tests of the computational core (CTest)
 ├── Flowsheets/    flowsheet files; inside, the validation flowsheets (to open in StoSiS)
 ├── tools/         dmdb_to_json.pl (conversion of the Dyssol material database)
@@ -136,7 +140,8 @@ The checks from the methods handbook are test programs in `tests/` (size
 distributions, graph and recycles, OU splitter, multiple runs against the
 analytical solution, materials, streams with compound/T/p, cards, vessel
 against the closed-form residence time distributions, screen against the
-grade efficiency curves of Dyssol, and a regression test over all results).
+grade efficiency curves of Dyssol, compound separator and classifier with the
+settling velocity after Kaskas, and a regression test over all results).
 Run them after building:
 
 ```bat

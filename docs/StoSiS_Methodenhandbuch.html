@@ -52,6 +52,8 @@
     main { max-width: none; padding: 0; }
     h2 { break-before: auto; }
     figure, table, .zusammen { break-inside: avoid; }
+    /* a figure taller than a page would be cut: shrink it to fit one page */
+    figure img { max-height: 22cm; width: auto; display: block; margin: 0 auto; border: none; }
     a { color: #000; }
   }
 </style>
@@ -85,7 +87,9 @@
       <li><a href="#k7-3">Größenabhängige Verzögerung</a></li>
       <li><a href="#k7-4">Behälter</a></li>
       <li><a href="#k7-5">Sieb</a></li>
-      <li><a href="#k7-6">Outlet</a></li>
+      <li><a href="#k7-6">Stofftrenner</a></li>
+      <li><a href="#k7-7">Sichter</a></li>
+      <li><a href="#k7-8">Outlet</a></li>
     </ol></li>
   <li><a href="#k8">Zufallszahlen und mehrere Läufe</a></li>
   <li><a href="#k9">Partikelmodus: Karten</a>
@@ -123,7 +127,7 @@
 </ul>
 <p>Der Rechenkern ist reines C++ ohne Abhängigkeit von der Oberfläche; er läuft auch in automatischen Tests und im Batchbetrieb. Die Oberfläche (Qt) dient zum Aufbauen, Einstellen und Auswerten. Ein Flowsheet lässt sich mit allen Einstellungen als JSON-Datei speichern (Kapitel 3).</p>
 <h4>Umfang</h4>
-<p>Verfügbare Units: Inlet, Outlet, Merger, Splitter (fest oder schwankend), Behälter (vier Mischungen oder Charge) und eine größenabhängige Verzögerung. Im Partikelmodus rechnen alle Units. Prozesse, die Partikel verändern – Koagulation, Bruch, Wachstum, Keimbildung –, sind nicht enthalten.</p>
+<p>Verfügbare Units: Inlet, Outlet, Merger, Splitter (fest oder schwankend), Behälter (vier Mischungen oder Charge), eine größenabhängige Verzögerung und drei Trenner: Sieb (nach Größe), Stofftrenner (nach Stoff) und Sichter (nach Sinkgeschwindigkeit). Im Partikelmodus rechnen alle Units. Prozesse, die Partikel verändern – Koagulation, Bruch, Wachstum, Keimbildung –, sind nicht enthalten.</p>
 
 
 <h2 id="k2"><span class="nr">2</span>Grundannahmen</h2>
@@ -269,11 +273,24 @@
 <h2 id="k7"><span class="nr">7</span>Units</h2>
 
 <h3 id="k7-1"><span class="nr">7.1</span>Merger</h3>
-<p>Der Merger addiert die Massenstromdichten seiner Eingänge je Stoff; Temperatur und Druck folgen aus Kapitel 6. Im Partikelmodus hängt er die Karten aller Eingänge aneinander.</p>
+<p>Der Merger addiert die Massenstromdichten seiner Eingänge je Stoff; Temperatur und Druck folgen aus Kapitel 6. Im Partikelmodus hängt er die Karten aller Eingänge aneinander (Abbildung 7.1).</p>
+<figure>
+  <img src="abbildungen/HB_Merger_Skizze.svg" alt="Merger: zwei Zuläufe verschiedener Temperatur und verschiedenen Drucks laufen zu einem Ausgang zusammen; im Partikelmodus werden die Karten aneinandergehängt">
+  <figcaption>Abbildung 7.1 – Merger mit zwei Zuläufen. Die Massenströme addieren sich, die Temperatur folgt aus der Energiebilanz, der Druck ist der kleinste Eingangsdruck. Im Partikelmodus werden die Karten aller Eingänge aneinandergehängt.</figcaption>
+</figure>
+<p>Weil die Energiebilanz mit der Wärmekapazität jedes Stoffs rechnet, liegt die Mischtemperatur zweier verschiedener Stoffe nicht auf der Geraden der Massenanteile (Abbildung 7.2).</p>
+<figure>
+  <img src="abbildungen/HB_Merger_Mischtemperatur.svg" alt="Mischtemperatur über dem Massenanteil des warmen Zulaufs für Sand mit Sand und Sand mit Harnstoff">
+  <figcaption>Abbildung 7.2 – Mischtemperatur über dem Massenanteil des warmen Zulaufs (80 °C) zu Sand mit 20 °C. Bei gleichem Stoff ergibt die Energiebilanz dasselbe wie ein Mittel nach der Masse, im Verhältnis 10 : 5 also 40,0 °C. Harnstoff hat mit 1544,7 J/(kg K) fast die doppelte Wärmekapazität von Sand (830 J/(kg K)) und hebt die Mischung auf 48,9 °C.</figcaption>
+</figure>
 
 <h3 id="k7-2"><span class="nr">7.2</span>Splitter</h3>
 <h4>Zweck</h4>
-<p>Der Splitter teilt einen Strom auf zwei oder drei Ausgänge auf, als reiner Mengenteiler: Der Anteil gilt für alle Partikelgrößen gleich.</p>
+<p>Der Splitter teilt einen Strom auf zwei oder drei Ausgänge auf, als reiner Mengenteiler: Der Anteil gilt für alle Partikelgrößen gleich (Abbildung 7.3).</p>
+<figure>
+  <img src="abbildungen/HB_Splitter_Skizze.svg" alt="Splitter mit drei Ausgängen; jeder Ausgang hat dieselbe Größenverteilung wie der Zulauf, nur kleiner">
+  <figcaption>Abbildung 7.3 – Splitter mit drei Ausgängen und den Anteilen 0,5, 0,3 und dem Rest 0,2. Jeder Ausgang erhält dieselbe Größenverteilung wie der Zulauf, nur entsprechend weniger.</figcaption>
+</figure>
 <h4>Annahmen</h4>
 <p>Die Anteile sind fest oder schwanken zeitlich korreliert um einen Mittelwert. Der letzte Ausgang erhält jeweils den Rest.</p>
 <h4>Verfahren</h4>
@@ -281,13 +298,13 @@
 <p class="formel">d<i>g</i> = −(<i>g</i> − μ)/τ · d<i>t</i> + σ √(2/τ) d<i>W</i></p>
 <p>Der Prozess ist stationär und normalverteilt, kehrt immer zum Mittelwert zurück und hat genau eine Korrelationszeit. Fortgeschrieben wird er exakt (Gillespie 1996) statt mit dem Euler-Verfahren, sodass Mittelwert, Streuung und Zeitverhalten nicht vom Zeitschritt abhängen:</p>
 <p class="formel"><i>g</i><sub><i>k</i>+1</sub> = μ + (<i>g<sub>k</sub></i> − μ) <i>a</i> + σ √(1 − <i>a</i>²) ξ, &nbsp; <i>a</i> = e<sup>−Δ<i>t</i>/τ</sup>, &nbsp; ξ ~ N(0, 1)</p>
-<p>Der Prozess startet bereits im Gleichgewicht, <i>g</i>(0) ~ N(μ, σ²). Anteile außerhalb von [0, 1] werden abgeschnitten; übersteigt die Summe der schwankenden Anteile 1, werden sie anteilig gekürzt. Die Masse bleibt in jedem Schritt exakt erhalten. Der Zufallsprozess läuft auch ohne Zulauf weiter, sodass die Zufallsfolge nur vom Seed abhängt. Im Partikelmodus verteilt das Konto-Verfahren die Karten (Kapitel 9.4); es setzt den Anteil nur um und fügt selbst keine Schwankung hinzu (Abbildung 7.1).</p>
+<p>Der Prozess startet bereits im Gleichgewicht, <i>g</i>(0) ~ N(μ, σ²). Anteile außerhalb von [0, 1] werden abgeschnitten; übersteigt die Summe der schwankenden Anteile 1, werden sie anteilig gekürzt. Die Masse bleibt in jedem Schritt exakt erhalten. Der Zufallsprozess läuft auch ohne Zulauf weiter, sodass die Zufallsfolge nur vom Seed abhängt. Im Partikelmodus verteilt das Konto-Verfahren die Karten (Kapitel 9.4); es setzt den Anteil nur um und fügt selbst keine Schwankung hinzu (Abbildung 7.4).</p>
 <figure>
-  <img src="abbildungen/HB_OU_Splitter_Was_Wie.svg" alt="Schwankender Splitter: der Ornstein-Uhlenbeck-Prozess legt den Anteil fest, das Verfahren setzt ihn um">
-  <figcaption>Abbildung 7.1 – Was und Wie beim schwankenden Splitter: Der Ornstein-Uhlenbeck-Prozess legt in jedem Schritt den Anteil <i>f</i>(<i>t</i>) fest – die echte Schwankung. Im Kontinuum wird jeder Wert der Verteilung mit <i>f</i>(<i>t</i>) multipliziert, im Partikelmodus werden ganze Karten so verteilt, dass der Ausgang <i>f</i>(<i>t</i>) erhält.</figcaption>
+  <img src="abbildungen/HB_Splitter_OU.svg" alt="Anteil eines schwankenden Splitters über der Zeit mit den Bändern Mittelwert plus minus eine und zwei Streuungen">
+  <figcaption>Abbildung 7.4 – Anteil eines schwankenden Splitters über 40 s mit μ = 0,3, σ = 0,05 und τ = 2 s, exakt fortgeschrieben mit Δ<i>t</i> = 0,1 s. Der Ornstein-Uhlenbeck-Prozess legt in jedem Schritt den Anteil fest, das ist die echte Schwankung. Im Kontinuum wird jeder Wert der Verteilung damit multipliziert, im Partikelmodus verteilt das Konto-Verfahren ganze Karten so, dass der Ausgang diesen Anteil erhält. Im Mittel liegt der Anteil zwei Drittel der Zeit im Band μ ± σ.</figcaption>
 </figure>
 <h4>Grenzen</h4>
-<p>Bei großem σ verschiebt das Abschneiden den Mittelwert leicht; der Editor weist darauf hin, wenn μ ± 3σ außerhalb von [0, 1] liegt. Größenabhängig trennt das Sieb (Kapitel 7.5).</p>
+<p>Bei großem σ verschiebt das Abschneiden den Mittelwert leicht; der Editor weist darauf hin, wenn μ ± 3σ außerhalb von [0, 1] liegt. Nach Größe trennt das Sieb (Kapitel 7.5), nach Stoff der Stofftrenner (7.6), nach Größe und Dichte der Sichter (7.7).</p>
 <h4>Prüfung</h4>
 <table>
   <tr><th>Fall</th><th>Erwartung</th><th>Ergebnis</th></tr>
@@ -307,7 +324,7 @@
 <h4>Zweck</h4>
 <p>Der Behälter hält Material zurück – ein Rührkessel, eine Wirbelschicht, ein Rohr oder ein Silo. Er glättet Schwankungen des Zulaufs und gibt dem Material eine Verweilzeitverteilung.</p>
 <h4>Annahmen</h4>
-<p>Der Ablauf folgt einer festen mittleren Verweilzeit τ, wie bei der Durchströmung mit τ = <i>V</i>/<i>Q</i>; eine Charge hat keinen Ablauf. Welches Material geht, bestimmt das Mischverhalten. Wählbar sind vier Fälle mit derselben mittleren Verweilzeit (Abbildung 7.2; Danckwerts 1953, Levenspiel 1999):</p>
+<p>Der Ablauf folgt einer festen mittleren Verweilzeit τ, wie bei der Durchströmung mit τ = <i>V</i>/<i>Q</i>; eine Charge hat keinen Ablauf. Welches Material geht, bestimmt das Mischverhalten. Wählbar sind vier Fälle mit derselben mittleren Verweilzeit (Abbildungen 7.5 und 7.6; Danckwerts 1953, Levenspiel 1999):</p>
 <table>
   <tr><th>Mischung</th><th>Wer geht</th><th>Verweilzeitverteilung</th></tr>
   <tr><td>ideal durchmischt</td><td>jedes Material mit derselben Wahrscheinlichkeit, unabhängig von seinem Alter</td><td>exponentiell</td></tr>
@@ -317,8 +334,17 @@
 </table>
 <p>Die Randzone hat τ<sub>R</sub> = (1 − φκ) τ / (1 − φ), damit das Mittel τ bleibt; Standard sind φ = 60 % und κ = 0,3. Bei <i>t</i> = 0 ist der Behälter leer, wie im Dauerbetrieb gefüllt (Zulauf bei <i>t</i> = 0 mal τ, mit dessen Größenverteilung) oder mit vorgegebener Masse, Stoff und Größenverteilung gefüllt.</p>
 <figure>
-  <img src="abbildungen/MC_23_Behaeltertypen.svg" alt="Vier Behältertypen mit Skizze, Verweilzeitverteilung und Austrittswahrscheinlichkeit je Schritt über dem Alter">
-  <figcaption>Abbildung 7.2 – Die vier Mischungen mit derselben mittleren Verweilzeit τ: Skizze (Farbe = Alter), Verweilzeitverteilung <i>E</i>(<i>t</i>) und die Wahrscheinlichkeit, dass Material eines bestimmten Alters im nächsten Schritt geht (Δ<i>t</i> = 0,02 τ). Nur im ideal durchmischten Behälter hängt sie nicht vom Alter ab.</figcaption>
+  <img src="abbildungen/HB_Behaelter_Skizze.svg" alt="Vier Behältertypen: Rührkessel, Rohr, Kaskade aus drei Kesseln und Kernfluss-Silo, Körner nach ihrem Alter gefärbt">
+  <figcaption>Abbildung 7.5 – Die vier Mischungen des Behälters mit Beispielen; die Farbe zeigt das Alter des Materials. Im durchmischten Kessel liegt jedes Alter überall, im Rohr bleibt die Reihenfolge erhalten, in der Kaskade wird das Material von Kessel zu Kessel älter, und im Silo läuft der Kern schnell durch, während der Rand lange liegen bleibt.</figcaption>
+</figure>
+<figure>
+  <img src="abbildungen/HB_Behaelter_Verweilzeit.svg" alt="Verweilzeitverteilung der vier Mischungen über der Zeit">
+  <figcaption>Abbildung 7.6 – Verweilzeitverteilung <i>E</i>(<i>t</i>) der vier Mischungen, alle mit dem Mittel τ. Ideal durchmischt exponentiell, Kaskade aus drei Kesseln mit einem Buckel, Pfropfenströmung ganz bei τ (Pfeil). Beim Kernfluss (φ = 60 %, κ = 0,3) laufen 60 % bei 0,3 τ durch den Kern (Pfeil), der Rest bildet mit τ<sub>R</sub> = 2,05 τ einen langen Ausläufer.</figcaption>
+</figure>
+<p>Nur im ideal durchmischten Behälter hängt die Wahrscheinlichkeit, im nächsten Schritt zu gehen, nicht vom Alter ab (Abbildung 7.7). Mit der Summenkurve <i>S</i>(<i>t</i>), dem Anteil, der nach der Zeit <i>t</i> noch im Behälter ist, gilt <i>p</i>(<i>t</i>) = 1 − <i>S</i>(<i>t</i> + Δ<i>t</i>) / <i>S</i>(<i>t</i>). Nur der durchmischte Behälter und die Kessel der Kaskade brauchen deshalb kein Gedächtnis; im Rohr muss sich eine Karte ihr Alter merken, im Silo ihre Zone.</p>
+<figure>
+  <img src="abbildungen/HB_Behaelter_Austritt.svg" alt="Wahrscheinlichkeit, im nächsten Schritt auszutreten, über dem Alter für die vier Mischungen">
+  <figcaption>Abbildung 7.7 – Wahrscheinlichkeit, dass Material eines bestimmten Alters im nächsten Schritt austritt (Δ<i>t</i> = 0,02 τ). Ideal durchmischt 1,98 % in jedem Alter; Pfropfenströmung 0 bis zum Alter τ, dann 100 %; in der Kaskade steigt sie mit dem Alter gegen 1 − e<sup>−3Δ<i>t</i>/τ</sup> = 5,8 %; beim Kernfluss springt sie bei 0,3 τ auf 64 % und liegt danach bei 0,97 %.</figcaption>
 </figure>
 <h4>Verfahren</h4>
 <p>Jeder Schritt bringt den Zulauf mal Δ<i>t</i> in den Behälter; der Ausgang zeigt, was während des Schritts austritt, geteilt durch Δ<i>t</i>. Die Schrittformeln sind exakt für einen im Schritt konstanten Zulauf. Im ideal durchmischten Behälter nimmt der Inhalt nach d<i>H</i>/d<i>t</i> = −<i>H</i>/τ ab; je Schritt geht vom Inhalt und vom Zulauf desselben Schritts der Anteil</p>
@@ -342,20 +368,28 @@
 
 <h3 id="k7-5"><span class="nr">7.5</span>Sieb</h3>
 <h4>Zweck</h4>
-<p>Das Sieb teilt den Zulauf nach der Partikelgröße in Grobgut (Ausgang 1) und Feingut (Ausgang 2). Dieselbe Unit beschreibt jeden Klassierer, dessen Trennung sich durch eine Trennkurve fassen lässt, etwa einen Sichter. Ein Mehrdecksieb sind mehrere Siebe hintereinander, je Deck eines.</p>
+<p>Das Sieb teilt den Zulauf nach der Partikelgröße in Grobgut (Ausgang 1) und Feingut (Ausgang 2). Dieselbe Unit beschreibt jeden Klassierer, dessen Trennung sich durch eine Trennkurve über der Größe fassen lässt; trennt ein Sichter merklich auch nach Dichte, ist die Unit Sichter (7.7) die richtige. Ein Mehrdecksieb sind mehrere Siebe hintereinander, je Deck eines.</p>
+<figure>
+  <img src="abbildungen/HB_Sieb_Schwingsieb.svg" alt="Schwingsieb von der Seite: grobe Körner laufen über das Deck ins Grobgut, feine fallen durch die Maschen ins Feingut">
+  <figcaption>Abbildung 7.8 – Schwingsieb von der Seite. Körner, die größer sind als die Maschenweite <i>w</i>, laufen über das schwingende Deck ins Grobgut (Ausgang 1), feinere fallen durch die Maschen ins Feingut (Ausgang 2). Körner knapp unter <i>w</i> brauchen viele Versuche, und manche erreichen vorher das Ende des Decks; deshalb ist der Trenngrad eine stetige Kurve statt einer Stufe.</figcaption>
+</figure>
 <h4>Annahmen</h4>
-<p>Getrennt wird nur nach der Größe, für alle Stoffe gleich. Der Trenngrad <i>T</i>(<i>d</i>) ist der Massenanteil der Partikel der Größe <i>d</i>, der ins Grobgut geht; er ist zeitlich fest und hängt nicht von der Beladung ab. Das Sieb hält nichts zurück, Temperatur und Druck bleiben. Wählbar sind die drei Trennkurven von Dyssol (Skorych et al. 2020) mit der Trenngröße <i>x</i><sub>cut</sub> und der Trennschärfe α; mit <i>x</i> = <i>d</i>/<i>x</i><sub>cut</sub>:</p>
+<p>Getrennt wird nur nach der Größe, für alle Stoffe gleich. Der Trenngrad <i>T</i>(<i>d</i>) ist der Massenanteil der Partikel der Größe <i>d</i>, der ins Grobgut geht; er ist zeitlich fest und hängt nicht von der Beladung ab. Das Sieb hält nichts zurück, Temperatur und Druck bleiben. Wählbar sind die drei Trennkurven von Dyssol (Skorych et al. 2020) mit der Trenngröße <i>x</i><sub>cut</sub> (dort ist <i>T</i> etwa 0,5), der Trennschärfe α und, nur bei Teipel-Hennig, einer zweiten Trennschärfe β und dem Offset <i>o</i>. Alle drei hängen nur von der bezogenen Größe <i>x</i> = <i>d</i>/<i>x</i><sub>cut</sub> ab:</p>
 <table>
   <tr><th>Modell</th><th>Trenngrad <i>T</i>(<i>d</i>)</th><th><i>T</i>(<i>x</i><sub>cut</sub>)</th></tr>
-  <tr><td>Plitt (1971)</td><td>1 − exp(−0,693 <i>x</i><sup>α</sup>)</td><td>0,49997</td></tr>
+  <tr><td>Plitt (1971)</td><td>1 − exp(−0,693 <i>x</i><sup>α</sup>)</td><td>0,49993</td></tr>
   <tr><td>Molerus-Hoffmann (1969)</td><td>1 / (1 + <i>x</i><sup>−2</sup> exp(α (1 − <i>x</i>²)))</td><td>0,5</td></tr>
   <tr><td>Teipel-Hennig (Hennig und Teipel 2016)</td><td>(1 − (1 + 3 <i>x</i><sup>(<i>x</i> + α) β</sup>)<sup>−1/2</sup>) (1 − <i>o</i>) + <i>o</i></td><td>0,5 (1 − <i>o</i>) + <i>o</i></td></tr>
 </table>
-<p>Je größer α, desto steiler die Kurve. β ist eine zweite Trennschärfe; der Offset <i>o</i> ist der Anteil, der unabhängig von der Größe ins Grobgut gelangt, etwa Feingut, das am Grobkorn haftet. Das Wahrscheinlichkeitsmodell von Dyssol (Normalverteilung über die Klassen) ist nicht enthalten, weil es vom Größenraster abhängt.</p>
+<p>Je größer α, desto steiler die Kurve; bei gleichem α sind die drei Modelle aber verschieden steil (Abbildung 7.9). Vergleichbar sind sie über die Trennschärfe κ = <i>d</i><sub>25</sub>/<i>d</i><sub>75</sub>, das Verhältnis der Größen mit <i>T</i> = 0,25 und <i>T</i> = 0,75; eine ideale Stufe hätte κ = 1. Die Zahl 0,693 bei Plitt ist ln 2, damit <i>T</i>(<i>x</i><sub>cut</sub>) fast 0,5 ist. Der Offset <i>o</i> ist der Anteil, der unabhängig von der Größe ins Grobgut gelangt, etwa Feingut, das am Grobkorn haftet. Das Wahrscheinlichkeitsmodell von Dyssol (Normalverteilung über die Klassen) ist nicht enthalten, weil es vom Größenraster abhängt.</p>
+<figure>
+  <img src="abbildungen/HB_Sieb_Trennkurven.svg" alt="Trenngrad der drei Modelle über d durch x_cut bei gleicher Trennschärfe">
+  <figcaption>Abbildung 7.9 – Die drei Trennkurven über <i>d</i>/<i>x</i><sub>cut</sub> bei derselben Trennschärfe α = 4 (Teipel-Hennig mit β = 0,5 und <i>o</i> = 0). Die Trenngröße verschiebt die Kurven nur auf der Größenachse. Bei gleichem α ist κ = 0,67 (Plitt), 0,80 (Molerus-Hoffmann) und 0,32 (Teipel-Hennig).</figcaption>
+</figure>
 <h4>Verfahren</h4>
 <p>Im Kontinuum wird an jeder Stützstelle und für jeden Stoff der Zulauf mit <i>T</i>(<i>d</i>) ins Grobgut und mit 1 − <i>T</i>(<i>d</i>) ins Feingut gegeben; die Masse bleibt exakt erhalten. Im Partikelmodus gehen ganze Karten nach dem Konto-Verfahren (Kapitel 9.4), wobei jede Karte ihren eigenen Trenngrad mitbringt. Karten mit <i>T</i> = 0 oder <i>T</i> = 1 gehen ohne Konto ins Feingut bzw. Grobgut.</p>
 <h4>Grenzen</h4>
-<p>Die Trennkurve hängt nicht vom Durchsatz, von der Siebfläche oder der Feuchte ab; Überladung und Siebgutverweilzeit sind nicht abgebildet. Nach Dichte oder Stoff trennt das Sieb nicht. Eine Karte trägt eine Größe; ein Gemisch verschiedener Größen in einer Karte, etwa nach einer Agglomeration, wird als Ganzes nach dieser Größe getrennt.</p>
+<p>Die Trennkurve hängt nicht vom Durchsatz, von der Siebfläche oder der Feuchte ab; Überladung und Siebgutverweilzeit sind nicht abgebildet. Nach Dichte oder Stoff trennt das Sieb nicht (dafür 7.6 und 7.7). Eine Karte trägt eine Größe; ein Gemisch verschiedener Größen in einer Karte, etwa nach einer Agglomeration, wird als Ganzes nach dieser Größe getrennt.</p>
 <h4>Prüfung</h4>
 <table>
   <tr><th>Fall</th><th>Erwartung</th><th>Ergebnis</th></tr>
@@ -366,7 +400,71 @@
   <tr><td>Karten mit <i>T</i> = 0 und <i>T</i> = 1, 200 Schritte</td><td>immer ins Feingut bzw. Grobgut</td><td>erfüllt</td></tr>
 </table>
 
-<h3 id="k7-6"><span class="nr">7.6</span>Outlet</h3>
+<h3 id="k7-6"><span class="nr">7.6</span>Stofftrenner</h3>
+<h4>Zweck</h4>
+<p>Der Stofftrenner teilt den Zulauf nach dem Stoff: Von jedem Stoff geht ein fester Anteil in Ausgang 1 („abgetrennt“), der Rest in Ausgang 2. So lassen sich ein Magnet beschreiben, der Eisenschrott aus Bauschutt holt, oder eine Sortierung von Hand.</p>
+<figure>
+  <img src="abbildungen/HB_Stofftrenner_Magnet.svg" alt="Überbandmagnet über einem Förderband hebt Eisen aus dem Brechgut">
+  <figcaption>Abbildung 7.10 – Überbandmagnet als Beispiel für den Stofftrenner. Der Magnet hebt Eisen aus dem Brechgut und trägt es mit seinem eigenen Band aus dem Gutstrom (Ausgang 1); Beton, Ziegel und Holz fahren weiter (Ausgang 2). Im Modell bleibt davon ein Anteil je Stoff, etwa Eisen 0,95 und alle anderen 0.</figcaption>
+</figure>
+<h4>Annahmen</h4>
+<p>Der Anteil <i>f<sub>k</sub></i> hängt nur vom Stoff <i>k</i> ab, nicht von der Größe, und ist zeitlich fest. Stoffe ohne Eintrag gehen ganz in Ausgang 2. Jeder Stoff hat damit in beiden Ausgängen dieselbe Größenverteilung. Der Stofftrenner hält nichts zurück, Temperatur und Druck bleiben.</p>
+<h4>Verfahren</h4>
+<p>Im Kontinuum geht an jeder Stützstelle <i>f<sub>k</sub></i> · Zulauf in Ausgang 1. Im Partikelmodus verteilt das Konto-Verfahren ganze Karten wie beim Sieb (Kapitel 9.4), mit <i>T</i> = <i>f<sub>k</sub></i> statt <i>T</i>(<i>d</i>). Eine Karte mit mehreren Stoffen, die es erst nach einer Koagulation gibt, geht als Ganzes mit dem nach Masse gemittelten Anteil Σ <i>m<sub>k</sub></i> <i>f<sub>k</sub></i> / Σ <i>m<sub>k</sub></i>, mit der Masse <i>m<sub>k</sub></i> des Stoffs <i>k</i> in der Karte.</p>
+<h4>Grenzen</h4>
+<p>Ein Magnet, der feines Eisen schlechter erfasst als grobes, ist nicht abgebildet. Verwachsene Körner, etwa Bewehrungsstahl im Beton, trennt der Stofftrenner nur als Karte mit mehreren Stoffen und dann nach dem Mittel. Steht ein Stoff in der Liste, der im Flowsheet nicht vorkommt, gibt es einen Hinweis.</p>
+<h4>Prüfung</h4>
+<table>
+  <tr><th>Fall</th><th>Erwartung</th><th>Ergebnis</th></tr>
+  <tr><td>Kontinuum, drei Stoffe mit <i>f</i> = 0,95 / 0 / 0,1</td><td>Ausgang 1 = <i>f<sub>k</sub></i> · Zulauf, beide Ausgänge zusammen = Zulauf</td><td>exakt bzw. auf 10<sup>−15</sup></td></tr>
+  <tr><td>Partikelmodus, drei Stoffe mit je 1000 Karten, <i>f</i> = 0,95 / 0 / 0,3, 1000 Schritte</td><td>Ausgang 1 0,22143 des Zulaufs; jeder Stoff und Größenbereich mit seinem <i>f<sub>k</sub></i></td><td>0,22133; je Stoff und Bereich höchstens 4,8 · 10<sup>−3</sup> daneben; Konten unter einem halben Kartenanteil</td></tr>
+  <tr><td>Eine Karte aus Eisen (<i>f</i> = 0,95) und Sand (<i>f</i> = 0) zu gleichen Massen, 1000 Schritte</td><td>Anteil 0,475</td><td>475-mal in Ausgang 1</td></tr>
+</table>
+
+<h3 id="k7-7"><span class="nr">7.7</span>Sichter</h3>
+<h4>Zweck</h4>
+<p>Der Sichter trennt nach der Sinkgeschwindigkeit in einem Fluid, also nach Größe und Dichte zugleich. Mit Luft beschreibt er einen Windsichter, mit Wasser ein Absetzbecken oder einen Aufstromklassierer. Ausgang 1 erhält das Schwergut, das absinkt, Ausgang 2 das Leichtgut, das das Fluid austrägt. Bei der Aufbereitung von Betonbruch trennt er so Leichtstoffe wie Holz und Kunststoff vom Gestein.</p>
+<h4>Annahmen</h4>
+<p>Die Partikel sind Kugeln (Kapitel 2). Entscheidend ist die stationäre Sinkgeschwindigkeit <i>w</i><sub>s</sub> eines einzelnen Korns der Größe <i>d</i> und Dichte ρ<sub>p</sub> im ruhenden Fluid der Dichte ρ<sub>f</sub> und dynamischen Viskosität η. Bei ihr ist die Gewichtskraft <i>F</i><sub>G</sub> abzüglich des Auftriebs <i>F</i><sub>A</sub> gleich der Widerstandskraft <i>F</i><sub>W</sub>:</p>
+<p class="formel"><i>F</i><sub>G</sub> − <i>F</i><sub>A</sub> = <i>F</i><sub>W</sub></p>
+<p>Eingesetzt, mit der Erdbeschleunigung <i>g</i> und dem Widerstandsbeiwert <i>c<sub>w</sub></i>:</p>
+<p class="formel">(π/6) <i>d</i>³ (ρ<sub>p</sub> − ρ<sub>f</sub>) <i>g</i> = <i>c<sub>w</sub></i> (π/4) <i>d</i>² ρ<sub>f</sub> <i>w</i><sub>s</sub>²/2, &nbsp;&nbsp; <i>c<sub>w</sub></i> = 24/Re + 4/√Re + 0,4, &nbsp;&nbsp; Re = <i>w</i><sub>s</sub> <i>d</i> ρ<sub>f</sub> / η</p>
+<p>Der Widerstandsbeiwert <i>c<sub>w</sub></i> sagt, wie stark das Fluid das Korn bremst. Für eine Kugel hängt er nur von der Reynolds-Zahl Re ab, dem Verhältnis von Trägheits- zu Zähigkeitskräften (<i>c<sub>w</sub></i> ≈ 253 bei Re = 0,1; 0,42 für Sand von 20 mm in Luft). Die Formel nach Kaskas (Brauer 1971; Stieß 2009) gilt vom Stokes-Bereich bis Re = 2 · 10<sup>5</sup>. Für kleine Re geht sie in das Gesetz von Stokes über, für große nähert sie sich dem Newton-Wert 0,4 (Abbildung 7.11).</p>
+<figure>
+  <img src="abbildungen/HB_Sichter_Kaskas.svg" alt="Widerstandsbeiwert nach Kaskas über der Reynolds-Zahl mit den Grenzfällen von Stokes und Newton">
+  <figcaption>Abbildung 7.11 – Widerstandsbeiwert nach Kaskas über der Reynolds-Zahl mit den Grenzfällen von Stokes (24/Re) und Newton (0,4). Jenseits von Re = 2 · 10<sup>5</sup> (grau) ist die Formel nicht belegt; dort gibt der Sichter einen Hinweis.</figcaption>
+</figure>
+<p>Der Trenngrad ist eine der drei Trennkurven des Siebs (Kapitel 7.5), aufgetragen über <i>x</i> = <i>w</i><sub>s</sub> / <i>w</i><sub>cut</sub> statt <i>d</i> / <i>x</i><sub>cut</sub>. Die Trenngeschwindigkeit <i>w</i><sub>cut</sub> ist beim Windsichter die Luftgeschwindigkeit <i>u</i> nach oben (Abbildung 7.12), beim Absetzbecken die Oberflächenbeschickung <i>Q</i>/<i>A</i>, der Volumenstrom <i>Q</i> des Wassers durch die Beckenfläche <i>A</i> (Abbildung 7.13). Dichte und Viskosität des Fluids sowie die Dichte jedes Stoffs stammen aus der Materialdatei, bei Temperatur und Druck des Zulaufs. Ein Korn, das nicht schwerer ist als das Fluid, sinkt nicht und geht ins Leichtgut.</p>
+<figure>
+  <img src="abbildungen/HB_Sichter_Windsichter.svg" alt="Windsichter: Steigrohr mit Luft nach oben, schwere Körner fallen, leichte steigen">
+  <figcaption>Abbildung 7.12 – Windsichter (Steigrohr). Der Zulauf rutscht seitlich ins Rohr, die Luft strömt von unten mit der Luftgeschwindigkeit <i>u</i> nach oben. Körner mit <i>w</i><sub>s</sub> &gt; <i>u</i> fallen ins Schwergut, Körner mit <i>w</i><sub>s</sub> &lt; <i>u</i> trägt die Luft ins Leichtgut; also ist <i>w</i><sub>cut</sub> = <i>u</i>. Turbulenz und Stöße der Körner verschmieren die Grenze zu einer Trennkurve.</figcaption>
+</figure>
+<figure>
+  <img src="abbildungen/HB_Sichter_Absetzbecken.svg" alt="Absetzbecken mit Bahnen sinkender Körner und der Grenzbahn w_s gleich Q durch A">
+  <figcaption>Abbildung 7.13 – Absetzbecken nach Hazen (1904). Ein Korn, das oben eintritt, braucht bei der Tiefe <i>H</i> die Zeit <i>H</i>/<i>w</i><sub>s</sub> bis zum Boden und hat bei der Beckenlänge <i>L</i> und der Fließgeschwindigkeit <i>v</i> die Zeit <i>L</i>/<i>v</i> bis zum Ablauf. Es setzt sich ab, wenn <i>w</i><sub>s</sub> ≥ <i>H v</i>/<i>L</i> = <i>Q</i>/(<i>B L</i>) = <i>Q</i>/<i>A</i> ist, mit der Breite <i>B</i> und der Fläche <i>A</i> = <i>B L</i> des Beckens. Die Tiefe kürzt sich heraus, also ist <i>w</i><sub>cut</sub> = <i>Q</i>/<i>A</i>.</figcaption>
+</figure>
+<h4>Verfahren</h4>
+<p>Mit der Archimedes-Zahl Ar = <i>d</i>³ (ρ<sub>p</sub> − ρ<sub>f</sub>) ρ<sub>f</sub> <i>g</i> / η², die nur Korn- und Fluiddaten und kein <i>w</i><sub>s</sub> enthält, lautet das Kräftegleichgewicht</p>
+<p class="formel"><i>c<sub>w</sub></i> Re² = 24 Re + 4 Re<sup>3/2</sup> + 0,4 Re² = 4/3 Ar</p>
+<p>Für √Re ist das ein Polynom, das steigt und konvex ist. Das Newton-Verfahren, gestartet oberhalb der Lösung (jeder Summand allein ergibt eine obere Schranke), fällt deshalb monoton auf die einzige Nullstelle. Im Kontinuum rechnet der Sichter eine Tabelle <i>T</i> je Stoff und Stützstelle und erneuert sie nur, wenn sich Temperatur oder Druck des Zulaufs ändern; ins Schwergut geht <i>T</i> · Zulauf. Im Partikelmodus verteilt das Konto-Verfahren ganze Karten wie beim Sieb (Kapitel 9.4), jede mit ihrem eigenen <i>T</i>(<i>w</i><sub>s</sub>(<i>d</i>, ρ)). Eine Karte mit mehreren Stoffen hat die Dichte <i>m</i> / Σ (<i>m<sub>k</sub></i>/ρ<sub><i>k</i></sub>), Kartenmasse <i>m</i> durch das Volumen aller Stoffe mit ihren Dichten ρ<sub><i>k</i></sub>. Jeder Stoff bekommt so seine eigene Trennkurve über der Größe; je leichter der Stoff, desto weiter rechts liegt sie (Abbildung 7.14).</p>
+<figure>
+  <img src="abbildungen/HB_Sichter_Trennkurven.svg" alt="Trennkurven des Sichters für vier Stoffe verschiedener Dichte">
+  <figcaption>Abbildung 7.14 – Trennkurven des Sichters mit seinen Standardwerten (Luft bei 293,15 K, Plitt, <i>w</i><sub>cut</sub> = 0,5 m/s, α = 4) für vier Stoffe der Materialdatei: <i>T</i> = 0,5 bei 81 µm (CaO, 3340 kg/m³), 102 µm (Sand, 2200 kg/m³), 130 µm (Coal, 1400 kg/m³) und 184 µm (Milk, 751 kg/m³). In Wasser sänke Milk nicht und ginge ganz ins Leichtgut.</figcaption>
+</figure>
+<h4>Grenzen</h4>
+<p>Gerechnet wird mit einem einzelnen Korn: Behindertes Absinken bei hoher Feststoffkonzentration, Kornform, Beladung und Turbulenz im Sichtraum gehen nur über die Trennschärfe α ein. Das Fluid ist kein eigener Strom; Luft und Wasser treten weder in die Bilanz noch in die Ausgänge ein. Jenseits von Re = 2 · 10<sup>5</sup> ist die Formel von Kaskas nicht belegt, der Sichter gibt dann einen Hinweis. Fehlt einem Stoff die Dichte oder der Materialdatei das Fluid, geht dieses Material mit Hinweis ganz ins Leichtgut.</p>
+<h4>Prüfung</h4>
+<table>
+  <tr><th>Fall</th><th>Erwartung</th><th>Ergebnis</th></tr>
+  <tr><td>Luft und Wasser, Dichten 1400, 2200 und 7870 kg/m³, 0,1 µm bis 100 mm (Re bis 9,6 · 10<sup>5</sup>)</td><td>Kräftegleichgewicht mit <i>c<sub>w</sub></i> nach Kaskas; <i>w</i><sub>s</sub> steigt mit <i>d</i></td><td>höchstens 1,1 · 10<sup>−15</sup> daneben; erfüllt</td></tr>
+  <tr><td>Sand in Luft, 1 µm und 0,1 µm</td><td><i>w</i><sub>s</sub> liegt um √Re/6 unter Stokes (3,5 · 10<sup>−4</sup> bzw. 1,1 · 10<sup>−5</sup>)</td><td>erfüllt auf 1 %</td></tr>
+  <tr><td>Sand in Luft, 20 mm</td><td>Newton-Bereich</td><td><i>w</i><sub>s</sub> = 33,8 m/s, Re = 4,5 · 10<sup>4</sup>, <i>c<sub>w</sub></i> = 0,42</td></tr>
+  <tr><td>Kontinuum, Sand und Kohle, in Luft (<i>w</i><sub>cut</sub> = 1 m/s) und in Wasser (0,01 m/s), Molerus-Hoffmann</td><td>Schwergut = <i>T</i> · Zulauf je Stoff und Stützstelle; Sand bei jeder Größe mindestens so stark im Schwergut wie Kohle</td><td>exakt; erfüllt</td></tr>
+  <tr><td>Partikelmodus, Luft, Plitt mit α = 3 und <i>w</i><sub>cut</sub> = 0,3 m/s, je 2000 Karten Sand und Kohle, 1000 Schritte</td><td>Schwergut 0,61059 des Zulaufs; jeder Stoff und Größenbereich mit seinem <i>T</i></td><td>0,61104; je Stoff und Bereich höchstens 1,8 · 10<sup>−3</sup> daneben; Konten unter einem halben Kartenanteil</td></tr>
+  <tr><td>Stoff ohne Dichte, unbekanntes Fluid, Karte mit Re &gt; 2 · 10<sup>5</sup></td><td>ins Leichtgut bzw. gerechnet, je mit Hinweis</td><td>erfüllt</td></tr>
+</table>
+
+<h3 id="k7-8"><span class="nr">7.8</span>Outlet</h3>
 <p>Das Outlet nimmt den ankommenden Strom auf und zeichnet ihn auf.</p>
 
 
@@ -477,7 +575,7 @@
 <p>Die Platzierung stimmt mit einer unabhängigen Rechnung überein; bei der Summe ohne Abflachung bleiben Masse und Partikelzahl je Karte unter den Schranken. Am Inlet trägt jede Karte im Inneren auf 0,1 % genau den Anteil 1/<i>N</i> an der Kartendichte.</p>
 
 <h3 id="k9-4"><span class="nr">9.4</span>Konto-Verfahren</h3>
-<p>Splitter, Behälter, Verzögerung und Sieb verteilen ganze Karten auf ihre Ziele, ohne sie zu kopieren oder je Karte zu würfeln (Abbildung 9.6). Die Karten eines Schritts werden nach Stoff und darin nach Größe geordnet und ab einer zufälligen Startposition einmal ringsum durchgegangen. Jede Karte zahlt auf das Konto jedes Ziels ein und geht ganz dorthin, wo am meisten steht; dieses Konto wird belastet. Die Konten laufen über die Schritte weiter, ihre Summe bleibt null. Die Ordnung nach Stoff sorgt dafür, dass jeder Stoff für sich im richtigen Verhältnis geteilt wird. In der Statistik heißt diese Auswahl systematische Stichprobe: gleiche Chance für jede Karte wie beim Würfeln, aber ohne dessen Streuung in der Zahl.</p>
+<p>Splitter, Behälter, Verzögerung, Sieb, Stofftrenner und Sichter verteilen ganze Karten auf ihre Ziele, ohne sie zu kopieren oder je Karte zu würfeln (Abbildung 9.6). Die Karten eines Schritts werden nach Stoff und darin nach Größe geordnet und ab einer zufälligen Startposition einmal ringsum durchgegangen. Jede Karte zahlt auf das Konto jedes Ziels ein und geht ganz dorthin, wo am meisten steht; dieses Konto wird belastet. Die Konten laufen über die Schritte weiter, ihre Summe bleibt null. Die Ordnung nach Stoff sorgt dafür, dass jeder Stoff für sich im richtigen Verhältnis geteilt wird. In der Statistik heißt diese Auswahl systematische Stichprobe: gleiche Chance für jede Karte wie beim Würfeln, aber ohne dessen Streuung in der Zahl.</p>
 <figure>
   <img src="abbildungen/MC_24_Konto_Verfahren.svg" alt="Konto-Verfahren Schritt für Schritt am Splitter und im Behälter">
   <figcaption>Abbildung 9.6 – Konto-Verfahren: a) ein Schritt am Splitter 30/70 mit zehn gleich schweren Karten – Ausgang A erhält genau 3 von 10, über alle Größen verteilt; b) sechs Schritte mit zufälligem Start gegen Zufall je Karte (3 ± 1,4 Karten je Schritt); c) im Behälter mit den Konten „bleibt“ und „geht“.</figcaption>
@@ -493,6 +591,7 @@
 <p>Im Ausgang eines Schritts treffen Karten verschiedener Größe aus verschiedenen Eintrittsschritten zusammen. Jede Gruppe gleicher ganzer Verzögerung <i>q</i> ist nur innerhalb ihres Eintrittsschritts ausgeglichen; je Ausgangsschritt weicht deshalb jede Gruppe um etwa eine Karte ab, nicht der ganze Strom. Im Standardfall (2000 Karten, etwa 25 Gruppen) liegt der Ablauf je Schritt bis zu 0,5 % neben dem Kontinuum, ohne systematischen Fehler; die Masse bleibt exakt erhalten.</p>
 <h4>Sieb</h4>
 <p>Die Konten heißen „Grobgut“ und „Feingut“ (Kapitel 7.5). Jede Karte zahlt <i>T</i>(<i>d</i>) · <i>s</i> bzw. (1 − <i>T</i>(<i>d</i>)) · <i>s</i> mit ihrer eigenen Größe <i>d</i> ein, <i>s</i> wie beim Splitter. Weil <i>T</i> von der Größe abhängt, gibt es ein Kontenpaar je Stoff und Größenbereich (Faktor 2, wie die Bereiche der Kartenansicht): Ein Kontostand wandert so nie in einen anderen Bereich oder Stoff, und innerhalb eines Bereichs, in dem sich <i>T</i> wenig ändert, geht jede (1/<i>T</i>)-te Karte ins Grobgut. Ein Kontostand bleibt unter einem halben Kartenanteil. Karten mit <i>T</i> = 0 oder 1 berühren kein Konto.</p>
+<p>Stofftrenner und Sichter (Kapitel 7.6, 7.7) rechnen genauso, mit denselben Kontenpaaren je Stoff und Größenbereich; nur der Anteil der Karte ist ein anderer: beim Stofftrenner der Anteil <i>f<sub>k</sub></i> ihres Stoffs, beim Sichter <i>T</i>(<i>w</i><sub>s</sub>) mit der Sinkgeschwindigkeit aus ihrer Größe und Dichte.</p>
 <h4>Grenzen</h4>
 <p>Sind die Karten verschieden schwer, etwa bei schwankendem Zulauf, streut der Ablauf eines Behälters etwa wie bei zufälliger Auswahl der Karten (0,83 % bei σ/μ = 0,167 und 400 Karten je Schritt). Ein einzelner Puls aus <i>N</i> verschieden schweren Karten zeigt in der nach Masse gewichteten Verweilzeit ein Rauschen von etwa σ<sub><i>T</i></sub> · CV / √<i>N</i>; im laufenden Betrieb mittelt es sich über die Karten im Vorrat.</p>
 
@@ -587,7 +686,10 @@
 <p>Martinetz et al. (2018) untersuchen eine kontinuierliche Linie aus Dosierern, Mischer, Becherförderer, Walzenkompaktor, pneumatischer Förderung und Tablettenpresse. Für jede Unit bestimmen sie aus Sprungversuchen ein Modell (Übertragungsfunktion): Mischer und Kompaktor als zwei Kessel mit Totzeit, die beiden Förderer als reine Totzeit (halbe Sammelzeit), die Presse als ein Kessel mit Totzeit. Die Kennwerte stammen aus Versuchen bei 10 und 15 kg/h und sind für 8 und 12,5 kg/h linear übertragen (dort Tab. 2). In den Versuchen springt der Wirkstoffanteil am Eintritt der ganzen Linie von 10 auf 20 %; gemessen wird er nach dem Kompaktor (NIR-Kugel im Granulatstrom) und an den Tabletten (NIR-Bildgebung, dazu offline UV/Vis), bei allen vier Durchsätzen je zweimal.</p>
 <p>Abbildung 11.5 fasst den Fall zusammen. Die Originalgrafiken sind nicht frei lizenziert; die Abbildung ist eine eigene Darstellung, die Messwerte sind aus den Abbildungen des Papers abgelesen.</p>
 <figure>
-  <img src="abbildungen/Val_5_Martinetz_Uebersicht.svg" alt="Trockengranulier-Linie nach Martinetz et al. 2018: Aufbau, Modell der Linie, Übertragungsfunktionen, Zeitkonstanten und Messwerte mit den Modellen des Papers">
+  <img src="abbildungen/Val_5_Martinetz_Uebersicht_1.svg" alt="Trockengranulier-Linie nach Martinetz et al. 2018: Aufbau, Modell der Linie und Übertragungsfunktionen">
+</figure>
+<figure>
+  <img src="abbildungen/Val_5_Martinetz_Uebersicht_2.svg" alt="Zeitkonstanten und Messwerte mit den Modellen des Papers">
   <figcaption>Abbildung 11.5 – Trockengranulier-Linie nach Martinetz et al. (2018): a) Aufbau mit den Messstellen, b) Modell der Linie, c) Übertragungsfunktionen der Units, d) Zeitkonstanten (Tab. 2 des Papers), e) Wirkstoffanteil nach dem Sprung von 10 auf 20 %: Messwerte und Modelle des Papers.</figcaption>
 </figure>
 
@@ -608,18 +710,22 @@
   <dt>Gewicht einer Karte</dt><dd>Zahl der echten Partikel, die eine Karte in einem Zeitschritt vertritt.</dd>
   <dt>Kartendichte, Anteil einer Karte</dt><dd>Die Dichte, nach der Karten über der Größe verteilt werden; der Anteil einer Karte daran innerhalb ihrer Stromscheibe.</dd>
   <dt>Konto-Verfahren</dt><dd>Verteilt ganze Karten auf Ziele, ohne je Karte zu würfeln: Jede Karte zahlt auf jedes Konto ein und geht dorthin, wo am meisten steht (Kapitel 9.4).</dd>
-  <dt>Trenngrad, Trennkurve, Trenngröße</dt><dd>Massenanteil der Partikel einer Größe, der ins Grobgut geht; sein Verlauf über der Größe; die Größe mit dem Trenngrad 0,5 (Kapitel 7.5).</dd>
+  <dt>Trenngrad, Trennkurve, Trenngröße, Trennschärfe</dt><dd>Massenanteil der Partikel einer Größe, der ins Grobgut (Sieb) bzw. Schwergut (Sichter) geht; sein Verlauf über der Größe; die Größe mit dem Trenngrad 0,5; κ = <i>d</i><sub>25</sub>/<i>d</i><sub>75</sub>, 1 für eine ideale Stufe (Kapitel 7.5).</dd>
+  <dt>Sinkgeschwindigkeit, Trenngeschwindigkeit</dt><dd>Stationäre Geschwindigkeit, mit der ein einzelnes Korn im ruhenden Fluid absinkt; die Sinkgeschwindigkeit, bei der ein Sichter etwa die Hälfte ins Schwergut gibt (Kapitel 7.7).</dd>
+  <dt>Schwergut, Leichtgut</dt><dd>Die beiden Ausgänge des Sichters: was absinkt, und was das Fluid austrägt.</dd>
 </dl>
 
 
 <h2 id="k13"><span class="nr">13</span>Literatur</h2>
 <div class="lit">
+<p>Brauer, H. (1971): Grundlagen der Einphasen- und Mehrphasenströmungen. Sauerländer, Aarau.</p>
 <p>Danckwerts, P. V. (1953): Continuous flow systems. Distribution of residence times. Chemical Engineering Science 2(1), 1–13.</p>
 <p>DeVille, R. E. L.; Riemer, N.; West, M. (2011): Weighted Flow Algorithms (WFA) for stochastic particle coagulation. Journal of Computational Physics 230(23), 8427–8451.</p>
 <p>Dukowicz, J. K. (1980): A particle-fluid numerical model for liquid sprays. Journal of Computational Physics 35(2), 229–253.</p>
 <p>Engisch, W. E.; Muzzio, F. J. (2012): Method for characterization of loss-in-weight feeder equipment. Powder Technology 228, 395–403.</p>
 <p>Engisch, W. E.; Muzzio, F. J. (2016): Using residence time distributions (RTDs) to address the traceability of raw materials in continuous pharmaceutical manufacturing. Journal of Pharmaceutical Innovation 11, 64–81.</p>
 <p>Gillespie, D. T. (1996): Exact numerical simulation of the Ornstein-Uhlenbeck process and its integral. Physical Review E 54, 2084–2091.</p>
+<p>Hazen, A. (1904): On sedimentation. Transactions of the American Society of Civil Engineers 53, 45–88.</p>
 <p>Hennig, M.; Teipel, U. (2016): Stationäre Siebklassierung. Chemie Ingenieur Technik 88, 911–918.</p>
 <p>Hesterberg, T. (1995): Weighted average importance sampling and defensive mixture distributions. Technometrics 37(2), 185–194.</p>
 <p>Hyndman, R. J.; Fan, Y. (1996): Sample quantiles in statistical packages. The American Statistician 50, 361–365.</p>
@@ -638,6 +744,7 @@
 <p>Shima, S.; Kusano, K.; Kawano, A.; Sugiyama, T.; Kawahara, S. (2009): The super-droplet method for the numerical simulation of clouds and precipitation: a particle-based and probabilistic microphysics model coupled with a non-hydrostatic model. Quarterly Journal of the Royal Meteorological Society 135, 1307–1320.</p>
 <p>Skorych, V.; Dosta, M.; Heinrich, S. (2020): Dyssol – an open-source flowsheet simulation framework for particulate materials. SoftwareX 12, 100572.</p>
 <p>Steele, G. L.; Lea, D.; Flood, C. H. (2014): Fast splittable pseudorandom number generators. Proceedings OOPSLA 2014.</p>
+<p>Stieß, M. (2009): Mechanische Verfahrenstechnik – Partikeltechnologie 1. 3. Auflage, Springer, Berlin.</p>
 <p>Uhlenbeck, G. E.; Ornstein, L. S. (1930): On the theory of the Brownian motion. Physical Review 36, 823–841.</p>
 <p>Welford, B. P. (1962): Note on a method for calculating corrected sums of squares and products. Technometrics 4, 419–420.</p>
 <p>Zhao, H.; Kruis, F. E.; Zheng, C. (2009): Reducing statistical noise and extending the size spectrum by applying weighted simulation particles in Monte Carlo simulation of coagulation. Aerosol Science and Technology 43, 781–793.</p>

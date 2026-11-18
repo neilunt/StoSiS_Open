@@ -4,6 +4,8 @@
 #include "SplitterEditorWidget.h"
 #include "VesselEditorWidget.h"
 #include "ScreenEditorWidget.h"
+#include "CompoundSeparatorEditorWidget.h"
+#include "ClassifierEditorWidget.h"
 #include "MaterialsPage.h"
 #include "SieveGridWidget.h"
 #include "CardDensityPreviewWidget.h"
@@ -101,6 +103,12 @@ QWidget* SettingsWindow::CreateNodeTab()
     m_screenEditor = new ScreenEditorWidget(m_pages);
     m_pages->insertWidget(PageScreen, m_screenEditor);
 
+    m_compoundSeparatorEditor = new CompoundSeparatorEditorWidget(m_pages);
+    m_pages->insertWidget(PageCompoundSeparator, m_compoundSeparatorEditor);
+
+    m_classifierEditor = new ClassifierEditorWidget(m_pages);
+    m_pages->insertWidget(PageClassifier, m_classifierEditor);
+
     layout->addWidget(m_pages, 1);
 
     connect(m_inletEditor, &InletEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
@@ -108,6 +116,8 @@ QWidget* SettingsWindow::CreateNodeTab()
     connect(m_splitterEditor, &SplitterEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
     connect(m_vesselEditor, &VesselEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
     connect(m_screenEditor, &ScreenEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
+    connect(m_compoundSeparatorEditor, &CompoundSeparatorEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
+    connect(m_classifierEditor, &ClassifierEditorWidget::Applied, this, &SettingsWindow::SettingsApplied);
     connect(m_processEditor, &ProcessNodeEditorWidget::ModelTypeChanged, this, &SettingsWindow::ModelTypeChanged);
 
     return tab;
@@ -620,6 +630,8 @@ void SettingsWindow::SetGraph(stosis::CFlowsheetGraph* graph)
     m_splitterEditor->SetGraph(graph);
     m_vesselEditor->SetGraph(graph);
     m_screenEditor->SetGraph(graph);
+    m_compoundSeparatorEditor->SetGraph(graph);
+    m_classifierEditor->SetGraph(graph);
     LoadGridValues();
     if (graph)
         LoadCardValues(graph->GetCardSettings());
@@ -631,6 +643,8 @@ void SettingsWindow::SetMaterialDatabase(stosis::CMaterialDatabase* database, co
     m_materialsPage->SetDatabase(database, loadError);
     m_inletEditor->SetMaterialDatabase(database);
     m_vesselEditor->SetMaterialDatabase(database);
+    m_compoundSeparatorEditor->SetMaterialDatabase(database);
+    m_classifierEditor->SetMaterialDatabase(database);
 }
 
 void SettingsWindow::ShowMaterials()
@@ -721,6 +735,14 @@ void SettingsWindow::OnNodeSelectionChanged(int index)
             m_screenEditor->SetNode(nodeId);
             m_pages->setCurrentIndex(PageScreen);
             break;
+        case stosis::ENodeType::CompoundSeparator:
+            m_compoundSeparatorEditor->SetNode(nodeId);
+            m_pages->setCurrentIndex(PageCompoundSeparator);
+            break;
+        case stosis::ENodeType::Classifier:
+            m_classifierEditor->SetNode(nodeId);
+            m_pages->setCurrentIndex(PageClassifier);
+            break;
         }
         return;
     }
@@ -768,5 +790,6 @@ void SettingsWindow::RefreshPreviews()
     m_splitterEditor->UpdatePreview();
     m_vesselEditor->UpdateHints();
     m_screenEditor->UpdatePreview();
+    m_classifierEditor->UpdatePreview();
     UpdateCardPreview();
 }

@@ -307,6 +307,10 @@ void FlowsheetCanvasWidget::AddNodeFromTemplate(const SNodeTemplate& tmpl, QPoin
         nodeId = m_graph->AddVesselNode(name, point.x(), point.y()); break;
     case stosis::ENodeType::Screen:
         nodeId = m_graph->AddScreenNode(name, point.x(), point.y()); break;
+    case stosis::ENodeType::CompoundSeparator:
+        nodeId = m_graph->AddCompoundSeparatorNode(name, point.x(), point.y()); break;
+    case stosis::ENodeType::Classifier:
+        nodeId = m_graph->AddClassifierNode(name, point.x(), point.y()); break;
     }
 
     FlowsheetNodeItem* item = CreateNodeItem(nodeId, name, tmpl.type, point);

@@ -21,13 +21,15 @@
 #include "MergerUnit.h"
 #include "VesselUnit.h"
 #include "ScreenUnit.h"
+#include "CompoundSeparatorUnit.h"
+#include "ClassifierUnit.h"
 #include "StreamProcessorRegistry.h"
 #include "BuiltinStreamProcessors.h"
 
 namespace stosis
 {
-    // Knotentyp im Flowsheet. Erweiterbar - weitere Einheiten (Screen,
-    // Crusher, ...) kommen als weiterer Eintrag dazu, das aendert an der
+    // Knotentyp im Flowsheet. Erweiterbar - weitere Einheiten (Brecher,
+    // ...) kommen als weiterer Eintrag dazu, das aendert an der
     // Grundstruktur nichts.
     enum class ENodeType
     {
@@ -37,7 +39,9 @@ namespace stosis
         Splitter,
         Merger,
         Vessel,
-        Screen
+        Screen,
+        CompoundSeparator,
+        Classifier
     };
 
     // Anzeigename eines Knotentyps - an einer Stelle, damit alle Listen
@@ -53,6 +57,8 @@ namespace stosis
         case ENodeType::Merger:   return "Merger";
         case ENodeType::Vessel:   return "Behaelter";
         case ENodeType::Screen:   return "Sieb";
+        case ENodeType::CompoundSeparator: return "Stofftrenner";
+        case ENodeType::Classifier: return "Sichter";
         }
         return "?";
     }
@@ -197,6 +203,18 @@ namespace stosis
             return AddNode(name, ENodeType::Screen, 1, 2, posX, posY, std::make_unique<CScreenUnit>());
         }
 
+        // Compound separator: share per compound to output 1 (abgetrennt), rest to output 2.
+        std::string AddCompoundSeparatorNode(const std::string& name, double posX, double posY)
+        {
+            return AddNode(name, ENodeType::CompoundSeparator, 1, 2, posX, posY, std::make_unique<CCompoundSeparatorUnit>());
+        }
+
+        // Classifier by settling velocity (heavy product = output 1, light product = output 2).
+        std::string AddClassifierNode(const std::string& name, double posX, double posY)
+        {
+            return AddNode(name, ENodeType::Classifier, 1, 2, posX, posY, std::make_unique<CClassifierUnit>());
+        }
+
         // Knoten mit vorgegebener ID (Flowsheet-Datei, Methodenhandbuch 3.4):
         // Aus der ID leitet sich der Zufallsstrom der Unit ab (GetUnitSeed),
         // deshalb behaelt ein geladenes Flowsheet seine IDs. numPorts = Zahl
@@ -228,6 +246,10 @@ namespace stosis
                 return AddNode(name, type, 1, 1, posX, posY, std::make_unique<CVesselUnit>(), id);
             case ENodeType::Screen:
                 return AddNode(name, type, 1, 2, posX, posY, std::make_unique<CScreenUnit>(), id);
+            case ENodeType::CompoundSeparator:
+                return AddNode(name, type, 1, 2, posX, posY, std::make_unique<CCompoundSeparatorUnit>(), id);
+            case ENodeType::Classifier:
+                return AddNode(name, type, 1, 2, posX, posY, std::make_unique<CClassifierUnit>(), id);
             }
             return std::string();
         }
@@ -466,12 +488,16 @@ namespace stosis
         CMergerUnit* GetMerger(const std::string& nodeId) { return FindUnit<CMergerUnit>(nodeId); }
         CVesselUnit* GetVessel(const std::string& nodeId) { return FindUnit<CVesselUnit>(nodeId); }
         CScreenUnit* GetScreen(const std::string& nodeId) { return FindUnit<CScreenUnit>(nodeId); }
+        CCompoundSeparatorUnit* GetCompoundSeparator(const std::string& nodeId) { return FindUnit<CCompoundSeparatorUnit>(nodeId); }
+        CClassifierUnit* GetClassifier(const std::string& nodeId) { return FindUnit<CClassifierUnit>(nodeId); }
         // Nur lesen (z.B. zum Schreiben der Flowsheet-Datei).
         const CInletUnit* GetInlet(const std::string& nodeId) const { return FindUnit<CInletUnit>(nodeId); }
         const IStreamProcessor* GetProcessor(const std::string& nodeId) const { return FindUnit<IStreamProcessor>(nodeId); }
         const CSplitterUnit* GetSplitter(const std::string& nodeId) const { return FindUnit<CSplitterUnit>(nodeId); }
         const CVesselUnit* GetVessel(const std::string& nodeId) const { return FindUnit<CVesselUnit>(nodeId); }
         const CScreenUnit* GetScreen(const std::string& nodeId) const { return FindUnit<CScreenUnit>(nodeId); }
+        const CCompoundSeparatorUnit* GetCompoundSeparator(const std::string& nodeId) const { return FindUnit<CCompoundSeparatorUnit>(nodeId); }
+        const CClassifierUnit* GetClassifier(const std::string& nodeId) const { return FindUnit<CClassifierUnit>(nodeId); }
 
         // Noch keine Knoten und keine Verbindungen (Laden einer Datei).
         bool IsEmpty() const { return m_nodes.empty() && m_connections.empty(); }
@@ -534,12 +560,8 @@ namespace stosis
         void SetMaterialDatabase(const CMaterialDatabase* materials) { m_materials = materials; }
 
         // Aktive Stoffe der naechsten Simulation: die Stoffe aller Inlets in
-        // der Reihenfolge der Materialdatei.
-        std::vector<std::string> GetActiveCompounds()
-        {
-            PrepareMaterials();
-            return m_grid.compounds;
-        }
+        // der Reihenfolge der Materialdatei. Aendert nichts am Graphen.
+        std::vector<std::string> GetActiveCompounds() const { return ComputeActiveCompounds(); }
 
         // Hinweise der letzten Simulation (z.B. fehlende Waermekapazitaet),
         // je Hinweis "Knotenname: Text", ohne Doppelungen.
@@ -565,6 +587,16 @@ namespace stosis
                 {
                     entries.push_back({ node.id, 0, base + ", Grobgut)" });
                     entries.push_back({ node.id, 1, base + ", Feingut)" });
+                }
+                else if (node.type == ENodeType::CompoundSeparator)
+                {
+                    entries.push_back({ node.id, 0, base + ", abgetrennt)" });
+                    entries.push_back({ node.id, 1, base + ", Rest)" });
+                }
+                else if (node.type == ENodeType::Classifier)
+                {
+                    entries.push_back({ node.id, 0, base + ", Schwergut)" });
+                    entries.push_back({ node.id, 1, base + ", Leichtgut)" });
                 }
                 else
                 {
@@ -1274,6 +1306,14 @@ namespace stosis
         // Ergebnis haengt also nicht von der Reihenfolge der Knoten ab.
         void PrepareMaterials()
         {
+            m_grid.compounds = ComputeActiveCompounds();
+            m_grid.materials = m_materials;
+        }
+
+        // Only reads: the GUI asks for it while a simulation may be running
+        // (progress dialog with processEvents).
+        std::vector<std::string> ComputeActiveCompounds() const
+        {
             std::vector<std::string> names;
             const auto add = [&names](const std::string& name)
             {
@@ -1305,8 +1345,7 @@ namespace stosis
                     const size_t rb = rank(b);
                     return ra != rb ? ra < rb : a < b;
                 });
-            m_grid.compounds = std::move(names);
-            m_grid.materials = m_materials;
+            return names;
         }
 
         template <typename T>
@@ -1390,10 +1429,11 @@ namespace stosis
         }
 
         // Trennapparate: hier beginnt physikalisch ein Rueckfuehrstrom
-        // (Splitter und Sieb, spaeter auch Sichter, Zyklon, ...).
+        // (Splitter, Sieb, Stofftrenner, Sichter, spaeter auch Zyklon, ...).
         static bool IsSeparatorType(ENodeType type)
         {
-            return type == ENodeType::Splitter || type == ENodeType::Screen;
+            return type == ENodeType::Splitter || type == ENodeType::Screen
+                || type == ENodeType::CompoundSeparator || type == ENodeType::Classifier;
         }
 
         // Welcher noch offene Knoten soll seine Eingaenge aufschneiden?

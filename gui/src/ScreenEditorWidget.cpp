@@ -1,4 +1,5 @@
 #include "ScreenEditorWidget.h"
+#include "GradeEfficiencyPreview.h"
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QLabel>
@@ -6,144 +7,7 @@
 #include <QGroupBox>
 #include <QFormLayout>
 #include <QVBoxLayout>
-#include <QPainter>
-#include <QPainterPath>
-#include <cmath>
 #include <algorithm>
-
-// Grade efficiency T(d) over the size range of the grid, size axis
-// logarithmic (linear if the range starts at 0), cut size dashed.
-class GradeEfficiencyPreview : public QWidget
-{
-public:
-    explicit GradeEfficiencyPreview(QWidget* parent = nullptr) : QWidget(parent)
-    {
-        setMinimumHeight(180);
-    }
-
-    void SetCurve(const stosis::SScreenSettings& settings, double sizeMin, double sizeMax, bool valid)
-    {
-        m_settings = settings;
-        m_sizeMin = sizeMin;
-        m_sizeMax = sizeMax;
-        m_valid = valid;
-        update();
-    }
-
-protected:
-    void paintEvent(QPaintEvent* /*event*/) override
-    {
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::Antialiasing);
-        const QColor ink = palette().color(QPalette::WindowText);
-        QColor faint = ink;
-        faint.setAlpha(70);
-        const QRect plot = rect().adjusted(50, 10, -15, -38);
-        if (plot.width() < 40 || plot.height() < 40 || !(m_sizeMax > m_sizeMin))
-            return;
-
-        const double f = stosis::kSizeDisplayFactor;
-        const bool logAxis = m_sizeMin > 0.0;
-        const double x0 = logAxis ? std::log10(m_sizeMin * f) : m_sizeMin * f;
-        const double x1 = logAxis ? std::log10(m_sizeMax * f) : m_sizeMax * f;
-        const auto toPixelX = [&](double sizeDisplay)
-        {
-            const double x = logAxis ? std::log10(sizeDisplay) : sizeDisplay;
-            return plot.left() + (x - x0) / (x1 - x0) * plot.width();
-        };
-        const auto toPixelY = [&](double t) { return plot.bottom() - t * plot.height(); };
-
-        // Grid and ticks: T in steps of 0.25; size 1-2-5 per decade (log) or 5 steps (linear).
-        QPen gridPen(faint, 1, Qt::DotLine);
-        painter.setPen(ink);
-        const QFontMetrics metrics(font());
-        for (int i = 0; i <= 4; ++i)
-        {
-            const double t = 0.25 * i;
-            const double y = toPixelY(t);
-            painter.setPen(gridPen);
-            painter.drawLine(QPointF(plot.left(), y), QPointF(plot.right(), y));
-            painter.setPen(ink);
-            const QString label = QString::number(t, 'g', 2).replace('.', ',');
-            painter.drawText(QRectF(0, y - 8, plot.left() - 6, 16), Qt::AlignRight | Qt::AlignVCenter, label);
-        }
-        std::vector<double> ticks;
-        if (logAxis)
-        {
-            for (int k = static_cast<int>(std::floor(x0)); k <= static_cast<int>(std::ceil(x1)); ++k)
-                for (double m : { 1.0, 2.0, 5.0 })
-                {
-                    const double value = m * std::pow(10.0, k);
-                    const double x = std::log10(value);
-                    if (x >= x0 - 1e-9 && x <= x1 + 1e-9)
-                        ticks.push_back(value);
-                }
-        }
-        else
-        {
-            for (int i = 0; i <= 5; ++i)
-                ticks.push_back(x0 + (x1 - x0) * i / 5.0);
-        }
-        double lastRight = -1e9;
-        for (double value : ticks)
-        {
-            const double x = toPixelX(value);
-            painter.setPen(gridPen);
-            painter.drawLine(QPointF(x, plot.top()), QPointF(x, plot.bottom()));
-            painter.setPen(ink);
-            const QString label = QString::number(value, 'g', 3).replace('.', ',');
-            const int width = metrics.horizontalAdvance(label);
-            if (x - width / 2.0 > lastRight + 4)
-            {
-                painter.drawText(QRectF(x - width / 2.0, plot.bottom() + 3, width, 16), Qt::AlignCenter, label);
-                lastRight = x + width / 2.0;
-            }
-        }
-        painter.setPen(ink);
-        painter.drawRect(plot);
-        painter.drawText(QRectF(plot.left(), plot.bottom() + 19, plot.width(), 16), Qt::AlignCenter,
-            QString("Partikelgroesse d [%1]").arg(QString::fromUtf8(stosis::kSizeDisplayUnit)));
-        painter.save();
-        painter.translate(12, plot.center().y());
-        painter.rotate(-90);
-        painter.drawText(QRectF(-plot.height() / 2.0, -8, plot.height(), 16), Qt::AlignCenter, "T(d) ins Grobgut");
-        painter.restore();
-        if (!m_valid)
-            return;
-
-        // Cut size
-        const double cut = m_settings.cutSize * f;
-        if (cut > 0.0 && cut >= m_sizeMin * f && cut <= m_sizeMax * f)
-        {
-            painter.setPen(QPen(ink, 1, Qt::DashLine));
-            const double x = toPixelX(cut);
-            painter.drawLine(QPointF(x, plot.top()), QPointF(x, plot.bottom()));
-            painter.drawText(QPointF(x + 4, plot.top() + 14), "x_cut");
-        }
-
-        // Curve
-        QPainterPath path;
-        const int numPoints = std::max(2, plot.width());
-        for (int i = 0; i <= numPoints; ++i)
-        {
-            const double x = x0 + (x1 - x0) * i / numPoints;
-            const double sizeDisplay = logAxis ? std::pow(10.0, x) : x;
-            const QPointF point(toPixelX(sizeDisplay), toPixelY(m_settings.GradeEfficiency(sizeDisplay / f)));
-            if (i == 0)
-                path.moveTo(point);
-            else
-                path.lineTo(point);
-        }
-        painter.setPen(QPen(palette().color(QPalette::Highlight), 2));
-        painter.drawPath(path);
-    }
-
-private:
-    stosis::SScreenSettings m_settings;
-    double m_sizeMin = 0.0;
-    double m_sizeMax = 0.0;
-    bool m_valid = false;
-};
 
 ScreenEditorWidget::ScreenEditorWidget(QWidget* parent)
     : QWidget(parent)
@@ -191,6 +55,12 @@ void ScreenEditorWidget::SetupUi()
     m_offsetSpin->setSingleStep(0.01);
     form->addRow(m_offsetLabel, m_offsetSpin);
 
+    m_formulaLabel = new QLabel(group);
+    m_formulaLabel->setTextFormat(Qt::RichText);
+    m_formulaLabel->setWordWrap(true);
+    m_formulaLabel->setStyleSheet(kFormulaLabelStyle);
+    form->addRow(m_formulaLabel);
+
     m_errorLabel = new QLabel(group);
     m_errorLabel->setWordWrap(true);
     m_errorLabel->setStyleSheet("color: rgb(200, 40, 40);");
@@ -200,7 +70,7 @@ void ScreenEditorWidget::SetupUi()
 
     auto* previewGroup = new QGroupBox("Vorschau", this);
     auto* previewLayout = new QVBoxLayout(previewGroup);
-    m_preview = new GradeEfficiencyPreview(previewGroup);
+    m_preview = new GradeEfficiencyPreview("T(d) ins Grobgut", previewGroup);
     previewLayout->addWidget(m_preview, 1);
     mainLayout->addWidget(previewGroup, 1);
 
@@ -251,11 +121,14 @@ stosis::SScreenSettings ScreenEditorWidget::CurrentSettings() const
 
 void ScreenEditorWidget::OnValuesChanged()
 {
-    const bool teipelHennig = CurrentSettings().model == stosis::EScreenModel::TeipelHennig;
+    const stosis::SScreenSettings settings = CurrentSettings();
+    const bool teipelHennig = settings.model == stosis::EScreenModel::TeipelHennig;
     m_betaLabel->setVisible(teipelHennig);
     m_betaSpin->setVisible(teipelHennig);
     m_offsetLabel->setVisible(teipelHennig);
     m_offsetSpin->setVisible(teipelHennig);
+    m_formulaLabel->setText(GradeEfficiencyFormulaHtml(settings.model,
+        "<i>x</i> = <i>d</i> / <i>x</i><sub>cut</sub>", "Partikelgroesse durch Trenngroesse"));
 
     const QString problems = QString::fromStdString(CurrentSettings().Check());
     m_errorLabel->setText(problems);
@@ -268,11 +141,16 @@ void ScreenEditorWidget::UpdatePreview()
 {
     if (!m_graph)
     {
-        m_preview->SetCurve(CurrentSettings(), 0.0, 0.0, false);
+        m_preview->SetCurves({}, 0.0, 0.0);
         return;
     }
     const stosis::SSimulationGrid& grid = m_graph->GetGrid();
-    m_preview->SetCurve(CurrentSettings(), grid.sizeMin, grid.sizeMax, CurrentSettings().Check().empty());
+    const stosis::SScreenSettings settings = CurrentSettings();
+    std::vector<GradeEfficiencyPreview::SCurve> curves;
+    if (settings.Check().empty())
+        curves.push_back({ QString(), [settings](double size) { return settings.GradeEfficiency(size); },
+            settings.cutSize, "x_cut" });
+    m_preview->SetCurves(std::move(curves), grid.sizeMin, grid.sizeMax);
 }
 
 void ScreenEditorWidget::OnApply()

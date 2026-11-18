@@ -21,6 +21,7 @@ set(STOSIS_TESTS
     test_particle_units  # Merger und Splitter im Partikelmodus (Kap. 9.4, 9.5)
     test_vessel          # Behaelter: vier Mischungen, Anfangsfuellung, Vorrat (Kap. 7.4)
     test_screen          # Sieb: Trennkurven wie Dyssol, Kontinuum, Karten (Kap. 7.5)
+    test_separators      # Stofftrenner und Sichter: Kaskas, Kontinuum, Karten (Kap. 7.6, 7.7)
     test_runlog          # Laufzeitprotokoll, Fortschritt, Kartenspeicher (Kap. 9.6, 10)
     test_flowsheet_file  # Flowsheet als Datei: Rundlauf, Fehler, Struktur (Kap. 3.3, 3.4)
     test_levenspiel      # Kompartiment-Modelle und Mischer aus Dateien gegen exakte RTD (Kap. 11.3, 11.4)

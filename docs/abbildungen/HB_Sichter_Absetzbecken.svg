@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="290" viewBox="0 0 500 290">
+<style>text { font-family: Calibri, Arial, sans-serif; } .t { font-size: 14px; fill: #222222; } .tb { font-size: 14px; font-weight: bold; fill: #222222; } .ts { font-size: 13px; fill: #52514e; } .tm { font-size: 15px; font-style: italic; fill: #222222; font-family: Cambria, 'Times New Roman', serif; }</style>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555555"/></marker>
+<marker id="ahl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5b8fc7"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d2781e"/></marker>
+</defs>
+<rect width="500" height="290" fill="#ffffff"/>
+<rect x="40" y="70" width="380" height="130" fill="#d8e9f3"/>
+<rect x="400" y="70" width="20" height="130" fill="#eef3f7"/>
+<line x1="400" y1="70" x2="400" y2="200" stroke="#898781" stroke-dasharray="4 3"/>
+<path d="M40 54 L40 200 L420 200 L420 70" stroke="#222222" stroke-width="2" fill="none"/>
+<line x1="40" y1="70" x2="420" y2="70" stroke="#5b8fc7" stroke-width="2"/>
+<path d="M6 76 L38 76" stroke="#555555" stroke-width="1.6" fill="none" marker-end="url(#ah)"/>
+<text class="tb" x="6" y="46">Zulauf, <tspan class="tm">Q</tspan></text>
+<path d="M420 84 L470 84" stroke="#d2781e" stroke-width="2" fill="none" marker-end="url(#aho)"/>
+<text class="tb" x="300" y="46" style="fill:#b8620f">Ablauf: Leichtgut · Ausgang 2</text>
+<path d="M266 100 L342 100 M266 113 L342 113" stroke="#5b8fc7" stroke-width="2" fill="none" marker-end="url(#ahl)"/>
+<text class="tm" x="250" y="90">v</text><text class="t" x="261" y="90">= <tspan class="tm">Q</tspan> / (<tspan class="tm">B</tspan> · <tspan class="tm">H</tspan>)</text>
+<!-- Bahnen -->
+<path d="M44 74 L150 197" stroke="#2563eb" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<circle cx="150" cy="194" r="4" fill="#2563eb"/>
+<path d="M44 74 L396 197" stroke="#222222" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<text class="t" x="264" y="176" transform="rotate(19 264 176)"><tspan class="tm">w</tspan><tspan font-size="10" dy="4">s</tspan><tspan dy="-4"> = </tspan><tspan class="tm">Q</tspan> / <tspan class="tm">A</tspan></text>
+<path d="M44 74 L398 150" stroke="#d2781e" stroke-width="1.6" stroke-dasharray="5 4" fill="none"/>
+<circle cx="396" cy="150" r="2.5" fill="#d2781e"/>
+<!-- Schlamm -->
+<g fill="#2563eb" opacity=".75">
+<circle cx="70" cy="196" r="3"/><circle cx="90" cy="197" r="2.5"/><circle cx="112" cy="196" r="3"/><circle cx="134" cy="197" r="2.5"/><circle cx="168" cy="197" r="2.5"/><circle cx="196" cy="197" r="2"/><circle cx="232" cy="197" r="2"/><circle cx="280" cy="198" r="1.8"/><circle cx="330" cy="198" r="1.6"/>
+</g>
+<!-- Masse -->
+<path d="M26 74 L26 196" stroke="#555555" stroke-width="1.2" fill="none" marker-start="url(#ah)" marker-end="url(#ah)"/>
+<text class="tm" x="10" y="140">H</text>
+<path d="M44 222 L416 222" stroke="#555555" stroke-width="1.2" fill="none" marker-start="url(#ah)" marker-end="url(#ah)"/>
+<text class="tm" x="226" y="240">L</text>
+<text class="tb" x="40" y="272" style="fill:#2563eb">Schlamm: Schwergut · Ausgang 1</text>
+</svg>

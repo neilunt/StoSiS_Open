@@ -31,7 +31,7 @@
 <p class="sub">Bedienung der Fenster. Was das Programm rechnet und warum, steht im Methodenhandbuch.</p>
 
 <nav>
-  <a href="#datei">Flowsheet als Datei</a> · <a href="#export">Weitere Dateien speichern</a> · <a href="#struktur">Fenster „Struktur“</a> · <a href="#kurven">Kurven und Heatmap</a> · <a href="#sieb">Sieb</a>
+  <a href="#datei">Flowsheet als Datei</a> · <a href="#export">Weitere Dateien speichern</a> · <a href="#struktur">Fenster „Struktur“</a> · <a href="#kurven">Kurven und Heatmap</a> · <a href="#sieb">Sieb</a> · <a href="#sichter">Sichter</a> · <a href="#stofftrenner">Stofftrenner</a>
 </nav>
 
 <h2 id="datei">Flowsheet als Datei</h2>
@@ -85,11 +85,25 @@
 <h2 id="sieb">Sieb</h2>
 <p>Das Sieb steht in der Palette unter „Trennen“. Ausgang 1 führt das Grobgut, Ausgang 2 das Feingut; so heißen die beiden auch in den Ergebnissen. Ein Mehrdecksieb entsteht aus mehreren Sieben hintereinander, das Feingut des einen in den Zulauf des nächsten.</p>
 <ul>
-  <li><b>Modell:</b> Plitt, Molerus-Hoffmann oder Teipel-Hennig; die Formeln stehen im Methodenhandbuch, Kapitel 7.5.</li>
+  <li><b>Modell:</b> Plitt, Molerus-Hoffmann oder Teipel-Hennig. Unter den Eingaben steht die Formel des gewählten Modells, darunter die bezogene Größe <i>x</i> (Herleitung im Methodenhandbuch, Kapitel 7.5).</li>
   <li><b>Trenngröße x_cut</b> in µm und <b>Trennschärfe α</b>; je größer α, desto steiler die Kurve. <b>β</b> und <b>Offset</b> erscheinen nur bei Teipel-Hennig.</li>
   <li><b>Vorschau:</b> der Trenngrad T(d) über dem Größenbereich des Rasters, Größe logarithmisch (linear, wenn das Raster bei 0 beginnt), x_cut gestrichelt. Sie folgt jeder Eingabe sofort, auch vor „Übernehmen“.</li>
   <li><b>Übernehmen</b> schreibt die Werte in das Sieb; ungültige Werte nennt eine rote Zeile, der Knopf ist dann gesperrt.</li>
 </ul>
+<h2 id="sichter">Sichter</h2>
+<p>Der Sichter steht in der Palette unter „Trennen“ und trennt nach der Sinkgeschwindigkeit, also nach Größe und Dichte. Ausgang 1 führt das Schwergut, Ausgang 2 das Leichtgut; so heißen die beiden auch in den Ergebnissen.</p>
+<ul>
+  <li><b>Fluid:</b> ein Gas oder eine Flüssigkeit aus der Materialdatei, Luft für einen Windsichter, Wasser für ein Absetzbecken. Darunter stehen Dichte und Viskosität bei 293,15 K und 1,013 bar; im Lauf gelten Temperatur und Druck des Zulaufs.</li>
+  <li><b>Trennkurve:</b> Plitt, Molerus-Hoffmann oder Teipel-Hennig wie beim Sieb, aber über w_s/w_cut statt d/x_cut; die Formel steht wie beim Sieb unter den Eingaben (Methodenhandbuch, Kapitel 7.7).</li>
+  <li><b>Trenngeschwindigkeit w_cut</b> in m/s: beim Windsichter die Luftgeschwindigkeit nach oben, beim Absetzbecken die Oberflächenbeschickung Q/A. Dazu <b>Trennschärfe α</b>, bei Teipel-Hennig auch <b>β</b> und <b>Offset</b>.</li>
+  <li><b>Vorschau:</b> T(d) für jeden Stoff des Flowsheets, beschriftet mit Dichte und der Größe, bei der T = 0,5 ist (gestrichelt). Stoffe ohne Dichte in der Materialdatei stehen darunter; sie gehen im Lauf ganz ins Leichtgut.</li>
+  <li><b>Übernehmen</b> schreibt die Werte in den Sichter. Hinweise nach dem Lauf: fehlende Dichte oder fehlendes Fluid, Körner jenseits von Re = 2 · 10<sup>5</sup>.</li>
+</ul>
+<h2 id="stofftrenner">Stofftrenner</h2>
+<p>Der Stofftrenner steht in der Palette unter „Trennen“. Er gibt von jedem Stoff einen festen Anteil in Ausgang 1 („abgetrennt“) und den Rest in Ausgang 2 („Rest“), unabhängig von der Größe – etwa einen Magneten für Eisenschrott.</p>
+<ul>
+  <li><b>Tabelle:</b> eine Zeile je Stoff, oben fett die Stoffe des Flowsheets, darunter die übrigen der Materialdatei. In der rechten Spalte steht der Anteil in Ausgang 1 (0 bis 1); 0 heißt, der Stoff geht ganz in Ausgang 2.</li>
+  <li>Unter der Tabelle steht zusammengefasst, was in Ausgang 1 geht. <b>Übernehmen</b> schreibt die Anteile in den Stofftrenner; in der Flowsheet-Datei stehen nur die Stoffe mit einem Anteil über 0.</li>
 </ul>
 </main>
 </body>

@@ -28,6 +28,8 @@ inline const std::vector<SNodeTemplate>& GetNodeTemplates()
         { "Prozess",    "Prozess-Einheit",        "Prozesse",         stosis::ENodeType::Process,  0 },
         { "Behaelter",  "Behaelter (Hold-up)",    "Prozesse",         stosis::ENodeType::Vessel,   0 },
         { "Sieb",       "Sieb (Grob- und Feingut)", "Trennen",        stosis::ENodeType::Screen,   0 },
+        { "Sichter",    "Sichter (Schwer- und Leichtgut)", "Trennen", stosis::ENodeType::Classifier, 0 },
+        { "Stofftrenner", "Stofftrenner (Anteil je Stoff)", "Trennen", stosis::ENodeType::CompoundSeparator, 0 },
     };
     return templates;
 }
@@ -44,6 +46,8 @@ inline QColor GetNodeColor(stosis::ENodeType type)
     case stosis::ENodeType::Merger:   return QColor(80, 160, 160);
     case stosis::ENodeType::Vessel:   return QColor(175, 105, 85);
     case stosis::ENodeType::Screen:   return QColor(120, 120, 200);
+    case stosis::ENodeType::Classifier: return QColor(95, 150, 205);
+    case stosis::ENodeType::CompoundSeparator: return QColor(160, 120, 170);
     }
     return QColor(150, 150, 150);
 }

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="344" viewBox="0 0 380 344">
+<style>text { font-family: Calibri, Arial, sans-serif; } .t { font-size: 14px; fill: #222222; } .tb { font-size: 14px; font-weight: bold; fill: #222222; } .ts { font-size: 13px; fill: #52514e; } .tm { font-size: 15px; font-style: italic; fill: #222222; font-family: Cambria, 'Times New Roman', serif; }</style>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555555"/></marker>
+<marker id="ahl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5b8fc7"/></marker>
+<marker id="ahb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+<marker id="aho" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d2781e"/></marker>
+</defs>
+<rect width="380" height="344" fill="#ffffff"/>
+<rect x="131" y="31" width="68" height="261" fill="#e8f0f8"/>
+<rect x="199" y="31" width="160" height="38" fill="#e8f0f8"/>
+<!-- Zulaufrinne und Luftstutzen -->
+<path d="M48 103 L131 136 L131 166 L48 133 z" fill="#f2efe6"/>
+<path d="M48 103 L130 136 M48 133 L130 166" stroke="#222222" stroke-width="2" fill="none"/>
+<rect x="70" y="263" width="61" height="22" fill="#e8f0f8"/>
+<path d="M70 262 L130 262 M70 286 L130 286" stroke="#222222" stroke-width="2" fill="none"/>
+<path d="M130 292 L130 286 M130 262 L130 166 M130 136 L130 30 L360 30" stroke="#222222" stroke-width="2" fill="none"/>
+<path d="M200 292 L200 70 L360 70" stroke="#222222" stroke-width="2" fill="none"/>
+<path d="M130 292 L152 318 M200 292 L178 318" stroke="#222222" stroke-width="2" fill="none"/>
+<!-- Luft -->
+<path d="M150 284 L150 236 M165 284 L165 230 M180 284 L180 236" stroke="#5b8fc7" stroke-width="2" fill="none" marker-end="url(#ahl)"/>
+<text class="tb" x="16" y="279">Luft, <tspan class="tm">u</tspan></text>
+<path d="M76 274 L140 274" stroke="#5b8fc7" stroke-width="2" fill="none" marker-end="url(#ahl)"/>
+<!-- Zulauf -->
+<path d="M12 103.6 L44 116.4" stroke="#555555" stroke-width="1.6" fill="none" marker-end="url(#ah)"/>
+<text class="tb" x="18" y="92">Zulauf</text>
+<circle cx="70" cy="126" r="6" fill="#2563eb"/>
+<circle cx="86" cy="134" r="2.6" fill="#d2781e"/>
+<circle cx="101" cy="139" r="5" fill="#2563eb"/>
+<circle cx="117" cy="146" r="3" fill="#d2781e"/>
+<!-- schwere Koerner -->
+<circle cx="160" cy="190" r="8" fill="#2563eb"/>
+<circle cx="183" cy="222" r="6.5" fill="#2563eb"/>
+<path d="M160 200 L160 214" stroke="#2563eb" stroke-width="2" fill="none" marker-end="url(#ahb)"/>
+<text class="t" x="210" y="206" style="fill:#2563eb"><tspan class="tm" style="fill:#2563eb">w</tspan><tspan font-size="10" dy="4">s</tspan><tspan dy="-4"> &gt; </tspan><tspan class="tm" style="fill:#2563eb">u</tspan>: fällt</text>
+<!-- leichte Koerner -->
+<circle cx="152" cy="118" r="3" fill="#d2781e"/>
+<circle cx="176" cy="92" r="2.6" fill="#d2781e"/>
+<circle cx="186" cy="56" r="3" fill="#d2781e"/>
+<circle cx="262" cy="48" r="2.6" fill="#d2781e"/>
+<path d="M176 84 L176 70" stroke="#d2781e" stroke-width="2" fill="none" marker-end="url(#aho)"/>
+<text class="t" x="210" y="112" style="fill:#b8620f"><tspan class="tm" style="fill:#b8620f">w</tspan><tspan font-size="10" dy="4">s</tspan><tspan dy="-4"> &lt; </tspan><tspan class="tm" style="fill:#b8620f">u</tspan>: steigt</text>
+<path d="M300 50 L372 50" stroke="#d2781e" stroke-width="2" fill="none" marker-end="url(#aho)"/>
+<text class="tb" x="132" y="20" style="fill:#b8620f">Leichtgut · Ausgang 2</text>
+<text class="tb" x="165" y="336" text-anchor="middle" style="fill:#2563eb">Schwergut · Ausgang 1</text>
+</svg>

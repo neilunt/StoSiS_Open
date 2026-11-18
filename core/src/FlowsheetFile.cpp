@@ -34,7 +34,8 @@ namespace stosis
         constexpr SEnumKey<ENodeType> kNodeTypes[] = {
             { ENodeType::Inlet, "Inlet" }, { ENodeType::Outlet, "Outlet" }, { ENodeType::Process, "Process" },
             { ENodeType::Splitter, "Splitter" }, { ENodeType::Merger, "Merger" }, { ENodeType::Vessel, "Vessel" },
-            { ENodeType::Screen, "Screen" } };
+            { ENodeType::Screen, "Screen" }, { ENodeType::CompoundSeparator, "CompoundSeparator" },
+            { ENodeType::Classifier, "Classifier" } };
         constexpr SEnumKey<ESizeGridType> kSizeGridTypes[] = {
             { ESizeGridType::Logarithmic, "logarithmic" }, { ESizeGridType::Linear, "linear" } };
         constexpr SEnumKey<ERepresentation> kRepresentations[] = {
@@ -199,6 +200,29 @@ namespace stosis
                     settings["alpha"] = s.alpha;
                     settings["beta"] = s.beta;
                     settings["offset"] = s.offset;
+                    j["settings"] = std::move(settings);
+                }
+                break;
+            case ENodeType::CompoundSeparator:
+                if (const CCompoundSeparatorUnit* separator = graph.GetCompoundSeparator(node.id))
+                {
+                    json shares = json::object();
+                    for (const auto& entry : separator->GetSettings().shares)
+                        shares[entry.first] = entry.second;
+                    settings["shares"] = std::move(shares);
+                    j["settings"] = std::move(settings);
+                }
+                break;
+            case ENodeType::Classifier:
+                if (const CClassifierUnit* classifier = graph.GetClassifier(node.id))
+                {
+                    const SClassifierSettings& s = classifier->GetSettings();
+                    settings["model"] = KeyOf(kScreenModels, s.model);
+                    settings["cutVelocity"] = s.cutVelocity;
+                    settings["alpha"] = s.alpha;
+                    settings["beta"] = s.beta;
+                    settings["offset"] = s.offset;
+                    settings["fluid"] = s.fluid;
                     j["settings"] = std::move(settings);
                 }
                 break;
@@ -647,6 +671,36 @@ namespace stosis
                 reader.Fail(where, v.Check());
         }
 
+        void ReadCompoundSeparator(CReader& reader, const json& s, const std::string& where, CCompoundSeparatorUnit& separator)
+        {
+            reader.Object(s, where, { "shares" });
+            const json* shares = reader.Optional(s, "shares", where);
+            if (!shares)
+                return;
+            const std::string at = where + ", shares";
+            if (!shares->is_object())
+                reader.Fail(at, "Objekt { \"Stoff\": Anteil, ... } erwartet");
+            SCompoundSeparatorSettings v;
+            for (const auto& item : shares->items())
+                v.shares.push_back({ item.key(), reader.Number(item.value(), at + ", " + item.key()) });
+            if (!separator.SetSettings(v))
+                reader.Fail(at, v.Check());
+        }
+
+        void ReadClassifier(CReader& reader, const json& s, const std::string& where, CClassifierUnit& classifier)
+        {
+            reader.Object(s, where, { "model", "cutVelocity", "alpha", "beta", "offset", "fluid" });
+            SClassifierSettings v = classifier.GetSettings();
+            reader.ReadEnum(s, "model", where, kScreenModels, v.model);
+            reader.ReadNumber(s, "cutVelocity", where, v.cutVelocity);
+            reader.ReadNumber(s, "alpha", where, v.alpha);
+            reader.ReadNumber(s, "beta", where, v.beta);
+            reader.ReadNumber(s, "offset", where, v.offset);
+            reader.ReadText(s, "fluid", where, v.fluid);
+            if (!classifier.SetSettings(v))
+                reader.Fail(where, v.Check());
+        }
+
         void ReadUnit(CReader& reader, const json& unit, size_t index, CFlowsheetGraph& graph)
         {
             const std::string at = "Unit " + std::to_string(index + 1);
@@ -665,7 +719,8 @@ namespace stosis
             if (type == ENodeType::Merger)
                 known.push_back("inputs");
             const bool hasSettings = type == ENodeType::Inlet || type == ENodeType::Splitter
-                || type == ENodeType::Process || type == ENodeType::Vessel || type == ENodeType::Screen;
+                || type == ENodeType::Process || type == ENodeType::Vessel || type == ENodeType::Screen
+                || type == ENodeType::CompoundSeparator || type == ENodeType::Classifier;
             if (hasSettings)
                 known.push_back("settings");
             reader.Object(unit, where, known);
@@ -714,6 +769,12 @@ namespace stosis
                 break;
             case ENodeType::Screen:
                 ReadScreen(reader, *settings, in, *graph.GetScreen(id));
+                break;
+            case ENodeType::CompoundSeparator:
+                ReadCompoundSeparator(reader, *settings, in, *graph.GetCompoundSeparator(id));
+                break;
+            case ENodeType::Classifier:
+                ReadClassifier(reader, *settings, in, *graph.GetClassifier(id));
                 break;
             default:
                 break;

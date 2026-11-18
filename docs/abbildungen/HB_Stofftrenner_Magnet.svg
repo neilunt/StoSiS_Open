@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="284" viewBox="0 0 760 318">
+<style>text { font-family: Calibri, Arial, sans-serif; } .t { font-size: 15px; fill: #222222; } .tb { font-size: 15px; font-weight: bold; fill: #222222; } .ts { font-size: 14px; fill: #52514e; } .ti { font-size: 15px; fill: #ffffff; font-weight: bold; }</style>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555555"/></marker>
+<marker id="ahi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#a8432c"/></marker>
+</defs>
+<rect width="760" height="318" fill="#ffffff"/>
+<!-- Ueberbandmagnet -->
+<text class="tb" x="405" y="30" text-anchor="middle">Überbandmagnet</text>
+<path d="M375 46 L440 46" stroke="#555555" stroke-width="1.5" fill="none" marker-end="url(#ah)"/>
+<rect x="300" y="56" width="210" height="70" rx="35" stroke="#222222" stroke-width="2" fill="none"/>
+<circle cx="335" cy="91" r="23" stroke="#222222" stroke-width="2" fill="#ffffff"/>
+<circle cx="475" cy="91" r="23" stroke="#222222" stroke-width="2" fill="#ffffff"/>
+<rect x="362" y="73" width="86" height="36" rx="2" fill="#333333"/>
+<text class="ti" x="405" y="96" text-anchor="middle">Magnet</text>
+<rect x="352" y="127" width="28" height="7" rx="1.5" fill="#a8432c"/>
+<rect x="414" y="127" width="20" height="7" rx="1.5" fill="#a8432c"/>
+<rect x="372" y="160" width="26" height="7" rx="1.5" fill="#a8432c" transform="rotate(-14 385 163)"/>
+<path d="M402 186 L402 146" stroke="#a8432c" stroke-width="2" stroke-dasharray="5 4" fill="none" marker-end="url(#ahi)"/>
+<text class="ts" x="410" y="172">Magnetkraft</text>
+<!-- Abwurf Eisen -->
+<path d="M498 128 Q584 112 664 146" stroke="#a8432c" stroke-width="2" stroke-dasharray="5 4" fill="none" marker-end="url(#ahi)"/>
+<rect x="572" y="112" width="22" height="7" rx="1.5" fill="#a8432c" transform="rotate(18 583 115)"/>
+<path d="M640 124 L640 174 L740 174 L740 124" stroke="#2563eb" stroke-width="2.5" fill="none"/>
+<rect x="660" y="160" width="22" height="7" rx="1.5" fill="#a8432c"/>
+<rect x="690" y="158" width="26" height="8" rx="1.5" fill="#a8432c" transform="rotate(-8 703 162)"/>
+<text class="tb" x="690" y="194" text-anchor="middle" style="fill:#2563eb">Ausgang 1</text>
+<text class="ts" x="690" y="211" text-anchor="middle">abgetrennt</text>
+<!-- Foerderband -->
+<text class="tb" x="40" y="150">Zulauf: Brechgut</text>
+<path d="M60 158 L84 182" stroke="#555555" stroke-width="1.5" fill="none" marker-end="url(#ah)"/>
+<rect x="40" y="198" width="580" height="24" rx="12" stroke="#222222" stroke-width="2" fill="#f1f0eb"/>
+<circle cx="52" cy="210" r="8" stroke="#222222" stroke-width="2" fill="#ffffff"/>
+<circle cx="608" cy="210" r="8" stroke="#222222" stroke-width="2" fill="#ffffff"/>
+<path d="M250 244 L360 244" stroke="#555555" stroke-width="1.5" fill="none" marker-end="url(#ah)"/>
+<text class="ts" x="250" y="264">Förderband</text>
+<polygon points="92,198 98,180 116,174 131,186 129,198" fill="#868e98"/>
+<polygon points="148,198 150,184 176,182 178,198" fill="#b8653e"/>
+<rect x="196" y="190" width="38" height="8" rx="1.5" fill="#a8432c"/>
+<polygon points="248,198 255,176 279,171 292,186 288,198" fill="#868e98"/>
+<rect x="306" y="188" width="32" height="10" rx="1" fill="#8a6a35"/>
+<polygon points="440,198 446,182 466,177 476,190 474,198" fill="#868e98"/>
+<rect x="488" y="187" width="28" height="11" rx="1" fill="#8a6a35"/>
+<polygon points="530,198 532,184 556,183 557,198" fill="#b8653e"/>
+<polygon points="566,198 571,183 590,180 600,192 598,198" fill="#868e98"/>
+<!-- Abwurf Rest -->
+<path d="M620 202 Q660 202 680 244" stroke="#555555" stroke-width="1.5" stroke-dasharray="5 4" fill="none" marker-end="url(#ah)"/>
+<path d="M640 244 L640 292 L740 292 L740 244" stroke="#d2781e" stroke-width="2.5" fill="none"/>
+<polygon points="652,292 657,276 675,272 684,284 682,292" fill="#868e98"/>
+<polygon points="690,292 692,280 712,279 713,292" fill="#b8653e"/>
+<rect x="716" y="282" width="20" height="10" rx="1" fill="#8a6a35"/>
+<text class="tb" x="690" y="312" text-anchor="middle" style="fill:#b8620f">Ausgang 2 · Rest</text>
+<!-- Legende -->
+<rect x="40" y="282" width="14" height="10" fill="#868e98"/><text class="ts" x="60" y="292">Beton</text>
+<rect x="110" y="282" width="14" height="10" fill="#b8653e"/><text class="ts" x="130" y="292">Ziegel</text>
+<rect x="182" y="284" width="18" height="6" fill="#a8432c"/><text class="ts" x="206" y="292">Eisen</text>
+<rect x="252" y="282" width="16" height="10" fill="#8a6a35"/><text class="ts" x="274" y="292">Holz</text>
+</svg>

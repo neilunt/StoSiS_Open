@@ -48,6 +48,7 @@ private:
     QDoubleSpinBox* m_betaSpin = nullptr;
     QLabel* m_offsetLabel = nullptr;
     QDoubleSpinBox* m_offsetSpin = nullptr;
+    QLabel* m_formulaLabel = nullptr; // selected model as a typeset formula
     QLabel* m_errorLabel = nullptr;
     GradeEfficiencyPreview* m_preview = nullptr;
     QPushButton* m_applyButton = nullptr;

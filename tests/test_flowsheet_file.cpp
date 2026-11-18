@@ -353,6 +353,50 @@ int main()
             "Sieb: unbekanntes Modell ist ein Fehler");
     }
 
+    // 1c) Compound separator and classifier in series: inlet -> magnet ->
+    //     air classifier -> two outlets, all values off the defaults.
+    {
+        CFlowsheetGraph g1;
+        const std::string in = g1.AddInletNode("Zulauf", 0, 0);
+        const std::string mg = g1.AddCompoundSeparatorNode("Magnet", 120, 0);
+        const std::string ws = g1.AddClassifierNode("Windsichter", 240, 0);
+        SCompoundSeparatorSettings m;
+        m.shares = { { "Fe", 0.95 }, { "Sand", 0.02 } };
+        g1.GetCompoundSeparator(mg)->SetSettings(m);
+        SClassifierSettings c;
+        c.model = EScreenModel::TeipelHennig;
+        c.cutVelocity = 2.5;
+        c.alpha = 3.5;
+        c.beta = 0.6;
+        c.offset = 0.04;
+        c.fluid = "H2O";
+        g1.GetClassifier(ws)->SetSettings(c);
+        g1.AddConnection(in, 0, mg, 0);
+        g1.AddConnection(mg, 0, g1.AddOutletNode("Fe-Schrott", 120, 80), 0);
+        g1.AddConnection(mg, 1, ws, 0);
+        g1.AddConnection(ws, 0, g1.AddOutletNode("Schwergut", 360, -40), 0);
+        g1.AddConnection(ws, 1, g1.AddOutletNode("Leichtgut", 360, 40), 0);
+        const std::string text1 = WriteFlowsheetJson(g1, SFlowsheetFileSettings());
+        CFlowsheetGraph g2;
+        const SFlowsheetReadResult read = ReadFlowsheetJson(text1, g2);
+        const CCompoundSeparatorUnit* magnet = read.ok ? g2.GetCompoundSeparator(mg) : nullptr;
+        const CClassifierUnit* classifier = read.ok ? g2.GetClassifier(ws) : nullptr;
+        const bool sameMagnet = magnet && magnet->GetSettings().shares == m.shares;
+        const bool sameClassifier = classifier && classifier->GetSettings().model == c.model
+            && classifier->GetSettings().cutVelocity == c.cutVelocity && classifier->GetSettings().alpha == c.alpha
+            && classifier->GetSettings().beta == c.beta && classifier->GetSettings().offset == c.offset
+            && classifier->GetSettings().fluid == c.fluid;
+        Check(read.ok && read.warnings.empty() && sameMagnet && sameClassifier && WriteFlowsheetJson(g2, read.settings) == text1
+            && Contains(text1, "\"type\": \"CompoundSeparator\"") && Contains(text1, "\"type\": \"Classifier\"")
+            && Contains(text1, "\"Fe\": 0.95") && Contains(text1, "\"fluid\": \"H2O\""),
+            "Stofftrenner und Sichter: Rundlauf mit Anteilen je Stoff, Modell, w_cut, alpha, beta, Offset und Fluid");
+        CFlowsheetGraph g3, g4, g5;
+        Check(!ReadFlowsheetJson(Replace(text1, "\"Fe\": 0.95", "\"Fe\": 1.5"), g3).ok
+            && !ReadFlowsheetJson(Replace(text1, "\"cutVelocity\": 2.5", "\"cutVelocity\": 0"), g4).ok
+            && !ReadFlowsheetJson(Replace(text1, "\"fluid\": \"H2O\"", "\"fluid\": \"\""), g5).ok,
+            "Stofftrenner und Sichter: Anteil > 1, w_cut = 0 und leeres Fluid sind Fehler");
+    }
+
     // 2) So sieht die Datei aus (Kontinuum-Flowsheet, Ausschnitte).
     CFlowsheetGraph g;
     BuildAll(g, false);

@@ -1,0 +1,2138 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>StoSiS Abbildungen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: technisches Datenblatt. Schmale Textspalte, breite Abbildungen; je Unit ein Kapitel: Skizze oder Animation, Modell, Kurve, Partikelmodus. */
+:root {
+  --paper: #f5f7f9; --ink: #18212b; --muted: #56636f; --rule: #d3dae1; --panel: #e9eef2; --accent: #1d5fa6;
+  --out1: #1d5fa6; --out2: #c97a12; --out3: #0d8467;
+  --m1: #1d5fa6; --m2: #c2410c; --m3: #0d8467; --m4: #7c3aed;
+  --hot: #c2410c; --cold: #1d5fa6;
+  --age0: #c9bcf0; --age1: #3b0764;
+  --sand: #c99a3c; --urea: #ebe6d6; --coal: #3b4148; --iron: #a8432c; --concrete: #868e98; --brick: #b8653e; --wood: #8a6a35; --stone: #6c7b66;
+  --air: #dde8f2; --water: #cfe2ee;
+  --display: "Barlow Semi Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  --math: "Cambria Math", "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11161b; --ink: #e3e8ed; --muted: #98a4af; --rule: #2b343d; --panel: #1a2128; --accent: #6ea8ea;
+    --out1: #6ea8ea; --out2: #eba648; --out3: #3fc79e;
+    --m1: #6ea8ea; --m2: #f08a5a; --m3: #3fc79e; --m4: #b18cff;
+    --hot: #f08a5a; --cold: #6ea8ea;
+    --age0: #6a5d9c; --age1: #ece4ff;
+    --sand: #d8ac52; --urea: #d6cfbb; --coal: #b4bcc5; --iron: #e06a4e; --concrete: #9aa3ad; --brick: #d8805a; --wood: #c09656; --stone: #95a68e;
+    --air: #1c2833; --water: #14303f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11161b; --ink: #e3e8ed; --muted: #98a4af; --rule: #2b343d; --panel: #1a2128; --accent: #6ea8ea;
+  --out1: #6ea8ea; --out2: #eba648; --out3: #3fc79e;
+  --m1: #6ea8ea; --m2: #f08a5a; --m3: #3fc79e; --m4: #b18cff;
+  --hot: #f08a5a; --cold: #6ea8ea;
+  --age0: #6a5d9c; --age1: #ece4ff;
+  --sand: #d8ac52; --urea: #d6cfbb; --coal: #b4bcc5; --iron: #e06a4e; --concrete: #9aa3ad; --brick: #d8805a; --wood: #c09656; --stone: #95a68e;
+  --air: #1c2833; --water: #14303f;
+  color-scheme: dark;
+}
+
+body { background: var(--paper); color: var(--ink); font: 400 17px/1.6 var(--body); }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.prose { max-width: 68ch; }
+p { margin: 0 0 .9em; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header { padding-block: 44px 28px; border-bottom: 1px solid var(--rule); }
+.eyebrow { font: 600 13px/1.2 var(--display); letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+h1 { font: 700 clamp(38px, 6.4vw, 60px)/1.02 var(--display); letter-spacing: -.01em; margin: 0 0 14px; text-wrap: balance; }
+h2 { font: 700 clamp(30px, 4.4vw, 40px)/1.08 var(--display); margin: 0 0 12px; text-wrap: balance; }
+h3 { font: 600 22px/1.2 var(--display); margin: 40px 0 10px; text-wrap: balance; }
+.lead { font-size: 19px; color: var(--ink); }
+nav.units { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+nav.units a { font: 600 15px/1 var(--display); letter-spacing: .03em; text-decoration: none; color: var(--ink); border: 1px solid var(--rule); padding: 9px 14px; border-radius: 3px; background: var(--paper); }
+nav.units a:hover { border-color: var(--accent); color: var(--accent); }
+nav.units a .k { color: var(--muted); font-weight: 500; margin-left: 6px; }
+
+section { padding-block: 44px; border-bottom: 1px solid var(--rule); }
+section:last-of-type { border-bottom: 0; }
+
+figure { margin: 22px 0 26px; }
+figcaption { font-size: 15px; line-height: 1.5; color: var(--muted); max-width: 78ch; margin-top: 10px; }
+.fig-svg { display: block; width: 100%; height: auto; max-width: 100%; }
+.figrow { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; align-items: start; }
+.figrow.sim { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+.figrow.side { grid-template-columns: minmax(0, 1fr) minmax(0, 240px); }
+@media (max-width: 760px) { .figrow, .figrow.sim, .figrow.side { grid-template-columns: 1fr; } }
+.figrow > * { min-width: 0; }
+
+.formula { font-family: var(--math); font-size: 19px; line-height: 1.5; margin: 6px 0 14px; overflow-x: auto; }
+.formula i, .math i { font-style: italic; }
+.math { font-family: var(--math); font-size: 1.04em; }
+.mono { font-family: var(--mono); font-size: .88em; }
+
+table.overview { border-collapse: collapse; width: 100%; font-size: 15.5px; }
+table.overview th { text-align: left; font: 600 13px/1.2 var(--display); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid var(--rule); padding: 8px 10px 6px 0; }
+table.overview td { border-bottom: 1px solid var(--rule); padding: 9px 10px 9px 0; vertical-align: top; }
+table.overview td:first-child { font: 600 17px/1.3 var(--display); }
+.tablebox { overflow-x: auto; }
+
+.models { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin: 18px 0 8px; }
+@media (max-width: 820px) { .models { grid-template-columns: 1fr; } }
+.model { border-top: 3px solid var(--c); padding-top: 10px; min-width: 0; }
+.model h4 { font: 600 19px/1.2 var(--display); margin: 0 0 4px; }
+.model .formula { font-size: 17px; margin: 4px 0 8px; }
+.model p { font-size: 15.5px; line-height: 1.5; }
+
+.panel { background: var(--panel); border-radius: 4px; padding: 18px; display: grid; grid-template-columns: minmax(0, 250px) minmax(0, 1fr); gap: 22px; margin: 20px 0 10px; }
+@media (max-width: 780px) { .panel { grid-template-columns: 1fr; } }
+.panel > * { min-width: 0; }
+.controls { display: flex; flex-direction: column; gap: 14px; }
+.ctl label, .ctl .lab { display: flex; justify-content: space-between; gap: 8px; font: 600 15px/1.2 var(--display); margin-bottom: 4px; }
+.ctl .val { font: 500 13px/1.2 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; accent-color: var(--accent); margin: 0; }
+select { font: 400 15px var(--body); padding: 6px 8px; border: 1px solid var(--rule); border-radius: 3px; background: var(--paper); color: var(--ink); width: 100%; }
+.checks { display: flex; flex-direction: column; gap: 6px; }
+.checks label { display: flex; align-items: center; gap: 8px; font: 500 15px/1.2 var(--body); cursor: pointer; }
+.swatch { display: inline-block; width: 18px; height: 4px; border-radius: 2px; background: var(--c); flex: none; }
+.btnrow { display: flex; flex-wrap: wrap; gap: 8px; }
+button { font: 600 14px/1 var(--display); letter-spacing: .03em; padding: 9px 13px; border-radius: 3px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); cursor: pointer; }
+button:hover { border-color: var(--accent); color: var(--accent); }
+.seg { display: inline-flex; border: 1px solid var(--ink); border-radius: 3px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; }
+.seg button + button { border-left: 1px solid var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.hint { font-size: 14px; color: var(--muted); line-height: 1.45; }
+
+table.data { border-collapse: collapse; width: 100%; font-size: 14.5px; margin-top: 10px; }
+table.data th { text-align: left; font: 600 12.5px/1.2 var(--display); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--rule); padding: 6px 8px 5px 0; }
+table.data td { border-bottom: 1px solid var(--rule); padding: 6px 8px 6px 0; vertical-align: baseline; }
+table.data td.num, table.data th.num { text-align: right; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+table.data th.num { font-family: var(--display); font-size: 12.5px; }
+
+canvas#siebCanvas { display: block; width: 100%; aspect-ratio: 800 / 360; max-width: 100%; background: var(--panel); border-radius: 4px; }
+
+/* SVG drawing classes */
+.s-ink { stroke: var(--ink); stroke-width: 2; }
+.s-muted { stroke: var(--muted); stroke-width: 1.5; }
+.s-out1 { stroke: var(--out1); stroke-width: 2.5; }
+.s-out2 { stroke: var(--out2); stroke-width: 2.5; }
+.s-iron { stroke: var(--iron); stroke-width: 2; }
+.s-acc { stroke: var(--accent); stroke-width: 2; }
+.dash { stroke-dasharray: 5 4; }
+.f-none { fill: none; }
+.f-paper { fill: var(--paper); }
+.f-panel { fill: var(--panel); }
+.f-ink { fill: var(--ink); }
+.f-out1 { fill: var(--out1); }
+.f-out2 { fill: var(--out2); }
+.f-iron { fill: var(--iron); }
+.f-concrete { fill: var(--concrete); }
+.f-stone { fill: var(--stone); }
+.f-brick { fill: var(--brick); }
+.f-wood { fill: var(--wood); }
+.f-sand { fill: var(--sand); }
+.f-air { fill: var(--air); }
+.f-water { fill: var(--water); }
+.f-muted { fill: var(--muted); }
+.lbl { fill: var(--ink); font: 600 16px var(--display); }
+.lbl-s { fill: var(--ink); font: 600 14px var(--display); }
+.lbl-m { fill: var(--muted); font: 500 14px var(--display); }
+.lbl-o1 { fill: var(--out1); font: 600 15px var(--display); }
+.lbl-o2 { fill: var(--out2); font: 600 15px var(--display); }
+.lbl-inv { fill: var(--paper); font: 600 14px var(--display); }
+.lbl-math { fill: var(--ink); font: italic 17px var(--math); }
+.ah-ink { fill: var(--ink); } .ah-muted { fill: var(--muted); } .ah-out1 { fill: var(--out1); } .ah-out2 { fill: var(--out2); } .ah-iron { fill: var(--iron); } .ah-acc { fill: var(--accent); }
+
+/* charts */
+.gl { stroke: var(--rule); stroke-width: 1; }
+.gl.minor { stroke-opacity: .55; }
+.frame { fill: none; stroke: var(--muted); stroke-width: 1; }
+.tick { fill: var(--muted); font: 400 12px var(--mono); }
+.axt { fill: var(--ink); font: 600 14px var(--display); }
+.curve { fill: none; stroke-width: 2.6; stroke-linejoin: round; }
+.curve.thin { stroke-width: 1.8; }
+.mark { stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 4 4; }
+.mark-acc { stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 6 4; }
+.c-m1 { stroke: var(--m1); } .c-m2 { stroke: var(--m2); } .c-m3 { stroke: var(--m3); }
+.c-iron { stroke: var(--iron); } .c-concrete { stroke: var(--concrete); } .c-coal { stroke: var(--coal); } .c-wood { stroke: var(--wood); } .c-sand { stroke: var(--sand); }
+.c-acc { stroke: var(--accent); } .c-muted { stroke: var(--muted); }
+.d-iron { fill: var(--iron); } .d-concrete { fill: var(--concrete); } .d-coal { fill: var(--coal); } .d-wood { fill: var(--wood); } .d-sand { fill: var(--sand); }
+.shade { fill: var(--rule); fill-opacity: .5; }
+.dot { fill: var(--out1); fill-opacity: .85; }
+
+footer { padding-block: 36px 56px; font-size: 15px; color: var(--muted); }
+footer h2 { font-size: 24px; color: var(--ink); }
+footer p { margin-bottom: .5em; max-width: 90ch; }
+
+/* Merger, Splitter, Behälter */
+canvas.anim { display: block; width: 100%; max-width: 100%; background: var(--panel); border-radius: 4px; }
+.animbar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin-top: 12px; }
+.animbar .hint { margin: 0; }
+.s-out3 { stroke: var(--out3); stroke-width: 2.5; }
+.f-out3 { fill: var(--out3); }
+.lbl-o3 { fill: var(--out3); font: 600 15px var(--display); }
+.c-m4 { stroke: var(--m4); } .c-out1 { stroke: var(--out1); } .c-out2 { stroke: var(--out2); } .c-out3 { stroke: var(--out3); } .c-ink { stroke: var(--ink); }
+.d-m1 { fill: var(--m1); } .d-m3 { fill: var(--m3); } .d-m4 { fill: var(--m4); } .d-out2 { fill: var(--out2); } .d-acc { fill: var(--accent); } .d-ink { fill: var(--ink); }
+.t-m1 { fill: var(--m1); font: 500 12.5px var(--mono); } .t-m3 { fill: var(--m3); font: 500 12.5px var(--mono); } .t-m4 { fill: var(--m4); font: 500 12.5px var(--mono); } .t-out2 { fill: var(--out2); font: 500 12.5px var(--mono); }
+.t-out1 { fill: var(--out1); font: 500 12.5px var(--mono); } .t-out3 { fill: var(--out3); font: 500 12.5px var(--mono); }
+.band { fill: var(--out1); }
+.faint { opacity: .4; }
+.ctlgroup { display: flex; flex-direction: column; gap: 12px; padding-top: 10px; border-top: 1px solid var(--rule); }
+.ctlgroup:first-child { border-top: 0; padding-top: 0; }
+.ctlgroup > .lab { font: 600 13px/1.2 var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.agelegend { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+.agebar { width: 120px; height: 10px; border-radius: 2px; background: linear-gradient(90deg, var(--age0), var(--age1)); flex: none; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--muted); margin: 4px 0 6px; }
+.legend > span { display: inline-flex; align-items: center; gap: 8px; }
+.radios { display: flex; flex-direction: column; gap: 6px; }
+.radios label { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin: 0; font: 500 15px/1.2 var(--body); cursor: pointer; }
+.card-a { fill: var(--hot); fill-opacity: .14; stroke: var(--hot); stroke-width: 1.6; }
+.card-b { fill: var(--cold); fill-opacity: .14; stroke: var(--cold); stroke-width: 1.6; }
+.lbl-hot { fill: var(--hot); font: 600 15px var(--display); }
+.lbl-cold { fill: var(--cold); font: 600 15px var(--display); }
+@media (prefers-reduced-motion: no-preference) {
+  .app { animation: cardIn 5s ease-out infinite both; transform-box: fill-box; }
+}
+@keyframes cardIn {
+  0% { opacity: 0; transform: translateX(-26px); }
+  10%, 82% { opacity: 1; transform: none; }
+  94%, 100% { opacity: 0; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="ah-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="ah-ink"/></marker>
+    <marker id="ah-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="ah-muted"/></marker>
+    <marker id="ah-out1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="ah-out1"/></marker>
+    <marker id="ah-out2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="ah-out2"/></marker>
+    <marker id="ah-iron" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="ah-iron"/></marker>
+    <marker id="ah-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="ah-acc"/></marker>
+  </defs>
+</svg>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <marker id="ah-out3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="f-out3"/></marker>
+    <marker id="ah-m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="d-m1"/></marker>
+    <marker id="ah-m4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="d-m4"/></marker>
+  </defs>
+</svg>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">StoSiS · Methodenhandbuch Kapitel 7</p>
+    <h1>Abbildungen zu den Units</h1>
+    <div class="prose">
+      <p class="lead">Sechs Units, je mit Skizze oder Animation, Modell und dem, was im Partikelmodus passiert. Die statischen Abbildungen stehen im Methodenhandbuch; hier lassen sich die Werte verändern.</p>
+      <p>Animationen und Kurven rechnet die Seite mit denselben Formeln wie das Programm. Wo sie vereinfacht, steht es dabei.</p>
+    </div>
+    <nav class="units" aria-label="Kapitel">
+      <a href="#merger">Merger<span class="k">zusammenführen</span></a>
+      <a href="#splitter">Splitter<span class="k">aufteilen</span></a>
+      <a href="#behaelter">Behälter<span class="k">zurückhalten</span></a>
+      <a href="#gemeinsam">Trenner<span class="k">gemeinsamer Aufbau</span></a>
+      <a href="#sieb">Sieb<span class="k">nach Größe</span></a>
+      <a href="#stofftrenner">Stofftrenner<span class="k">nach Stoff</span></a>
+      <a href="#sichter">Sichter<span class="k">nach Sinkgeschwindigkeit</span></a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ============================================================ -->
+<section id="merger">
+  <div class="wrap">
+    <p class="eyebrow">Methodenhandbuch 7.1 · mehrere Zuläufe, ein Ausgang</p>
+    <h2>Merger</h2>
+    <div class="prose">
+      <p>Der Merger führt Ströme zusammen. Die Massenströme addieren sich je Stoff und Größe, die Temperatur folgt aus der Energiebilanz, und der Druck ist der kleinste Eingangsdruck. Der Merger hält nichts zurück.</p>
+    </div>
+    <figure>
+      <canvas id="mergerCanvas" class="anim" width="800" height="330" style="aspect-ratio: 800 / 330" role="img" aria-label="Zwei Zuläufe mit Körnern laufen im Merger zusammen; die Farbe der Leitung zeigt die Temperatur"></canvas>
+      <div class="animbar"><button id="mergerPlay" type="button">Anhalten</button></div>
+      <figcaption>Zwei Zuläufe treffen sich im Merger. Die Farbe der Leitung zeigt die Temperatur des Stroms (blau kalt, rot warm), die Körner zeigen Stoff und Größe. Hinter dem Merger hat der Strom eine einzige Temperatur, die Körner selbst ändern sich nicht. Je größer ein Massenstrom, desto mehr Körner. Die Regler unten ändern das Bild.</figcaption>
+    </figure>
+
+    <h3>Mischtemperatur aus der Energiebilanz</h3>
+    <div class="prose">
+      <p>Die Mischtemperatur ist die Temperatur, bei der die Enthalpie der Mischung gleich der Summe der zugeführten Enthalpien ist. Bei konstanter Wärmekapazität <span class="math"><i>c</i><sub>p</sub></span> ist das ein Mittel, gewichtet mit Massenstrom mal Wärmekapazität:</p>
+    </div>
+    <div class="formula"><i>T</i> = Σ <i>ṁ</i><sub><i>i</i></sub> <i>c</i><sub>p,<i>i</i></sub> <i>T</i><sub><i>i</i></sub> / Σ <i>ṁ</i><sub><i>i</i></sub> <i>c</i><sub>p,<i>i</i></sub>, &nbsp; <i>p</i> = min <i>p</i><sub><i>i</i></sub></div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctlgroup">
+          <span class="lab">Zulauf 1</span>
+          <div class="ctl"><span class="lab">Stoff</span>
+            <div class="seg" role="group" aria-label="Stoff in Zulauf 1"><button type="button" id="mMatSand" aria-pressed="true">Sand</button><button type="button" id="mMatUrea" aria-pressed="false">Harnstoff</button></div></div>
+          <div class="ctl"><label for="mM1">Massenstrom <span class="val" id="mM1Val"></span></label><input id="mM1" type="range" min="0" max="20" step="0.5" value="5"></div>
+          <div class="ctl"><label for="mT1">Temperatur <span class="val" id="mT1Val"></span></label><input id="mT1" type="range" min="-20" max="150" step="1" value="80"></div>
+          <div class="ctl"><label for="mP1">Druck <span class="val" id="mP1Val"></span></label><input id="mP1" type="range" min="0.8" max="2" step="0.05" value="1.2"></div>
+        </div>
+        <div class="ctlgroup">
+          <span class="lab">Zulauf 2 · Sand</span>
+          <div class="ctl"><label for="mM2">Massenstrom <span class="val" id="mM2Val"></span></label><input id="mM2" type="range" min="0" max="20" step="0.5" value="10"></div>
+          <div class="ctl"><label for="mT2">Temperatur <span class="val" id="mT2Val"></span></label><input id="mT2" type="range" min="-20" max="150" step="1" value="20"></div>
+          <div class="ctl"><label for="mP2">Druck <span class="val" id="mP2Val"></span></label><input id="mP2" type="range" min="0.8" max="2" step="0.05" value="1"></div>
+        </div>
+      </div>
+      <div>
+        <svg id="mixPlot" class="fig-svg" role="img" aria-label="Mischtemperatur über dem Massenanteil von Zulauf 1 für Sand mit Sand und Harnstoff mit Sand"></svg>
+        <div class="tablebox">
+          <table class="data" id="mixTable">
+            <thead><tr><th>Ausgang</th><th class="num">Wert</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Bei gleichem Stoff kürzt sich die Wärmekapazität heraus, und die Mischtemperatur ist das Mittel nach der Masse: Sand mit 80 °C und Sand mit 20 °C im Verhältnis 5 : 10 ergeben 40,0 °C. Harnstoff hat mit 1544,7 J/(kg K) fast die doppelte Wärmekapazität von Sand (830 J/(kg K)). Warmer Harnstoff bringt deshalb mehr Wärme mit und hebt dieselbe Mischung auf 48,9 °C; die Kurve liegt über der Geraden.</p>
+      <p>StoSiS speichert <span class="math"><i>c</i><sub>p</sub>(<i>T</i>)</span> je Stoff, integriert daraus die Enthalpie und löst die Bilanz mit dem Newton-Verfahren (Kapitel 6). Die Seite rechnet mit konstanter Wärmekapazität, wie der Prüffall im Handbuch. Führt ein Zulauf keine Masse, zählen seine Temperatur und sein Druck nicht mit.</p>
+    </div>
+
+    <h3>Im Partikelmodus</h3>
+    <div class="figrow">
+      <div class="prose">
+        <p>Im Partikelmodus hängt der Merger die Karten aller Eingänge aneinander. Keine Karte wird verändert, geteilt oder zusammengelegt. Der Ausgang hat so viele Karten wie alle Eingänge zusammen.</p>
+        <p>Zusammengelegt wird erst an den Grenzen je Stromscheibe (Kapitel 9.5), wenn ein Strom mehr Karten trägt als vorgesehen. Temperatur und Druck gehören zum Strom, nicht zur Karte; sie kommen aus derselben Energiebilanz wie im Kontinuum.</p>
+      </div>
+      <svg class="fig-svg" viewBox="0 0 410 80" role="img" aria-label="Drei Karten aus Zulauf 1 und zwei aus Zulauf 2 werden im Ausgang aneinandergehängt" style="max-width:460px; align-self:center">
+        <text x="0" y="22" class="lbl-hot">Zulauf 1</text>
+        <rect x="0" y="34" width="26" height="38" rx="3" class="card-a"/>
+        <rect x="32" y="34" width="26" height="38" rx="3" class="card-a"/>
+        <rect x="64" y="34" width="26" height="38" rx="3" class="card-a"/>
+        <text x="104" y="59" class="lbl">+</text>
+        <text x="124" y="22" class="lbl-cold">Zulauf 2</text>
+        <rect x="124" y="34" width="26" height="38" rx="3" class="card-b"/>
+        <rect x="156" y="34" width="26" height="38" rx="3" class="card-b"/>
+        <path d="M196 53 L238 53" class="s-ink f-none" marker-end="url(#ah-ink)"/>
+        <text x="252" y="22" class="lbl">Ausgang</text>
+        <rect x="252" y="34" width="26" height="38" rx="3" class="card-a app" style="animation-delay: 0s"/>
+        <rect x="284" y="34" width="26" height="38" rx="3" class="card-a app" style="animation-delay: .3s"/>
+        <rect x="316" y="34" width="26" height="38" rx="3" class="card-a app" style="animation-delay: .6s"/>
+        <rect x="348" y="34" width="26" height="38" rx="3" class="card-b app" style="animation-delay: .9s"/>
+        <rect x="380" y="34" width="26" height="38" rx="3" class="card-b app" style="animation-delay: 1.2s"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="splitter">
+  <div class="wrap">
+    <p class="eyebrow">Methodenhandbuch 7.2 · ein Zulauf, zwei oder drei Ausgänge</p>
+    <h2>Splitter</h2>
+    <div class="prose">
+      <p>Der Splitter teilt einen Strom als reiner Mengenteiler. Der Anteil eines Ausgangs gilt für alle Stoffe und Größen gleich, deshalb hat jeder Ausgang dieselbe Größenverteilung wie der Zulauf, nur weniger. Der letzte Ausgang erhält den Rest.</p>
+    </div>
+    <figure>
+      <canvas id="splitCanvas" class="anim" width="800" height="360" style="aspect-ratio: 800 / 360" role="img" aria-label="Körner laufen in den Splitter und werden auf drei Ausgänge verteilt; rechts die gezählten Größenverteilungen je Ausgang"></canvas>
+      <div class="animbar"><button id="splitPlay" type="button">Anhalten</button><span class="hint" id="splitCount" aria-live="off"></span></div>
+      <figcaption>Splitter mit drei Ausgängen. Links die Größenverteilung des Zulaufs, rechts je Ausgang die gezählten Körner nach Größe (Balken) und der Zulauf mal dem gezählten Anteil (Linie). Die Körner verteilt das Konto-Verfahren wie im Partikelmodus. Die Anteile stellen die Regler unten ein.</figcaption>
+    </figure>
+
+    <h3>Fest oder schwankend</h3>
+    <div class="prose">
+      <p>Die Anteile sind fest oder schwanken zeitlich korreliert um einen Mittelwert. Im schwankenden Modus folgt der Anteil <span class="math"><i>g</i></span> jedes Ausgangs außer dem letzten einem Ornstein-Uhlenbeck-Prozess mit Mittelwert μ, Streuung σ und Korrelationszeit τ:</p>
+    </div>
+    <div class="formula">d<i>g</i> = −(<i>g</i> − μ)/τ · d<i>t</i> + σ √(2/τ) d<i>W</i></div>
+    <div class="prose">
+      <p>StoSiS schreibt ihn exakt fort (Gillespie 1996), sodass Mittelwert, Streuung und Zeitverhalten nicht vom Zeitschritt abhängen:</p>
+    </div>
+    <div class="formula"><i>g</i><sub><i>k</i>+1</sub> = μ + (<i>g</i><sub><i>k</i></sub> − μ) <i>a</i> + σ √(1 − <i>a</i>²) ξ, &nbsp; <i>a</i> = e<sup>−Δ<i>t</i>/τ</sup>, &nbsp; ξ ~ N(0, 1)</div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><span class="lab">Anteile</span>
+          <div class="seg" role="group" aria-label="Anteile"><button type="button" id="spFix" aria-pressed="false">fest</button><button type="button" id="spOU" aria-pressed="true">schwankend</button></div></div>
+        <div class="ctl"><label for="spMu1">Ausgang 1: μ₁ <span class="val" id="spMu1Val"></span></label><input id="spMu1" type="range" min="0" max="1" step="0.01" value="0.5"></div>
+        <div class="ctl"><label for="spMu2">Ausgang 2: μ₂ <span class="val" id="spMu2Val"></span></label><input id="spMu2" type="range" min="0" max="1" step="0.01" value="0.3"></div>
+        <div class="ctl"><label for="spSig">Streuung σ <span class="val" id="spSigVal"></span></label><input id="spSig" type="range" min="0" max="0.2" step="0.005" value="0.05"></div>
+        <div class="ctl"><label for="spTau">Korrelationszeit τ <span class="val" id="spTauVal"></span></label><input id="spTau" type="range" min="0.2" max="10" step="0.1" value="2"></div>
+        <div class="ctl"><label for="spDt">Zeitschritt Δt</label>
+          <select id="spDt"><option value="0.1" selected>0,1 s</option><option value="0.5">0,5 s</option><option value="1">1 s</option><option value="2">2 s</option></select></div>
+        <p class="hint" id="spWarn" aria-live="polite"></p>
+      </div>
+      <div>
+        <svg id="ouPlot" class="fig-svg" role="img" aria-label="Anteile der drei Ausgänge über die letzten 40 Sekunden"></svg>
+        <div class="tablebox" id="ouStatsBox">
+          <table class="data" id="ouStats">
+            <thead><tr><th>Ausgang 1, über 40 000 Schritte</th><th class="num">Soll</th><th class="num">exakt</th><th class="num">Euler</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Oben die Anteile der letzten 40 s, Ausgang 1 mit den Bändern μ ± σ und μ ± 2σ. Im Mittel liegt der Anteil zwei Drittel der Zeit im inneren Band. Die Tabelle schreibt denselben Prozess mit denselben Zufallszahlen einmal exakt und einmal mit dem Euler-Verfahren fort. Exakt bleiben Mittel, Streuung und Autokorrelation bei jedem Zeitschritt richtig. Euler streut zu stark, bei Δ<i>t</i> = 1 s und τ = 2 s um 15 %, weil seine Varianz <span class="math">σ² / (1 − Δ<i>t</i>/(2τ))</span> ist.</p>
+      <p>Anteile außerhalb von [0, 1] schneidet StoSiS ab; übersteigt die Summe der schwankenden Anteile 1, werden sie anteilig gekürzt. Die Masse bleibt in jedem Schritt exakt erhalten. Der Zufallsprozess läuft auch ohne Zulauf weiter, sodass die Folge nur vom Seed abhängt.</p>
+    </div>
+
+    <h3>Im Partikelmodus</h3>
+    <div class="prose">
+      <p>Karten verteilt das Konto-Verfahren (Kapitel 9.4), wie oben in der Animation. Jeder Ausgang hat ein Konto. Jede Karte zahlt <span class="math"><i>g</i><sub><i>i</i></sub> · <i>s</i></span> auf das Konto jedes Ausgangs ein und geht ganz dorthin, wo am meisten steht; dieses Konto wird um <span class="math"><i>s</i></span> belastet. Bei 0,5 / 0,3 / 0,2 gehen von zehn Karten genau fünf, drei und zwei in die drei Ausgänge, über alle Größen verteilt.</p>
+      <p>Das Konto-Verfahren setzt den Anteil nur um und fügt selbst keine Schwankung hinzu. Der Verlauf von <span class="math"><i>g</i></span> ist bei gleichem Seed im Kontinuum und im Partikelmodus derselbe. Nach Größe trennt das Sieb, nach Stoff der Stofftrenner, nach Größe und Dichte der Sichter.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="behaelter">
+  <div class="wrap">
+    <p class="eyebrow">Methodenhandbuch 7.4 · Hold-up mit Verweilzeitverteilung</p>
+    <h2>Behälter</h2>
+    <div class="prose">
+      <p>Der Behälter hält Material zurück, etwa ein Rührkessel, eine Wirbelschicht, ein Rohr oder ein Silo. Der Ablauf folgt einer festen mittleren Verweilzeit τ, wie bei der Durchströmung mit τ = <i>V</i>/<i>Q</i>. Welches Material geht, bestimmt die Mischung. Alle vier Mischungen haben dieselbe mittlere Verweilzeit.</p>
+    </div>
+    <figure>
+      <canvas id="vesselCanvas" class="anim" width="800" height="300" style="aspect-ratio: 800 / 300" role="img" aria-label="Vier Behälter mit gleichem Zulauf: durchmischt, Pfropfenströmung, Kaskade, Kernfluss; die Farbe der Körner zeigt ihr Alter"></canvas>
+      <div class="animbar">
+        <button id="vesselPlay" type="button">Anhalten</button>
+        <button id="vesselPulse" type="button">Markierte Körner zugeben</button>
+        <div class="seg" role="group" aria-label="Tempo"><button type="button" id="vSpeed1" aria-pressed="true">1×</button><button type="button" id="vSpeed4" aria-pressed="false">4×</button></div>
+        <span class="agelegend"><span>Alter</span><span class="agebar" aria-hidden="true"></span><span>neu → 2τ und älter</span></span>
+      </div>
+      <figcaption>Vier Behälter bekommen denselben Zulauf, ein Korn je Zeitschritt Δ<i>t</i> = 0,02 τ. Die Farbe zeigt das Alter. Im durchmischten Kessel liegt jedes Alter überall, im Rohr bleibt die Reihenfolge erhalten, in der Kaskade wird das Material von Kessel zu Kessel älter, im Silo läuft der Kern schnell durch, während der Rand lange liegen bleibt. Markierte Körner (Ring) zeigen, wie ein kurzer Puls auseinanderläuft. Oben steht, wie viele Körner im Behälter liegen: im Mittel rund τ/Δ<i>t</i> = 50, in allen vier gleich (Little 1961).</figcaption>
+    </figure>
+
+    <h3>Wer geht als Nächstes</h3>
+    <div class="tablebox">
+      <table class="overview">
+        <thead><tr><th>Mischung</th><th>Wer geht</th><th>Verweilzeitverteilung</th><th>Beispiele</th></tr></thead>
+        <tbody>
+          <tr><td>ideal durchmischt</td><td>jedes Material mit derselben Wahrscheinlichkeit, unabhängig vom Alter</td><td>exponentiell</td><td>Rührkessel, Wirbelschicht</td></tr>
+          <tr><td>Pfropfenströmung</td><td>das älteste zuerst</td><td>alles genau τ</td><td>Rohr, Förderband</td></tr>
+          <tr><td>Kaskade aus <i>n</i> Kesseln</td><td>Kessel für Kessel, je τ/<i>n</i></td><td>Erlang (Gamma)</td><td>Behälter in Reihe</td></tr>
+          <tr><td>Kernfluss</td><td>der Anteil φ als Pfropfen in κτ durch den Kern, der Rest durchmischt durch die Randzone</td><td>früher Durchbruch, langer Ausläufer</td><td>Silo mit Totzonen</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="prose" style="margin-top:18px">
+      <p>Die Randzone hat <span class="math">τ<sub>R</sub> = (1 − φκ) τ / (1 − φ)</span>, damit das Mittel τ bleibt. Mit der Summenkurve <span class="math"><i>S</i>(<i>t</i>)</span>, dem Anteil, der nach der Zeit <i>t</i> noch im Behälter ist, ist die Wahrscheinlichkeit, im nächsten Schritt zu gehen:</p>
+    </div>
+    <div class="formula"><i>p</i>(<i>t</i>) = 1 − <i>S</i>(<i>t</i> + Δ<i>t</i>) / <i>S</i>(<i>t</i>)</div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><span class="lab">Kurven für</span>
+          <div class="radios" id="vKinds"></div></div>
+        <div class="ctl"><label for="vN">Kessel in der Kaskade <span class="val" id="vNVal"></span></label><input id="vN" type="range" min="2" max="6" step="1" value="3"></div>
+        <div class="ctl"><label for="vPhi">Kernfluss: Anteil im Kern φ <span class="val" id="vPhiVal"></span></label><input id="vPhi" type="range" min="0" max="0.9" step="0.05" value="0.6"></div>
+        <div class="ctl"><label for="vKappa">Kernfluss: Zeit im Kern κ <span class="val" id="vKappaVal"></span></label><input id="vKappa" type="range" min="0.1" max="0.9" step="0.05" value="0.3"></div>
+        <p class="hint" id="vInfo" aria-live="polite"></p>
+      </div>
+      <div>
+        <svg id="ePlot" class="fig-svg" role="img" aria-label="Verweilzeitverteilung E(t) der vier Mischungen mit gezählten Balken für die gewählte"></svg>
+        <svg id="pPlot" class="fig-svg" role="img" aria-label="Wahrscheinlichkeit, im nächsten Schritt auszutreten, über dem Alter" style="margin-top:6px"></svg>
+        <div class="tablebox">
+          <table class="data" id="vTable">
+            <thead><tr><th>Mischung</th><th class="num">Körner gezählt</th><th class="num">mittlere Verweilzeit</th><th>Austritt im nächsten Schritt</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Oben die Verweilzeitverteilung <span class="math"><i>E</i>(<i>t</i>)</span> aller vier Mischungen (Linien) und die gezählten Austritte der gewählten (Balken). Pfropfenströmung und Kern geben Spitzen, die als Pfeile stehen. Unten die Wahrscheinlichkeit, im nächsten Schritt auszutreten: Punkte gezählt, Linie nach der Formel. Gezählt wird ab dem Laden der Seite, mit einem schnellen Vorlauf ohne Bild. In der Animation tritt jedes Korn zu Beginn eines Schritts ein, deshalb liegen die gezählten Mittel bis zu Δ<i>t</i>/2 = 0,01 τ über τ. StoSiS rechnet den Zulauf innerhalb des Schritts mit dem Anteil <span class="math"><i>b</i></span> und trifft τ exakt.</p>
+      <p>Nur im ideal durchmischten Behälter hängt diese Wahrscheinlichkeit nicht vom Alter ab, 1,98 % in jedem Alter. Nur er und die einzelnen Kessel der Kaskade brauchen deshalb kein Gedächtnis. Im Rohr muss sich eine Karte ihr Alter merken, im Silo ihre Zone. Beim Kernfluss springt sie bei 0,3 τ auf 64 % und liegt danach bei 0,97 %.</p>
+    </div>
+
+    <h3>Im Partikelmodus</h3>
+    <div class="prose">
+      <p>Im Partikelmodus gehen ganze Karten. Welche, entscheidet das Konto-Verfahren mit den Konten „geht“ und „bleibt“ (Kapitel 9.4): Jede Karte zahlt <span class="math"><i>a</i> = 1 − e<sup>−Δ<i>t</i>/τ</sup></span> beziehungsweise <span class="math">1 − <i>a</i></span> ein, und das gewählte Konto wird um eine ganze Karte belastet. So hat jede Karte unabhängig von Gewicht und Alter dieselbe Austrittswahrscheinlichkeit. Die Animation lost jedes Korn einzeln aus; die Wahrscheinlichkeiten sind dieselben, das Konto-Verfahren spart nur die Streuung des Würfelns.</p>
+      <p>Eine Karte merkt sich nur, wo sie liegt: im Inhalt, in einem Kessel oder im Schritt, in dem sie austritt. Im Dauerbetrieb liegen <span class="math"><i>N</i> τ/Δ<i>t</i></span> Karten im Behälter, bei <span class="math"><i>N</i></span> Karten je Schritt. Der Vorrat fasst (τ/Δ<i>t</i> + 2) Zulaufschritte mit je höchstens 2<i>N</i> Karten, ein Kessel mit τ = 641 s bei Δ<i>t</i> = 0,5 s und 2000 Karten je Schritt also rund 5,1 Millionen.</p>
+      <p>Grenzen: Die Verweilzeit ist fest. Ein geregelter Füllstand, ein vorgegebener Austrag und ein größenabhängiger Austrag sind nicht enthalten. Als Ergebnis erscheint nur der Ablauf, nicht der Inhalt.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="gemeinsam">
+  <div class="wrap">
+    <p class="eyebrow">Alle drei Trenner</p>
+    <h2>Ein Anteil für Ausgang 1</h2>
+    <figure>
+      <svg class="fig-svg" viewBox="0 0 640 170" role="img" aria-label="Zulauf geht in den Trenner, Anteil T in Ausgang 1, Rest in Ausgang 2" style="max-width:640px">
+        <path d="M20 85 L196 85" class="s-ink f-none" marker-end="url(#ah-ink)"/>
+        <text x="24" y="72" class="lbl">Zulauf</text>
+        <text x="24" y="108" class="lbl-m">je Stoff und Größe</text>
+        <rect x="200" y="48" width="130" height="74" rx="3" class="s-ink f-panel"/>
+        <text x="265" y="80" text-anchor="middle" class="lbl-s">Trenner</text>
+        <text x="265" y="106" text-anchor="middle" class="lbl-math">T</text>
+        <path d="M330 68 L380 36 L600 36" class="s-out1 f-none" marker-end="url(#ah-out1)"/>
+        <path d="M330 102 L380 134 L600 134" class="s-out2 f-none" marker-end="url(#ah-out2)"/>
+        <text x="392" y="26" class="lbl-o1">Ausgang 1:  T · Zulauf</text>
+        <text x="392" y="158" class="lbl-o2">Ausgang 2:  (1 − T) · Zulauf</text>
+      </svg>
+    </figure>
+    <div class="tablebox">
+      <table class="overview">
+        <thead><tr><th>Unit</th><th><i>T</i> hängt ab von</th><th>Ausgang 1</th><th>Ausgang 2</th><th>Beispiele</th></tr></thead>
+        <tbody>
+          <tr><td>Sieb</td><td>Korngröße <span class="math"><i>d</i></span></td><td>Grobgut</td><td>Feingut</td><td>Schwingsieb, Mehrdecksieb</td></tr>
+          <tr><td>Stofftrenner</td><td>Stoff <span class="math"><i>k</i></span></td><td>abgetrennt</td><td>Rest</td><td>Überbandmagnet, Klaubung von Hand</td></tr>
+          <tr><td>Sichter</td><td>Sinkgeschwindigkeit <span class="math"><i>w</i><sub>s</sub>(<i>d</i>, ρ)</span></td><td>Schwergut</td><td>Leichtgut</td><td>Windsichter, Absetzbecken</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="prose" style="margin-top:18px">
+      <p>Im Kontinuum geht an jeder Stützstelle des Größenrasters und für jeden Stoff <span class="math"><i>T</i> · Zulauf</span> in Ausgang 1, der Rest in Ausgang 2. Die Masse bleibt exakt erhalten. Keiner der drei hält Material zurück, Temperatur und Druck gehen unverändert in beide Ausgänge.</p>
+      <p>Im Code teilen sich die drei eine Basis, <span class="mono">TwoWaySeparator.h</span>. Sie enthält das Kontinuum und das Konto-Verfahren für die Karten; jede Unit liefert nur ihr <span class="math"><i>T</i></span>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="sieb">
+  <div class="wrap">
+    <p class="eyebrow">Methodenhandbuch 7.5 · Ausgang 1 Grobgut, Ausgang 2 Feingut</p>
+    <h2>Sieb</h2>
+    <div class="prose">
+      <p>Das Sieb trennt nach der Korngröße <span class="math"><i>d</i></span>. Der Trenngrad <span class="math"><i>T</i>(<i>d</i>)</span> ist der Massenanteil der Körner der Größe <span class="math"><i>d</i></span>, der ins Grobgut geht. Er gilt für alle Stoffe gleich und ändert sich nicht mit der Zeit oder der Beladung.</p>
+    </div>
+
+    <h3>Warum die Trennkurve ein S ist</h3>
+    <div class="prose">
+      <p>Auf einem Schwingsieb hüpfen die Körner über das schräge Siebdeck. Bei jedem Aufprall auf eine Masche der Weite <span class="math"><i>w</i></span> fällt ein Korn mit <span class="math"><i>d</i> &lt; <i>w</i></span> mit der Wahrscheinlichkeit <span class="math"><i>p</i> = (1 − <i>d</i>/<i>w</i>)²</span> hindurch (nach Gaudin, ohne Drahtdicke). Nach <span class="math"><i>n</i></span> Maschen liegt es mit <span class="math">(1 − <i>p</i>)<sup><i>n</i></sup></span> noch auf dem Deck und geht ins Grobgut.</p>
+    </div>
+    <figure>
+      <div class="figrow sim">
+        <div>
+          <canvas id="siebCanvas" width="800" height="360" role="img" aria-label="Schwingsieb mit hüpfenden Körnern: grobe Körner laufen über das Deck ins Grobgut, feine fallen durch die Maschen ins Feingut"></canvas>
+          <div class="btnrow" style="margin-top:12px; align-items:center">
+            <button id="siebPlay" type="button">Anhalten</button>
+            <div class="ctl" style="flex:1; min-width:200px">
+              <label for="siebN">Maschen auf dem Deck <span class="val" id="siebNVal">12</span></label>
+              <input id="siebN" type="range" min="3" max="20" step="1" value="12">
+            </div>
+          </div>
+        </div>
+        <svg id="siebSimPlot" class="fig-svg" role="img" aria-label="Anteil ins Grobgut über d durch w, gezählt und erwartet"></svg>
+      </div>
+      <figcaption>Gedankenmodell eines Schwingsiebs. Grobe Körner (<span class="math"><i>d</i> ≥ <i>w</i></span>) kommen nie durch, sehr feine fast sofort. Körner knapp unter der Maschenweite brauchen viele Versuche, und manche erreichen das Ende des Decks, bevor es klappt. Rechts der Anteil ins Grobgut je Größenklasse: Punkte gezählt (Fläche nach Anzahl), Linie erwartet. Ein längeres Deck gibt mehr Versuche, die Kurve wird steiler und rückt nach rechts. StoSiS rechnet diese Bewegung nicht nach; das Sieb bekommt die Trennkurve als Formel vorgegeben, wie in Dyssol.</figcaption>
+    </figure>
+
+    <h3>Drei Formeln für T(d)</h3>
+    <div class="prose">
+      <p>Alle drei Kurven schreiben <span class="math"><i>T</i></span> über dem Verhältnis <span class="math"><i>x</i> = <i>d</i> / <i>x</i><sub>cut</sub></span>. Die Trenngröße <span class="math"><i>x</i><sub>cut</sub></span> verschiebt die Kurve nur auf der Größenachse. Ihre Form legen die Trennschärfe <span class="math">α</span> und bei Teipel-Hennig zusätzlich <span class="math">β</span> und der Offset <span class="math"><i>o</i></span> fest.</p>
+    </div>
+    <div class="models">
+      <div class="model" style="--c: var(--m1)">
+        <h4>Plitt (1971)</h4>
+        <div class="formula"><i>T</i> = 1 − exp(−0,693 <i>x</i><sup>α</sup>)</div>
+        <p>0,693 ist ln 2 auf drei Stellen, deshalb liegt <span class="math"><i>T</i>(<i>x</i><sub>cut</sub>)</span> bei 0,49993, knapp unter 0,5. Die Form ist die einer RRSB-Verteilung: Zur feinen Seite läuft die Kurve lang aus, zur groben erreicht sie 1 schnell. Ein Parameter für die Steilheit.</p>
+      </div>
+      <div class="model" style="--c: var(--m2)">
+        <h4>Molerus-Hoffmann (1969)</h4>
+        <div class="formula"><i>T</i> = 1 / (1 + <i>x</i><sup>−2</sup> exp(α (1 − <i>x</i>²)))</div>
+        <p>Entstanden aus einem stochastischen Modell für Windsichter: Die Turbulenz streut die Körner, und <span class="math">α</span> beschreibt, wie stark die gerichtete Bewegung gegenüber dieser Streuung überwiegt. <span class="math"><i>T</i>(<i>x</i><sub>cut</sub>) = 0,5</span> genau.</p>
+      </div>
+      <div class="model" style="--c: var(--m3)">
+        <h4>Teipel-Hennig (2016)</h4>
+        <div class="formula"><i>T</i> = (1 − (1 + 3 <i>x</i><sup>(<i>x</i> + α) β</sup>)<sup>−½</sup>) (1 − <i>o</i>) + <i>o</i></div>
+        <p>Zwei Formparameter und ein Offset <span class="math"><i>o</i></span>: der Anteil, der unabhängig von der Größe ins Grobgut gelangt, etwa Feingut, das an groben Körnern haftet. Ohne Offset ist <span class="math"><i>T</i>(<i>x</i><sub>cut</sub>) = 0,5</span>, mit Offset <span class="math">0,5 (1 − <i>o</i>) + <i>o</i></span>.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="sxcut">Trenngröße x<sub>cut</sub> <span class="val" id="sxcutVal"></span></label><input id="sxcut" type="range" min="-4.7" max="-2.3" step="0.01" value="-3.699"></div>
+        <div class="ctl"><label for="salpha">Trennschärfe α <span class="val" id="salphaVal"></span></label><input id="salpha" type="range" min="0.5" max="20" step="0.1" value="4"></div>
+        <div class="ctl"><label for="sbeta">β (Teipel-Hennig) <span class="val" id="sbetaVal"></span></label><input id="sbeta" type="range" min="0.1" max="2" step="0.05" value="0.5"></div>
+        <div class="ctl"><label for="soff">Offset o (Teipel-Hennig) <span class="val" id="soffVal"></span></label><input id="soff" type="range" min="0" max="0.4" step="0.01" value="0"></div>
+        <div class="checks" id="smodels">
+          <label><input type="checkbox" value="plitt" checked> <span class="swatch" style="--c: var(--m1)"></span> Plitt</label>
+          <label><input type="checkbox" value="mh" checked> <span class="swatch" style="--c: var(--m2)"></span> Molerus-Hoffmann</label>
+          <label><input type="checkbox" value="th" checked> <span class="swatch" style="--c: var(--m3)"></span> Teipel-Hennig</label>
+        </div>
+      </div>
+      <div>
+        <svg id="siebPlot" class="fig-svg" role="img" aria-label="Trennkurven T(d) der drei Modelle"></svg>
+        <div class="tablebox">
+          <table class="data" id="siebTable">
+            <thead><tr><th>Modell</th><th class="num">T(x<sub>cut</sub>)</th><th class="num">d<sub>25</sub></th><th class="num">d<sub>75</sub></th><th class="num">κ = d<sub>25</sub>/d<sub>75</sub></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Wie scharf ein Sieb trennt, beschreibt die Trennschärfe <span class="math">κ = <i>d</i><sub>25</sub>/<i>d</i><sub>75</sub></span>: die Größe, bei der ein Viertel ins Grobgut geht, geteilt durch die Größe mit drei Vierteln. Eine ideale Stufe hätte κ = 1. Bei gleichem <span class="math">α</span> sind die drei Modelle verschieden steil; vergleichen lassen sie sich über κ, nicht über α.</p>
+      <p>Ein Mehrdecksieb sind mehrere Siebe hintereinander. Das Feingut des oberen Decks ist der Zulauf des nächsten, für das Produktsieb 20 / 10 / 5 mm der Case Study also drei Siebe.</p>
+    </div>
+
+    <h3>Im Partikelmodus: das Konto-Verfahren</h3>
+    <div class="prose">
+      <p>Im Partikelmodus besteht ein Strom aus Karten. Eine Karte zu teilen hieße, sie zu kopieren; deshalb geht jede ganz in einen Ausgang. Damit trotzdem der Anteil <span class="math"><i>T</i></span> ins Grobgut kommt, führt das Sieb je Stoff und Größenbereich (Faktor 2) eine Art Spardose.</p>
+      <p>Jede Karte zahlt <span class="math"><i>T</i> · <i>s</i></span> ein, <span class="math"><i>s</i></span> ist ihr Anteil an der Kartendichte. Liegt danach mindestens <span class="math"><i>s</i>/2</span> darin, geht die Karte ins Grobgut und nimmt <span class="math"><i>s</i></span> heraus. Sonst geht sie ins Feingut. Bei <span class="math"><i>T</i> = 0,3</span> geht so etwa jede dritte Karte ins Grobgut, ohne zu würfeln. Zufällig ist nur, bei welcher Karte der Gang durch den Ring beginnt. Der Kontostand wird in den nächsten Zeitschritt mitgenommen und bleibt zwischen <span class="math">−<i>s</i>/2</span> und <span class="math">+<i>s</i>/2</span>.</p>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="kT">Trenngrad T im Bereich <span class="val" id="kTVal"></span></label><input id="kT" type="range" min="0.05" max="0.95" step="0.01" value="0.3"></div>
+        <div class="btnrow"><button id="kNext" type="button">Nächster Zeitschritt</button></div>
+        <p class="hint" id="kSummary" aria-live="polite"></p>
+        <p class="hint">Hier tragen alle zwölf Karten denselben Anteil <span class="math"><i>s</i> = 1</span>. In StoSiS hat jede Karte ihren eigenen Anteil an der Kartendichte, und <span class="math"><i>T</i></span> ändert sich mit ihrer Größe leicht.</p>
+      </div>
+      <svg id="kontoPlot" class="fig-svg" role="img" aria-label="Kontostand nach jeder Karte und Ziel jeder Karte"></svg>
+    </div>
+    <div class="prose">
+      <p>Warum je Größenbereich eine eigene Spardose? Mit einer einzigen könnte das Guthaben grober Karten (<span class="math"><i>T</i></span> nahe 1) eine feine Karte mit <span class="math"><i>T</i> = 0,01</span> ins Grobgut schieben. Je Bereich bleibt jedes Guthaben dort, wo es entstanden ist. Karten mit <span class="math"><i>T</i></span> genau 0 oder 1 berühren kein Konto.</p>
+      <p>Grenzen: Die Trennkurve hängt nicht vom Durchsatz, von der Beladung oder der Feuchte ab. Nach Dichte oder Stoff trennt das Sieb nicht.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="stofftrenner">
+  <div class="wrap">
+    <p class="eyebrow">Methodenhandbuch 7.6 · Ausgang 1 abgetrennt, Ausgang 2 Rest</p>
+    <h2>Stofftrenner</h2>
+    <div class="prose">
+      <p>Der Stofftrenner gibt von jedem Stoff <span class="math"><i>k</i></span> einen festen Anteil <span class="math"><i>f</i><sub><i>k</i></sub></span> in Ausgang 1, unabhängig von der Größe. Das passt zu einem Überbandmagneten, der Eisenschrott aus Brechgut holt, oder zu einer Sortierung von Hand.</p>
+    </div>
+    <figure>
+      <svg class="fig-svg" viewBox="0 0 760 318" role="img" aria-label="Überbandmagnet über einem Förderband hebt Eisenteile heraus">
+        <!-- magnet -->
+        <text x="405" y="30" text-anchor="middle" class="lbl">Überbandmagnet</text>
+        <path d="M375 46 L440 46" class="s-muted f-none" marker-end="url(#ah-muted)"/>
+        <rect x="300" y="56" width="210" height="70" rx="35" class="s-ink f-none"/>
+        <circle cx="335" cy="91" r="23" class="s-ink f-paper"/>
+        <circle cx="475" cy="91" r="23" class="s-ink f-paper"/>
+        <rect x="362" y="73" width="86" height="36" rx="2" class="f-ink"/>
+        <text x="405" y="96" text-anchor="middle" class="lbl-inv">Magnet</text>
+        <rect x="352" y="127" width="28" height="7" rx="1.5" class="f-iron"/>
+        <rect x="414" y="127" width="20" height="7" rx="1.5" class="f-iron"/>
+        <!-- iron lifting -->
+        <rect x="372" y="160" width="26" height="7" rx="1.5" class="f-iron" transform="rotate(-14 385 163)"/>
+        <path d="M402 186 L402 146" class="s-iron f-none dash" marker-end="url(#ah-iron)"/>
+        <text x="410" y="170" class="lbl-m">Magnetkraft</text>
+        <!-- iron discharge -->
+        <path d="M498 128 Q584 112 664 146" class="s-iron f-none dash" marker-end="url(#ah-iron)"/>
+        <rect x="572" y="112" width="22" height="7" rx="1.5" class="f-iron" transform="rotate(18 583 115)"/>
+        <path d="M640 124 L640 174 L740 174 L740 124" class="s-out1 f-none"/>
+        <rect x="660" y="160" width="22" height="7" rx="1.5" class="f-iron"/>
+        <rect x="690" y="158" width="26" height="8" rx="1.5" class="f-iron" transform="rotate(-8 703 162)"/>
+        <text x="690" y="194" text-anchor="middle" class="lbl-o1">Ausgang 1</text>
+        <text x="690" y="210" text-anchor="middle" class="lbl-m">abgetrennt</text>
+        <!-- conveyor -->
+        <text x="40" y="150" class="lbl">Zulauf: Brechgut</text>
+        <path d="M60 158 L84 182" class="s-muted f-none" marker-end="url(#ah-muted)"/>
+        <rect x="40" y="198" width="580" height="24" rx="12" class="s-ink f-panel"/>
+        <circle cx="52" cy="210" r="8" class="s-ink f-paper"/>
+        <circle cx="608" cy="210" r="8" class="s-ink f-paper"/>
+        <path d="M250 244 L360 244" class="s-muted f-none" marker-end="url(#ah-muted)"/>
+        <text x="250" y="264" class="lbl-m">Förderband</text>
+        <!-- material on the belt -->
+        <polygon points="92,198 98,180 116,174 131,186 129,198" class="f-concrete"/>
+        <polygon points="148,198 150,184 176,182 178,198" class="f-brick"/>
+        <rect x="196" y="190" width="38" height="8" rx="1.5" class="f-iron"/>
+        <polygon points="248,198 255,176 279,171 292,186 288,198" class="f-concrete"/>
+        <rect x="306" y="188" width="32" height="10" rx="1" class="f-wood"/>
+        <polygon points="440,198 446,182 466,177 476,190 474,198" class="f-concrete"/>
+        <rect x="488" y="187" width="28" height="11" rx="1" class="f-wood"/>
+        <polygon points="530,198 532,184 556,183 557,198" class="f-brick"/>
+        <polygon points="566,198 571,183 590,180 600,192 598,198" class="f-concrete"/>
+        <!-- rest discharge -->
+        <path d="M620 202 Q660 202 680 244" class="s-muted f-none dash" marker-end="url(#ah-muted)"/>
+        <path d="M640 244 L640 292 L740 292 L740 244" class="s-out2 f-none"/>
+        <polygon points="652,292 657,276 675,272 684,284 682,292" class="f-concrete"/>
+        <polygon points="690,292 692,280 712,279 713,292" class="f-brick"/>
+        <rect x="716" y="282" width="20" height="10" rx="1" class="f-wood"/>
+        <text x="690" y="312" text-anchor="middle" class="lbl-o2">Ausgang 2 · Rest</text>
+      </svg>
+      <figcaption>Überbandmagnet über dem Förderband. Der Magnet hebt Eisenteile aus dem Brechgut und trägt sie mit seinem eigenen Band aus dem Gutstrom (Ausgang 1); Beton, Ziegel und Holz fahren weiter (Ausgang 2). Im Modell bleibt davon nur ein Anteil je Stoff.</figcaption>
+    </figure>
+
+    <h3>Ein Anteil je Stoff</h3>
+    <div class="prose">
+      <p>Für den Stofftrenner ist <span class="math"><i>T</i> = <i>f</i><sub><i>k</i></sub></span>. Stoffe ohne Eintrag haben <span class="math"><i>f</i> = 0</span> und gehen ganz in Ausgang 2. Weil <span class="math"><i>f</i></span> nicht von der Größe abhängt, hat jeder Stoff in beiden Ausgängen dieselbe Größenverteilung; geteilt wird nur die Menge.</p>
+    </div>
+    <div class="panel">
+      <div class="controls" id="stoffControls"></div>
+      <div>
+        <svg id="stoffBars" class="fig-svg" role="img" aria-label="Zusammensetzung von Zulauf, Ausgang 1 und Ausgang 2"></svg>
+        <div class="tablebox">
+          <table class="data" id="stoffTable">
+            <thead><tr><th>Stoff</th><th class="num">im Zulauf</th><th class="num">Ausbringen in Ausgang 1</th><th class="num">Gehalt in Ausgang 1</th><th class="num">Gehalt in Ausgang 2</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="hint" style="margin-top:8px">Zusammensetzung des Zulaufs angenommen, nach den Stoffgruppen von DIN 4226-101 (Rc Beton und Mörtel, Ru Naturstein, Rb Ziegel). Werte je 100 t Zulauf.</p>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Zwei Kennzahlen aus der Sortiertechnik helfen beim Lesen. Das Ausbringen eines Stoffs ist der Anteil, der im gewünschten Ausgang ankommt; beim Stofftrenner ist das genau <span class="math"><i>f</i><sub><i>k</i></sub></span>. Der Gehalt ist sein Anteil an allem, was in diesem Ausgang liegt, und hängt vom Zulauf ab. Schon 2 % des Betons im Ausgang 1 machen den Eisenschrott deutlich unrein, weil vierzigmal mehr Beton als Eisen kommt.</p>
+    </div>
+
+    <h3>Karten mit mehreren Stoffen</h3>
+    <div class="figrow">
+      <div class="prose">
+        <p>Im Partikelmodus verteilt wieder das Konto-Verfahren ganze Karten, mit <span class="math"><i>T</i> = <i>f</i><sub><i>k</i></sub></span> statt <span class="math"><i>T</i>(<i>d</i>)</span>.</p>
+        <p>Bisher trägt jede Karte genau einen Stoff. Erst eine Koagulation kann Karten mit mehreren Stoffen erzeugen, etwa Eisen, das in Beton steckt. So eine Karte geht als Ganzes, mit dem nach Masse gemittelten Anteil:</p>
+        <div class="formula"><i>T</i> = Σ <i>m</i><sub><i>k</i></sub> <i>f</i><sub><i>k</i></sub> / Σ <i>m</i><sub><i>k</i></sub></div>
+        <p>Im Test geht eine Karte aus 1 kg Eisen (<span class="math"><i>f</i> = 0,95</span>) und 1 kg Sand (<span class="math"><i>f</i> = 0</span>) in 475 von 1000 Schritten in Ausgang 1.</p>
+      </div>
+      <svg class="fig-svg" viewBox="0 0 380 200" role="img" aria-label="Karte mit Eisen und Sand, Anteil 0,475" style="max-width:420px">
+        <rect x="20" y="20" width="200" height="150" rx="6" class="s-ink f-panel"/>
+        <text x="36" y="48" class="lbl-s">Karte</text>
+        <text x="36" y="76" class="lbl-m">Größe</text><text x="204" y="76" text-anchor="end" class="lbl-s">120 µm</text>
+        <rect x="36" y="88" width="10" height="10" class="f-iron"/><text x="54" y="98" class="lbl-m">Eisen</text><text x="204" y="98" text-anchor="end" class="lbl-s">1 kg · f = 0,95</text>
+        <rect x="36" y="110" width="10" height="10" class="f-sand"/><text x="54" y="120" class="lbl-m">Sand</text><text x="204" y="120" text-anchor="end" class="lbl-s">1 kg · f = 0</text>
+        <line x1="36" y1="136" x2="204" y2="136" class="s-muted"/>
+        <text x="36" y="156" class="lbl-m">T</text><text x="204" y="156" text-anchor="end" class="lbl-s">(0,95 + 0) / 2 = 0,475</text>
+        <path d="M224 70 L300 40" class="s-out1 f-none" marker-end="url(#ah-out1)"/>
+        <path d="M224 120 L300 150" class="s-out2 f-none" marker-end="url(#ah-out2)"/>
+        <text x="306" y="44" class="lbl-o1">47,5 %</text>
+        <text x="306" y="60" class="lbl-m">der Schritte</text>
+        <text x="306" y="156" class="lbl-o2">52,5 %</text>
+      </svg>
+    </div>
+    <div class="prose">
+      <p>Grenzen: Ein echter Magnet erfasst feines Eisen schlechter als grobes, und Eisen, das in Beton steckt, nur zum Teil. Beides bildet der Stofftrenner nicht ab. Steht ein Stoff in der Liste, der im Flowsheet nicht vorkommt, gibt es einen Hinweis.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="sichter">
+  <div class="wrap">
+    <p class="eyebrow">Methodenhandbuch 7.7 · Ausgang 1 Schwergut, Ausgang 2 Leichtgut</p>
+    <h2>Sichter</h2>
+    <div class="prose">
+      <p>Der Sichter trennt nach der Sinkgeschwindigkeit <span class="math"><i>w</i><sub>s</sub></span> eines Korns in einem Fluid. Sie hängt von Größe und Dichte ab: Ein kleines schweres Korn kann so schnell sinken wie ein großes leichtes. Ausgang 1 bekommt das Schwergut, das absinkt, Ausgang 2 das Leichtgut, das das Fluid austrägt.</p>
+    </div>
+    <div class="figrow">
+      <figure>
+        <svg class="fig-svg" viewBox="0 0 340 344" role="img" aria-label="Windsichter: Steigrohr mit Luft nach oben">
+          <path d="M130 292 L130 30 L322 30" class="s-ink f-none"/>
+          <path d="M200 292 L200 70 L322 70" class="s-ink f-none"/>
+          <rect x="131" y="31" width="68" height="261" class="f-air"/>
+          <rect x="199" y="31" width="122" height="38" class="f-air"/>
+          <path d="M130 292 L152 318 M200 292 L178 318" class="s-ink f-none"/>
+          <!-- air -->
+          <path d="M150 284 L150 236 M165 284 L165 230 M180 284 L180 236" class="s-acc f-none" marker-end="url(#ah-acc)"/>
+          <text x="20" y="258" class="lbl-s">Luft, <tspan class="lbl-math">u</tspan></text>
+          <path d="M66 274 L126 274" class="s-acc f-none" marker-end="url(#ah-acc)"/>
+          <!-- feed -->
+          <path d="M40 112 L126 150" class="s-ink f-none" marker-end="url(#ah-ink)"/>
+          <text x="20" y="100" class="lbl-s">Zulauf</text>
+          <!-- heavy particles -->
+          <circle cx="160" cy="190" r="8" class="f-out1"/>
+          <circle cx="183" cy="222" r="6.5" class="f-out1"/>
+          <path d="M160 200 L160 214" class="s-out1 f-none" marker-end="url(#ah-out1)"/>
+          <text x="210" y="206" class="lbl-o1">w<tspan dy="4" font-size="11">s</tspan><tspan dy="-4"> &gt; u: fällt</tspan></text>
+          <!-- light particles -->
+          <circle cx="152" cy="118" r="3" class="f-out2"/>
+          <circle cx="176" cy="92" r="2.6" class="f-out2"/>
+          <circle cx="186" cy="56" r="3" class="f-out2"/>
+          <circle cx="252" cy="48" r="2.6" class="f-out2"/>
+          <path d="M176 84 L176 70" class="s-out2 f-none" marker-end="url(#ah-out2)"/>
+          <text x="210" y="112" class="lbl-o2">w<tspan dy="4" font-size="11">s</tspan><tspan dy="-4"> &lt; u: steigt</tspan></text>
+          <path d="M282 50 L330 50" class="s-out2 f-none" marker-end="url(#ah-out2)"/>
+          <text x="132" y="20" class="lbl-o2">Leichtgut · Ausgang 2</text>
+          <text x="165" y="334" text-anchor="middle" class="lbl-o1">Schwergut · Ausgang 1</text>
+        </svg>
+        <figcaption>Windsichter (Steigrohr). Luft strömt mit <span class="math"><i>u</i></span> nach oben. Ein Korn mit <span class="math"><i>w</i><sub>s</sub> &gt; <i>u</i></span> fällt gegen den Strom, eines mit <span class="math"><i>w</i><sub>s</sub> &lt; <i>u</i></span> wird mitgerissen. Also <span class="math"><i>w</i><sub>cut</sub> = <i>u</i></span>. Turbulenz und Stöße verschmieren die Grenze, daher eine Trennkurve statt einer Stufe.</figcaption>
+      </figure>
+      <figure>
+        <svg class="fig-svg" viewBox="0 0 470 290" role="img" aria-label="Absetzbecken mit Bahnen sinkender Körner">
+          <rect x="40" y="70" width="380" height="130" class="f-water"/>
+          <path d="M40 54 L40 200 L420 200 L420 70" class="s-ink f-none"/>
+          <line x1="40" y1="70" x2="420" y2="70" class="s-acc"/>
+          <rect x="400" y="70" width="20" height="130" class="f-panel" opacity=".7"/>
+          <line x1="400" y1="70" x2="400" y2="200" class="s-muted dash"/>
+          <path d="M6 76 L38 76" class="s-ink f-none" marker-end="url(#ah-ink)"/>
+          <text x="6" y="62" class="lbl-s">Zulauf, <tspan class="lbl-math">Q</tspan></text>
+          <path d="M420 84 L462 84" class="s-out2 f-none" marker-end="url(#ah-out2)"/>
+          <path d="M150 112 L230 112 M150 146 L230 146" class="s-acc f-none" marker-end="url(#ah-acc)"/>
+          <text x="160" y="132" class="lbl-math">v = Q / (B · H)</text>
+          <!-- trajectories -->
+          <path d="M44 74 L150 197" class="s-out1 f-none dash"/>
+          <circle cx="150" cy="194" r="4" class="f-out1"/>
+          <path d="M44 74 L396 197" class="s-ink f-none dash"/>
+          <text x="262" y="176" class="lbl-s" transform="rotate(19 262 176)">w<tspan dy="4" font-size="11">s</tspan><tspan dy="-4"> = Q/A</tspan></text>
+          <path d="M44 74 L398 150" class="s-out2 f-none dash"/>
+          <circle cx="396" cy="150" r="2.5" class="f-out2"/>
+          <!-- sludge -->
+          <g class="f-out1" opacity=".75">
+            <circle cx="70" cy="196" r="3"/><circle cx="90" cy="197" r="2.5"/><circle cx="112" cy="196" r="3"/><circle cx="134" cy="197" r="2.5"/><circle cx="168" cy="197" r="2.5"/><circle cx="196" cy="197" r="2"/><circle cx="232" cy="197" r="2"/><circle cx="280" cy="198" r="1.8"/><circle cx="330" cy="198" r="1.6"/>
+          </g>
+          <!-- dimensions -->
+          <path d="M26 72 L26 198" class="s-muted f-none" marker-start="url(#ah-muted)" marker-end="url(#ah-muted)"/>
+          <text x="12" y="140" class="lbl-math">H</text>
+          <path d="M42 222 L418 222" class="s-muted f-none" marker-start="url(#ah-muted)" marker-end="url(#ah-muted)"/>
+          <text x="226" y="240" class="lbl-math">L</text>
+          <text x="40" y="270" class="lbl-o1">Schlamm: Schwergut · Ausgang 1</text>
+          <text x="320" y="62" class="lbl-o2">Ablauf: Leichtgut</text>
+        </svg>
+        <figcaption>Absetzbecken nach Hazen (1904). Ein Korn, das oben eintritt, braucht <span class="math"><i>H</i>/<i>w</i><sub>s</sub></span> bis zum Boden und hat <span class="math"><i>L</i>/<i>v</i></span> Zeit bis zum Ablauf. Es setzt sich ab, wenn <span class="math"><i>w</i><sub>s</sub> ≥ <i>H v</i>/<i>L</i> = <i>Q</i>/(<i>B L</i>) = <i>Q</i>/<i>A</i></span>. Die Tiefe kürzt sich heraus, nur die Fläche zählt: <span class="math"><i>w</i><sub>cut</sub> = <i>Q</i>/<i>A</i></span>, die Oberflächenbeschickung.</figcaption>
+      </figure>
+    </div>
+
+    <h3>Wie schnell ein Korn sinkt</h3>
+    <div class="figrow side">
+      <div class="prose">
+        <p>Ein Korn sinkt im ruhenden Fluid so schnell, dass sein Gewicht minus Auftrieb gleich dem Widerstand ist. StoSiS nimmt Kugeln an:</p>
+        <div class="formula">(π/6) <i>d</i>³ (ρ<sub>p</sub> − ρ<sub>f</sub>) <i>g</i> = <i>c</i><sub>w</sub> · (π/4) <i>d</i>² · ρ<sub>f</sub> <i>w</i><sub>s</sub>² / 2</div>
+        <p>Der Widerstandsbeiwert stammt von Kaskas (Brauer 1971; Stieß 2009) und gilt vom Stokes-Bereich bis <span class="math">Re = 2 · 10<sup>5</sup></span>:</p>
+        <div class="formula"><i>c</i><sub>w</sub> = 24/Re + 4/√Re + 0,4, &nbsp; Re = <i>w</i><sub>s</sub> <i>d</i> ρ<sub>f</sub> / η</div>
+        <p>Weil <span class="math">Re</span> selbst von <span class="math"><i>w</i><sub>s</sub></span> abhängt, löst StoSiS die Gleichung über die Archimedes-Zahl <span class="math">Ar = <i>d</i>³ (ρ<sub>p</sub> − ρ<sub>f</sub>) ρ<sub>f</sub> <i>g</i> / η²</span>. Mit ihr wird das Gleichgewicht zu <span class="math"><i>c</i><sub>w</sub> Re² = 24 Re + 4 Re<sup>3/2</sup> + 0,4 Re² = 4/3 Ar</span>, für <span class="math">√Re</span> ein steigendes, konvexes Polynom. Das Newton-Verfahren, oberhalb der Lösung gestartet, fällt monoton auf die einzige Nullstelle.</p>
+      </div>
+      <svg class="fig-svg" viewBox="0 0 240 250" role="img" aria-label="Kräfte an einem sinkenden Korn" style="max-width:260px">
+        <circle cx="120" cy="125" r="42" class="f-sand"/>
+        <circle cx="120" cy="125" r="42" class="s-ink f-none" stroke-width="1.5"/>
+        <path d="M120 125 L120 222" class="s-ink f-none" marker-end="url(#ah-ink)"/>
+        <text x="128" y="214" class="lbl-s">Gewicht</text>
+        <path d="M100 86 L100 26" class="s-acc f-none" marker-end="url(#ah-acc)"/>
+        <text x="20" y="40" class="lbl-s">Auftrieb</text>
+        <path d="M140 86 L140 14" class="s-out2 f-none" marker-end="url(#ah-out2)"/>
+        <text x="148" y="28" class="lbl-s">Widerstand</text>
+        <path d="M196 104 L196 160" class="s-muted f-none" marker-end="url(#ah-muted)"/>
+        <text x="204" y="140" class="lbl-math">w</text><text x="216" y="145" class="lbl-m" font-size="11">s</text>
+      </svg>
+    </div>
+    <figure>
+      <svg id="cwPlot" class="fig-svg" role="img" aria-label="Widerstandsbeiwert über Re: Kaskas, Stokes und Newton"></svg>
+      <figcaption>Widerstandsbeiwert nach Kaskas über der Reynolds-Zahl. Für kleine Re folgt er dem Gesetz von Stokes, <span class="math"><i>c</i><sub>w</sub> = 24/Re</span>; für große nähert er sich dem Newton-Wert 0,4. Jenseits von <span class="math">Re = 2 · 10<sup>5</sup></span> (grau) ist die Formel nicht belegt; dort gibt der Sichter einen Hinweis.</figcaption>
+    </figure>
+
+    <h3>Vom Korn zur Trennkurve</h3>
+    <div class="prose">
+      <p>Der Trenngrad ist eine der drei Kurven des Siebs, nur über <span class="math"><i>x</i> = <i>w</i><sub>s</sub> / <i>w</i><sub>cut</sub></span> statt <span class="math"><i>d</i> / <i>x</i><sub>cut</sub></span>. Jeder Stoff bekommt damit seine eigene Trennkurve über der Größe. Je leichter der Stoff, desto weiter rechts liegt sie. Wer nicht schwerer ist als das Fluid, sinkt nicht und geht ganz ins Leichtgut, etwa Holz in Wasser.</p>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><span class="lab">Fluid</span>
+          <div class="seg" role="group" aria-label="Fluid"><button type="button" id="fAir" aria-pressed="true">Luft</button><button type="button" id="fWater" aria-pressed="false">Wasser</button></div>
+          <p class="hint" id="fluidInfo" style="margin-top:6px"></p>
+        </div>
+        <div class="ctl"><label for="wcut">Trenngeschwindigkeit w<sub>cut</sub> <span class="val" id="wcutVal"></span></label><input id="wcut" type="range" min="-2" max="2" step="0.01" value="0.301"></div>
+        <div class="ctl"><label for="cModel">Trennkurve</label>
+          <select id="cModel"><option value="plitt">Plitt</option><option value="mh">Molerus-Hoffmann</option><option value="th">Teipel-Hennig (β = 0,5, o = 0)</option></select></div>
+        <div class="ctl"><label for="calpha">Trennschärfe α <span class="val" id="calphaVal"></span></label><input id="calpha" type="range" min="0.5" max="12" step="0.1" value="3"></div>
+        <div class="checks" id="cMats"></div>
+      </div>
+      <div>
+        <svg id="wsPlot" class="fig-svg" role="img" aria-label="Sinkgeschwindigkeit über der Größe je Stoff"></svg>
+        <svg id="tPlot" class="fig-svg" role="img" aria-label="Trennkurve T über der Größe je Stoff" style="margin-top:6px"></svg>
+        <div class="tablebox">
+          <table class="data" id="cTable">
+            <thead><tr><th>Stoff</th><th class="num">ρ in kg/m³</th><th class="num">T = 0,5 bei</th><th class="num">sinkt wie 1 mm Beton bei</th><th>Dichte aus</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <p>Oben sinkt jedes Korn mit seiner eigenen Geschwindigkeit; wo seine Kurve die Linie <span class="math"><i>w</i><sub>cut</sub></span> schneidet, liegt seine Trennkorngröße. Gestrichelte Abschnitte liegen jenseits von <span class="math">Re = 2 · 10<sup>5</sup></span>. Die Spalte „sinkt wie 1 mm Beton“ nennt gleichfällige Körner: Sie landen im selben Ausgang wie ein Betonkorn von 1 mm.</p>
+      <p>Dichte und Viskosität des Fluids und die Dichte jedes Stoffs nimmt der Sichter aus der Materialdatei, bei Temperatur und Druck des Zulaufs. Ändern sich beide, rechnet er seine Tabelle <span class="math"><i>T</i></span> je Stoff und Stützstelle neu.</p>
+    </div>
+
+    <h3>Im Partikelmodus und Grenzen</h3>
+    <div class="prose">
+      <p>Karten verteilt wieder das Konto-Verfahren, jede mit <span class="math"><i>T</i>(<i>w</i><sub>s</sub>(<i>d</i>, ρ))</span> aus ihrer eigenen Größe und Dichte. Eine Karte mit mehreren Stoffen hat die Dichte <span class="math"><i>m</i> / Σ (<i>m</i><sub><i>k</i></sub> / ρ<sub><i>k</i></sub>)</span>.</p>
+      <p>Gerechnet wird mit einem einzelnen Korn. Behindertes Absinken bei hoher Feststoffkonzentration, Kornform, Beladung und Turbulenz im Sichtraum gehen nur über die Trennschärfe <span class="math">α</span> ein. Das Fluid ist kein eigener Strom, Luft und Wasser tauchen in der Bilanz nicht auf. Fehlt einem Stoff die Dichte oder der Materialdatei das Fluid, geht das Material mit Hinweis ganz ins Leichtgut.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h2>Quellen und Werte</h2>
+    <p>Brauer, H. (1971): Grundlagen der Einphasen- und Mehrphasenströmungen. Sauerländer, Aarau.</p>
+    <p>Danckwerts, P. V. (1953): Continuous flow systems. Distribution of residence times. Chemical Engineering Science 2(1), 1–13.</p>
+    <p>Gaudin, A. M. (1939): Principles of Mineral Dressing. McGraw-Hill, New York.</p>
+    <p>Gillespie, D. T. (1996): Exact numerical simulation of the Ornstein-Uhlenbeck process and its integral. Physical Review E 54, 2084–2091.</p>
+    <p>Hazen, A. (1904): On sedimentation. Transactions of the American Society of Civil Engineers 53, 45–88.</p>
+    <p>Hennig, M.; Teipel, U. (2016): Stationäre Siebklassierung. Chemie Ingenieur Technik 88, 911–918.</p>
+    <p>Levenspiel, O. (1999): Chemical Reaction Engineering. 3. Auflage, Wiley, New York.</p>
+    <p>Little, J. D. C. (1961): A proof for the queuing formula: L = λW. Operations Research 9(3), 383–387.</p>
+    <p>Molerus, O.; Hoffmann, H. (1969): Darstellung von Windsichtertrennkurven durch ein stochastisches Modell. Chemie Ingenieur Technik 41(5–6), 340–344.</p>
+    <p>Plitt, L. R. (1971): The analysis of solid–solid separations in classifiers. CIM Bulletin 64(708), 42–47.</p>
+    <p>Stieß, M. (2009): Mechanische Verfahrenstechnik – Partikeltechnologie 1. 3. Auflage, Springer, Berlin.</p>
+    <p>Uhlenbeck, G. E.; Ornstein, L. S. (1930): On the theory of the Brownian motion. Physical Review 36, 823–841.</p>
+    <p style="margin-top:14px">Wärmekapazitäten für den Merger: Sand 830 J/(kg K), Harnstoff 1544,7 J/(kg K), als konstante Werte wie im Prüffall des Handbuchs. Luft (1,204 kg/m³, 1,82 · 10⁻⁵ Pa s), Wasser (998,2 kg/m³, 1,002 · 10⁻³ Pa s), Kohle (Coal, 1400 kg/m³) und Sand (2200 kg/m³) stammen aus <span class="mono">data/Materialien.json</span> bei 293,15 K und 1,013 bar. Eisen, Beton und Holz sind Annahmen für die Case Study; sie stehen noch nicht in der Materialdatei.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(s) { return document.querySelector(s); }
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function text(parent, x, y, s, cls, anchor) {
+    var t = el('text', { x: x, y: y, 'class': cls || '' }, parent);
+    if (anchor) t.setAttribute('text-anchor', anchor);
+    t.textContent = s;
+    return t;
+  }
+  var SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  function pow10(k) { return '10' + String(k).split('').map(function (c) { return SUP[c]; }).join(''); }
+  function num(v, sig) {
+    if (!isFinite(v)) return '–';
+    sig = sig || 3;
+    return Number(v.toPrecision(sig)).toLocaleString('de-DE', { maximumFractionDigits: 12 });
+  }
+  function fmtSize(m) { return m < 0.9995e-3 ? num(m * 1e6) + ' µm' : num(m * 1e3) + ' mm'; }
+  function fmtVel(v) { return v >= 0.01 ? num(v) + ' m/s' : num(v * 1000) + ' mm/s'; }
+  function fmtDecade(v) {
+    var k = Math.round(Math.log10(v));
+    if (Math.abs(v / Math.pow(10, k) - 1) < 1e-9) return k >= -2 && k <= 3 ? num(v) : pow10(k);
+    return num(v);
+  }
+  function logspace(a, b, n) {
+    var out = [], la = Math.log10(a), lb = Math.log10(b);
+    for (var i = 0; i <= n; i++) out.push(Math.pow(10, la + (lb - la) * i / n));
+    return out;
+  }
+
+  // ---------- plot frame ----------
+  var clipCount = 0;
+  function logTicks(r, fmt) {
+    var out = [], span = Math.log10(r[1] / r[0]);
+    for (var k = Math.floor(Math.log10(r[0])); k <= Math.ceil(Math.log10(r[1])); k++) {
+      [1, 2, 5].forEach(function (m) {
+        var v = m * Math.pow(10, k);
+        if (v < r[0] * 0.999 || v > r[1] * 1.001) return;
+        var major = m === 1;
+        var every = span > 6.5 ? 2 : 1;
+        var labeled = major ? (k % every === 0) : span <= 3.2;
+        out.push({ v: v, major: major, label: labeled ? fmt(v) : null });
+      });
+    }
+    return out;
+  }
+  function linTicks(r, step, fmt) {
+    var out = [];
+    for (var v = Math.ceil(r[0] / step - 1e-9) * step; v <= r[1] + 1e-9; v += step)
+      out.push({ v: v, major: true, label: fmt(v) });
+    return out;
+  }
+  function makePlot(svg, o) {
+    var W = o.w || 640, H = o.h || 320;
+    var m = { l: 62, r: 18, t: 14, b: 46 };
+    if (o.m) for (var k in o.m) m[k] = o.m[k];
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    var tx = o.xlog ? Math.log10 : function (v) { return v; };
+    var ty = o.ylog ? Math.log10 : function (v) { return v; };
+    var x0 = tx(o.x[0]), x1 = tx(o.x[1]), y0 = ty(o.y[0]), y1 = ty(o.y[1]);
+    function X(v) { return m.l + (tx(v) - x0) / (x1 - x0) * (W - m.l - m.r); }
+    function Y(v) { var p = H - m.b - (ty(v) - y0) / (y1 - y0) * (H - m.t - m.b); return Math.max(-5000, Math.min(5000, p)); }
+    var grid = el('g', null, svg), axes = el('g', null, svg);
+    var id = 'clip' + (++clipCount);
+    var defs = el('defs', null, svg);
+    var cp = el('clipPath', { id: id }, defs);
+    el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b }, cp);
+    var plot = el('g', { 'clip-path': 'url(#' + id + ')' }, svg);
+    var over = el('g', null, svg);
+    var xt = o.xlog ? logTicks(o.x, o.xfmt) : linTicks(o.x, o.xstep, o.xfmt);
+    xt.forEach(function (t) {
+      var px = X(t.v);
+      el('line', { x1: px, x2: px, y1: m.t, y2: H - m.b, 'class': t.major ? 'gl' : 'gl minor' }, grid);
+      if (t.label !== null) text(axes, px, H - m.b + 17, t.label, 'tick', 'middle');
+    });
+    var yt = o.ylog ? logTicks(o.y, o.yfmt) : linTicks(o.y, o.ystep, o.yfmt);
+    yt.forEach(function (t) {
+      var py = Y(t.v);
+      el('line', { x1: m.l, x2: W - m.r, y1: py, y2: py, 'class': t.major ? 'gl' : 'gl minor' }, grid);
+      if (t.label !== null) { var tt = text(axes, m.l - 7, py + 4, t.label, 'tick', 'end'); }
+    });
+    el('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, 'class': 'frame' }, axes);
+    if (o.xlabel) text(axes, m.l + (W - m.l - m.r) / 2, H - 8, o.xlabel, 'axt', 'middle');
+    if (o.ylabel) {
+      var yl = text(axes, 0, 0, o.ylabel, 'axt', 'middle');
+      yl.setAttribute('transform', 'translate(15 ' + (m.t + (H - m.t - m.b) / 2) + ') rotate(-90)');
+    }
+    return { X: X, Y: Y, plot: plot, over: over, W: W, H: H, m: m };
+  }
+  function linePath(P, xs, f) {
+    var d = '', pen = false;
+    xs.forEach(function (x) {
+      var y = f(x);
+      if (y === null || !isFinite(y)) { pen = false; return; }
+      var py = P.Y(y);
+      if (!isFinite(py)) { pen = false; return; }
+      d += (pen ? 'L' : 'M') + P.X(x).toFixed(1) + ' ' + py.toFixed(1);
+      pen = true;
+    });
+    return d;
+  }
+
+  // ---------- models (same formulas as ScreenUnit.h / ClassifierUnit.h) ----------
+  function gradeT(model, x, a, b, o) {
+    if (!(x > 0)) return model === 'th' ? o : 0;
+    var t;
+    if (model === 'plitt') t = 1 - Math.exp(-0.693 * Math.pow(x, a));
+    else if (model === 'mh') t = 1 / (1 + Math.exp(a * (1 - x * x)) / (x * x));
+    else t = (1 - Math.pow(1 + 3 * Math.pow(x, (x + a) * b), -0.5)) * (1 - o) + o;
+    return isFinite(t) ? Math.min(1, Math.max(0, t)) : (x > 1 ? 1 : 0);
+  }
+  // size where a rising function reaches q (bisection on log d); NaN if not bracketed
+  function quantile(f, q, lo, hi) {
+    lo = lo || 1e-9; hi = hi || 10;
+    if (!(f(lo) < q && f(hi) >= q)) return NaN;
+    for (var i = 0; i < 90; i++) { var mid = Math.sqrt(lo * hi); if (f(mid) < q) lo = mid; else hi = mid; }
+    return Math.sqrt(lo * hi);
+  }
+  var G = 9.80665;
+  function settle(d, rp, rf, eta) {
+    if (!(d > 0) || !(rp > rf)) return { w: 0, re: 0 };
+    var ar = d * d * d * (rp - rf) * rf * G / (eta * eta), k = 4 / 3 * ar;
+    var x = Math.min(Math.sqrt(k / 24), Math.cbrt(k / 4), Math.sqrt(Math.sqrt(k / 0.4)));
+    for (var i = 0; i < 200; i++) {
+      var f = ((0.4 * x + 4) * x + 24) * x * x - k, df = ((1.6 * x + 12) * x + 48) * x, nx = x - f / df;
+      if (!(nx < x) || !(nx > 0)) break;
+      x = nx;
+    }
+    var re = x * x;
+    return { w: re * eta / (d * rf), re: re };
+  }
+
+  // ======================= Sieb: Gedankenmodell (canvas) =======================
+  (function () {
+    var cv = $('#siebCanvas'), ctx = cv.getContext('2d');
+    var VW = 800, VH = 360, WM = 18, PITCH = 24, PLATE = 46;
+    var P0 = { x: 92, y: 104 }, ang = Math.atan2(80, 492), ux = Math.cos(ang), uy = Math.sin(ang), upx = uy, upy = -ux;
+    var n = 12, parts = [], tallyT = [], tallyC = [], countF = 0, countC = 0, spawnAcc = 0, chartAcc = 0;
+    var NCL = 15, running = true, visible = true, last = 0, time = 0, colors = null;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function deckPt(s) { return { x: P0.x + ux * s, y: P0.y + uy * s }; }
+    function deckLen() { return PLATE + n * PITCH; }
+    function openS(k) { return PLATE + (k + 0.5) * PITCH; }
+    function cls(x) { return Math.min(NCL - 1, Math.max(0, Math.floor((x - 0.2) / 0.1))); }
+    function passP(x) { return x < 1 ? (1 - x) * (1 - x) : 0; }
+    function tally(x, coarse) { var c = cls(x); tallyT[c]++; if (coarse) { tallyC[c]++; countC++; } else countF++; }
+    function seed(N) {
+      for (var i = 0; i < N; i++) {
+        var x = 0.2 + 1.5 * Math.random(), passed = false;
+        for (var k = 0; k < n; k++) if (Math.random() < passP(x)) { passed = true; break; }
+        tally(x, !passed);
+      }
+    }
+    function reset() {
+      parts = []; tallyT = []; tallyC = [];
+      for (var i = 0; i < NCL; i++) { tallyT.push(0); tallyC.push(0); }
+      countF = 0; countC = 0; seed(1500); drawChart();
+    }
+    function spawn() {
+      var x = 0.2 + 1.5 * Math.random(), r = x * WM / 2, s = deckPt(14);
+      parts.push({ x: x, r: r, ph: 'drop', px: s.x + (Math.random() - 0.5) * 8, py: 58, vy: 0, vx: 0, k: -1, t: 0, s0: 14, s1: openS(0) });
+    }
+    function step(dt) {
+      time += dt;
+      spawnAcc += dt * 5.5;
+      while (spawnAcc >= 1) { spawnAcc -= 1; if (parts.length < 90) spawn(); }
+      for (var i = parts.length - 1; i >= 0; i--) {
+        var p = parts[i];
+        if (p.ph === 'drop') {
+          p.vy += 900 * dt; p.py += p.vy * dt;
+          var land = deckPt(14).y + upy * p.r;
+          if (p.py >= land) { p.ph = 'hop'; p.t = 0; p.s0 = 14; p.s1 = openS(0); p.k = 0; }
+        } else if (p.ph === 'hop') {
+          p.t += dt / 0.3;
+          if (p.t >= 1) {
+            var here = deckPt(p.s1);
+            if (Math.random() < passP(p.x)) { p.ph = 'fall'; p.px = here.x; p.py = here.y; p.vy = 60; }
+            else if (p.k + 1 < n) { p.k++; p.t = 0; p.s0 = p.s1; p.s1 = openS(p.k); }
+            else { p.ph = 'off'; var e = deckPt(deckLen()); p.px = e.x; p.py = e.y + upy * p.r; p.vx = 150; p.vy = -30; }
+          }
+        } else if (p.ph === 'fall') {
+          p.vy += 900 * dt; p.py += p.vy * dt;
+          if (p.py > 318) { tally(p.x, false); parts.splice(i, 1); }
+        } else if (p.ph === 'off') {
+          p.vy += 900 * dt; p.px += p.vx * dt; p.py += p.vy * dt;
+          if (p.py > 318) { tally(p.x, true); parts.splice(i, 1); }
+        }
+      }
+    }
+    function readColors() {
+      var cs = getComputedStyle(document.documentElement);
+      function g(k) { return cs.getPropertyValue(k).trim(); }
+      colors = { ink: g('--ink'), muted: g('--muted'), rule: g('--rule'), sand: g('--sand'), o1: g('--out1'), o2: g('--out2'), paper: g('--paper') };
+    }
+    function line(a, b) { ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+    function draw() {
+      if (!colors) readColors();
+      var C = colors, rect = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+      var wpx = Math.max(1, Math.round(rect.width * dpr)), hpx = Math.max(1, Math.round(rect.height * dpr));
+      if (cv.width !== wpx || cv.height !== hpx) { cv.width = wpx; cv.height = hpx; }
+      var sc = wpx / VW;
+      ctx.setTransform(sc, 0, 0, sc, 0, 0);
+      ctx.clearRect(0, 0, VW, VH);
+      var font = '600 21px "Barlow Semi Condensed", "Arial Narrow", sans-serif', small = '500 18px "Barlow Semi Condensed", "Arial Narrow", sans-serif';
+      // hopper
+      var h = deckPt(14);
+      ctx.strokeStyle = C.ink; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(h.x - 40, 14); ctx.lineTo(h.x - 9, 48); ctx.moveTo(h.x + 40, 14); ctx.lineTo(h.x + 9, 48); ctx.stroke();
+      ctx.fillStyle = C.ink; ctx.font = font; ctx.fillText('Zulauf', h.x + 48, 34);
+      // deck: plate, wires, end bar
+      var L = deckLen(), e = deckPt(L);
+      ctx.lineWidth = 6; ctx.lineCap = 'butt';
+      line(deckPt(0), deckPt(PLATE + 0.5 * PITCH - WM / 2));
+      for (var k = 0; k < n; k++) {
+        var a = openS(k) + WM / 2, b = (k + 1 < n) ? openS(k + 1) - WM / 2 : L;
+        line(deckPt(a), deckPt(b));
+      }
+      // springs
+      ctx.lineWidth = 2;
+      [10, L - 8].forEach(function (s) {
+        var p = deckPt(s); ctx.beginPath(); ctx.moveTo(p.x, p.y + 4);
+        for (var j = 1; j <= 6; j++) ctx.lineTo(p.x + (j % 2 ? 7 : -7), p.y + 4 + j * 6);
+        ctx.lineTo(p.x, p.y + 46); ctx.stroke();
+        ctx.fillStyle = C.muted; ctx.fillRect(p.x - 14, p.y + 46, 28, 6);
+      });
+      // mesh width label
+      var o0 = deckPt(openS(1));
+      ctx.fillStyle = C.muted; ctx.font = small; ctx.fillText('Masche w', o0.x - 8, o0.y - 22);
+      // fines funnel
+      var fl = deckPt(PLATE), fr = e, cx = (fl.x + fr.x) / 2;
+      ctx.strokeStyle = C.o2; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(fl.x, fl.y + 26); ctx.lineTo(fl.x, 280); ctx.lineTo(cx - 34, 322); ctx.lineTo(cx - 34, 334); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(fr.x - 22, fr.y + 26); ctx.lineTo(fr.x - 22, 280); ctx.lineTo(cx + 34, 322); ctx.lineTo(cx + 34, 334); ctx.stroke();
+      ctx.fillStyle = C.o2; ctx.font = font; ctx.textAlign = 'center';
+      ctx.fillText('Feingut · Ausgang 2', cx, 356);
+      // coarse bin
+      var bx = e.x + 6;
+      ctx.strokeStyle = C.o1;
+      ctx.beginPath(); ctx.moveTo(bx + 20, 256); ctx.lineTo(bx + 20, 330); ctx.lineTo(Math.min(VW - 6, bx + 150), 330); ctx.lineTo(Math.min(VW - 6, bx + 150), 256); ctx.stroke();
+      var bc = Math.min(VW - 64, bx + 85);
+      ctx.fillStyle = C.o1; ctx.textAlign = 'center';
+      ctx.fillText('Grobgut', bc, 228); ctx.font = small; ctx.fillText('Ausgang 1', bc, 248);
+      // counts
+      ctx.textAlign = 'right'; ctx.font = small; ctx.fillStyle = C.muted;
+      ctx.fillText((countF + countC).toLocaleString('de-DE') + ' Körner gezählt', VW - 10, 30);
+      ctx.textAlign = 'left';
+      // particles
+      for (var i = 0; i < parts.length; i++) {
+        var p = parts[i], x = p.px, y = p.py;
+        if (p.ph === 'hop') {
+          var s = p.s0 + (p.s1 - p.s0) * p.t, q = deckPt(s), hh = (12 + p.r * 0.4) * 4 * p.t * (1 - p.t);
+          x = q.x + upx * (p.r + hh); y = q.y + upy * (p.r + hh);
+        }
+        ctx.beginPath(); ctx.arc(x, y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.ph === 'fall' ? C.o2 : p.ph === 'off' ? C.o1 : C.sand;
+        ctx.fill();
+        ctx.lineWidth = 1; ctx.strokeStyle = C.ink; ctx.globalAlpha = 0.35; ctx.stroke(); ctx.globalAlpha = 1;
+      }
+    }
+    function drawChart() {
+      var P = makePlot($('#siebSimPlot'), { w: 400, h: 330, m: { l: 52, r: 14, t: 14, b: 48 }, x: [0.2, 1.7], y: [0, 1], xstep: 0.3, ystep: 0.25,
+        xfmt: function (v) { return num(v, 2); }, yfmt: function (v) { return num(v, 2); }, xlabel: 'd / w', ylabel: 'Anteil ins Grobgut' });
+      el('line', { x1: P.X(1), x2: P.X(1), y1: P.m.t, y2: P.H - P.m.b, 'class': 'mark' }, P.plot);
+      var xs = []; for (var i = 0; i <= 300; i++) xs.push(0.2 + 1.5 * i / 300);
+      el('path', { d: linePath(P, xs, function (x) { return x < 1 ? Math.pow(1 - passP(x), n) : 1; }), 'class': 'curve c-acc thin' }, P.plot);
+      var maxT = Math.max.apply(null, tallyT) || 1;
+      for (var c = 0; c < NCL; c++) {
+        if (!tallyT[c]) continue;
+        el('circle', { cx: P.X(0.25 + 0.1 * c), cy: P.Y(tallyC[c] / tallyT[c]), r: (2 + 4 * Math.sqrt(tallyT[c] / maxT)).toFixed(1), 'class': 'dot' }, P.plot);
+      }
+      text(P.over, P.X(0.24), P.Y(0.93), 'erwartet (1 − p)ⁿ', 'tick');
+      text(P.over, P.X(0.24), P.Y(0.84), 'Punkte: gezählt', 'tick');
+    }
+    var looping = false;
+    function frame(ts) {
+      if (!running || !visible || reduce) { last = 0; looping = false; return; }
+      var dt = last ? Math.min(0.05, (ts - last) / 1000) : 0.016; last = ts;
+      step(dt); draw();
+      chartAcc += dt; if (chartAcc > 0.6) { chartAcc = 0; drawChart(); }
+      requestAnimationFrame(frame);
+    }
+    function start() { if (running && visible && !reduce && !looping) { looping = true; last = 0; requestAnimationFrame(frame); } }
+    var nIn = $('#siebN'), nVal = $('#siebNVal'), play = $('#siebPlay');
+    nIn.addEventListener('input', function () { n = +nIn.value; nVal.textContent = n; reset(); for (var t = 0; t < 360; t++) step(1 / 60); draw(); });
+    play.addEventListener('click', function () { running = !running; play.textContent = running ? 'Anhalten' : 'Weiter'; start(); });
+    if (reduce) { running = false; play.textContent = 'Weiter'; play.addEventListener('click', function () { reduce = false; start(); }, { once: true }); }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { var was = visible; visible = es[0].isIntersecting; if (visible && !was) start(); }, { threshold: 0.05 }).observe(cv);
+    }
+    if ('ResizeObserver' in window) new ResizeObserver(function () { draw(); }).observe(cv);
+    function themeChanged() { colors = null; draw(); }
+    if (window.matchMedia) { var mq = window.matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', themeChanged); }
+    new MutationObserver(themeChanged).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    reset();
+    for (var t = 0; t < 480; t++) step(1 / 60); // resting frame with particles on the deck
+    draw();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { draw(); });
+    start();
+  })();
+
+  // ======================= Sieb: drei Trennkurven =======================
+  (function () {
+    var MODELS = [{ id: 'plitt', name: 'Plitt', c: 'c-m1' }, { id: 'mh', name: 'Molerus-Hoffmann', c: 'c-m2' }, { id: 'th', name: 'Teipel-Hennig', c: 'c-m3' }];
+    var xcIn = $('#sxcut'), aIn = $('#salpha'), bIn = $('#sbeta'), oIn = $('#soff');
+    function draw() {
+      var xcut = Math.pow(10, +xcIn.value), a = +aIn.value, b = +bIn.value, o = +oIn.value;
+      $('#sxcutVal').textContent = fmtSize(xcut);
+      $('#salphaVal').textContent = num(a, 3);
+      $('#sbetaVal').textContent = num(b, 3);
+      $('#soffVal').textContent = num(o, 2);
+      var shown = {};
+      Array.prototype.forEach.call(document.querySelectorAll('#smodels input'), function (c) { shown[c.value] = c.checked; });
+      var P = makePlot($('#siebPlot'), { w: 640, h: 320, x: [10e-6, 10e-3], y: [0, 1], xlog: true, xfmt: fmtSize, ystep: 0.25,
+        yfmt: function (v) { return num(v, 2); }, xlabel: 'Korngröße d', ylabel: 'T(d) ins Grobgut' });
+      el('line', { x1: P.m.l, x2: P.W - P.m.r, y1: P.Y(0.5), y2: P.Y(0.5), 'class': 'mark' }, P.plot);
+      el('line', { x1: P.X(xcut), x2: P.X(xcut), y1: P.m.t, y2: P.H - P.m.b, 'class': 'mark' }, P.plot);
+      text(P.over, P.X(xcut) + 5, P.m.t + 16, 'x_cut', 'tick');
+      var xs = logspace(10e-6, 10e-3, 360);
+      var rows = '';
+      MODELS.forEach(function (M) {
+        var f = function (d) { return gradeT(M.id, d / xcut, a, b, o); };
+        if (shown[M.id]) el('path', { d: linePath(P, xs, f), 'class': 'curve ' + M.c }, P.plot);
+        var d25 = quantile(f, 0.25), d75 = quantile(f, 0.75);
+        rows += '<tr><td>' + M.name + '</td><td class="num">' + f(xcut).toFixed(5).replace('.', ',') + '</td><td class="num">' + (isFinite(d25) ? fmtSize(d25) : '–') +
+          '</td><td class="num">' + (isFinite(d75) ? fmtSize(d75) : '–') + '</td><td class="num">' + (isFinite(d25) && isFinite(d75) ? num(d25 / d75, 3) : '–') + '</td></tr>';
+      });
+      $('#siebTable tbody').innerHTML = rows;
+    }
+    [xcIn, aIn, bIn, oIn].forEach(function (i) { i.addEventListener('input', draw); });
+    Array.prototype.forEach.call(document.querySelectorAll('#smodels input'), function (c) { c.addEventListener('change', draw); });
+    draw();
+  })();
+
+  // ======================= Konto-Verfahren =======================
+  (function () {
+    var SIZES = [66, 69, 72, 76, 80, 84, 88, 93, 98, 104, 110, 117];
+    var N = SIZES.length, st = { T: 0.3, bal: 0, start: 4, steps: 0, cards: 0, first: 0, last: null };
+    var TIn = $('#kT');
+    function walk() {
+      var a = st.bal, res = [];
+      for (var j = 0; j < N; j++) {
+        var idx = (st.start + j) % N, before = a;
+        a += st.T;
+        var paid = a, first = a >= 0.5;
+        if (first) a -= 1;
+        res.push({ idx: idx, before: before, paid: paid, after: a, first: first });
+      }
+      st.bal = a; st.steps++; st.cards += N;
+      st.first += res.filter(function (r) { return r.first; }).length;
+      st.last = res;
+    }
+    function draw() {
+      var svg = $('#kontoPlot'), W = 720, H = 290, left = 70, cw = (W - left - 14) / N;
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      var y0 = 20, y1 = 150;
+      function Y(v) { return y1 - (v + 0.6) / 2.2 * (y1 - y0); }
+      // grid lines
+      [-0.5, 0, 0.5, 1, 1.5].forEach(function (v) {
+        el('line', { x1: left, x2: W - 14, y1: Y(v), y2: Y(v), 'class': v === 0.5 ? 'mark-acc' : 'gl' }, svg);
+        text(svg, left - 8, Y(v) + 4, (v > 0 ? '+' : '') + num(v, 2) + ' s', 'tick', 'end');
+      });
+      text(svg, W - 16, Y(0.5) - 6, 'Schwelle s/2', 'tick', 'end');
+      text(svg, left, 12, 'Kontostand Grobgut', 'axt');
+      var d = 'M' + left + ' ' + Y(st.last[0].before).toFixed(1);
+      st.last.forEach(function (r, j) {
+        var xc = left + cw * (j + 0.5);
+        d += 'L' + (xc - 9) + ' ' + Y(r.before).toFixed(1) + 'L' + (xc - 9) + ' ' + Y(r.paid).toFixed(1) + 'L' + (xc + 9) + ' ' + Y(r.paid).toFixed(1) + 'L' + (xc + 9) + ' ' + Y(r.after).toFixed(1);
+        if (j < N - 1) d += 'L' + (xc + cw / 2) + ' ' + Y(r.after).toFixed(1);
+      });
+      el('path', { d: d, 'class': 'curve c-muted thin' }, svg);
+      st.last.forEach(function (r, j) {
+        var xc = left + cw * (j + 0.5);
+        el('circle', { cx: xc, cy: Y(r.paid), r: 4.5, 'class': r.first ? 'f-out1' : 'f-out2' }, svg);
+        var cy = 182, ch = 54;
+        el('rect', { x: xc - cw / 2 + 3, y: cy, width: cw - 6, height: ch, rx: 3, 'class': (r.first ? 'f-out1' : 'f-out2') }, svg).setAttribute('fill-opacity', '0.18');
+        el('rect', { x: xc - cw / 2 + 3, y: cy, width: cw - 6, height: ch, rx: 3, 'class': 'f-none ' + (r.first ? 's-out1' : 's-out2') }, svg).setAttribute('stroke-width', '1.6');
+        text(svg, xc, cy + 22, String(SIZES[r.idx]), 'lbl-s', 'middle');
+        text(svg, xc, cy + 40, 'µm', 'lbl-m', 'middle');
+        text(svg, xc, cy + ch + 18, r.first ? 'grob' : 'fein', r.first ? 'lbl-o1' : 'lbl-o2', 'middle');
+      });
+      text(svg, left - 8, 214, 'Karte', 'tick', 'end');
+      text(svg, left + cw * 0.5, 176, 'Start ↓', 'tick', 'middle');
+      var mine = st.last.filter(function (r) { return r.first; }).length;
+      $('#kSummary').innerHTML = 'Zeitschritt ' + st.steps + ': ' + mine + ' von ' + N + ' Karten ins Grobgut, Soll ' + num(st.T * N, 3) + '. ' +
+        (st.steps > 1 ? 'Über alle ' + st.steps + ' Schritte: ' + st.first + ' von ' + st.cards + ', Soll ' + num(st.T * st.cards, 4) + '. ' : '') +
+        'Gang ab der Karte mit ' + SIZES[st.start] + ' µm, ringsum.';
+    }
+    function reset() { st.T = +TIn.value; $('#kTVal').textContent = num(st.T, 2); st.bal = 0; st.steps = 0; st.cards = 0; st.first = 0; st.start = 4; walk(); draw(); }
+    TIn.addEventListener('input', reset);
+    $('#kNext').addEventListener('click', function () { st.start = Math.floor(Math.random() * N); walk(); draw(); });
+    reset();
+  })();
+
+  // ======================= Stofftrenner =======================
+  (function () {
+    var S = [
+      { id: 'beton', name: 'Beton, Mörtel (Rc)', feed: 78, f: 0, cls: 'f-concrete', col: 'var(--concrete)' },
+      { id: 'stein', name: 'Naturstein (Ru)', feed: 15, f: 0, cls: 'f-stone', col: 'var(--stone)' },
+      { id: 'ziegel', name: 'Ziegel (Rb)', feed: 4, f: 0, cls: 'f-brick', col: 'var(--brick)' },
+      { id: 'eisen', name: 'Eisen', feed: 2, f: 0.95, cls: 'f-iron', col: 'var(--iron)' },
+      { id: 'holz', name: 'Holz', feed: 1, f: 0, cls: 'f-wood', col: 'var(--wood)' }
+    ];
+    var box = $('#stoffControls');
+    var intro = document.createElement('p'); intro.className = 'hint'; intro.textContent = 'Anteil f je Stoff in Ausgang 1:'; box.appendChild(intro);
+    S.forEach(function (s) {
+      var d = document.createElement('div'); d.className = 'ctl';
+      d.innerHTML = '<label for="sf-' + s.id + '"><span style="display:inline-flex;align-items:center;gap:8px"><span class="swatch" style="--c:' + s.col + ';height:10px;width:10px"></span>' + s.name +
+        '</span><span class="val" id="sfv-' + s.id + '"></span></label><input id="sf-' + s.id + '" type="range" min="0" max="1" step="0.01" value="' + s.f + '">';
+      box.appendChild(d);
+      d.querySelector('input').addEventListener('input', function (ev) { s.f = +ev.target.value; draw(); });
+    });
+    function draw() {
+      S.forEach(function (s) { $('#sfv-' + s.id).textContent = num(s.f, 2); });
+      var svg = $('#stoffBars'), W = 640, H = 196, x0 = 150, x1 = W - 80, bh = 30;
+      while (svg.firstChild) svg.removeChild(svg.firstChild);
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      var rows = [
+        { name: 'Zulauf', sub: '', parts: S.map(function (s) { return s.feed; }), cls: 'lbl' },
+        { name: 'Ausgang 1', sub: 'abgetrennt', parts: S.map(function (s) { return s.feed * s.f; }), cls: 'lbl-o1' },
+        { name: 'Ausgang 2', sub: 'Rest', parts: S.map(function (s) { return s.feed * (1 - s.f); }), cls: 'lbl-o2' }
+      ];
+      rows.forEach(function (r, i) {
+        var y = 14 + i * 60, tot = r.parts.reduce(function (a, b) { return a + b; }, 0);
+        text(svg, 0, y + 14, r.name, r.cls);
+        if (r.sub) text(svg, 0, y + 31, r.sub, 'lbl-m');
+        el('rect', { x: x0, y: y, width: x1 - x0, height: bh, 'class': 'f-none s-muted' }, svg).setAttribute('stroke-width', '1');
+        var x = x0;
+        if (tot > 1e-12) r.parts.forEach(function (p, k) {
+          var w = p / tot * (x1 - x0);
+          if (w <= 0) return;
+          el('rect', { x: x, y: y, width: w, height: bh, 'class': S[k].cls }, svg);
+          if (w > 40) text(svg, x + w / 2, y + 20, num(100 * p / tot, 2) + ' %', 'lbl-inv', 'middle');
+          x += w;
+        });
+        else text(svg, (x0 + x1) / 2, y + 20, 'leer', 'lbl-m', 'middle');
+        text(svg, W, y + 20, num(tot, 3) + ' t', 'lbl-s', 'end');
+      });
+      var t1 = S.reduce(function (a, s) { return a + s.feed * s.f; }, 0), t2 = 100 - t1;
+      $('#stoffTable tbody').innerHTML = S.map(function (s) {
+        return '<tr><td>' + s.name + '</td><td class="num">' + num(s.feed, 3) + ' t</td><td class="num">' + num(100 * s.f, 3) + ' %</td><td class="num">' +
+          (t1 > 1e-12 ? num(100 * s.feed * s.f / t1, 3) + ' %' : '–') + '</td><td class="num">' + (t2 > 1e-12 ? num(100 * s.feed * (1 - s.f) / t2, 3) + ' %' : '–') + '</td></tr>';
+      }).join('');
+    }
+    draw();
+  })();
+
+  // ======================= Sichter =======================
+  (function () {
+    // c_w after Kaskas
+    var P = makePlot($('#cwPlot'), { w: 760, h: 320, x: [1e-2, 1e6], y: [0.1, 1e4], xlog: true, ylog: true, xfmt: fmtDecade, yfmt: fmtDecade, xlabel: 'Reynolds-Zahl Re', ylabel: 'Widerstandsbeiwert' });
+    el('rect', { x: P.X(2e5), y: P.m.t, width: P.W - P.m.r - P.X(2e5), height: P.H - P.m.t - P.m.b, 'class': 'shade' }, P.plot);
+    var re = logspace(1e-2, 1e6, 300);
+    el('path', { d: linePath(P, re, function (r) { return 24 / r; }), 'class': 'curve thin c-muted', 'stroke-dasharray': '6 5' }, P.plot);
+    el('path', { d: linePath(P, re, function () { return 0.4; }), 'class': 'curve thin c-muted', 'stroke-dasharray': '6 5' }, P.plot);
+    el('path', { d: linePath(P, re, function (r) { return 24 / r + 4 / Math.sqrt(r) + 0.4; }), 'class': 'curve c-acc' }, P.plot);
+    text(P.over, P.X(0.3), P.Y(24 / 0.3) - 8, 'Stokes 24/Re', 'tick');
+    text(P.over, P.X(3e3), P.Y(0.4) + 16, 'Newton 0,4', 'tick');
+    text(P.over, P.X(30), P.Y(24 / 30 + 4 / Math.sqrt(30) + 0.4) - 12, 'Kaskas', 'axt');
+    text(P.over, P.X(2e5) + 6, P.m.t + 16, 'nicht belegt', 'tick');
+
+    var FL = {
+      air: { name: 'Luft', rho: 1.204, eta: 1.82e-5, y: [1e-6, 300], range: [-2, 2], w: 2 },
+      water: { name: 'Wasser', rho: 998.2, eta: 1.002e-3, y: [1e-8, 10], range: [-4, 0], w: 0.01 }
+    };
+    var MATS = [
+      { id: 'iron', name: 'Eisen', rho: 7870, src: 'Annahme (Stahl)', on: true },
+      { id: 'concrete', name: 'Beton', rho: 2300, src: 'Annahme, Rohdichte im Mittelsdorf-Bericht 2240–2320', on: true },
+      { id: 'sand', name: 'Sand', rho: 2200, src: 'Materialdatei (Sand)', on: false },
+      { id: 'coal', name: 'Kohle', rho: 1400, src: 'Materialdatei (Coal)', on: true },
+      { id: 'wood', name: 'Holz', rho: 600, src: 'Annahme', on: true }
+    ];
+    var fluid = 'air';
+    var wIn = $('#wcut'), aIn = $('#calpha'), mSel = $('#cModel');
+    var box = $('#cMats');
+    MATS.forEach(function (m) {
+      var l = document.createElement('label');
+      l.innerHTML = '<input type="checkbox" ' + (m.on ? 'checked' : '') + '> <span class="swatch" style="--c: var(--' + m.id + ')"></span> ' + m.name + ' <span class="hint">' + m.rho.toLocaleString('de-DE') + ' kg/m³</span>';
+      l.querySelector('input').addEventListener('change', function (ev) { m.on = ev.target.checked; draw(); });
+      box.appendChild(l);
+    });
+    function setFluid(f) {
+      fluid = f;
+      $('#fAir').setAttribute('aria-pressed', f === 'air'); $('#fWater').setAttribute('aria-pressed', f === 'water');
+      wIn.min = FL[f].range[0]; wIn.max = FL[f].range[1]; wIn.value = Math.log10(FL[f].w);
+      draw();
+    }
+    $('#fAir').addEventListener('click', function () { setFluid('air'); });
+    $('#fWater').addEventListener('click', function () { setFluid('water'); });
+    wIn.addEventListener('input', function () { FL[fluid].w = Math.pow(10, +wIn.value); draw(); });
+    aIn.addEventListener('input', draw);
+    mSel.addEventListener('change', draw);
+    function draw() {
+      var F = FL[fluid], wcut = F.w, a = +aIn.value, model = mSel.value;
+      $('#wcutVal').textContent = fmtVel(wcut);
+      $('#calphaVal').textContent = num(a, 3);
+      var ke = Math.floor(Math.log10(F.eta));
+      $('#fluidInfo').textContent = F.name + ': ' + num(F.rho, 4) + ' kg/m³, ' + num(F.eta / Math.pow(10, ke), 3) + ' · ' + pow10(ke) + ' Pa s (Materialdatei, 293,15 K). ' +
+        (fluid === 'air' ? 'w_cut = Luftgeschwindigkeit im Steigrohr.' : 'w_cut = Oberflächenbeschickung Q/A, ' + num(wcut * 3600, 3) + ' m/h.');
+      var dr = [1e-6, 0.1], ds = logspace(dr[0], dr[1], 360);
+      var Pw = makePlot($('#wsPlot'), { w: 640, h: 300, x: dr, y: F.y, xlog: true, ylog: true, xfmt: fmtSize, yfmt: fmtDecade, ylabel: 'wₛ in m/s', m: { b: 30 } });
+      var Pt = makePlot($('#tPlot'), { w: 640, h: 250, x: dr, y: [0, 1], xlog: true, xfmt: fmtSize, ystep: 0.25, yfmt: function (v) { return num(v, 2); }, xlabel: 'Korngröße d', ylabel: 'T ins Schwergut' });
+      el('line', { x1: Pw.m.l, x2: Pw.W - Pw.m.r, y1: Pw.Y(wcut), y2: Pw.Y(wcut), 'class': 'mark-acc' }, Pw.plot);
+      text(Pw.over, Pw.W - Pw.m.r - 6, Pw.Y(wcut) - 6, 'w_cut', 'tick', 'end');
+      el('line', { x1: Pt.m.l, x2: Pt.W - Pt.m.r, y1: Pt.Y(0.5), y2: Pt.Y(0.5), 'class': 'mark' }, Pt.plot);
+      var refW = settle(1e-3, 2300, F.rho, F.eta).w, rows = '';
+      MATS.forEach(function (m) {
+        var sinks = m.rho > F.rho;
+        var share = function (d) { return gradeT(model, settle(d, m.rho, F.rho, F.eta).w / wcut, a, 0.5, 0); };
+        var d50 = sinks ? quantile(share, 0.5) : NaN;
+        var deq = sinks ? quantile(function (d) { return settle(d, m.rho, F.rho, F.eta).w; }, refW) : NaN;
+        if (m.on && sinks) {
+          var solid = '', dashed = '', penS = false, penD = false;
+          ds.forEach(function (d, i) {
+            var s = settle(d, m.rho, F.rho, F.eta), px = Pw.X(d).toFixed(1), py = Pw.Y(s.w).toFixed(1), ok = s.re <= 2e5;
+            if (ok) { solid += (penS ? 'L' : 'M') + px + ' ' + py; penS = true; penD = false; }
+            else { if (!penD && i > 0) { var p0 = settle(ds[i - 1], m.rho, F.rho, F.eta); dashed += 'M' + Pw.X(ds[i - 1]).toFixed(1) + ' ' + Pw.Y(p0.w).toFixed(1); penD = true; } dashed += (penD ? 'L' : 'M') + px + ' ' + py; penD = true; penS = false; }
+          });
+          el('path', { d: solid, 'class': 'curve c-' + m.id }, Pw.plot);
+          if (dashed) el('path', { d: dashed, 'class': 'curve c-' + m.id, 'stroke-dasharray': '6 5' }, Pw.plot);
+          var dcross = quantile(function (d) { return settle(d, m.rho, F.rho, F.eta).w; }, wcut);
+          if (isFinite(dcross)) el('circle', { cx: Pw.X(dcross), cy: Pw.Y(wcut), r: 4.5, 'class': 'd-' + m.id }, Pw.plot);
+          el('path', { d: linePath(Pt, ds, share), 'class': 'curve c-' + m.id }, Pt.plot);
+          if (isFinite(d50)) el('line', { x1: Pt.X(d50), x2: Pt.X(d50), y1: Pt.m.t, y2: Pt.H - Pt.m.b, 'class': 'mark c-' + m.id }, Pt.plot);
+        }
+        rows += '<tr><td><span class="swatch" style="--c: var(--' + m.id + ');margin-right:8px"></span>' + m.name + '</td><td class="num">' + m.rho.toLocaleString('de-DE') + '</td><td class="num">' +
+          (sinks ? (isFinite(d50) ? fmtSize(d50) : '–') : 'sinkt nicht') + '</td><td class="num">' + (sinks ? (isFinite(deq) ? fmtSize(deq) : '–') : '–') + '</td><td>' + m.src + '</td></tr>';
+      });
+      $('#cTable tbody').innerHTML = rows;
+    }
+    setFluid('air');
+  })();
+
+  // ======================= Helfer für Merger, Splitter, Behälter =======================
+  var DISPLAY = '"Barlow Semi Condensed", "Arial Narrow", sans-serif';
+  function hexRgb(h) {
+    h = String(h).replace('#', '').trim();
+    if (h.length === 3) h = h.replace(/./g, function (c) { return c + c; });
+    var n = parseInt(h, 16);
+    return isFinite(n) ? [n >> 16 & 255, n >> 8 & 255, n & 255] : [128, 128, 128];
+  }
+  function lerpRgb(A, B, t) {
+    return 'rgb(' + Math.round(A[0] + (B[0] - A[0]) * t) + ',' + Math.round(A[1] + (B[1] - A[1]) * t) + ',' + Math.round(A[2] + (B[2] - A[2]) * t) + ')';
+  }
+  function tokenColors() {
+    var cs = getComputedStyle(document.documentElement), o = { rgb: {} };
+    ['ink', 'muted', 'rule', 'paper', 'panel', 'accent', 'sand', 'urea', 'hot', 'cold', 'out1', 'out2', 'out3', 'age0', 'age1'].forEach(function (k) {
+      o[k] = cs.getPropertyValue('--' + k).trim();
+      o.rgb[k] = hexRgb(o[k]);
+    });
+    return o;
+  }
+  var themeHooks = [];
+  function onTheme(f) { themeHooks.push(f); }
+  function fireTheme() { themeHooks.forEach(function (f) { f(); }); }
+  if (window.matchMedia) { var mqT = window.matchMedia('(prefers-color-scheme: dark)'); if (mqT.addEventListener) mqT.addEventListener('change', fireTheme); }
+  new MutationObserver(fireTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  function fitCanvas(cv, ctx, VW) {
+    var rect = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    var w = Math.max(1, Math.round(rect.width * dpr)), h = Math.max(1, Math.round(rect.height * dpr));
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+    var sc = w / VW;
+    ctx.setTransform(sc, 0, 0, sc, 0, 0);
+  }
+  function makePath(pts) {
+    var segs = [], L = 0;
+    for (var i = 1; i < pts.length; i++) {
+      var dx = pts[i][0] - pts[i - 1][0], dy = pts[i][1] - pts[i - 1][1], l = Math.sqrt(dx * dx + dy * dy);
+      segs.push({ x: pts[i - 1][0], y: pts[i - 1][1], dx: dx, dy: dy, l: l, s: L });
+      L += l;
+    }
+    return { pts: pts, segs: segs, L: L };
+  }
+  function pathAt(P, s) {
+    for (var i = 0; i < P.segs.length; i++) {
+      var g = P.segs[i];
+      if (s <= g.s + g.l) { var f = Math.max(0, (s - g.s) / g.l); return { x: g.x + g.dx * f, y: g.y + g.dy * f }; }
+    }
+    var e = P.pts[P.pts.length - 1];
+    return { x: e[0], y: e[1] };
+  }
+  function strokePts(ctx, pts) {
+    ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.stroke();
+  }
+  function arrowHead(ctx, x, y, ang, size, color) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang); ctx.fillStyle = color;
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-size, -size * 0.5); ctx.lineTo(-size, size * 0.5); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  function arrowLine(ctx, x0, y0, x1, y1, color, size) {
+    var ang = Math.atan2(y1 - y0, x1 - x0), s = size || 9;
+    ctx.strokeStyle = color; ctx.lineWidth = 2;
+    strokePts(ctx, [[x0, y0], [x1 - Math.cos(ang) * s * 0.8, y1 - Math.sin(ang) * s * 0.8]]);
+    arrowHead(ctx, x1, y1, ang, s, color);
+  }
+  function rr(ctx, x, y, w, h, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  function runAnim(cv, step, draw, btn) {
+    var running = true, visible = true, looping = false, last = 0;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function frame(ts) {
+      if (!running || !visible || reduce) { looping = false; last = 0; return; }
+      var dt = last ? Math.min(0.05, (ts - last) / 1000) : 0.016; last = ts;
+      step(dt); draw();
+      requestAnimationFrame(frame);
+    }
+    function start() { if (running && visible && !reduce && !looping) { looping = true; last = 0; requestAnimationFrame(frame); } }
+    if (reduce) { running = false; btn.textContent = 'Abspielen'; }
+    btn.addEventListener('click', function () {
+      if (reduce) { reduce = false; running = true; } else running = !running;
+      btn.textContent = running ? 'Anhalten' : 'Weiter';
+      start();
+    });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { var was = visible; visible = es[0].isIntersecting; if (visible && !was) start(); }, { threshold: 0.05 }).observe(cv);
+    }
+    if ('ResizeObserver' in window) new ResizeObserver(function () { draw(); }).observe(cv);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { draw(); });
+    draw(); start();
+  }
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function gauss(rnd) { var u = 0; while (u === 0) u = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rnd()); }
+  function poissonL(L, rnd) { var k = 0, p = 1; do { k++; p *= rnd(); } while (p > L); return k - 1; }
+  function f2(v) { return v.toFixed(2).replace('.', ','); }
+  function f3(v) { return v.toFixed(3).replace('.', ','); }
+  function tauFmt(v) { return v === 0 ? '0' : Math.abs(v - 1) < 1e-9 ? 'τ' : num(v, 2) + ' τ'; }
+  function debounce(f, ms) { var t = 0; return function () { clearTimeout(t); t = setTimeout(f, ms); }; }
+
+  // ======================= Merger =======================
+  (function () {
+    var CP = { sand: 830, urea: 1544.7 }, NAME = { sand: 'Sand', urea: 'Harnstoff' };
+    var st = { mat1: 'sand', m1: 5, T1: 80, p1: 1.2, m2: 10, T2: 20, p2: 1 };
+    function mixT(mat1, m1, m2) {
+      var c1 = m1 * CP[mat1], c2 = m2 * CP.sand;
+      return c1 + c2 > 0 ? (c1 * st.T1 + c2 * st.T2) / (c1 + c2) : (st.T1 + st.T2) / 2;
+    }
+    function result() {
+      var m = st.m1 + st.m2, ps = [];
+      if (st.m1 > 0) ps.push(st.p1);
+      if (st.m2 > 0) ps.push(st.p2);
+      if (!ps.length) ps = [st.p1, st.p2];
+      return { m: m, T: mixT(st.mat1, st.m1, st.m2), Tm: m > 0 ? (st.m1 * st.T1 + st.m2 * st.T2) / m : (st.T1 + st.T2) / 2, p: Math.min.apply(null, ps) };
+    }
+    function fT(T) { return T.toFixed(1).replace('.', ',').replace('-', '−') + ' °C'; }
+    function fM(m) { return num(m, 3) + ' kg/s'; }
+    function fP(p) { return p.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 2 }) + ' bar'; }
+
+    var cv = $('#mergerCanvas'), ctx = cv.getContext('2d'), VW = 800, VH = 330, C = null;
+    var A1 = [[0, 76], [258, 76], [348, 148]], A2 = [[0, 254], [258, 254], [348, 192]], AO = [[472, 170], [772, 170]];
+    var NODE = { x: 348, y: 126, w: 124, h: 88 };
+    var PATHS = [makePath(A1.concat([[410, 170]], AO)), makePath(A2.concat([[410, 170]], AO))];
+    var parts = [], acc = [0.3, 0.6], SPEED = 120;
+    function spawn(k) { parts.push({ k: k, s: 0, r: 2.6 + 4.4 * Math.pow(Math.random(), 1.6), mat: k === 0 ? st.mat1 : 'sand' }); }
+    function step(dt) {
+      [st.m1, st.m2].forEach(function (m, k) {
+        acc[k] += dt * 0.6 * m * (0.4 + 1.2 * Math.random());
+        while (acc[k] >= 1) { acc[k] -= 1; if (parts.length < 220) spawn(k); }
+      });
+      for (var i = parts.length - 1; i >= 0; i--) {
+        var p = parts[i];
+        p.s += SPEED * dt;
+        if (p.s > PATHS[p.k].L) parts.splice(i, 1);
+      }
+    }
+    function tcol(T) { return lerpRgb(C.rgb.cold, C.rgb.hot, Math.max(0, Math.min(1, T / 100))); }
+    function draw() {
+      if (!C) C = tokenColors();
+      fitCanvas(cv, ctx, VW);
+      ctx.clearRect(0, 0, VW, VH);
+      var R = result(), c1 = st.m1 > 0 ? tcol(st.T1) : C.muted, c2 = st.m2 > 0 ? tcol(st.T2) : C.muted, cO = R.m > 0 ? tcol(R.T) : C.muted;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 5;
+      [[A1, c1, st.m1], [A2, c2, st.m2]].forEach(function (q) {
+        var pts = q[0], n = pts.length, a = pts[n - 2], b = pts[n - 1], ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+        ctx.strokeStyle = q[1]; ctx.lineWidth = 5; ctx.setLineDash(q[2] > 0 ? [] : [8, 8]);
+        strokePts(ctx, pts.slice(0, n - 1).concat([[b[0] - Math.cos(ang) * 14, b[1] - Math.sin(ang) * 14]]));
+        ctx.setLineDash([]);
+        arrowHead(ctx, b[0], b[1], ang, 18, q[1]);
+      });
+      ctx.strokeStyle = cO; ctx.lineWidth = 5; ctx.setLineDash(R.m > 0 ? [] : [8, 8]);
+      strokePts(ctx, [AO[0], [AO[1][0], AO[1][1]]]);
+      ctx.setLineDash([]);
+      arrowHead(ctx, AO[1][0] + 18, AO[1][1], 0, 18, cO);
+      parts.forEach(function (p) {
+        var q = pathAt(PATHS[p.k], p.s);
+        ctx.beginPath(); ctx.arc(q.x, q.y, p.r, 0, 2 * Math.PI);
+        ctx.fillStyle = p.mat === 'urea' ? C.urea : C.sand; ctx.fill();
+        ctx.lineWidth = 1; ctx.globalAlpha = 0.5; ctx.strokeStyle = C.ink; ctx.stroke(); ctx.globalAlpha = 1;
+      });
+      rr(ctx, NODE.x, NODE.y, NODE.w, NODE.h, 6);
+      ctx.fillStyle = C.paper; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = C.ink; ctx.stroke();
+      ctx.fillStyle = C.ink; ctx.font = '600 22px ' + DISPLAY; ctx.textAlign = 'center';
+      ctx.fillText('Merger', NODE.x + NODE.w / 2, NODE.y + NODE.h / 2 + 7);
+      ctx.textAlign = 'left'; ctx.font = '600 19px ' + DISPLAY;
+      ctx.fillStyle = c1; ctx.fillText('Zulauf 1: ' + NAME[st.mat1] + ', ' + fM(st.m1) + ', ' + fT(st.T1) + ', ' + fP(st.p1), 14, 50);
+      ctx.fillStyle = c2; ctx.fillText('Zulauf 2: Sand, ' + fM(st.m2) + ', ' + fT(st.T2) + ', ' + fP(st.p2), 14, 292);
+      ctx.fillStyle = cO; ctx.fillText('Ausgang: ' + fM(R.m) + ', ' + fT(R.T) + ', ' + fP(R.p), 488, 146);
+      ctx.fillStyle = C.muted; ctx.font = '500 17px ' + DISPLAY;
+      ctx.fillText('Temperatur aus der Energiebilanz,', 488, 206);
+      ctx.fillText('Druck = kleinster Eingangsdruck', 488, 228);
+    }
+    function drawChart() {
+      var R = result(), lo = Math.min(st.T1, st.T2), hi = Math.max(st.T1, st.T2);
+      if (hi - lo < 4) { lo -= 5; hi += 5; }
+      var span = hi - lo, ystep = span > 120 ? 40 : span > 60 ? 20 : span > 25 ? 10 : 5;
+      var y0 = Math.floor(lo / ystep) * ystep, y1 = Math.ceil(hi / ystep) * ystep;
+      var P = makePlot($('#mixPlot'), { w: 640, h: 300, x: [0, 1], y: [y0, y1], xstep: 0.25, ystep: ystep, m: { l: 74 },
+        xfmt: function (v) { return num(100 * v, 3) + ' %'; }, yfmt: function (v) { return num(v, 4).replace('-', '−') + ' °C'; },
+        xlabel: 'Massenanteil von Zulauf 1', ylabel: 'Mischtemperatur' });
+      var xs = [];
+      for (var i = 0; i <= 200; i++) xs.push(i / 200);
+      var lab = [];
+      ['sand', 'urea'].forEach(function (mat) {
+        var cur = mat === st.mat1, a = { d: linePath(P, xs, function (x) { return mixT(mat, x, 1 - x); }), 'class': 'curve ' + (cur ? 'c-acc' : 'thin c-muted') };
+        if (!cur) a['stroke-dasharray'] = '6 5';
+        el('path', a, P.plot);
+        lab.push({ mat: mat, y: mixT(mat, 0.6, 0.4), cur: cur });
+      });
+      var rising = st.T1 >= st.T2, upper = lab[0].y >= lab[1].y ? 0 : 1;
+      lab.forEach(function (L, i) {
+        var isUp = i === upper, left = isUp === rising;
+        var t = text(P.over, P.X(left ? 0.57 : 0.63), P.Y(L.y) + (isUp ? -10 : 22), (L.mat === 'urea' ? 'Harnstoff' : 'Sand') + ' + Sand', L.cur ? 'axt' : 'tick', left ? 'end' : 'start');
+        if (Math.abs(lab[0].y - lab[1].y) < 0.5 && i === 1) t.setAttribute('visibility', 'hidden');
+      });
+      if (R.m > 0) {
+        var x0 = st.m1 / R.m, right = x0 < 0.72;
+        el('line', { x1: P.X(x0), x2: P.X(x0), y1: P.m.t, y2: P.H - P.m.b, 'class': 'mark' }, P.plot);
+        el('circle', { cx: P.X(x0), cy: P.Y(R.T), r: 5.5, 'class': 'd-acc' }, P.over);
+        text(P.over, P.X(x0) + (right ? 10 : -10), P.Y(R.T) + 5, fT(R.T), 'axt', right ? 'start' : 'end');
+      }
+      $('#mixTable tbody').innerHTML =
+        '<tr><td>Massenstrom</td><td class="num">' + fM(R.m) + '</td></tr>' +
+        '<tr><td>Mischtemperatur aus der Energiebilanz</td><td class="num">' + fT(R.T) + '</td></tr>' +
+        '<tr><td>zum Vergleich: Mittel nach der Masse</td><td class="num">' + fT(R.Tm) + '</td></tr>' +
+        '<tr><td>Druck: kleinster Eingangsdruck mit Masse</td><td class="num">' + fP(R.p) + '</td></tr>';
+    }
+    var ins = { m1: $('#mM1'), T1: $('#mT1'), p1: $('#mP1'), m2: $('#mM2'), T2: $('#mT2'), p2: $('#mP2') };
+    function readCtl() {
+      for (var k in ins) st[k] = +ins[k].value;
+      $('#mM1Val').textContent = fM(st.m1); $('#mT1Val').textContent = fT(st.T1); $('#mP1Val').textContent = fP(st.p1);
+      $('#mM2Val').textContent = fM(st.m2); $('#mT2Val').textContent = fT(st.T2); $('#mP2Val').textContent = fP(st.p2);
+    }
+    Object.keys(ins).forEach(function (k) { ins[k].addEventListener('input', function () { readCtl(); drawChart(); draw(); }); });
+    function setMat(m) {
+      st.mat1 = m;
+      $('#mMatSand').setAttribute('aria-pressed', m === 'sand'); $('#mMatUrea').setAttribute('aria-pressed', m === 'urea');
+      drawChart(); draw();
+    }
+    $('#mMatSand').addEventListener('click', function () { setMat('sand'); });
+    $('#mMatUrea').addEventListener('click', function () { setMat('urea'); });
+    onTheme(function () { C = null; draw(); });
+    readCtl();
+    for (var t = 0; t < 420; t++) step(1 / 60);
+    drawChart();
+    runAnim(cv, step, draw, $('#mergerPlay'));
+  })();
+
+  // ======================= Splitter =======================
+  (function () {
+    var cv = $('#splitCanvas'), ctx = cv.getContext('2d'), VW = 800, VH = 360, C = null;
+    var OY = [70, 180, 290], NODE = { x: 236, y: 140, w: 104, h: 80 };
+    var INPATH = makePath([[0, 180], [236, 180]]);
+    var OUT = OY.map(function (y) { return makePath([[340, 180 + (y - 180) * 0.22], [392, y], [588, y]]); });
+    var NCL = 8, RAD = [], PROB = [], CUM = [];
+    (function () {
+      var s = 0, c = 0, k;
+      for (k = 0; k < NCL; k++) { RAD.push(2.6 + 0.75 * k); var w = Math.exp(-Math.pow(k - 3.4, 2) / (2 * 1.7 * 1.7)); PROB.push(w); s += w; }
+      for (k = 0; k < NCL; k++) { PROB[k] /= s; c += PROB[k]; CUM.push(c); }
+    })();
+    function sampleCls() { var u = Math.random(); for (var k = 0; k < NCL; k++) if (u <= CUM[k]) return k; return NCL - 1; }
+
+    var st = { ou: true, mu1: 0.5, mu2: 0.3, sig: 0.05, tau: 2, dt: 0.1 };
+    var g = [0.5, 0.3], gc = [0.5, 0.3, 0.2], time = 0, ouAcc = 0, hist = [];
+    var parts = [], spawnAcc = 0, accts = [0, 0, 0], counts, feed, total, chartAcc = 0, countAcc = 0;
+    function shares() {
+      var a, b;
+      if (st.ou) { a = Math.min(1, Math.max(0, g[0])); b = Math.min(1, Math.max(0, g[1])); }
+      else { a = st.mu1; b = st.mu2; }
+      if (a + b > 1) { var s = a + b; a /= s; b /= s; }
+      return [a, b, Math.max(0, 1 - a - b)];
+    }
+    function initOU() { g = [st.mu1 + st.sig * gauss(Math.random), st.mu2 + st.sig * gauss(Math.random)]; gc = shares(); }
+    function ouStep() {
+      var a = Math.exp(-st.dt / st.tau), b = Math.sqrt(1 - a * a);
+      g[0] = st.mu1 + (g[0] - st.mu1) * a + st.sig * b * gauss(Math.random);
+      g[1] = st.mu2 + (g[1] - st.mu2) * a + st.sig * b * gauss(Math.random);
+    }
+    function resetCounts() {
+      counts = [0, 1, 2].map(function () { var a = []; for (var k = 0; k < NCL; k++) a.push(0); return a; });
+      feed = []; for (var k = 0; k < NCL; k++) feed.push(0);
+      total = [0, 0, 0]; accts = [0, 0, 0];
+    }
+    function decide(k) {
+      var best = 0, i;
+      for (i = 0; i < 3; i++) accts[i] += gc[i];
+      for (i = 1; i < 3; i++) if (accts[i] > accts[best] + 1e-12) best = i;
+      accts[best] -= 1;
+      feed[k]++; counts[best][k]++; total[best]++;
+      return best;
+    }
+    function seedCounts(n) { for (var i = 0; i < n; i++) decide(sampleCls()); }
+    function advance(dt) {
+      time += dt; ouAcc += dt;
+      while (ouAcc >= st.dt) {
+        ouAcc -= st.dt;
+        if (st.ou) ouStep();
+        gc = shares();
+        hist.push({ t: time - ouAcc, s: gc.slice() });
+      }
+      while (hist.length > 2 && hist[1].t < time - 41) hist.shift();
+    }
+    function step(dt) {
+      advance(dt);
+      spawnAcc += dt * 9 * (0.5 + Math.random());
+      while (spawnAcc >= 1) { spawnAcc -= 1; if (parts.length < 200) { var k = sampleCls(); parts.push({ k: k, r: RAD[k], s: 0, out: -1 }); } }
+      for (var i = parts.length - 1; i >= 0; i--) {
+        var p = parts[i];
+        p.s += 130 * dt;
+        if (p.out < 0 && p.s >= INPATH.L + 18) { p.out = decide(p.k); p.s = 0; }
+        else if (p.out >= 0 && p.s >= OUT[p.out].L) parts.splice(i, 1);
+      }
+      chartAcc += dt; if (chartAcc > 0.12) { chartAcc = 0; drawChart(); }
+      countAcc += dt; if (countAcc > 0.5) { countAcc = 0; showCount(); }
+    }
+    function showCount() {
+      var n = total[0] + total[1] + total[2];
+      $('#splitCount').textContent = 'Gezählt seit dem Laden: ' + n.toLocaleString('de-DE') + ' Körner, davon ' +
+        total.map(function (t) { return num(n ? 100 * t / n : 0, 3) + ' %'; }).join(' / ') + '.';
+    }
+    function draw() {
+      if (!C) C = tokenColors();
+      fitCanvas(cv, ctx, VW);
+      ctx.clearRect(0, 0, VW, VH);
+      var cols = [C.out1, C.out2, C.out3], k, i;
+      // Größenverteilung des Zulaufs
+      var hx0 = 24, hx1 = 196, hy = 124, hh = 64;
+      ctx.beginPath(); ctx.moveTo(hx0, hy);
+      for (var j = 0; j <= 60; j++) {
+        var u = j / 60, w = Math.exp(-Math.pow(u * (NCL - 1) - 3.4, 2) / (2 * 1.7 * 1.7));
+        ctx.lineTo(hx0 + u * (hx1 - hx0), hy - hh * w);
+      }
+      ctx.lineTo(hx1, hy); ctx.closePath();
+      ctx.globalAlpha = 0.35; ctx.fillStyle = C.muted; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.strokeStyle = C.muted; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = C.ink; ctx.font = '600 20px ' + DISPLAY; ctx.textAlign = 'left'; ctx.fillText('Zulauf', hx0, 40);
+      ctx.fillStyle = C.muted; ctx.font = '500 17px ' + DISPLAY; ctx.fillText('Größenverteilung', hx0, hy + 24);
+      // Leitungen
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.strokeStyle = C.ink; ctx.lineWidth = 4; strokePts(ctx, [[0, 180], [220, 180]]); arrowHead(ctx, 236, 180, 0, 16, C.ink);
+      OUT.forEach(function (P, i) {
+        ctx.strokeStyle = cols[i]; ctx.lineWidth = 4;
+        strokePts(ctx, P.pts.slice(0, P.pts.length - 1).concat([[P.pts[P.pts.length - 1][0] - 4, OY[i]]]));
+        arrowHead(ctx, P.pts[P.pts.length - 1][0] + 12, OY[i], 0, 16, cols[i]);
+      });
+      // Körner
+      parts.forEach(function (p) {
+        var q;
+        if (p.out < 0) { if (p.s > INPATH.L) return; q = pathAt(INPATH, p.s); }
+        else q = pathAt(OUT[p.out], p.s);
+        ctx.beginPath(); ctx.arc(q.x, q.y, p.r, 0, 2 * Math.PI);
+        ctx.fillStyle = C.sand; ctx.fill();
+        ctx.lineWidth = 1; ctx.globalAlpha = 0.5; ctx.strokeStyle = C.ink; ctx.stroke(); ctx.globalAlpha = 1;
+      });
+      // Knoten
+      rr(ctx, NODE.x, NODE.y, NODE.w, NODE.h, 6);
+      ctx.fillStyle = C.paper; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = C.ink; ctx.stroke();
+      ctx.fillStyle = C.ink; ctx.font = '600 22px ' + DISPLAY; ctx.textAlign = 'center';
+      ctx.fillText('Splitter', NODE.x + NODE.w / 2, NODE.y + NODE.h / 2 + 7);
+      ctx.fillStyle = C.muted; ctx.font = '500 17px ' + DISPLAY;
+      ctx.fillText(st.ou ? 'Anteile schwankend' : 'Anteile fest', NODE.x + NODE.w / 2, NODE.y + NODE.h + 26);
+      // Beschriftung der Ausgänge
+      ctx.textAlign = 'left'; ctx.font = '600 19px ' + DISPLAY;
+      ['Ausgang 1: ', 'Ausgang 2: ', 'Ausgang 3, Rest: '].forEach(function (s, i) { ctx.fillStyle = cols[i]; ctx.fillText(s + f2(gc[i]), 398, OY[i] - 12); });
+      // gezählte Größenverteilung je Ausgang
+      var n = total[0] + total[1] + total[2], mx = 1e-9;
+      for (i = 0; i < 3; i++) for (k = 0; k < NCL; k++) mx = Math.max(mx, counts[i][k], n ? feed[k] * total[i] / n : 0);
+      var bx = 618, bw = 174, cw = bw / NCL;
+      for (i = 0; i < 3; i++) {
+        var base = OY[i] + 32, top = OY[i] - 44, H = base - top;
+        ctx.strokeStyle = C.muted; ctx.lineWidth = 1; strokePts(ctx, [[bx, base], [bx + bw, base]]);
+        ctx.fillStyle = cols[i]; ctx.globalAlpha = 0.35;
+        for (k = 0; k < NCL; k++) { var hgt = H * counts[i][k] / mx; ctx.fillRect(bx + k * cw + 1.5, base - hgt, cw - 3, hgt); }
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = cols[i]; ctx.lineWidth = 2; ctx.beginPath();
+        for (k = 0; k < NCL; k++) { var e = n ? feed[k] * total[i] / n : 0, X = bx + (k + 0.5) * cw, Y = base - H * e / mx; if (k) ctx.lineTo(X, Y); else ctx.moveTo(X, Y); }
+        ctx.stroke();
+        ctx.fillStyle = C.muted; ctx.font = '500 15px ' + DISPLAY; ctx.textAlign = 'right';
+        ctx.fillText(total[i].toLocaleString('de-DE') + ' Körner', bx + bw, top - 2);
+        ctx.textAlign = 'left';
+      }
+    }
+    function drawChart() {
+      var t1 = time, t0 = time - 40, mxs = Math.max(st.mu1, st.mu2, 1 - st.mu1 - st.mu2);
+      var top = Math.min(1, Math.max(0.2, Math.ceil((mxs + (st.ou ? 3 * st.sig : 0) + 0.04) * 10) / 10));
+      var P = makePlot($('#ouPlot'), { w: 640, h: 270, x: [t0, t1], y: [0, top], xstep: 10, ystep: top > 0.6 ? 0.2 : 0.1,
+        xfmt: function (v) { return num(v, 6) + ' s'; }, yfmt: function (v) { return num(v, 2); }, xlabel: 'Zeit', ylabel: 'Anteil' });
+      if (st.ou) {
+        [[2, 0.09], [1, 0.13]].forEach(function (b) {
+          var ya = P.Y(st.mu1 + b[0] * st.sig), yb = P.Y(st.mu1 - b[0] * st.sig);
+          el('rect', { x: P.m.l, width: P.W - P.m.l - P.m.r, y: ya, height: Math.max(0, yb - ya), 'class': 'band', 'fill-opacity': b[1] }, P.plot);
+        });
+        el('line', { x1: P.m.l, x2: P.W - P.m.r, y1: P.Y(st.mu1), y2: P.Y(st.mu1), 'class': 'mark' }, P.plot);
+      }
+      [0, 1, 2].forEach(function (i) {
+        var d = '';
+        hist.forEach(function (h) {
+          var x = P.X(Math.max(t0 - 1, h.t)).toFixed(1), y = P.Y(h.s[i]).toFixed(1);
+          d += d ? 'H' + x + 'V' + y : 'M' + x + ' ' + y;
+        });
+        if (d) { d += 'H' + P.X(t1).toFixed(1); el('path', { d: d, 'class': 'curve ' + ['c-out1', 'c-out2 thin', 'c-out3 thin'][i] }, P.plot); }
+      });
+    }
+    function computeStats() {
+      $('#ouStatsBox').hidden = !st.ou;
+      if (!st.ou) return;
+      var rnd = mulberry32(20261117), N = 40000, a = Math.exp(-st.dt / st.tau), b = Math.sqrt(1 - a * a), r = st.dt / st.tau;
+      var ge = st.mu1 + st.sig * gauss(rnd), gu = ge, E = new Float64Array(N), U = new Float64Array(N), lag = Math.round(st.tau / st.dt);
+      for (var k = 0; k < N; k++) {
+        var xi = gauss(rnd);
+        ge = st.mu1 + (ge - st.mu1) * a + st.sig * b * xi;
+        gu = gu - (gu - st.mu1) * r + st.sig * Math.sqrt(2 * r) * xi;
+        E[k] = ge; U[k] = gu;
+      }
+      function stats(X) {
+        var n = X.length, m = 0, v = 0, c = 0, i;
+        for (i = 0; i < n; i++) m += X[i];
+        m /= n;
+        for (i = 0; i < n; i++) v += (X[i] - m) * (X[i] - m);
+        v /= n;
+        if (lag >= 1 && v > 0) { for (i = 0; i + lag < n; i++) c += (X[i] - m) * (X[i + lag] - m); c /= (n - lag) * v; } else c = NaN;
+        return { m: m, s: Math.sqrt(v), c: c };
+      }
+      var se = stats(E), su = stats(U), bad = Math.abs(1 - r) >= 1 || !isFinite(su.s) || su.s > 1e3;
+      function cell(v) { return '<td class="num">' + (isFinite(v) ? f3(v) : '–') + '</td>'; }
+      function ucell(v) { return bad ? '<td class="num">instabil</td>' : cell(v); }
+      var lagLabel = lag >= 1 ? 'Autokorrelation nach ' + num(lag * st.dt, 3) + ' s' : 'Autokorrelation (Δt &gt; 2τ)';
+      $('#ouStats tbody').innerHTML =
+        '<tr><td>Mittel</td>' + cell(st.mu1) + cell(se.m) + ucell(su.m) + '</tr>' +
+        '<tr><td>Streuung</td>' + cell(st.sig) + cell(se.s) + ucell(su.s) + '</tr>' +
+        '<tr><td>' + lagLabel + '</td>' + cell(lag >= 1 ? Math.exp(-lag * st.dt / st.tau) : NaN) + cell(se.c) + ucell(su.c) + '</tr>';
+    }
+    var stats2 = debounce(computeStats, 120);
+    function warn() {
+      var w = '';
+      if (st.mu1 + st.mu2 > 1) w = 'μ₁ + μ₂ > 1: die Anteile werden anteilig gekürzt, Ausgang 3 bleibt leer.';
+      else if (st.ou && [st.mu1, st.mu2].some(function (m) { return m - 3 * st.sig < 0 || m + 3 * st.sig > 1; }))
+        w = 'Hinweis wie im Editor: μ ± 3σ liegt außerhalb von [0, 1]. Das Abschneiden verschiebt den Mittelwert leicht.';
+      $('#spWarn').textContent = w;
+    }
+    function readCtl(resetShares) {
+      st.mu1 = +$('#spMu1').value; st.mu2 = +$('#spMu2').value; st.sig = +$('#spSig').value; st.tau = +$('#spTau').value; st.dt = +$('#spDt').value;
+      $('#spMu1Val').textContent = f2(st.mu1); $('#spMu2Val').textContent = f2(st.mu2);
+      $('#spSigVal').textContent = f3(st.sig); $('#spTauVal').textContent = num(st.tau, 3) + ' s';
+      ['#spSig', '#spTau', '#spDt'].forEach(function (s) { $(s).disabled = !st.ou; });
+      if (resetShares) { if (st.ou) initOU(); gc = shares(); resetCounts(); seedCounts(300); }
+      warn(); stats2(); drawChart(); draw(); showCount();
+    }
+    ['#spMu1', '#spMu2', '#spSig'].forEach(function (s) { $(s).addEventListener('input', function () { readCtl(true); }); });
+    ['#spTau', '#spDt'].forEach(function (s) { $(s).addEventListener('input', function () { readCtl(false); }); });
+    function setMode(ou) {
+      st.ou = ou;
+      $('#spFix').setAttribute('aria-pressed', !ou); $('#spOU').setAttribute('aria-pressed', ou);
+      readCtl(true);
+    }
+    $('#spFix').addEventListener('click', function () { setMode(false); });
+    $('#spOU').addEventListener('click', function () { setMode(true); });
+    var lg = document.createElement('div');
+    lg.className = 'legend';
+    lg.innerHTML = '<span><span class="swatch" style="--c: var(--out1)"></span>Ausgang 1, Bänder μ₁ ± σ und μ₁ ± 2σ</span><span><span class="swatch" style="--c: var(--out2)"></span>Ausgang 2</span><span><span class="swatch" style="--c: var(--out3)"></span>Ausgang 3, Rest</span>';
+    $('#ouPlot').parentNode.insertBefore(lg, $('#ouPlot').nextSibling);
+    onTheme(function () { C = null; draw(); });
+    resetCounts();
+    st.mu1 = +$('#spMu1').value; st.mu2 = +$('#spMu2').value; st.sig = +$('#spSig').value;
+    initOU();
+    seedCounts(300);
+    for (var t = 0; t < 1260; t++) step(1 / 30);
+    readCtl(false);
+    runAnim(cv, step, draw, $('#splitPlay'));
+  })();
+
+  // ======================= Behälter =======================
+  (function () {
+    var DT = 0.02, Q = 50, AGEMAX = 600, NSEED = 20000;
+    var par = { n: 3, phi: 0.6, kappa: 0.3 }, K_mix, K_R, K_L, K_tauR, K_qc;
+    var KINDS = [
+      { id: 'mix', name: 'ideal durchmischt', sub: 'jede Karte gleich', ex: 'Rührkessel, Wirbelschicht', tok: 'm3', curve: 'c-m3', dot: 'd-m3', txt: 't-m3' },
+      { id: 'plug', name: 'Pfropfenströmung', sub: 'die älteste zuerst', ex: 'Rohr, Förderband', tok: 'm1', curve: 'c-m1', dot: 'd-m1', txt: 't-m1', mk: 'ah-m1' },
+      { id: 'casc', name: 'Kaskade', sub: 'Kessel für Kessel', ex: 'Behälter in Reihe', tok: 'out2', curve: 'c-out2', dot: 'd-out2', txt: 't-out2' },
+      { id: 'core', name: 'Kernfluss', sub: 'Kern schnell, Rand langsam', ex: 'Silo mit Totzonen', tok: 'm4', curve: 'c-m4', dot: 'd-m4', txt: 't-m4', mk: 'ah-m4' }
+    ];
+    var sel = 'mix';
+    function setConst() {
+      K_tauR = (1 - par.phi * par.kappa) / (1 - par.phi);
+      K_mix = 1 - Math.exp(-DT); K_R = 1 - Math.exp(-DT / K_tauR); K_L = Math.exp(-par.n * DT);
+      K_qc = Math.round(par.kappa / DT * 1e6) / 1e6;
+    }
+    function newState(kind, rnd) {
+      var s = { age: 0 };
+      if (kind === 'casc') s.j = 0;
+      if (kind === 'core') {
+        s.core = rnd() < par.phi;
+        if (s.core) { var qi = Math.floor(K_qc); s.q = Math.max(1, qi + (rnd() < K_qc - qi ? 1 : 0)); }
+      }
+      return s;
+    }
+    function stepState(kind, s, rnd) {
+      var out;
+      if (kind === 'mix') out = rnd() < K_mix;
+      else if (kind === 'plug') out = s.age + 1 >= Q;
+      else if (kind === 'casc') { s.j += poissonL(K_L, rnd); out = s.j >= par.n; }
+      else out = s.core ? s.age + 1 >= s.q : rnd() < K_R;
+      s.age++;
+      return out;
+    }
+    function Sfun(kind, t) {
+      if (t <= 0) return 1;
+      if (kind === 'mix') return Math.exp(-t);
+      if (kind === 'plug') return t < 1 - 1e-9 ? 1 : 0;
+      if (kind === 'casc') { var x = par.n * t, s = 0, term = 1; for (var k = 0; k < par.n; k++) { s += term; term *= x / (k + 1); } return Math.exp(-x) * s; }
+      var tq = t / DT, qi = Math.floor(K_qc + 1e-9), f = K_qc - qi;
+      var sc = tq < qi - 1e-9 ? 1 : tq < qi + 1 - 1e-9 ? f : 0;
+      return par.phi * sc + (1 - par.phi) * Math.exp(-t / K_tauR);
+    }
+    function Efun(kind, t) {
+      if (kind === 'mix') return Math.exp(-t);
+      if (kind === 'casc') { var f = 1; for (var k = 2; k < par.n; k++) f *= k; return Math.pow(par.n, par.n) * Math.pow(t, par.n - 1) * Math.exp(-par.n * t) / f; }
+      if (kind === 'core') return (1 - par.phi) * Math.exp(-t / K_tauR) / K_tauR;
+      return NaN;
+    }
+    function pExp(kind, j) { var a = Sfun(kind, j * DT); return a > 1e-12 ? 1 - Sfun(kind, (j + 1) * DT) / a : NaN; }
+
+    var stats = {};
+    function resetStats() { KINDS.forEach(function (K) { stats[K.id] = { n: 0, ex: new Float64Array(AGEMAX + 1), sum: 0 }; }); }
+    function record(kind, age) { var S = stats[kind]; S.ex[Math.min(AGEMAX, age - 1)]++; S.n++; S.sum += age; }
+    function seedStats() {
+      KINDS.forEach(function (K) {
+        for (var i = 0; i < NSEED; i++) {
+          var s = newState(K.id, Math.random), guard = 0;
+          while (!stepState(K.id, s, Math.random) && ++guard < 20000) { }
+          record(K.id, s.age);
+        }
+      });
+    }
+
+    // ---------- Animation ----------
+    var cv = $('#vesselCanvas'), ctx = cv.getContext('2d'), C = null, narrow = false;
+    var live = {}, leaving = [], markLeft = 0, acc = 0, speed = 1, STEP = 0.08, clock = 0, chartAcc = 0;
+    var ENTRY = { mix: [34, 64], plug: [22, 126], casc: [14, 98], core: [100, 52] };
+    var EXIT = { mix: [196, 180], plug: [200, 126], casc: [200, 154], core: [100, 216] };
+    function cascBox(j) { var w = (172 - (par.n - 1) * 10) / par.n; return { x: 14 + j * (w + 10), y: 86, w: w, h: 80 }; }
+    function place(kind, g) {
+      if (kind === 'mix') { g.tx = 40 + Math.random() * 120; g.ty = 64 + Math.random() * 122; }
+      else if (kind === 'casc') { var b = cascBox(Math.min(g.j, par.n - 1)); g.tx = b.x + 6 + Math.random() * (b.w - 12); g.ty = b.y + 7 + Math.random() * (b.h - 14); }
+      else if (kind === 'core' && !g.core) { var left = Math.random() < 0.5; g.tx = (left ? 47 : 119) + Math.random() * 34; g.ty = 60 + Math.random() * 84; }
+    }
+    function target(kind, g, frac) {
+      if (kind === 'plug') return [34 + Math.min(1, (g.age + frac) / Q) * 134, 126 + g.lane * 11];
+      if (kind === 'core' && g.core) return [100 + g.lane * 6, 58 + Math.min(1, (g.age + frac) / g.q) * 134];
+      return [g.tx, g.ty];
+    }
+    function simStep() {
+      KINDS.forEach(function (K) {
+        var list = live[K.id], g = newState(K.id, Math.random);
+        g.px = ENTRY[K.id][0]; g.py = ENTRY[K.id][1]; g.mark = markLeft > 0; g.lane = Math.random() * 2 - 1; g.jit = Math.random() * 6.283;
+        place(K.id, g); list.push(g);
+        for (var i = list.length - 1; i >= 0; i--) {
+          var q = list[i], j0 = q.j;
+          if (stepState(K.id, q, Math.random)) { record(K.id, q.age); list.splice(i, 1); q.kind = K.id; q.fade = 0; leaving.push(q); }
+          else if (K.id === 'casc' && q.j !== j0) place('casc', q);
+        }
+      });
+      if (markLeft > 0) markLeft--;
+    }
+    function settle() { KINDS.forEach(function (K) { live[K.id].forEach(function (g) { var t = target(K.id, g, 0); g.px = t[0]; g.py = t[1]; }); }); leaving = []; }
+    function resetLive() { KINDS.forEach(function (K) { live[K.id] = []; }); for (var i = 0; i < 2 * Q + 20; i++) simStep(); settle(); }
+    function step(dt) {
+      clock += dt;
+      acc += dt * speed;
+      var n = 0;
+      while (acc >= STEP && n < 12) { acc -= STEP; simStep(); n++; }
+      if (n >= 12) acc = 0;
+      var k = Math.min(1, dt * 7 * speed), frac = acc / STEP;
+      KINDS.forEach(function (K) { live[K.id].forEach(function (g) { var t = target(K.id, g, frac); g.px += (t[0] - g.px) * k; g.py += (t[1] - g.py) * k; }); });
+      for (var i = leaving.length - 1; i >= 0; i--) {
+        var g = leaving[i], e = EXIT[g.kind];
+        g.px += (e[0] - g.px) * k; g.py += (e[1] - g.py) * k; g.fade += dt * 2.5 * Math.sqrt(speed);
+        if (g.fade >= 1) leaving.splice(i, 1);
+      }
+      chartAcc += dt; if (chartAcc > 1) { chartAcc = 0; drawCharts(); }
+    }
+    function ageCol(age) { return lerpRgb(C.rgb.age0, C.rgb.age1, Math.min(1, age / (2 * Q))); }
+    function drawGrain(g, x, y, alpha) {
+      ctx.globalAlpha = alpha;
+      ctx.beginPath(); ctx.arc(x, y, 3.8, 0, 2 * Math.PI); ctx.fillStyle = ageCol(g.age); ctx.fill();
+      ctx.lineWidth = 0.8; ctx.strokeStyle = C.ink; ctx.globalAlpha = alpha * 0.3; ctx.stroke(); ctx.globalAlpha = alpha;
+      if (g.mark) { ctx.beginPath(); ctx.arc(x, y, 6.6, 0, 2 * Math.PI); ctx.lineWidth = 1.8; ctx.strokeStyle = C.ink; ctx.stroke(); }
+      ctx.globalAlpha = 1;
+    }
+    function drawPanel(K) {
+      var id = K.id, i;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.fillStyle = C.paper; ctx.strokeStyle = C.ink; ctx.lineWidth = 2;
+      if (id === 'mix') {
+        rr(ctx, 28, 52, 144, 146, 18); ctx.fill(); ctx.stroke();
+        arrowLine(ctx, 6, 38, 32, 62, C.muted); arrowLine(ctx, 172, 180, 198, 180, C.muted);
+      } else if (id === 'plug') {
+        rr(ctx, 22, 104, 156, 44, 22); ctx.fill(); ctx.stroke();
+        arrowLine(ctx, 2, 126, 22, 126, C.muted); arrowLine(ctx, 178, 126, 199, 126, C.muted);
+        ctx.fillStyle = C.muted; ctx.font = '500 16px ' + DISPLAY; ctx.textAlign = 'center'; ctx.fillText('neu → alt', 100, 94);
+      } else if (id === 'casc') {
+        for (i = 0; i < par.n; i++) {
+          var b = cascBox(i);
+          rr(ctx, b.x, b.y, b.w, b.h, 7); ctx.fillStyle = C.paper; ctx.fill(); ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.stroke();
+          if (i < par.n - 1) arrowLine(ctx, b.x + b.w, 154, b.x + b.w + 10, 154, C.muted, 6);
+        }
+        arrowLine(ctx, 0, 98, 14, 98, C.muted, 7);
+        var lb = cascBox(par.n - 1); arrowLine(ctx, lb.x + lb.w, 154, 199, 154, C.muted, 7);
+      } else {
+        ctx.beginPath(); ctx.moveTo(40, 52); ctx.lineTo(160, 52); ctx.lineTo(160, 150); ctx.lineTo(112, 196); ctx.lineTo(88, 196); ctx.lineTo(40, 150); ctx.closePath();
+        ctx.fillStyle = C.paper; ctx.fill();
+        ctx.globalAlpha = 0.14; ctx.fillStyle = C.accent; ctx.fillRect(88, 52, 24, 144); ctx.globalAlpha = 1;
+        ctx.beginPath(); ctx.moveTo(40, 52); ctx.lineTo(40, 150); ctx.lineTo(88, 196); ctx.moveTo(160, 52); ctx.lineTo(160, 150); ctx.lineTo(112, 196);
+        ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.stroke();
+        arrowLine(ctx, 100, 30, 100, 50, C.muted); arrowLine(ctx, 100, 198, 100, 218, C.muted);
+        ctx.fillStyle = C.muted; ctx.font = '500 15px ' + DISPLAY; ctx.textAlign = 'center'; ctx.fillText('Rand', 64, 46); ctx.fillText('Rand', 136, 46);
+      }
+      if (id === 'mix') { // Rührer
+        ctx.strokeStyle = C.muted; ctx.lineWidth = 3; strokePts(ctx, [[100, 36], [100, 162]]);
+        ctx.lineWidth = 5; strokePts(ctx, [[78, 162], [122, 162]]);
+        ctx.fillStyle = C.muted; ctx.fillRect(89, 27, 22, 9);
+      }
+      live[id].forEach(function (g) {
+        var x = g.px, y = g.py;
+        if (id === 'mix' || id === 'casc' || (id === 'core' && !g.core)) { x += Math.sin(clock * 1.3 + g.jit) * 1.6; y += Math.cos(clock * 1.1 + g.jit * 1.7) * 1.6; }
+        drawGrain(g, x, y, 1);
+      });
+      leaving.forEach(function (g) { if (g.kind === id) drawGrain(g, g.px, g.py, Math.max(0, 1 - g.fade)); });
+      ctx.textAlign = 'center';
+      ctx.fillStyle = C.muted; ctx.font = '500 15px ' + DISPLAY; ctx.fillText(live[id].length + ' im Behälter', id === 'core' ? 150 : 100, 18);
+      ctx.fillStyle = C.ink; ctx.font = '600 19px ' + DISPLAY; ctx.fillText(id === 'casc' ? 'Kaskade aus ' + par.n + ' Kesseln' : K.name, 100, 240);
+      ctx.font = '500 17px ' + DISPLAY; ctx.fillText(K.sub, 100, 262);
+      ctx.fillStyle = C.muted; ctx.font = '500 15px ' + DISPLAY; ctx.fillText(K.ex, 100, 284);
+      ctx.textAlign = 'left';
+    }
+    function draw() {
+      if (!C) C = tokenColors();
+      var w = cv.getBoundingClientRect().width, nw = w > 0 && w < 560;
+      if (nw !== narrow) { narrow = nw; cv.style.aspectRatio = narrow ? '400 / 600' : '800 / 300'; }
+      var VW = narrow ? 400 : 800, VH = narrow ? 600 : 300;
+      fitCanvas(cv, ctx, VW);
+      ctx.clearRect(0, 0, VW, VH);
+      KINDS.forEach(function (K, i) {
+        ctx.save();
+        ctx.translate(narrow ? (i % 2) * 200 : i * 200, narrow ? Math.floor(i / 2) * 300 : 0);
+        drawPanel(K);
+        ctx.restore();
+      });
+    }
+
+    // ---------- Kurven ----------
+    function drawCharts() {
+      var Ksel = KINDS.filter(function (K) { return K.id === sel; })[0], S = stats[sel], xs = [], i, j;
+      for (i = 1; i <= 400; i++) xs.push(i / 100);
+      // E(t)
+      var YM = 1.6, P = makePlot($('#ePlot'), { w: 640, h: 270, x: [0, 4], y: [0, YM], xstep: 0.5, ystep: 0.4, xfmt: tauFmt, yfmt: function (v) { return num(v, 2); }, xlabel: 'Verweilzeit t', ylabel: 'E(t) · τ' });
+      var bins = new Float64Array(40);
+      for (j = 0; j < AGEMAX; j++) { var R = j + 1, b = Math.ceil(R / 5) - 1; if (b < 40) bins[b] += S.ex[j]; }
+      var bw = P.X(0.1) - P.X(0);
+      for (i = 0; i < 40; i++) {
+        if (!bins[i]) continue;
+        var dens = bins[i] / (S.n * 0.1), y = P.Y(Math.min(dens, YM));
+        el('rect', { x: P.X(i * 0.1) + 1, width: bw - 2, y: y, height: P.Y(0) - y, 'class': Ksel.dot, 'fill-opacity': 0.3 }, P.plot);
+        if (dens > YM) text(P.over, P.X((i + 1) * 0.1) + 4, P.m.t + 48, 'gezählt ' + num(100 * bins[i] / S.n, 3) + ' %', Ksel.txt);
+      }
+      KINDS.forEach(function (K) {
+        var cur = K.id === sel, cls = 'curve ' + K.curve + (cur ? '' : ' thin faint');
+        if (K.id !== 'plug') el('path', { d: linePath(P, xs, function (t) { return Efun(K.id, t); }), 'class': cls }, P.plot);
+        var at = K.id === 'plug' ? 1 : K.id === 'core' ? K_qc * DT : NaN;
+        if (isFinite(at) && (K.id === 'plug' || par.phi > 0)) {
+          var ln = el('line', { x1: P.X(at), x2: P.X(at), y1: P.Y(0), y2: P.m.t + 4, 'class': K.curve + (cur ? '' : ' faint'), 'stroke-width': cur ? 2.6 : 1.8, 'marker-end': 'url(#' + K.mk + ')' }, P.plot);
+          ln.setAttribute('fill', 'none');
+          var lbl = K.id === 'plug' ? 'Pfropfen: alles bei τ' : 'Kern: ' + num(100 * par.phi, 3) + ' % bei ' + tauFmt(at);
+          var tt = text(P.over, P.X(at) + 7, P.m.t + (K.id === 'plug' ? 16 : 32), lbl, K.txt);
+          if (!cur) tt.setAttribute('class', K.txt + ' faint');
+        }
+      });
+      // p(Alter)
+      var PM = 0.08, Pp = makePlot($('#pPlot'), { w: 640, h: 250, x: [0, 3], y: [0, PM], xstep: 0.5, ystep: 0.02, xfmt: tauFmt, yfmt: function (v) { return num(100 * v, 2) + ' %'; }, xlabel: 'Alter der Karte', ylabel: 'Austritt im nächsten Schritt' });
+      var ages = []; for (j = 0; j < 150; j++) ages.push(j);
+      KINDS.forEach(function (K) {
+        var cur = K.id === sel, d = '', pen = false;
+        ages.forEach(function (j) {
+          var p = pExp(K.id, j);
+          if (!isFinite(p)) { pen = false; return; }
+          d += (pen ? 'L' : 'M') + Pp.X(j * DT).toFixed(1) + ' ' + Pp.Y(p).toFixed(1); pen = true;
+        });
+        el('path', { d: d, 'class': 'curve ' + K.curve + (cur ? '' : ' thin faint') }, Pp.plot);
+      });
+      var risk = S.n, labelled = false;
+      for (j = 0; j < 150 && j < AGEMAX; j++) {
+        if (risk >= 40) {
+          var ph = S.ex[j] / risk, cy = Pp.Y(Math.min(ph, PM));
+          el('circle', { cx: Pp.X(j * DT), cy: cy, r: 2.3, 'class': Ksel.dot }, Pp.plot);
+          if (ph > PM && !labelled && (sel === 'plug' || sel === 'core')) { text(Pp.over, Pp.X(j * DT) + 8, Pp.m.t + 14, 'gezählt ' + num(100 * ph, 3) + ' % bei ' + tauFmt(Math.round(j * DT * 100) / 100), Ksel.txt); labelled = true; }
+        }
+        risk -= S.ex[j];
+      }
+      if (sel === 'mix') text(Pp.over, Pp.X(1.6), Pp.Y(K_mix) - 8, num(100 * K_mix, 3) + ' % in jedem Alter', Ksel.txt);
+      if (sel === 'casc') text(Pp.over, Pp.X(2.95), Pp.Y(1 - K_L) + 18, 'gegen ' + num(100 * (1 - K_L), 2) + ' %', Ksel.txt, 'end');
+      if (sel === 'core' && par.phi > 0) text(Pp.over, Pp.X(2.95), Pp.Y(K_R) - 8, 'danach ' + num(100 * K_R, 2) + ' %', Ksel.txt, 'end');
+      // Tabelle
+      $('#vTable tbody').innerHTML = KINDS.map(function (K) {
+        var s = stats[K.id], desc;
+        if (K.id === 'mix') desc = num(100 * K_mix, 3) + ' % in jedem Alter';
+        else if (K.id === 'plug') desc = '0 bis τ, dann 100 %';
+        else if (K.id === 'casc') desc = 'steigt gegen ' + num(100 * (1 - K_L), 2) + ' %';
+        else desc = par.phi > 0 ? num(100 * pExp('core', Math.round(K_qc) - 1), 2) + ' % bei ' + tauFmt(K_qc * DT) + ', danach ' + num(100 * K_R, 2) + ' %' : 'wie durchmischt';
+        return '<tr><td><span class="swatch" style="--c: var(--' + K.tok + ');margin-right:8px"></span>' + (K.id === 'casc' ? 'Kaskade, ' + par.n + ' Kessel' : K.name) + '</td><td class="num">' + s.n.toLocaleString('de-DE') +
+          '</td><td class="num">' + num(s.sum / s.n * DT, 3) + ' τ</td><td>' + desc + '</td></tr>';
+      }).join('');
+    }
+    function info() {
+      $('#vNVal').textContent = par.n; $('#vPhiVal').textContent = num(100 * par.phi, 3) + ' %'; $('#vKappaVal').textContent = num(par.kappa, 2);
+      $('#vInfo').textContent = 'Kaskade: jeder Kessel τ/' + par.n + '. Kernfluss: Kern in ' + num(par.kappa, 2) + ' τ, Randzone τ_R = ' + num(K_tauR, 3) + ' τ. Zeitschritt Δt = 0,02 τ.';
+    }
+    var rebuild = debounce(function () { resetStats(); seedStats(); resetLive(); drawCharts(); draw(); }, 150);
+    function readPar() {
+      par.n = +$('#vN').value; par.phi = +$('#vPhi').value; par.kappa = +$('#vKappa').value;
+      setConst(); info(); rebuild();
+    }
+    ['#vN', '#vPhi', '#vKappa'].forEach(function (s) { $(s).addEventListener('input', readPar); });
+    var rbox = $('#vKinds');
+    KINDS.forEach(function (K) {
+      var l = document.createElement('label');
+      l.innerHTML = '<input type="radio" name="vKind" value="' + K.id + '"' + (K.id === sel ? ' checked' : '') + '> <span class="swatch" style="--c: var(--' + K.tok + ')"></span> ' + (K.id === 'casc' ? 'Kaskade' : K.name);
+      l.querySelector('input').addEventListener('change', function (ev) { if (ev.target.checked) { sel = K.id; drawCharts(); } });
+      rbox.appendChild(l);
+    });
+    $('#vesselPulse').addEventListener('click', function () { markLeft = 8; });
+    function setSpeed(s) { speed = s; $('#vSpeed1').setAttribute('aria-pressed', s === 1); $('#vSpeed4').setAttribute('aria-pressed', s === 4); }
+    $('#vSpeed1').addEventListener('click', function () { setSpeed(1); });
+    $('#vSpeed4').addEventListener('click', function () { setSpeed(4); });
+    onTheme(function () { C = null; draw(); });
+    setConst(); info();
+    resetStats(); seedStats(); resetLive();
+    drawCharts();
+    runAnim(cv, step, draw, $('#vesselPlay'));
+  })();
+})();
+</script>
+
+</body></html>
