@@ -159,5 +159,14 @@ namespace stosis
         // Spaeter melden hier auch Keimbildung (Keimgroesse) und Bruch
         // (kleinste Bruchstuecke) ihren Bedarf.
         virtual std::vector<std::string> CheckSizeGrid(const SSizeGrid& /*sizes*/) const { return {}; }
+
+        // Content (hold-up) as a result of its own (methods handbook 7.4, 10).
+        // A unit with content gets an extra results entry "content"; after
+        // every step the graph asks for the state at the end of the step.
+        // GetContent writes a continuum slice: mass density [kg/m] per
+        // compound and size (cards projected onto the size grid as masses,
+        // not mass flows), with temperature and pressure of the content.
+        virtual bool HasContent() const { return false; }
+        virtual void GetContent(CStreamSlice& /*content*/) const {}
     };
 }

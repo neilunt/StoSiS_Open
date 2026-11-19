@@ -9,10 +9,14 @@
 #include <QHBoxLayout>
 #include "SizeGrid.h"
 
-// Beschriftung der Farbskala: Massenstromdichte je um (intern je m).
-static QString DensityLabel(const QString& prefix, const QString& suffix = QString())
+// Beschriftung der Farbskala: Massenstromdichte je um (intern je m); for the
+// content of a unit the mass density.
+static QString DensityLabel(const QString& prefix, const QString& suffix = QString(), bool content = false)
 {
-    return prefix + "Massenstromdichte" + suffix + " [kg/(s " + QString::fromUtf8(stosis::kSizeDisplayUnit) + ")]";
+    const QString unit = QString::fromUtf8(stosis::kSizeDisplayUnit);
+    if (content)
+        return prefix + "Massendichte" + suffix + " [kg/" + unit + "]";
+    return prefix + "Massenstromdichte" + suffix + " [kg/(s " + unit + ")]";
 }
 
 ResultsHeatmapWindow::ResultsHeatmapWindow(QWidget* parent)
@@ -75,7 +79,8 @@ void ResultsHeatmapWindow::SetupUi()
     m_marginalsCheck = new QCheckBox("Randverteilungen", this);
     m_marginalsCheck->setChecked(true);
     m_marginalsCheck->setToolTip("Oben/rechts: ueber die jeweils andere Achse integriert\n"
-                                 "(Massenstrom ueber die Zeit bzw. Groessenverteilung des Durchsatzes)");
+                                 "(Massenstrom ueber die Zeit bzw. Groessenverteilung des Durchsatzes;\n"
+                                 "beim Inhalt: Masse ueber die Zeit bzw. zeitlich gemittelte Groessenverteilung)");
     controls->addWidget(m_marginalsCheck);
     controls->addStretch(1);
     mainLayout->addLayout(controls);
@@ -146,13 +151,18 @@ void ResultsHeatmapWindow::OnNodeSelectionChanged(int /*index*/)
 void ResultsHeatmapWindow::UpdateHeatmap()
 {
     const stosis::CStreamStatistics* streamStats = nullptr;
+    bool content = false; // content of a unit: masses instead of mass flows
     if (m_graph && m_nodeCombo->currentIndex() >= 0)
     {
         std::string nodeId;
         size_t port = 0;
         if (ParseResultsKey(m_nodeCombo->currentData().toString(), nodeId, port))
+        {
             streamStats = m_graph->GetStreamStatistics(nodeId, port);
+            content = m_graph->IsContentEntry(nodeId, port);
+        }
     }
+    m_heatmap->SetContentMode(content);
     if (streamStats)
         UpdateCompoundList(streamStats->GetCompoundNames());
     const int compound = m_compoundCombo->currentData().toInt(); // -1 = alle Stoffe
@@ -189,21 +199,44 @@ void ResultsHeatmapWindow::UpdateHeatmap()
             stosis::CEnsembleStatistics::MeanAndStdDev(stosis::CEnsembleStatistics::Column(runSeries, t), mean, overSize[t]);
         for (size_t s = 0; s < overTime.size(); ++s)
             stosis::CEnsembleStatistics::MeanAndStdDev(stosis::CEnsembleStatistics::Column(runSizes, s), mean, overTime[s]);
+        // Content: spread of the time mean, not of the integral over the time.
+        const double totalTime = results->GetTotalTime();
+        if (content && totalTime > 0.0)
+            for (double& value : overTime)
+                value /= totalTime;
         m_heatmap->SetMarginalOverride(std::move(overSize), std::move(overTime), "Std. ");
-        m_heatmap->SetValueLabel(DensityLabel("Std. ", compoundSuffix));
+        m_heatmap->SetValueLabel(DensityLabel("Std. ", compoundSuffix, content));
     }
     else
     {
         // Mittelwert und Einzellauf: Integral der Matrix ist korrekt
         // (der Mittelwert ist linear).
         m_heatmap->ClearMarginalOverride();
-        m_heatmap->SetValueLabel(DensityLabel("", compoundSuffix));
+        m_heatmap->SetValueLabel(DensityLabel("", compoundSuffix, content));
     }
     m_heatmap->SetResults(results);
 
+    const QString period = QString::number(results->GetTotalTime(), 'g', 4);
+    if (content)
+    {
+        // Content at the end of the simulation, mean and spread over the runs.
+        const auto& runSeries = stats->GetRunTimeSeries();
+        double endMean = 0.0, endStd = 0.0;
+        if (!runSeries.empty() && !runSeries.front().empty())
+            stosis::CEnsembleStatistics::MeanAndStdDev(
+                stosis::CEnsembleStatistics::Column(runSeries, runSeries.front().size() - 1), endMean, endStd);
+        if (stats->GetNumRuns() > 1)
+            m_totalLabel->setText(QString("Masse des Inhalts%4 bei t = %1: %2 +- %3 kg   "
+                                          "(Mittelwert +- Standardabweichung ueber N = %5 Laeufe)")
+                .arg(period).arg(endMean, 0, 'g', 6).arg(endStd, 0, 'g', 3).arg(compoundSuffix).arg(stats->GetNumRuns()));
+        else
+            m_totalLabel->setText(QString("Masse des Inhalts%3 bei t = %1: %2 kg   (Integral ueber die Groesse, 1 Lauf)")
+                .arg(period).arg(endMean, 0, 'g', 6).arg(compoundSuffix));
+        return;
+    }
+
     double totalMean = 0.0, totalStd = 0.0;
     stosis::CEnsembleStatistics::MeanAndStdDev(stats->GetRunTotals(), totalMean, totalStd);
-    const QString period = QString::number(results->GetTotalTime(), 'g', 4);
     if (stats->GetNumRuns() > 1)
     {
         m_totalLabel->setText(QString("Durchgesetzte Masse%5 im Zeitraum 0 - %1: %2 +- %3   "

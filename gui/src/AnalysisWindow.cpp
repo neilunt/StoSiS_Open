@@ -21,8 +21,9 @@
 
 namespace
 {
-    // Einheit des Massenstroms in den Ergebnissen (SI, wie im Kurvenfenster).
+    // Einheit des Massenstroms in den Ergebnissen (SI, wie im Kurvenfenster); content: mass.
     const QString kUnit = "kg/s";
+    const QString kContentUnit = "kg";
     // Mehr Klassen zeichnet das Histogramm nicht (zu kleine Klassenbreite).
     constexpr size_t kMaxBins = 2000;
 
@@ -94,7 +95,7 @@ void AnalysisWindow::SetupUi()
     topRow->addWidget(new QLabel("Ausgang:", this));
     m_entryCombo = new QComboBox(this);
     m_entryCombo->setMinimumWidth(240);
-    m_entryCombo->setToolTip("Welcher Strom ausgewertet wird (Massenstrom aller Stoffe).");
+    m_entryCombo->setToolTip("Welcher Strom ausgewertet wird (Massenstrom aller Stoffe; beim Inhalt eines Behaelters die Masse).");
     topRow->addWidget(m_entryCombo);
     topRow->addStretch(1);
     m_exportButton = new QPushButton("Als CSV exportieren ...", this);
@@ -289,6 +290,11 @@ void AnalysisWindow::Recompute()
     }
     const std::vector<std::vector<double>>& runs = stats->GetTotal().GetRunTimeSeries();
     const double dt = stats->GetTotal().GetMean().GetDt();
+    // Content of a vessel: mass [kg] like a load cell, otherwise mass flow [kg/s].
+    const bool content = m_graph->IsContentEntry(nodeId, port);
+    const QString unit = content ? kContentUnit : kUnit;
+    for (AnalysisPlotWidget* plot : { m_densityPlot, m_probabilityPlot, m_timePlot })
+        plot->SetUnit(unit, content ? "Masse" : "Massenstrom");
 
     // --- Fenstermittel je Lauf -----------------------------------------
     const size_t n = stosis::StepsPerWindow(dt, m_windowSpin->value());
@@ -396,7 +402,7 @@ void AnalysisWindow::Recompute()
                            "&middot; Schiefe %7 &middot; Korrelation benachbarter Werte %8")
         .arg(s.count)
         .arg(filter ? QString(" (%1 gefiltert)").arg(removed.front()) : QString())
-        .arg(Num(s.mean)).arg(kUnit).arg(Num(s.stdDev, 4))
+        .arg(Num(s.mean)).arg(unit).arg(Num(s.stdDev, 4))
         .arg(QString::number(100.0 * s.rsd, 'f', 3)).arg(QString::number(s.skewness, 'f', 2))
         .arg(QString::number(s.lag1Correlation, 'f', 2));
     if (runs.size() > 1)
@@ -427,7 +433,7 @@ void AnalysisWindow::Recompute()
             .arg(m_setpointSpin->value() > 0.0 ? Num(m_setpointSpin->value(), 8) : QString("Mittelwert"))
             .arg(Num(m_bandSpin->value(), 4)).arg(Num(m_sigmaSpin->value(), 3)).arg(removed.front());
     m_exportHeader += QString("# Lauf 1 (nach Filter): n %1, Mittel %2 %3, Std %4 %3, RSD %5 %\n")
-        .arg(s.count).arg(Num(s.mean, 8)).arg(kUnit).arg(Num(s.stdDev, 6)).arg(QString::number(100.0 * s.rsd, 'f', 4));
+        .arg(s.count).arg(Num(s.mean, 8)).arg(unit).arg(Num(s.stdDev, 6)).arg(QString::number(100.0 * s.rsd, 'f', 4));
     m_exportHeader += "# Werte: Fenstermittel je Lauf, ungefiltert\n";
     m_exportButton->setEnabled(true);
 }

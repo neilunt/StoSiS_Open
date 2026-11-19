@@ -21,6 +21,42 @@ namespace stosis
         return (size - grid.sizeMin) / step;
     }
 
+    // Neighbouring nodes of a card size: node i gets the share 1 - upper,
+    // node i + 1 the share upper (linear in d or in ln d). Sizes outside
+    // [sizeMin, sizeMax] go entirely to the boundary node.
+    inline void GetGridNeighbours(const SSizeGrid& grid, double size, size_t& i, double& upper)
+    {
+        const size_t numS = grid.numClasses;
+        i = 0;
+        upper = 0.0;
+        if (numS < 2)
+            return;
+        const double x = GetGridPosition(grid, size);
+        const double last = static_cast<double>(numS - 1);
+        if (x >= last)
+        {
+            i = numS - 2;
+            upper = 1.0;
+        }
+        else if (x > 0.0) // NaN stays at i = 0 as well
+        {
+            i = static_cast<size_t>(x);
+            upper = x - static_cast<double>(i);
+        }
+    }
+
+    // Adds the amount of one card (compound c, a mass flow or a mass) to the
+    // nodes i and i + 1 as a density: divided by the trapezoid weights.
+    inline void AddAtGridNodes(CStreamSlice& out, size_t c, size_t i, double upper, double amount,
+        const std::vector<double>& weights)
+    {
+        if (amount == 0.0)
+            return;
+        out.SetValue(c, i, out.GetValue(c, i) + amount * (1.0 - upper) / weights[i]);
+        if (upper > 0.0)
+            out.SetValue(c, i + 1, out.GetValue(c, i + 1) + amount * upper / weights[i + 1]);
+    }
+
     // Karten -> Groessenraster, damit Heatmap, Kurven, Statistik und das
     // Fenster "Auswertung" im Partikelmodus unveraendert weiterarbeiten
     // (Methodenhandbuch 9.6). Jede Karte gibt ihren Massenstrom je Stoff
@@ -58,31 +94,10 @@ namespace stosis
         for (size_t k = 0; k < cards.GetNumCards(); ++k)
         {
             size_t i = 0;
-            double upper = 0.0; // Anteil fuer die Stuetzstelle i + 1
-            if (numS >= 2)
-            {
-                const double x = GetGridPosition(grid, cards.GetCardSize(k));
-                const double last = static_cast<double>(numS - 1);
-                if (x >= last)
-                {
-                    i = numS - 2;
-                    upper = 1.0;
-                }
-                else if (x > 0.0) // auch: NaN bleibt bei i = 0
-                {
-                    i = static_cast<size_t>(x);
-                    upper = x - static_cast<double>(i);
-                }
-            }
+            double upper = 0.0;
+            GetGridNeighbours(grid, cards.GetCardSize(k), i, upper);
             for (size_t c = 0; c < numC; ++c)
-            {
-                const double massFlow = cards.GetCardMass(k, c) * perSecond;
-                if (massFlow == 0.0)
-                    continue;
-                out.SetValue(c, i, out.GetValue(c, i) + massFlow * (1.0 - upper) / weights[i]);
-                if (upper > 0.0)
-                    out.SetValue(c, i + 1, out.GetValue(c, i + 1) + massFlow * upper / weights[i + 1]);
-            }
+                AddAtGridNodes(out, c, i, upper, cards.GetCardMass(k, c) * perSecond, weights);
         }
     }
 }

@@ -351,8 +351,11 @@
 <p class="formel"><i>a</i> = 1 − e<sup>−Δ<i>t</i>/τ</sup>, &nbsp;&nbsp; <i>b</i> = 1 − (τ/Δ<i>t</i>) <i>a</i> ≈ Δ<i>t</i>/(2τ)</p>
 <p>Bei der Pfropfenströmung tritt ein Zulaufschritt nach τ aus; ist τ/Δ<i>t</i> = <i>q</i> + <i>r</i> nicht ganzzahlig, geht der Anteil 1 − <i>r</i> nach <i>q</i> Schritten, der Rest nach <i>q</i> + 1. In der Kaskade gelangt Material aus einem Kessel in einem Schritt mit der Poisson-Wahrscheinlichkeit <i>P<sub>m</sub></i> (λ = <i>n</i>Δ<i>t</i>/τ) um <i>m</i> Kessel weiter, aus dem Zulauf mit <i>Q<sub>m</sub></i> = P(<i>X</i> &gt; <i>m</i>)/λ; was über den letzten Kessel hinauskäme, geht. Der Kernfluss verbindet einen Pfropfen- und einen ideal durchmischten Teil. Temperatur und Druck folgen je Bereich aus der Energiebilanz wie im Merger.</p>
 <p>Im Partikelmodus gehen ganze Karten. Welche, entscheidet das Konto-Verfahren mit den Konten „geht“ und „bleibt“ (Kapitel 9.4): Jede Karte geht unabhängig von Gewicht und Alter mit derselben Wahrscheinlichkeit, und jede Größengegend verliert ihren Anteil. Eine Karte merkt sich nur, wo sie liegt – im Inhalt, in einem Kessel oder im Schritt, in dem sie austritt. Im Dauerbetrieb liegen nach Little (1961) <i>N</i> τ/Δ<i>t</i> Karten im Behälter. Der Vorrat wächst deshalb mit τ/Δ<i>t</i>: Er fasst (τ/Δ<i>t</i> + 2) Zulaufschritte mit je höchstens 2 <i>N</i> Karten (Obergrenze der Stromscheibe), mindestens das Eingestellte × <i>N</i> und höchstens 10 Millionen Karten. Erst darüber werden neu hinzukommende Karten paarweise zusammengelegt wie bei den Grenzen je Stromscheibe (Kapitel 9.5). Beispiel: Ein Kessel mit τ = 641 s bei Δ<i>t</i> = 0,5 s und 2000 Karten je Schritt fasst rund 5,1 Millionen Karten.</p>
+<p>Neben dem Ablauf ist auch der Inhalt ein eigenes Ergebnis („Behälter, Inhalt“). Nach jedem Schritt hält StoSiS die Masse je Stoff und Größe in kg fest, im Partikelmodus wie die Ströme aufs Raster umgerechnet (Kapitel 9.6), dazu Temperatur und Druck der Mischung. Für den Inhalt <i>H<sub>k</sub></i> nach Schritt <i>k</i> gilt mit Zulauf <i>ṁ</i><sub>zu,<i>k</i></sub> und Ablauf <i>ṁ</i><sub>ab,<i>k</i></sub> in kg/s</p>
+<p class="formel"><i>H<sub>k</sub></i> = <i>H</i><sub><i>k</i>−1</sub> + (<i>ṁ</i><sub>zu,<i>k</i></sub> − <i>ṁ</i><sub>ab,<i>k</i></sub>) Δ<i>t</i></p>
+<p>Weil Schritt <i>k</i> den Zulauf eines ganzen Δ<i>t</i> aufnimmt, entspricht <i>H<sub>k</sub></i> dem Inhalt eines stetig gerechneten Behälters zur Zeit <i>t<sub>k</sub></i> + Δ<i>t</i>. Bei konstantem Zulauf <i>ṁ</i> in den leeren, ideal durchmischten Behälter ist das <i>H<sub>k</sub></i> = τ <i>ṁ</i> (1 − e<sup>−(<i>k</i>+1)Δ<i>t</i>/τ</sup>); mit τ = 10 s und 1 kg/s steigt der Inhalt auf 10 kg. Für die Charge ist der Inhalt das eigentliche Ergebnis.</p>
 <h4>Grenzen</h4>
-<p>Die Verweilzeit ist fest. Ein geregelter Füllstand, ein vorgegebener Austrag (Dosierschnecke) und ein größenabhängiger Austrag sind nicht enthalten. Als Ergebnis erscheint nur der Ablauf, nicht der Inhalt; das betrifft vor allem die Charge. Ist der Vorrat voll, trägt der Ablauf weniger, schwerere Karten und streut stärker.</p>
+<p>Die Verweilzeit ist fest. Ein geregelter Füllstand, ein vorgegebener Austrag (Dosierschnecke) und ein größenabhängiger Austrag sind nicht enthalten. Die Kartenansicht zeigt nur den Ablauf, nicht die Karten im Inhalt. Ist der Vorrat voll, trägt der Ablauf weniger, schwerere Karten und streut stärker.</p>
 <h4>Prüfung</h4>
 <table>
   <tr><th>Fall</th><th>Erwartung</th><th>Ergebnis</th></tr>
@@ -364,6 +367,8 @@
   <tr><td>Schwankender Splitter davor (σ = 0,05, τ<sub>OU</sub> = 2 s, τ = 10 s)</td><td>Streuung des Ablaufs nach der Schrittformel</td><td>1000 Läufe: 0,8 % daneben; Partikelmodus folgt dem Kontinuum auf höchstens 1,1 % je Schritt</td></tr>
   <tr><td>Pfropfenströmung, τ/Δ<i>t</i> = 50,5, je Größe eine schwere und eine leichte Karte (10 : 1)</td><td>Ablauf = Zulauf</td><td>höchstens 9,7 % je Schritt; ohne neues Auslosen 82 % in jedem zweiten Schritt</td></tr>
   <tr><td>Schwankender Zulauf (σ/μ = 0,167, τ<sub>OU</sub> = 2 s) direkt in den durchmischten Behälter, 400 Karten je Schritt</td><td>Soll <i>a</i> · Inhalt/Δ<i>t</i> + <i>b</i> · Zulauf</td><td>Streuung 0,94 % um das Soll, im Mittel 0,05 % daneben</td></tr>
+  <tr><td>Inhalt als Ergebnis: 1 kg/s in den leeren, ideal durchmischten Behälter (τ = 10 s, Δ<i>t</i> = 0,2 s), 400 Karten je Schritt</td><td><i>H<sub>k</sub></i> = τ <i>ṁ</i> (1 − e<sup>−(<i>k</i>+1)Δ<i>t</i>/τ</sup>) und Bilanz je Schritt; am Ende gleich der Masse im Behälter</td><td>Kontinuum auf 3 · 10<sup>−15</sup>, Bilanz auf 2 · 10<sup>−14</sup> in beiden Darstellungen; Partikelmodus höchstens 6 Zulaufkarten neben dem Kontinuum</td></tr>
+  <tr><td>Charge mit 30 kg Anfangsfüllung bei 350 K, ohne Zulauf</td><td>Inhalt in jedem Schritt gleich, bei der Fülltemperatur</td><td>erfüllt, in beiden Darstellungen</td></tr>
 </table>
 
 <h3 id="k7-5"><span class="nr">7.5</span>Sieb</h3>
@@ -620,7 +625,8 @@
 
 <h2 id="k10"><span class="nr">10</span>Auswertung</h2>
 <p>Kurven zeigen Massenstrom, Temperatur und Druck über der Zeit oder die Verteilung über der Größe, jeweils mit Streuband über die Läufe. Die Heatmap zeigt die Massenstromdichte über Zeit und Größe mit beiden Randverteilungen; umschaltbar sind Lauf 1, Mittelwert und Standardabweichung.</p>
-<p>Das Fenster „Auswertung“ bereitet den Massenstrom eines Ausgangs so auf, wie man eine Messung auswertet (nach Engisch &amp; Muzzio 2012):</p>
+<p>Beim Inhalt eines Behälters (Kapitel 7.4) steht überall Masse statt Massenstrom: in den Kurven die Größe „Masse (Inhalt)“ in kg, in der Heatmap die Massendichte in kg/µm. Ihre Ränder zeigen die Masse über der Zeit und die zeitlich gemittelte Größenverteilung, denn ein Integral über die Zeit wie beim Durchsatz eines Stroms hätte hier keine Bedeutung.</p>
+<p>Das Fenster „Auswertung“ bereitet den Massenstrom eines Ausgangs so auf, wie man eine Messung auswertet (nach Engisch &amp; Muzzio 2012); beim Inhalt eines Behälters liest es die Masse wie eine Wägezelle:</p>
 <ul>
   <li>Mittel über Zeitfenster, etwa 1 s wie bei einer Waage; die Einschwingzeit lässt sich ausschließen.</li>
   <li>Ausreißerfilter: erst Sollwert ± <i>x</i> %, dann wiederholt ± <i>k</i>σ, bis sich nichts mehr ändert.</li>

@@ -46,6 +46,12 @@ void HeatmapWidget::SetShowMarginals(bool enabled)
     update();
 }
 
+void HeatmapWidget::SetContentMode(bool content)
+{
+    m_contentMode = content;
+    update();
+}
+
 void HeatmapWidget::SetSizeUnit(double factor, const QString& unit)
 {
     m_sizeFactor = factor > 0.0 ? factor : 1.0;
@@ -183,6 +189,11 @@ void HeatmapWidget::ComputeMarginals()
             overSize[t] = m_results->IntegrateOverSize(t);
         for (size_t s = 0; s < numS; ++s)
             overTime[s] = m_results->IntegrateOverTime(s);
+        // Content: time mean instead of the integral over the time.
+        const double totalTime = m_results->GetTotalTime();
+        if (m_contentMode && totalTime > 0.0)
+            for (double& value : overTime)
+                value /= totalTime;
     }
     // Masse je Groesse in der Anzeigeeinheit (z.B. je um statt je m).
     for (double& value : overTime)
@@ -235,17 +246,20 @@ void HeatmapWidget::ClearMarginalOverride()
 
 QString HeatmapWidget::SizeMarginalLabel() const
 {
-    return m_sizeUnit.isEmpty() ? QString("Masse pro Groesse") : "Masse je " + m_sizeUnit;
+    const QString label = m_sizeUnit.isEmpty() ? QString("Masse pro Groesse") : "Masse je " + m_sizeUnit;
+    return m_contentMode ? label + " (Zeitmittel)" : label;
 }
 
 QString HeatmapWidget::ColumnMarginalLabel() const
 {
-    return m_marginalLabelPrefix + (m_timeOnXAxis ? QString("Massenstrom") : SizeMarginalLabel());
+    const QString overTime = m_contentMode ? QString("Masse") : QString("Massenstrom");
+    return m_marginalLabelPrefix + (m_timeOnXAxis ? overTime : SizeMarginalLabel());
 }
 
 QString HeatmapWidget::RowMarginalLabel() const
 {
-    return m_marginalLabelPrefix + (m_timeOnXAxis ? SizeMarginalLabel() : QString("Massenstrom"));
+    const QString overTime = m_contentMode ? QString("Masse") : QString("Massenstrom");
+    return m_marginalLabelPrefix + (m_timeOnXAxis ? SizeMarginalLabel() : overTime);
 }
 
 // Zeichnet eine Randverteilung als Linie mit leicht gefuellter Flaeche.

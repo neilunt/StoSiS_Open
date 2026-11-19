@@ -102,6 +102,7 @@ namespace stosis
         std::string nodeId;
         size_t port = 0;
         std::string label;
+        bool content = false; // content of a unit (masses [kg]), not a stream
     };
 
     // Ein Eintrag im Baum der Flowsheet-Struktur (Fenster "Struktur",
@@ -268,6 +269,7 @@ namespace stosis
                 m_connections.end());
             m_units.erase(nodeId);
             m_outputRecords.erase(nodeId);
+            m_contentRecords.erase(nodeId);
             m_statistics.erase(nodeId);
             m_nodes.erase(
                 std::remove_if(m_nodes.begin(), m_nodes.end(),
@@ -551,6 +553,8 @@ namespace stosis
         {
             if (COutletUnit* outlet = GetOutlet(nodeId))
                 return &outlet->GetRecord();
+            if (IsContentEntry(nodeId, port))
+                return &m_contentRecords[nodeId];
             return GetOutputRecord(nodeId, port);
         }
 
@@ -602,8 +606,20 @@ namespace stosis
                 {
                     entries.push_back({ node.id, 0, base + ")" });
                 }
+                if (m_contentRecords.count(node.id))
+                    entries.push_back({ node.id, node.numOutputs, base + ", Inhalt)", true });
             }
             return entries;
+        }
+
+        // Is (nodeId, port) the content entry of a unit with hold-up? Then the
+        // results are masses [kg] instead of mass flows [kg/s].
+        bool IsContentEntry(const std::string& nodeId, size_t port) const
+        {
+            if (!m_contentRecords.count(nodeId))
+                return false;
+            const SFlowsheetNode* node = FindNode(nodeId);
+            return node && port == node->numOutputs;
         }
 
         // Speichert das gemeinsame Zeit-/Groessenraster des Flowsheets. Es wird
@@ -962,6 +978,8 @@ namespace stosis
             for (auto& entry : m_outputRecords)
                 for (CStreamRecord& record : entry.second)
                     record.Configure(m_grid);
+            for (auto& entry : m_contentRecords)
+                entry.second.Configure(m_grid);
 
             // 3) Laufzeit-Daten in Ausfuehrungsreihenfolge vorbereiten, damit
             // in der Zeitschleife keine Suche mehr noetig ist.
@@ -982,6 +1000,8 @@ namespace stosis
                 std::vector<const CStreamSlice*> inputs;
                 SUnitTiming* timing = nullptr;
                 std::vector<CCardHistory>* cardHistories = nullptr; // nur Lauf 1 im Partikelmodus
+                CStreamRecord* contentRecord = nullptr; // units with content only
+                CStreamSlice content;                   // content after the step (reused)
             };
 
             std::vector<SRuntimeNode> runtime(order.size());
@@ -997,6 +1017,9 @@ namespace stosis
                 auto unitIt = m_units.find(order[i]);
                 rn.unit = (unitIt != m_units.end()) ? unitIt->second.get() : nullptr;
                 rn.records = &m_outputRecords[order[i]];
+                auto contentIt = m_contentRecords.find(order[i]);
+                if (rn.unit && contentIt != m_contentRecords.end())
+                    rn.contentRecord = &contentIt->second;
                 rn.current.resize(node->numOutputs);
                 rn.previous.resize(node->numOutputs);
                 for (size_t p = 0; p < node->numOutputs; ++p)
@@ -1068,6 +1091,11 @@ namespace stosis
                     const double tLimits = clock.GetSeconds();
                     for (size_t p = 0; p < rn.current.size() && p < rn.records->size(); ++p)
                         (*rn.records)[p].Record(k, rn.current[p]);
+                    if (rn.contentRecord)
+                    {
+                        rn.unit->GetContent(rn.content);
+                        rn.contentRecord->Record(k, rn.content);
+                    }
                     const double t2 = clock.GetSeconds();
 
                     rn.timing->stepSeconds += t1 - t0;
@@ -1207,7 +1235,10 @@ namespace stosis
             m_cardHistories.clear();
             if (m_grid.representation != ERepresentation::Particles || !m_recordCardHistory)
                 return;
-            const std::vector<SResultsEntry> entries = GetResultsEntries();
+            std::vector<SResultsEntry> entries = GetResultsEntries();
+            // No card view of the content yet (the stock can hold far more cards than a slice).
+            entries.erase(std::remove_if(entries.begin(), entries.end(),
+                [](const SResultsEntry& entry) { return entry.content; }), entries.end());
             const size_t budget = m_grid.cards.historyBudgetBytes / std::max<size_t>(entries.size(), 1);
             for (const SResultsEntry& entry : entries)
             {
@@ -1290,13 +1321,16 @@ namespace stosis
             node.posX = posX;
             node.posY = posY;
             m_nodes.push_back(node);
+            const bool content = unit && unit->HasContent();
             m_units[node.id] = std::move(unit);
             // Feste Groesse ab hier -> Zeiger auf die Ergebnisse (z.B. in der
             // Heatmap) bleiben ueber alle Simulationen hinweg gueltig.
             m_outputRecords[node.id] = std::vector<CStreamRecord>(numOutputs);
+            if (content)
+                m_contentRecords[node.id] = CStreamRecord();
             // Statistik je angezeigtem Ergebnis: beim Outlet das, was ankommt,
-            // sonst je Ausgang (wie GetDisplayResults).
-            m_statistics[node.id] = std::vector<CStreamStatistics>(type == ENodeType::Outlet ? 1 : numOutputs);
+            // sonst je Ausgang (wie GetDisplayResults), dazu der Inhalt.
+            m_statistics[node.id] = std::vector<CStreamStatistics>((type == ENodeType::Outlet ? 1 : numOutputs) + (content ? 1 : 0));
             return node.id;
         }
 
@@ -1519,6 +1553,9 @@ namespace stosis
         std::map<std::string, std::unique_ptr<IFlowsheetUnit>> m_units;
         // Verlauf jedes Ausgangs-Ports ueber die ganze Simulation.
         std::map<std::string, std::vector<CStreamRecord>> m_outputRecords;
+        // Content of units with hold-up (IFlowsheetUnit::HasContent) after
+        // every step; results entry port = number of outputs.
+        std::map<std::string, CStreamRecord> m_contentRecords;
         // Statistik ueber mehrere Laeufe, je Eintrag aus GetResultsEntries().
         std::map<std::string, std::vector<CStreamStatistics>> m_statistics;
 

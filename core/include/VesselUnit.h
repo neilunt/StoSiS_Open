@@ -13,6 +13,7 @@
 #include "StreamMixing.h"
 #include "CardLimits.h"
 #include "CardPlacement.h"
+#include "CardProjection.h"
 #include "SizeDistribution.h"
 #include "SimulationLog.h"
 
@@ -442,6 +443,52 @@ namespace stosis
 
         // Inhalt nach der Anfangsfuellung [kg] ("wie im Dauerbetrieb": nach Schritt 0 gesetzt).
         double GetInitialContentMass() const { return m_initialMass; }
+
+        bool HasContent() const override { return true; }
+
+        // Content after the last step as a results entry (methods handbook
+        // 7.4, 10): mass density [kg/m] per compound and size over all
+        // regions. Continuum: the regions hold mass flow densities of one
+        // inflow step, times dt = mass. Cards: projected onto the size grid
+        // like the streams (CardProjection.h), but as masses. Its integral over
+        // the size is GetContentMass. Temperature and pressure: mixture of the
+        // regions (energy balance as at the outlet).
+        void GetContent(CStreamSlice& content) const override
+        {
+            if (content.HasCards() || content.GetNumSizeClasses() != m_numS || content.GetNumCompounds() != m_numC)
+                content.Resize(m_numS, m_numC);
+            else
+                content.Clear();
+            std::vector<SMixPart> parts;
+            parts.reserve(m_regions.size());
+            for (const SRegion& region : m_regions)
+            {
+                if (region.values.size() >= m_numC * m_numS)
+                    for (size_t c = 0; c < m_numC; ++c)
+                        for (size_t s = 0; s < m_numS; ++s)
+                        {
+                            const double value = region.values[c * m_numS + s];
+                            if (value != 0.0)
+                                content.SetValue(c, s, content.GetValue(c, s) + value * m_dt);
+                        }
+                if (m_sizeWeights.size() >= m_numS)
+                    for (const SCardBin& bin : region.store.bins)
+                        for (size_t k = 0; k < bin.Count(); ++k)
+                        {
+                            size_t i = 0;
+                            double upper = 0.0;
+                            GetGridNeighbours(m_sizes, bin.sizes[k], i, upper);
+                            for (size_t c = 0; c < m_numC; ++c)
+                                AddAtGridNodes(content, c, i, upper, bin.masses[k * m_numC + c], m_sizeWeights);
+                        }
+                parts.push_back(MakePart(RegionWeights(region), region.temperature, region.pressure));
+            }
+            if (parts.empty())
+                return;
+            const SMixResult mix = MixConditions(parts, m_compounds, m_materials);
+            content.SetTemperature(mix.temperature);
+            content.SetPressure(mix.pressure);
+        }
 
         // Karten im Vorrat (Partikelmodus).
         size_t GetContentCards() const

@@ -24,8 +24,9 @@ public:
 
     explicit AnalysisPlotWidget(EKind kind, QWidget* parent = nullptr);
 
-    // Einheit der Werte fuer die Achsenbeschriftung, z.B. "kg/s".
-    void SetUnit(const QString& unit);
+    // Einheit der Werte fuer die Achsenbeschriftung, z.B. "kg/s"; quantity
+    // names the values over the time ("Massenstrom", "Masse" for a content).
+    void SetUnit(const QString& unit, const QString& quantity = "Massenstrom");
     // Statt eines Diagramms nur einen Hinweis zeigen.
     void ShowMessage(const QString& message);
 
@@ -50,6 +51,7 @@ private:
 
     EKind m_kind;
     QString m_unit;
+    QString m_quantity = "Massenstrom";
     QString m_message = "Noch keine Ergebnisse";
 
     stosis::SHistogram m_histogram;

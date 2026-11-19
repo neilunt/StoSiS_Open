@@ -12,7 +12,7 @@ class QPushButton;
 // (je Mehrfachauswahl per Strg/Umschalt), darunter ein gemeinsames Diagramm
 // mit einer Linie je markiertem Eintrag und Stoff ueber die Zeit: Massenstrom
 // (Integral ueber alle Groessen; alle Stoffe zusammen oder einzelne Stoffe),
-// Temperatur oder Druck. Bei mehreren Laeufen zeigt die Linie den
+// Temperatur, Druck oder die Masse des Inhalts (Behaelter). Bei mehreren Laeufen zeigt die Linie den
 // Mittelwert, dazu wahlweise ein Streuband (+-1 sigma, +-2 sigma,
 // 5-95 %-Perzentil) und die Einzellaeufe als duenne Linien. The plot can be
 // zoomed and panned with the mouse (see CurveWidget); the shown curves can
@@ -57,8 +57,13 @@ private:
     {
         QuantityMassFlow = 0,
         QuantityTemperature,
-        QuantityPressure
+        QuantityPressure,
+        QuantityContentMass // content of units with hold-up [kg]
     };
+
+    // Is the entry listed for the chosen quantity? Mass flow: streams only,
+    // content mass: content entries only, temperature and pressure: all.
+    bool IsListed(const stosis::SResultsEntry& entry) const;
 
     stosis::CFlowsheetGraph* m_graph = nullptr;
 

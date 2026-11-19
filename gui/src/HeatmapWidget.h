@@ -65,6 +65,11 @@ public:
         const QString& labelPrefix);
     void ClearMarginalOverride();
 
+    // Content of a unit instead of a stream: the margins show the mass over
+    // the time and the time mean of the size distribution (an integral over
+    // the time, as for the throughput of a stream, has no meaning here).
+    void SetContentMode(bool content);
+
 protected:
     void paintEvent(QPaintEvent* event) override;
     // Zeigt Zeit, Groesse und Wert der Zelle unter dem Mauszeiger als Tooltip.
@@ -131,4 +136,5 @@ private:
     std::vector<double> m_overrideOverSize;
     std::vector<double> m_overrideOverTime;
     QString m_marginalLabelPrefix;
+    bool m_contentMode = false;
 };

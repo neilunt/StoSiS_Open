@@ -144,9 +144,10 @@ AnalysisPlotWidget::AnalysisPlotWidget(EKind kind, QWidget* parent)
     setMinimumSize(280, 220);
 }
 
-void AnalysisPlotWidget::SetUnit(const QString& unit)
+void AnalysisPlotWidget::SetUnit(const QString& unit, const QString& quantity)
 {
     m_unit = unit;
+    m_quantity = quantity;
     update();
 }
 
@@ -366,6 +367,6 @@ void AnalysisPlotWidget::PaintTimeSeries(QPainter& p, const QRect& plot)
     DrawFrameAndXAxis(p, m, "Zeit [s]");
     DrawYTicks(p, m, AutoTicks(m.y0, m.y1));
     p.setPen(Qt::darkGray);
-    p.drawText(plot.adjusted(6, 4, 0, 0), Qt::AlignLeft | Qt::AlignTop, "Massenstrom [" + m_unit + "]");
+    p.drawText(plot.adjusted(6, 4, 0, 0), Qt::AlignLeft | Qt::AlignTop, m_quantity + " [" + m_unit + "]");
     DrawLegend(p, plot, { { light, 0, "je Zeitschritt" }, { kMeanColor, 0, "Mittel je Fenster" } });
 }

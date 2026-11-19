@@ -78,7 +78,9 @@ void ResultsCurveWindow::SetupUi()
     m_quantityCombo->insertItem(QuantityMassFlow, "Massenstrom");
     m_quantityCombo->insertItem(QuantityTemperature, "Temperatur");
     m_quantityCombo->insertItem(QuantityPressure, "Druck");
-    connect(m_quantityCombo, &QComboBox::currentIndexChanged, this, &ResultsCurveWindow::UpdateCurves);
+    m_quantityCombo->insertItem(QuantityContentMass, "Masse (Inhalt)");
+    // The list of units depends on the quantity (streams or contents).
+    connect(m_quantityCombo, &QComboBox::currentIndexChanged, this, &ResultsCurveWindow::RefreshNodeList);
     quantityRow->addWidget(m_quantityCombo);
     quantityRow->addSpacing(15);
 
@@ -137,6 +139,8 @@ void ResultsCurveWindow::RefreshNodeList()
         // Ein Eintrag pro Knoten, beim Splitter einer pro Ausgang.
         for (const stosis::SResultsEntry& entry : m_graph->GetResultsEntries())
         {
+            if (!IsListed(entry))
+                continue;
             auto* item = new QListWidgetItem(QString::fromStdString(entry.label));
             const QString key = MakeResultsKey(entry.nodeId, entry.port);
             item->setData(Qt::UserRole, key);
@@ -146,6 +150,16 @@ void ResultsCurveWindow::RefreshNodeList()
     }
     m_nodeList->blockSignals(false);
     UpdateCurves();
+}
+
+bool ResultsCurveWindow::IsListed(const stosis::SResultsEntry& entry) const
+{
+    const int quantity = m_quantityCombo->currentIndex();
+    if (quantity == QuantityMassFlow)
+        return !entry.content;
+    if (quantity == QuantityContentMass)
+        return entry.content;
+    return true;
 }
 
 void ResultsCurveWindow::OnSelectionChanged()
@@ -160,6 +174,8 @@ void ResultsCurveWindow::UpdateCurves()
 
     const int band = m_bandCombo->currentIndex();
     const int quantity = m_quantityCombo->currentIndex();
+    // Mass flow or content mass: integral over the size, per compound.
+    const bool amounts = quantity == QuantityMassFlow || quantity == QuantityContentMass;
     bool compoundListUpdated = false;
     std::vector<SCurveSeries> series;
     double totalTime = 1.0;
@@ -190,13 +206,13 @@ void ResultsCurveWindow::UpdateCurves()
         // Curves of this unit: for the mass flow one per selected compound entry
         // ("alle Stoffe" = sum), for temperature and pressure one.
         std::vector<std::pair<QString, int>> compounds; // name, line style
-        if (quantity == QuantityMassFlow)
+        if (amounts)
             for (int c = 0; c < m_compoundList->count(); ++c)
                 if (m_compoundList->item(c)->isSelected())
                     compounds.push_back({ m_compoundList->item(c)->text(), c });
         if (compounds.empty())
             compounds.push_back({ kAllCompounds, 0 });
-        const bool nameWithCompound = quantity == QuantityMassFlow && (compounds.size() > 1 || compounds.front().first != kAllCompounds);
+        const bool nameWithCompound = amounts && (compounds.size() > 1 || compounds.front().first != kAllCompounds);
         const size_t curvesBefore = series.size();
         const std::vector<std::string> names = streamStats->GetCompoundNames();
 
@@ -205,7 +221,7 @@ void ResultsCurveWindow::UpdateCurves()
             // Je Lauf eine Zeitreihe: Massenstrom (Integral ueber die Groesse,
             // mit Delta d), Temperatur oder Druck.
             const stosis::CEnsembleStatistics* massFlow = &streamStats->GetTotal();
-            if (quantity == QuantityMassFlow && compound != kAllCompounds)
+            if (amounts && compound != kAllCompounds)
             {
                 const auto it = std::find(names.begin(), names.end(), compound.toStdString());
                 if (it == names.end())
@@ -255,7 +271,7 @@ void ResultsCurveWindow::UpdateCurves()
                 else
                 {
                     const double k = (band == BandTwoSigma) ? 2.0 : 1.0;
-                    // Ein Massenstrom ist nie negativ - das Band auch nicht.
+                    // Ein Massenstrom (eine Masse) ist nie negativ - das Band auch nicht.
                     curve.lower[t] = std::max(0.0, mean - k * stdDev);
                     curve.upper[t] = mean + k * stdDev;
                 }
@@ -285,10 +301,12 @@ void ResultsCurveWindow::UpdateCurves()
         m_shownQuantity = "Temperatur [K]";
     else if (quantity == QuantityPressure)
         m_shownQuantity = "Druck [Pa]";
+    else if (quantity == QuantityContentMass)
+        m_shownQuantity = "Masse des Inhalts [kg]";
     else
         m_shownQuantity = "Massenstrom [kg/s]";
-    m_curveWidget->SetValueAxis(m_shownQuantity, quantity == QuantityMassFlow);
-    m_compoundList->setEnabled(quantity == QuantityMassFlow && m_compoundList->count() > 1);
+    m_curveWidget->SetValueAxis(m_shownQuantity, amounts);
+    m_compoundList->setEnabled(amounts && m_compoundList->count() > 1);
     m_curveWidget->SetTimeAxis(totalTime, numTimeSteps);
     m_curveWidget->SetCaption(caption);
     m_shownSeries = series;

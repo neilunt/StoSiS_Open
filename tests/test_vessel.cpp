@@ -1,7 +1,8 @@
 // Behaelter (Methodenhandbuch 7.4): vier Mischungen gegen ihre geschlossene
 // Verweilzeitverteilung, Kontinuum und Partikelmodus, Massenbilanz,
-// Anfangsfuellung, Vorrat, Temperatur, die Daempfung einer OU-Schwankung
-// und die Losnummer (gleich grosse Karten je Schritt neu ausgelost).
+// Anfangsfuellung, Vorrat, Temperatur, die Daempfung einer OU-Schwankung,
+// die Losnummer (gleich grosse Karten je Schritt neu ausgelost) und der
+// Inhalt als eigenes Ergebnis.
 //
 // Schrittformel: Jeder Schritt bringt den Zulauf mal dt, der Ausgang zeigt,
 // was im Schritt austritt, geteilt durch dt. Fuer konstanten Zulauf in einen
@@ -646,6 +647,124 @@ int main()
             100.0 * spread, 100.0 * mean);
         Check(spread < 0.014 && std::abs(mean) < 0.002,
             "Losnummer: schwankender Zulauf, Ablauf je Schritt hoechstens 1,4 % um das Soll gestreut, im Mittel auf 0,2 %");
+    }
+
+    // 12) Content as a results entry (methods handbook 7.4, 10): the graph
+    //     records the content after every step. Inlet 1 kg/s -> vessel
+    //     (ideally mixed, tau 10 s, empty) -> outlet, continuum and cards.
+    //     Step k admits the inflow of one dt (step formula above), so after
+    //     step k the vessel holds what a continuous vessel holds at
+    //     t_k + dt: content_k = tau q (1 - exp(-(k + 1) dt / tau)).
+    {
+        const double tau = 10.0;
+        struct SContentRun
+        {
+            std::vector<double> content, in, out;
+            double dt = 0.0, final = 0.0, lastRecorded = 0.0;
+            bool entry = false, statistics = false;
+        };
+        const auto runContent = [&](ERepresentation representation)
+        {
+            SContentRun run;
+            CFlowsheetGraph graph;
+            const std::string inlet = graph.AddInletNode("Inlet1", 0, 0);
+            const std::string vessel = graph.AddVesselNode("Behaelter1", 1, 0);
+            const std::string outlet = graph.AddOutletNode("Outlet1", 2, 0);
+            graph.AddConnection(inlet, 0, vessel, 0);
+            graph.AddConnection(vessel, 0, outlet, 0);
+            graph.ConfigureGrid(30, 1e-6, 1e-3, 201, 40.0);
+            graph.GetInlet(inlet)->SetMaterial("Sand");
+            graph.GetInlet(inlet)->SetTimeProfile({ { 0.0, 1.0 } });
+            graph.GetVessel(vessel)->SetSettings(Settings(EVesselMixing::Mixed, tau, EVesselFill::Empty));
+            graph.SetRepresentation(representation);
+            SCardSettings cardSettings = graph.GetCardSettings();
+            cardSettings.cardsPerSlice = N;
+            graph.SetCardSettings(cardSettings);
+            if (graph.RunSimulations(1) != 1)
+                return run;
+            for (const SResultsEntry& entry : graph.GetResultsEntries())
+                if (entry.nodeId == vessel && entry.content)
+                    run.entry = entry.port == 1 && entry.label.find("Inhalt") != std::string::npos
+                        && graph.IsContentEntry(vessel, 1) && !graph.IsContentEntry(vessel, 0);
+            const CSimulationResults* content = graph.GetDisplayResults(vessel, 1);
+            const CSimulationResults* in = graph.GetOutputResults(inlet, 0);
+            const CSimulationResults* out = graph.GetOutputResults(vessel, 0);
+            if (!content || !in || !out)
+                return run;
+            run.dt = graph.GetGrid().GetDt();
+            for (size_t k = 0; k < content->GetNumTimeSteps(); ++k)
+            {
+                run.content.push_back(content->IntegrateOverSize(k));
+                run.in.push_back(in->IntegrateOverSize(k));
+                run.out.push_back(out->IntegrateOverSize(k));
+            }
+            run.final = graph.GetVessel(vessel)->GetContentMass();
+            run.lastRecorded = run.content.back();
+            // One run: the mean over the runs is the record itself.
+            const CStreamStatistics* stats = graph.GetStreamStatistics(vessel, 1);
+            run.statistics = stats && stats->GetTotal().GetMean().HasSameGrid(*content);
+            for (size_t k = 0; run.statistics && k < content->GetNumTimeSteps(); ++k)
+                run.statistics = NearAbs(stats->GetTotal().GetMean().IntegrateOverSize(k), run.content[k], 1e-12 * tau);
+            return run;
+        };
+
+        const SContentRun continuum = runContent(ERepresentation::Continuum);
+        const SContentRun cards = runContent(ERepresentation::Particles);
+        Check(continuum.entry && cards.entry, "Inhalt: eigener Eintrag \"(Behaelter, Inhalt)\" hinter dem Ausgang");
+        Check(continuum.statistics && cards.statistics, "Inhalt: Statistik ueber die Laeufe wie bei den Stroemen");
+
+        double worstFormula = 0.0, worstBalance = 0.0, worstCards = 0.0;
+        double before = 0.0, beforeCards = 0.0;
+        for (size_t k = 0; k < continuum.content.size() && k < cards.content.size(); ++k)
+        {
+            const double q = continuum.in[0];
+            const double expected = tau * q * (1.0 - std::exp(-static_cast<double>(k + 1) * continuum.dt / tau));
+            worstFormula = std::max(worstFormula, std::abs(continuum.content[k] - expected) / (tau * q));
+            before += (continuum.in[k] - continuum.out[k]) * continuum.dt;
+            beforeCards += (cards.in[k] - cards.out[k]) * cards.dt;
+            worstBalance = std::max({ worstBalance, std::abs(continuum.content[k] - before) / (tau * q),
+                std::abs(cards.content[k] - beforeCards) / (tau * q) });
+            worstCards = std::max(worstCards, std::abs(cards.content[k] - continuum.content[k]));
+        }
+        const double card = cards.in.empty() ? 1.0 : cards.in[0] * cards.dt / static_cast<double>(N); // mass of an inflow card
+        std::printf("      Inhalt: Formel %.1e, Bilanz %.1e, Karten gegen Kontinuum hoechstens %.2f Karten; am Ende %.4f kg (Behaelter %.4f kg)\n",
+            worstFormula, worstBalance, worstCards / card, continuum.lastRecorded, continuum.final);
+        Check(!continuum.content.empty() && worstFormula < 1e-8,
+            "Inhalt im Kontinuum = tau q (1 - exp(-(k + 1) dt / tau)) (1e-8)");
+        Check(worstBalance < 1e-9, "Inhalt: Bilanz Inhalt_k = Inhalt_k-1 + (Zulauf_k - Ablauf_k) dt, Kontinuum und Karten (1e-9)");
+        Check(NearRel(continuum.lastRecorded, continuum.final, 1e-12) && NearRel(cards.lastRecorded, cards.final, 1e-9),
+            "Inhalt am Ende = GetContentMass (Karten aufs Raster umgerechnet, Masse bleibt)");
+        Check(worstCards < 15.0 * card, "Inhalt: Karten hoechstens 15 Zulaufkarten neben dem Kontinuum");
+
+        // Batch with a prescribed fill and no inflow: the content stays, at
+        // the temperature of the fill.
+        for (const ERepresentation representation : { ERepresentation::Continuum, ERepresentation::Particles })
+        {
+            CFlowsheetGraph graph;
+            const std::string vessel = graph.AddVesselNode("Behaelter1", 0, 0);
+            const std::string outlet = graph.AddOutletNode("Outlet1", 1, 0);
+            graph.AddConnection(vessel, 0, outlet, 0);
+            graph.ConfigureGrid(30, 1e-6, 1e-3, 51, 10.0);
+            SVesselSettings s = Settings(EVesselMixing::Mixed, tau, EVesselFill::Prescribed);
+            s.batch = true;
+            s.fillMass = 30.0;
+            s.fillMaterial = "Kalk";
+            s.fillTemperature = 350.0;
+            graph.GetVessel(vessel)->SetSettings(s);
+            graph.SetRepresentation(representation);
+            SCardSettings cardSettings = graph.GetCardSettings();
+            cardSettings.cardsPerSlice = N;
+            graph.SetCardSettings(cardSettings);
+            const bool ran = graph.RunSimulations(1) == 1;
+            const CStreamRecord* record = graph.GetDisplayRecord(vessel, 1);
+            const double initial = graph.GetVessel(vessel)->GetInitialContentMass();
+            bool constant = ran && record && initial > 29.0;
+            for (size_t k = 0; constant && k < record->GetTotal().GetNumTimeSteps(); ++k)
+                constant = NearRel(record->GetTotal().IntegrateOverSize(k), initial, 1e-9)
+                    && NearAbs(record->GetTemperature()[k], 350.0, 1e-9);
+            Check(constant, std::string("Charge mit Anfangsfuellung, ") + (representation == ERepresentation::Particles ? "Karten" : "Kontinuum")
+                + ": Inhalt bleibt in jedem Schritt gleich, bei der Fuelltemperatur");
+        }
     }
 
     return Summary();
