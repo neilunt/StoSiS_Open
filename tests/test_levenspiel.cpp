@@ -18,6 +18,10 @@
 // through plug flow plus stirred tank with the mean and spread of the
 // dispersion model of the paper; standard deviations against Tab. 1 there.
 //
+// CS1: product screening after Mittelsdorf Recycling / IAB Weimar (2017),
+// three screens in a row; product shares and gradings against an independent
+// integration of the same formulas, particle mode against the continuum.
+//
 // Bezug: Der Puls fuellt das Intervall [0, dt], Ausgang k ist die Masse,
 // die in [k dt, (k + 1) dt] austritt, geteilt durch dt. Exakt ist damit
 //   r_k = 1/dt^2 * Integral_0^dt (F((k+1) dt - u) - F(k dt - u)) du
@@ -859,6 +863,153 @@ int main(int argc, char* argv[])
                         out << "\n";
                     }
                 }
+            }
+        }
+    }
+
+    // CS1: product screening of a mobile recycling plant after Mittelsdorf
+    // Recycling / IAB Weimar (2017): feed 0/40 mm as a table inlet, three
+    // Plitt screens in a row -> 16/32, 8/16, 4/8, 0/4 mm. The continuum is
+    // checked against an independent integration of the same formulas
+    // (product shares and gradings for x_cut = 16.2 / 10 / 5.5 mm, alpha = 18),
+    // the particle mode against the continuum.
+    {
+        const std::string file = "Mittelsdorf2017_CS1_Produktsiebung.json";
+        const std::vector<std::string> products = { "16/32", "8/16", "4/8", "0/4" };
+        const double expectShare[4] = { 0.3096, 0.1525, 0.1660, 0.3720 };
+        const std::vector<double> sieves = { 0.001, 0.002, 0.004, 0.0056, 0.008, 0.0112, 0.016, 0.0224, 0.0315 };
+        const double expectQ3[4][9] = {
+            { 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0001, 0.0270, 0.4221, 0.9422 },
+            { 0.0000, 0.0000, 0.0000, 0.0000, 0.0012, 0.2574, 0.9280, 1.0000, 1.0000 },
+            { 0.0000, 0.0000, 0.0001, 0.0523, 0.5985, 0.9999, 1.0000, 1.0000, 1.0000 },
+            { 0.4153, 0.5858, 0.8304, 0.9907, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000 } };
+        const size_t cards = csvDir.empty() ? 500 : 2000;
+        // time mean of an outlet: mass flow and the cumulative distribution in
+        // ln d (trapezoid over the stored density per m times d)
+        struct SProduct
+        {
+            double flow = 0.0;
+            std::vector<double> size, cum;
+            double Q3(double s) const
+            {
+                if (s <= size.front())
+                    return 0.0;
+                for (size_t i = 1; i < size.size(); ++i)
+                    if (s <= size[i])
+                    {
+                        const double f = std::log(s / size[i - 1]) / std::log(size[i] / size[i - 1]);
+                        return (cum[i - 1] + f * (cum[i] - cum[i - 1])) / flow;
+                    }
+                return 1.0;
+            }
+        };
+        const auto run = [&](bool particles, std::map<std::string, SProduct>& out, double& feed, std::string& error)
+        {
+            CFlowsheetGraph graph;
+            const SFlowsheetReadResult read = LoadFlowsheetFile(std::string(STOSIS_VALIDATION_DIR) + "/" + file, graph);
+            if (!read.ok || !read.warnings.empty())
+            {
+                error = read.ok ? read.warnings.front() : read.error;
+                return false;
+            }
+            SCardSettings settings = graph.GetCardSettings();
+            settings.cardsPerSlice = cards;
+            graph.SetCardSettings(settings);
+            graph.SetRepresentation(particles ? ERepresentation::Particles : ERepresentation::Continuum);
+            graph.RunSimulations(1);
+            for (const SFlowsheetNode& node : graph.GetNodes())
+            {
+                if (node.type == ENodeType::Inlet)
+                    feed = graph.GetInlet(node.id)->GetMassFlowAtTime(0.0);
+                if (node.type != ENodeType::Outlet)
+                    continue;
+                const CSimulationResults* r = graph.GetDisplayResults(node.id, 0);
+                if (!r || r->GetNumTimeSteps() == 0)
+                    continue;
+                const size_t n = r->GetNumSizeClasses(), steps = r->GetNumTimeSteps();
+                std::vector<double> mean(n, 0.0);
+                for (size_t k = 0; k < steps; ++k)
+                    for (size_t i = 0; i < n; ++i)
+                        mean[i] += r->GetValue(k, i) / static_cast<double>(steps);
+                SProduct& p = out[node.name];
+                p.size.resize(n);
+                p.cum.assign(n, 0.0);
+                for (size_t i = 0; i < n; ++i)
+                    p.size[i] = r->GetSizeAt(i);
+                for (size_t i = 1; i < n; ++i)
+                    p.cum[i] = p.cum[i - 1] + 0.5 * (mean[i - 1] * p.size[i - 1] + mean[i] * p.size[i]) * std::log(p.size[i] / p.size[i - 1]);
+                p.flow = p.cum[n - 1];
+            }
+            return true;
+        };
+        std::map<std::string, SProduct> cont, part;
+        double feed = 0.0;
+        std::string error;
+        const bool okC = run(false, cont, feed, error);
+        const bool okP = okC && run(true, part, feed, error);
+        if (!okC || !okP || cont.size() != 4 || part.size() != 4)
+            Check(false, "CS1 Mittelsdorf: Datei laden und rechnen - " + error);
+        else
+        {
+            double sumC = 0.0, sumP = 0.0, devShare = 0.0, devQ3 = 0.0, devShareP = 0.0, devQ3P = 0.0;
+            std::printf("      CS1 Produktsiebung Mittelsdorf 2017: Anteil Kontinuum | Partikel (%zu Karten) | unabhaengig; d50 Kontinuum\n", cards);
+            for (size_t k = 0; k < 4; ++k)
+            {
+                const SProduct& c = cont[products[k]];
+                const SProduct& p = part[products[k]];
+                sumC += c.flow;
+                sumP += p.flow;
+                double lo = 1e-5, hi = 0.05;
+                for (int it = 0; it < 60; ++it)
+                {
+                    const double mid = std::sqrt(lo * hi);
+                    (c.Q3(mid) < 0.5 ? lo : hi) = mid;
+                }
+                std::printf("         %-5s %.4f | %.4f | %.4f; d50 %.2f mm\n", products[k].c_str(), c.flow / feed, p.flow / feed, expectShare[k], 1000.0 * lo);
+                devShare = std::max(devShare, std::abs(c.flow / feed - expectShare[k]));
+                devShareP = std::max(devShareP, std::abs(p.flow / feed - c.flow / feed));
+                for (size_t s = 0; s < sieves.size(); ++s)
+                {
+                    if (std::abs(c.Q3(sieves[s]) - expectQ3[k][s]) > 5e-3)
+                        std::printf("         %-5s bei %.1f mm: Q3 %.4f, unabhaengig %.4f\n", products[k].c_str(), 1000.0 * sieves[s], c.Q3(sieves[s]), expectQ3[k][s]);
+                    devQ3 = std::max(devQ3, std::abs(c.Q3(sieves[s]) - expectQ3[k][s]));
+                    devQ3P = std::max(devQ3P, std::abs(p.Q3(sieves[s]) - c.Q3(sieves[s])));
+                }
+            }
+            std::printf("         Bilanz: Kontinuum %.2e, Partikel %.2e relativ; Kontinuum gegen unabhaengig: Anteil %.1e, Q3 %.1e;"
+                        " Partikel gegen Kontinuum: Anteil %.1e, Q3 %.1e\n",
+                sumC / feed - 1.0, sumP / feed - 1.0, devShare, devQ3, devShareP, devQ3P);
+            Check(std::abs(sumC / feed - 1.0) < 1e-6 && std::abs(sumP / feed - 1.0) < 1e-6, "CS1: Massenbilanz der Produktsiebung geschlossen");
+            Check(devShare < 2e-3 && devQ3 < 5e-3, "CS1: Kontinuum wie die unabhaengige Rechnung (Anteile auf 0,2, Sieblinien auf 0,5 %-Punkte)");
+            Check(devShareP < 0.01 && devQ3P < 0.03, "CS1: Partikelmodus wie das Kontinuum (Anteile auf 1, Sieblinien auf 3 %-Punkte)");
+            if (!csvDir.empty())
+            {
+                std::ofstream out(csvDir + "/CS1_Mittelsdorf_Produktsiebung.csv");
+                out << "d_mm;Q3_Zulauf";
+                for (const char* mode : { "Kontinuum", "Partikel" })
+                    for (const std::string& name : products)
+                        out << ";Q3_" << mode << "_" << name;
+                out << "\n";
+                const SProduct& ref = cont[products[0]];
+                for (size_t i = 0; i < ref.size.size(); ++i)
+                {
+                    double below = 0.0;
+                    for (const std::string& name : products)
+                        below += cont[name].cum[i];
+                    out << 1000.0 * ref.size[i] << ";" << below / sumC;
+                    for (const auto* set : { &cont, &part })
+                        for (const std::string& name : products)
+                        {
+                            const SProduct& p = set->at(name);
+                            out << ";" << p.cum[i] / p.flow;
+                        }
+                    out << "\n";
+                }
+                out << "# Anteile am Zulauf:";
+                for (const auto* set : { &cont, &part })
+                    for (const std::string& name : products)
+                        out << " " << set->at(name).flow / feed;
+                out << "\n";
             }
         }
     }

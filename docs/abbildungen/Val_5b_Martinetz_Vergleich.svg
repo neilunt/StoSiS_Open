@@ -5,9 +5,9 @@
 <text class="th" text-anchor="start" x="8.0" y="16.0">Trockengranulier-Linie: StoSiS gegen Messung und Linienmodell (Martinetz et al. 2018)</text>
 <text class="th2" text-anchor="start" x="10.0" y="38.0">e) StoSiS: Wirkstoffanteil nach dem Kompaktor und an der Presse</text>
 <line x1="12.0" y1="51.0" x2="26.0" y2="51.0" stroke="#ea580c" stroke-width="1.4" stroke-dasharray="5 3"/>
-<text class="tn" text-anchor="start" x="30.0" y="54.0">Kontinuum, Kompaktor</text>
+<text class="tn" text-anchor="start" x="30.0" y="54.0">Kontinuum, NIR-Kugel</text>
 <line x1="150.0" y1="51.0" x2="164.0" y2="51.0" stroke="#ea580c" stroke-width="1.4"/>
-<text class="tn" text-anchor="start" x="168.0" y="54.0">Kontinuum, Presse</text>
+<text class="tn" text-anchor="start" x="168.0" y="54.0">Kontinuum, NIR-CI</text>
 <line x1="280.0" y1="51.0" x2="294.0" y2="51.0" stroke="#7c3aed" stroke-width="0.9"/>
 <text class="tn" text-anchor="start" x="298.0" y="54.0">Partikelmodus (2000 Karten je Schritt und Inlet)</text>
 <text class="tl" text-anchor="start" x="44.0" y="68.0">7,92 kg/h (Kennwerte extrapoliert)</text>

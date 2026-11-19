@@ -1,0 +1,326 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="552" viewBox="0 30 700 552">
+<defs><marker id="mg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555555"/></marker></defs>
+<style>text { font-family: Calibri, Arial, sans-serif; } .th { font-size: 14px; font-weight: bold; fill: #222222; } .th2 { font-size: 11.5px; font-weight: bold; fill: #222222; } .tl { font-size: 10.5px; fill: #333333; } .tn { font-size: 9.5px; fill: #5b6470; } .tu { font-size: 10px; font-weight: bold; fill: #222222; } .ta { font-size: 9px; fill: #5b6470; } .m { font-family: 'Cambria Math', Cambria, 'Times New Roman', serif; font-size: 14px; fill: #222222; } .mi { font-family: 'Cambria Math', Cambria, 'Times New Roman', serif; font-style: italic; }</style>
+<rect y="30" width="700" height="990" fill="#ffffff"/>
+<text class="th" text-anchor="start" x="10.0" y="20.0">Recycled aggregates from concrete rubble after Mittelsdorf Recycling / IAB Weimar (2017)</text>
+<text class="th2" text-anchor="start" x="10.0" y="44.0">a) Mobile plant and sampling points</text>
+<g transform="translate(16,52)">
+<text class="tl" text-anchor="start" x="14.0" y="14.0">Concrete rubble</text>
+<line x1="40.0" y1="18.0" x2="40.0" y2="42.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<rect x="14.0" y="44.0" width="82.0" height="16.0" rx="2" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.1"/>
+<line x1="20.0" y1="47.0" x2="24.0" y2="57.0" stroke="#6b7280" stroke-width="1"/>
+<line x1="28.0" y1="47.0" x2="32.0" y2="57.0" stroke="#6b7280" stroke-width="1"/>
+<line x1="36.0" y1="47.0" x2="40.0" y2="57.0" stroke="#6b7280" stroke-width="1"/>
+<line x1="44.0" y1="47.0" x2="48.0" y2="57.0" stroke="#6b7280" stroke-width="1"/>
+<line x1="52.0" y1="47.0" x2="56.0" y2="57.0" stroke="#6b7280" stroke-width="1"/>
+<line x1="60.0" y1="47.0" x2="64.0" y2="57.0" stroke="#6b7280" stroke-width="1"/>
+<line x1="68.0" y1="47.0" x2="72.0" y2="57.0" stroke="#6b7280" stroke-width="1"/>
+<line x1="76.0" y1="47.0" x2="80.0" y2="57.0" stroke="#6b7280" stroke-width="1"/>
+<line x1="84.0" y1="47.0" x2="88.0" y2="57.0" stroke="#6b7280" stroke-width="1"/>
+<text class="tn" text-anchor="middle" x="55.0" y="74.0">Plate feeder, grizzly</text>
+<line x1="96.0" y1="52.0" x2="122.0" y2="52.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<text class="tl" text-anchor="middle" x="160.0" y="18.0">Pre-screen</text>
+<text class="tn" text-anchor="middle" x="160.0" y="29.0">60 ○ · 30 □</text>
+<polygon points="124,36 196,36 196,88 160,112 124,88" fill="#f3f4f6" stroke="#374151" stroke-width="1.2"/>
+<line x1="128.0" y1="46.0" x2="192.0" y2="62.0" stroke="#374151" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="128.0" y1="60.0" x2="192.0" y2="76.0" stroke="#374151" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="160.0" y1="112.0" x2="160.0" y2="146.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<polygon points="136,182 184,182 160,150" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+<circle cx="190.0" cy="168.0" r="4" fill="#d2781e" stroke="#ffffff" stroke-width="1"/>
+<text class="tl" text-anchor="middle" x="160.0" y="196.0">Pre-screen material</text>
+<text class="tn" text-anchor="middle" x="160.0" y="207.0">0/30 mm</text>
+<line x1="196.0" y1="58.0" x2="238.0" y2="58.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<text class="ta" text-anchor="middle" x="214.0" y="54.0">> 60</text>
+<polyline points="196,80 218,80 218,128 262,128" fill="none" stroke="#555555" stroke-width="1.3"/>
+<text class="ta" text-anchor="start" x="222.0" y="104.0">30/60</text>
+<text class="tl" text-anchor="start" x="304.0" y="48.0">Impact</text>
+<text class="tl" text-anchor="start" x="304.0" y="59.0">crusher</text>
+<rect x="238.0" y="38.0" width="60.0" height="54.0" rx="3" fill="#f3f4f6" stroke="#374151" stroke-width="1.2"/>
+<circle cx="268.0" cy="65.0" r="14" fill="#ffffff" stroke="#374151" stroke-width="1.2"/>
+<line x1="274.6" y1="69.5" x2="280.4" y2="73.5" stroke="#374151" stroke-width="1.6"/>
+<line x1="263.5" y1="71.6" x2="259.5" y2="77.4" stroke="#374151" stroke-width="1.6"/>
+<line x1="261.4" y1="60.5" x2="255.6" y2="56.5" stroke="#374151" stroke-width="1.6"/>
+<line x1="272.5" y1="58.4" x2="276.5" y2="52.6" stroke="#374151" stroke-width="1.6"/>
+<line x1="268.0" y1="92.0" x2="268.0" y2="128.0" stroke="#555555" stroke-width="1.3"/>
+<line x1="262.0" y1="128.0" x2="404.0" y2="128.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<rect x="300.0" y="106.0" width="52.0" height="12.0" rx="2" fill="#374151" stroke="#374151" stroke-width="1"/>
+<text class="tn" text-anchor="middle" x="326.0" y="100.0">Overband magnet</text>
+<line x1="352.0" y1="116.0" x2="372.0" y2="148.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<rect x="356.0" y="150.0" width="36.0" height="14.0" rx="2" fill="#e5e7eb" stroke="#6b7280" stroke-width="1"/>
+<text class="tl" text-anchor="middle" x="374.0" y="176.0">Fe scrap</text>
+<text class="tl" text-anchor="middle" x="438.0" y="98.0">Intermediate screen 40 □</text>
+<polygon points="406,104 470,104 470,140 438,160 406,140" fill="#f3f4f6" stroke="#374151" stroke-width="1.2"/>
+<line x1="410.0" y1="114.0" x2="466.0" y2="132.0" stroke="#374151" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="470.0" y1="126.0" x2="498.0" y2="126.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<rect x="500.0" y="116.0" width="58.0" height="20.0" rx="4" fill="#fde2e2" stroke="#c0392b" stroke-width="1.1"/>
+<text class="tu" text-anchor="middle" x="529.0" y="129.5">Air knife</text>
+<line x1="558.0" y1="126.0" x2="588.0" y2="126.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<text class="tl" text-anchor="start" x="592.0" y="124.0">Light</text>
+<text class="tl" text-anchor="start" x="592.0" y="135.0">material</text>
+<polyline points="529,116 529,6 268,6 268,30" fill="none" stroke="#555555" stroke-width="1.3" stroke-dasharray="5 3"/>
+<line x1="268.0" y1="26.0" x2="268.0" y2="36.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<text class="tn" text-anchor="middle" x="400.0" y="16.0">> 40 mm back to the crusher</text>
+<line x1="438.0" y1="160.0" x2="438.0" y2="196.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<circle cx="448.0" cy="176.0" r="4" fill="#d2781e" stroke="#ffffff" stroke-width="1"/>
+<text class="tl" text-anchor="start" x="456.0" y="172.0">Input product screening</text>
+<text class="tn" text-anchor="start" x="456.0" y="183.0">0/40 mm</text>
+<text class="tl" text-anchor="end" x="398.0" y="214.0">Product screen</text>
+<text class="tn" text-anchor="end" x="398.0" y="225.0">20 □ · 10 □ · 5 slot</text>
+<polygon points="404,198 484,198 484,236 444,256 404,236" fill="#f3f4f6" stroke="#374151" stroke-width="1.2"/>
+<line x1="408.0" y1="204.0" x2="480.0" y2="214.0" stroke="#374151" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="408.0" y1="214.0" x2="480.0" y2="224.0" stroke="#374151" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="408.0" y1="224.0" x2="480.0" y2="234.0" stroke="#374151" stroke-width="1" stroke-dasharray="4 3"/>
+<polyline points="484,206 652,206 652,262" fill="none" stroke="#555555" stroke-width="1.3"/>
+<line x1="652.0" y1="258.0" x2="652.0" y2="264.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<polyline points="484,216 600,216 600,262" fill="none" stroke="#555555" stroke-width="1.3"/>
+<line x1="600.0" y1="258.0" x2="600.0" y2="264.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<polyline points="484,228 548,228 548,262" fill="none" stroke="#555555" stroke-width="1.3"/>
+<line x1="548.0" y1="258.0" x2="548.0" y2="264.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<line x1="444.0" y1="256.0" x2="444.0" y2="264.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<polygon points="422,296 466,296 444,266" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+<circle cx="470.0" cy="284.0" r="4" fill="#d2781e" stroke="#ffffff" stroke-width="1"/>
+<text class="tl" text-anchor="middle" x="444.0" y="309.0">0/4 mm</text>
+<polygon points="526,296 570,296 548,266" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+<circle cx="574.0" cy="284.0" r="4" fill="#d2781e" stroke="#ffffff" stroke-width="1"/>
+<text class="tl" text-anchor="middle" x="548.0" y="309.0">4/8 mm</text>
+<polygon points="578,296 622,296 600,266" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+<circle cx="626.0" cy="284.0" r="4" fill="#d2781e" stroke="#ffffff" stroke-width="1"/>
+<text class="tl" text-anchor="middle" x="600.0" y="309.0">8/16 mm</text>
+<polygon points="630,296 674,296 652,266" fill="#9ca3af" stroke="#6b7280" stroke-width="1"/>
+<circle cx="678.0" cy="284.0" r="4" fill="#d2781e" stroke="#ffffff" stroke-width="1"/>
+<text class="tl" text-anchor="middle" x="652.0" y="309.0">16/32 mm</text>
+<line x1="534.0" y1="240.0" x2="546.0" y2="248.0" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="2 2"/>
+<line x1="586.0" y1="240.0" x2="598.0" y2="248.0" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="2 2"/>
+<line x1="638.0" y1="240.0" x2="650.0" y2="248.0" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="2 2"/>
+<text class="tn" text-anchor="middle" x="600" y="201" style="fill:#2563eb">Water spraying on the coarse products</text>
+<circle cx="24.0" cy="300.0" r="4" fill="#d2781e" stroke="#ffffff" stroke-width="1"/>
+<text class="tn" text-anchor="start" x="32.0" y="303.0">sample: grading, density, water absorption, composition</text>
+</g>
+<text class="th2" text-anchor="start" x="10.0" y="392.0">b) Product screening as three screens in a row (StoSiS units)</text>
+<g transform="translate(16,400)">
+<rect x="0.0" y="14.0" width="78.0" height="24.0" rx="5" fill="#d4ecd4" stroke="#4f8f4f" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="39.0" y="30.0">Feed 0/40</text>
+<line x1="78.0" y1="26.0" x2="96.0" y2="26.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<rect x="98.0" y="14.0" width="92.0" height="24.0" rx="5" fill="#fbeedd" stroke="#a8692c" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="144.0" y="30.0">Screen 20 □</text>
+<line x1="144.0" y1="38.0" x2="144.0" y2="52.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<rect x="114.0" y="54.0" width="60.0" height="20.0" rx="5" fill="#ecd9d3" stroke="#8f4f3f" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="144.0" y="68.0">16/32</text>
+<line x1="190.0" y1="26.0" x2="246.0" y2="26.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<text class="ta" text-anchor="start" x="152.0" y="49.0">oversize</text>
+<text class="ta" text-anchor="middle" x="218.0" y="22.0">undersize</text>
+<rect x="248.0" y="14.0" width="92.0" height="24.0" rx="5" fill="#fbeedd" stroke="#a8692c" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="294.0" y="30.0">Screen 10 □</text>
+<line x1="294.0" y1="38.0" x2="294.0" y2="52.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<rect x="264.0" y="54.0" width="60.0" height="20.0" rx="5" fill="#ecd9d3" stroke="#8f4f3f" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="294.0" y="68.0">8/16</text>
+<line x1="340.0" y1="26.0" x2="396.0" y2="26.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<text class="ta" text-anchor="start" x="302.0" y="49.0">oversize</text>
+<text class="ta" text-anchor="middle" x="368.0" y="22.0">undersize</text>
+<rect x="398.0" y="14.0" width="92.0" height="24.0" rx="5" fill="#fbeedd" stroke="#a8692c" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="444.0" y="30.0">Screen 5 slot</text>
+<line x1="444.0" y1="38.0" x2="444.0" y2="52.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<rect x="414.0" y="54.0" width="60.0" height="20.0" rx="5" fill="#ecd9d3" stroke="#8f4f3f" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="444.0" y="68.0">4/8</text>
+<line x1="490.0" y1="26.0" x2="546.0" y2="26.0" stroke="#555555" stroke-width="1.3" marker-end="url(#mg)"/>
+<text class="ta" text-anchor="start" x="452.0" y="49.0">oversize</text>
+<text class="ta" text-anchor="middle" x="518.0" y="22.0">undersize</text>
+<rect x="548.0" y="14.0" width="60.0" height="24.0" rx="5" fill="#ecd9d3" stroke="#8f4f3f" stroke-width="1.3"/>
+<text class="tu" text-anchor="middle" x="578.0" y="30.0">0/4</text>
+</g>
+<text class="th2" text-anchor="start" x="10.0" y="498.0">c) Grade efficiency of each deck after Plitt (as in Dyssol)</text>
+<text class="m" xml:space="preserve" text-anchor="middle" x="350" y="528"><tspan class="mi">T</tspan>(<tspan class="mi">d</tspan>) = 1 − exp(−0.693 (<tspan class="mi">d</tspan> / <tspan class="mi">x</tspan><tspan font-size="10" dy="3">cut</tspan><tspan dy="-3">)</tspan><tspan font-size="10" dy="-6" class="mi">α</tspan><tspan dy="6">)</tspan></text>
+<text class="tl" text-anchor="start" x="80.0" y="552.0"><tspan class="mi">T</tspan>: mass fraction of size <tspan class="mi">d</tspan> going to the oversize</text>
+<text class="tl" text-anchor="start" x="80.0" y="566.0"><tspan class="mi">d</tspan>: particle size (sieve opening)</text>
+<text class="tl" text-anchor="start" x="380.0" y="552.0"><tspan class="mi">x</tspan><tspan font-size="8" dy="2">cut</tspan><tspan dy="-2">: cut size, </tspan><tspan class="mi">T</tspan>(<tspan class="mi">x</tspan><tspan font-size="8" dy="2">cut</tspan><tspan dy="-2">) ≈ 0.5</tspan></text>
+<text class="tl" text-anchor="start" x="380.0" y="566.0">α: sharpness of separation</text>
+<text class="th2" text-anchor="start" x="10.0" y="604.0">d) Values of the report (fractions without air classification and washing)</text>
+<text class="tu" text-anchor="start" x="16.0" y="624.0">Property</text>
+<text class="tu" text-anchor="end" x="400.0" y="614.0">Pre-screen</text>
+<text class="tu" text-anchor="end" x="400.0" y="624.0">material</text>
+<text class="tu" text-anchor="end" x="476.0" y="614.0">Input product</text>
+<text class="tu" text-anchor="end" x="476.0" y="624.0">screening</text>
+<text class="tu" text-anchor="end" x="524.0" y="624.0">0/4</text>
+<text class="tu" text-anchor="end" x="572.0" y="624.0">4/8</text>
+<text class="tu" text-anchor="end" x="620.0" y="624.0">8/16</text>
+<text class="tu" text-anchor="end" x="668.0" y="624.0">16/32</text>
+<text class="tn" text-anchor="start" x="16.0" y="636.0">Share of the feed (Fig. 9) [mass %]</text>
+<text class="tn" text-anchor="end" x="400.0" y="636.0">40.8</text>
+<text class="tn" text-anchor="end" x="476.0" y="636.0">–</text>
+<text class="tn" text-anchor="end" x="524.0" y="636.0">21.0*</text>
+<text class="tn" text-anchor="end" x="572.0" y="636.0">5.8*</text>
+<text class="tn" text-anchor="end" x="620.0" y="636.0">11.4</text>
+<text class="tn" text-anchor="end" x="668.0" y="636.0">20.8</text>
+<rect x="14.0" y="639.0" width="650.0" height="12.0" rx="0" fill="#f4f6f9" stroke="none" stroke-width="0"/>
+<text class="tn" text-anchor="start" x="16.0" y="648.0">Median size d50 (sieving) [mm]</text>
+<text class="tn" text-anchor="end" x="400.0" y="648.0">2.1</text>
+<text class="tn" text-anchor="end" x="476.0" y="648.0">9.1</text>
+<text class="tn" text-anchor="end" x="524.0" y="648.0">1.0</text>
+<text class="tn" text-anchor="end" x="572.0" y="648.0">7.3</text>
+<text class="tn" text-anchor="end" x="620.0" y="648.0">12.3</text>
+<text class="tn" text-anchor="end" x="668.0" y="648.0">23.9</text>
+<text class="tn" text-anchor="start" x="16.0" y="660.0">Particle density, oven-dry (pycnometer) [kg/m³]</text>
+<text class="tn" text-anchor="end" x="400.0" y="660.0">2370</text>
+<text class="tn" text-anchor="end" x="476.0" y="660.0">2240</text>
+<text class="tn" text-anchor="end" x="524.0" y="660.0">2010</text>
+<text class="tn" text-anchor="end" x="572.0" y="660.0">2280</text>
+<text class="tn" text-anchor="end" x="620.0" y="660.0">2300</text>
+<text class="tn" text-anchor="end" x="668.0" y="660.0">2320</text>
+<rect x="14.0" y="663.0" width="650.0" height="12.0" rx="0" fill="#f4f6f9" stroke="none" stroke-width="0"/>
+<text class="tn" text-anchor="start" x="16.0" y="672.0">Water absorption after 10 min [mass %]</text>
+<text class="tn" text-anchor="end" x="400.0" y="672.0">6.5</text>
+<text class="tn" text-anchor="end" x="476.0" y="672.0">6.6</text>
+<text class="tn" text-anchor="end" x="524.0" y="672.0">8.4</text>
+<text class="tn" text-anchor="end" x="572.0" y="672.0">4.7</text>
+<text class="tn" text-anchor="end" x="620.0" y="672.0">4.4</text>
+<text class="tn" text-anchor="end" x="668.0" y="672.0">3.6</text>
+<text class="tn" text-anchor="start" x="16.0" y="684.0">Bulk density [kg/m³]</text>
+<text class="tn" text-anchor="end" x="400.0" y="684.0">1410</text>
+<text class="tn" text-anchor="end" x="476.0" y="684.0">1500</text>
+<text class="tn" text-anchor="end" x="524.0" y="684.0">1460</text>
+<text class="tn" text-anchor="end" x="572.0" y="684.0">1170</text>
+<text class="tn" text-anchor="end" x="620.0" y="684.0">1150</text>
+<text class="tn" text-anchor="end" x="668.0" y="684.0">1150</text>
+<rect x="14.0" y="687.0" width="650.0" height="12.0" rx="0" fill="#f4f6f9" stroke="none" stroke-width="0"/>
+<text class="tn" text-anchor="start" x="16.0" y="696.0">Concrete, mortar Rc + natural stone Ru [mass %]</text>
+<text class="tn" text-anchor="end" x="400.0" y="696.0">–</text>
+<text class="tn" text-anchor="end" x="476.0" y="696.0">–</text>
+<text class="tn" text-anchor="end" x="524.0" y="696.0">–</text>
+<text class="tn" text-anchor="end" x="572.0" y="696.0">98.8</text>
+<text class="tn" text-anchor="end" x="620.0" y="696.0">98.7</text>
+<text class="tn" text-anchor="end" x="668.0" y="696.0">98.4</text>
+<text class="ta" text-anchor="start" x="16.0" y="712.0">* named 0/2 and 2/8 in Fig. 9; residue 0.2 % sludge and above 0.01 % light material</text>
+<text class="th2" text-anchor="start" x="10.0" y="732.0">e) Grading curves: cumulative passing in mass percent (mass %)</text>
+<rect x="52.0" y="768.0" width="270.0" height="166.0" rx="0" fill="#ffffff" stroke="#9ca3af" stroke-width="0.8"/>
+<line x1="52.0" y1="900.8" x2="322.0" y2="900.8" stroke="#e5e7eb" stroke-width="0.7"/>
+<line x1="52.0" y1="867.6" x2="322.0" y2="867.6" stroke="#e5e7eb" stroke-width="0.7"/>
+<line x1="52.0" y1="834.4" x2="322.0" y2="834.4" stroke="#e5e7eb" stroke-width="0.7"/>
+<line x1="52.0" y1="801.2" x2="322.0" y2="801.2" stroke="#e5e7eb" stroke-width="0.7"/>
+<line x1="61.0" y1="768.0" x2="61.0" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="61.0" y="945.0">0.063</text>
+<line x1="87.8" y1="768.0" x2="87.8" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="87.8" y="945.0">0.125</text>
+<line x1="114.9" y1="768.0" x2="114.9" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="114.9" y="945.0">0.25</text>
+<line x1="142.0" y1="768.0" x2="142.0" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="142.0" y="945.0">0.5</text>
+<line x1="169.1" y1="768.0" x2="169.1" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="169.1" y="945.0">1</text>
+<line x1="196.2" y1="768.0" x2="196.2" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="196.2" y="945.0">2</text>
+<line x1="223.3" y1="768.0" x2="223.3" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="223.3" y="945.0">4</text>
+<line x1="250.4" y1="768.0" x2="250.4" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="250.4" y="945.0">8</text>
+<line x1="277.5" y1="768.0" x2="277.5" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="277.5" y="945.0">16</text>
+<line x1="303.9" y1="768.0" x2="303.9" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="303.9" y="945.0">31.5</text>
+<text class="ta" text-anchor="end" x="48.0" y="937.0">0</text>
+<text class="ta" text-anchor="end" x="48.0" y="903.8">20</text>
+<text class="ta" text-anchor="end" x="48.0" y="870.6">40</text>
+<text class="ta" text-anchor="end" x="48.0" y="837.4">60</text>
+<text class="ta" text-anchor="end" x="48.0" y="804.2">80</text>
+<text class="ta" text-anchor="end" x="48.0" y="771.0">100</text>
+<text class="ta" text-anchor="end" x="48.0" y="763.0">mass %</text>
+<text class="ta" text-anchor="end" x="322.0" y="957.0">sieve opening [mm]</text>
+<polyline points="61.0,925.6 87.8,920.2 114.9,911.6 142.0,893.5 169.1,872.2 196.2,852.8 223.3,821.5 236.4,804.7 250.4,791.2 263.5,781.2 277.5,773.7 290.6,768.0 303.9,768.0 " fill="none" stroke="#6b7280" stroke-width="1.1"/>
+<rect x="57.4" y="922.0" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="84.2" y="916.6" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="111.3" y="908.0" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="138.4" y="889.9" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="165.5" y="868.6" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="192.6" y="849.2" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="219.7" y="817.9" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="232.8" y="801.1" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="246.8" y="787.6" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="259.9" y="777.6" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="273.9" y="770.1" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="287.0" y="764.4" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<rect x="300.3" y="764.4" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<polyline points="61.0,931.6 87.8,929.4 114.9,925.9 142.0,918.3 169.1,908.4 196.2,897.8 223.3,882.7 236.4,871.4 250.4,855.7 263.5,838.2 277.5,819.8 290.6,797.7 303.9,771.0 317.9,768.0 " fill="none" stroke="#2563eb" stroke-width="1.1"/>
+<polygon points="61.0,927.0 65.6,931.6 61.0,936.2 56.4,931.6" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="87.8,924.8 92.4,929.4 87.8,934.0 83.2,929.4" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="114.9,921.3 119.5,925.9 114.9,930.5 110.3,925.9" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="142.0,913.7 146.6,918.3 142.0,922.9 137.4,918.3" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="169.1,903.8 173.7,908.4 169.1,913.0 164.5,908.4" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="196.2,893.2 200.8,897.8 196.2,902.4 191.6,897.8" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="223.3,878.1 227.9,882.7 223.3,887.3 218.7,882.7" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="236.4,866.8 241.0,871.4 236.4,876.0 231.8,871.4" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="250.4,851.1 255.0,855.7 250.4,860.3 245.8,855.7" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="263.5,833.6 268.1,838.2 263.5,842.8 258.9,838.2" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="277.5,815.2 282.1,819.8 277.5,824.4 272.9,819.8" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="290.6,793.1 295.2,797.7 290.6,802.3 286.0,797.7" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="303.9,766.4 308.5,771.0 303.9,775.6 299.3,771.0" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="317.9,763.4 322.5,768.0 317.9,772.6 313.3,768.0" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<rect x="60.4" y="742.4" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#6b7280" stroke-width="1.2"/>
+<text class="tn" text-anchor="start" x="72.0" y="749.0">Pre-screen material</text>
+<polygon points="170.0,741.4 174.6,746.0 170.0,750.6 165.4,746.0" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<text class="tn" text-anchor="start" x="178.0" y="749.0">Input product screening</text>
+<rect x="400.0" y="768.0" width="270.0" height="166.0" rx="0" fill="#ffffff" stroke="#9ca3af" stroke-width="0.8"/>
+<line x1="400.0" y1="900.8" x2="670.0" y2="900.8" stroke="#e5e7eb" stroke-width="0.7"/>
+<line x1="400.0" y1="867.6" x2="670.0" y2="867.6" stroke="#e5e7eb" stroke-width="0.7"/>
+<line x1="400.0" y1="834.4" x2="670.0" y2="834.4" stroke="#e5e7eb" stroke-width="0.7"/>
+<line x1="400.0" y1="801.2" x2="670.0" y2="801.2" stroke="#e5e7eb" stroke-width="0.7"/>
+<line x1="400.0" y1="768.0" x2="400.0" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="400.0" y="945.0">1</text>
+<line x1="447.8" y1="768.0" x2="447.8" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="447.8" y="945.0">2</text>
+<line x1="495.7" y1="768.0" x2="495.7" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="495.7" y="945.0">4</text>
+<line x1="543.5" y1="768.0" x2="543.5" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="543.5" y="945.0">8</text>
+<line x1="591.4" y1="768.0" x2="591.4" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="591.4" y="945.0">16</text>
+<line x1="638.1" y1="768.0" x2="638.1" y2="934.0" stroke="#e5e7eb" stroke-width="0.7"/>
+<text class="ta" text-anchor="middle" x="638.1" y="945.0">31.5</text>
+<text class="ta" text-anchor="end" x="396.0" y="937.0">0</text>
+<text class="ta" text-anchor="end" x="396.0" y="903.8">20</text>
+<text class="ta" text-anchor="end" x="396.0" y="870.6">40</text>
+<text class="ta" text-anchor="end" x="396.0" y="837.4">60</text>
+<text class="ta" text-anchor="end" x="396.0" y="804.2">80</text>
+<text class="ta" text-anchor="end" x="396.0" y="771.0">100</text>
+<text class="ta" text-anchor="end" x="396.0" y="763.0">mass %</text>
+<text class="ta" text-anchor="end" x="670.0" y="957.0">sieve opening [mm]</text>
+<polyline points="447.8,932.3 543.5,834.7 591.4,768.8 614.6,768.0 " fill="none" stroke="#c2410c" stroke-width="1.1"/>
+<polygon points="447.8,927.7 452.2,935.7 443.4,935.7" fill="#c2410c" stroke="#c2410c" stroke-width="1.2"/>
+<polygon points="543.5,830.1 547.9,838.1 539.1,838.1" fill="#c2410c" stroke="#c2410c" stroke-width="1.2"/>
+<polygon points="591.4,764.2 595.8,772.2 587.0,772.2" fill="#c2410c" stroke="#c2410c" stroke-width="1.2"/>
+<polygon points="614.6,763.4 619.0,771.4 610.2,771.4" fill="#c2410c" stroke="#c2410c" stroke-width="1.2"/>
+<polyline points="447.8,933.2 543.5,829.6 591.4,768.8 614.6,768.0 " fill="none" stroke="#c2410c" stroke-width="1.1" stroke-dasharray="4 3"/>
+<polygon points="447.8,928.6 452.2,936.6 443.4,936.6" fill="#ffffff" stroke="#c2410c" stroke-width="1.2"/>
+<polygon points="543.5,825.0 547.9,833.0 539.1,833.0" fill="#ffffff" stroke="#c2410c" stroke-width="1.2"/>
+<polygon points="591.4,764.2 595.8,772.2 587.0,772.2" fill="#ffffff" stroke="#c2410c" stroke-width="1.2"/>
+<polygon points="614.6,763.4 619.0,771.4 610.2,771.4" fill="#ffffff" stroke="#c2410c" stroke-width="1.2"/>
+<polyline points="543.5,932.8 591.4,778.3 614.6,768.0 " fill="none" stroke="#2563eb" stroke-width="1.1"/>
+<polygon points="543.5,928.2 548.1,932.8 543.5,937.4 538.9,932.8" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="591.4,773.7 596.0,778.3 591.4,782.9 586.8,778.3" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="614.6,763.4 619.2,768.0 614.6,772.6 610.0,768.0" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<polyline points="543.5,933.2 591.4,776.8 614.6,768.0 " fill="none" stroke="#2563eb" stroke-width="1.1" stroke-dasharray="4 3"/>
+<polygon points="543.5,928.6 548.1,933.2 543.5,937.8 538.9,933.2" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="591.4,772.2 596.0,776.8 591.4,781.4 586.8,776.8" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<polygon points="614.6,763.4 619.2,768.0 614.6,772.6 610.0,768.0" fill="#ffffff" stroke="#2563eb" stroke-width="1.2"/>
+<polyline points="566.7,930.7 591.4,925.2 614.6,870.9 638.1,779.0 662.7,768.0 " fill="none" stroke="#0d8467" stroke-width="1.1"/>
+<rect x="563.1" y="927.1" width="7.2" height="7.2" rx="0" fill="#0d8467" stroke="#0d8467" stroke-width="1.2"/>
+<rect x="587.8" y="921.6" width="7.2" height="7.2" rx="0" fill="#0d8467" stroke="#0d8467" stroke-width="1.2"/>
+<rect x="611.0" y="867.3" width="7.2" height="7.2" rx="0" fill="#0d8467" stroke="#0d8467" stroke-width="1.2"/>
+<rect x="634.5" y="775.4" width="7.2" height="7.2" rx="0" fill="#0d8467" stroke="#0d8467" stroke-width="1.2"/>
+<rect x="659.1" y="764.4" width="7.2" height="7.2" rx="0" fill="#0d8467" stroke="#0d8467" stroke-width="1.2"/>
+<polyline points="566.7,932.3 591.4,928.0 614.6,853.5 638.1,776.8 662.7,768.0 " fill="none" stroke="#0d8467" stroke-width="1.1" stroke-dasharray="4 3"/>
+<rect x="563.1" y="928.7" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#0d8467" stroke-width="1.2"/>
+<rect x="587.8" y="924.4" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#0d8467" stroke-width="1.2"/>
+<rect x="611.0" y="849.9" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#0d8467" stroke-width="1.2"/>
+<rect x="634.5" y="773.2" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#0d8467" stroke-width="1.2"/>
+<rect x="659.1" y="764.4" width="7.2" height="7.2" rx="0" fill="#ffffff" stroke="#0d8467" stroke-width="1.2"/>
+<polygon points="412.0,741.4 416.4,749.4 407.6,749.4" fill="#c2410c" stroke="#c2410c" stroke-width="1.2"/>
+<text class="tn" text-anchor="start" x="420.0" y="749.0">4/8</text>
+<polygon points="450.0,741.4 454.6,746.0 450.0,750.6 445.4,746.0" fill="#2563eb" stroke="#2563eb" stroke-width="1.2"/>
+<text class="tn" text-anchor="start" x="458.0" y="749.0">8/16</text>
+<rect x="490.4" y="742.4" width="7.2" height="7.2" rx="0" fill="#0d8467" stroke="#0d8467" stroke-width="1.2"/>
+<text class="tn" text-anchor="start" x="502.0" y="749.0">16/32</text>
+<line x1="426.0" y1="758.0" x2="440.0" y2="758.0" stroke="#555555" stroke-width="1.1"/>
+<text class="tn" text-anchor="start" x="444.0" y="761.0">without</text>
+<line x1="490.0" y1="758.0" x2="504.0" y2="758.0" stroke="#555555" stroke-width="1.1" stroke-dasharray="4 3"/>
+<text class="tn" text-anchor="start" x="508.0" y="761.0">with air classification and washing</text>
+<text class="ta" text-anchor="start" x="10.0" y="976.0">Source: Mittelsdorf Recycling, IAB Weimar (2017), final report UIP NKa3-002103. a) own drawing after Fig. 3; d) Tables 4, 5 of the appendix and Fig. 9; e) values read from Figs. 21–23.</text>
+</svg>

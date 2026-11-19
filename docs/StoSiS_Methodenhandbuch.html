@@ -643,8 +643,8 @@
   <li><b>Vergleich mit anderen Programmen</b> wie Dyssol oder PharmaPy: gleiche Modelle, gleiche Ergebnisse?</li>
   <li><b>Validierung:</b> Trifft das Modell die Wirklichkeit? Das zeigt nur ein Experiment.</li>
 </ul>
-<p>Die Prüfungen der Verifikation liegen als 17 Testprogramme im Repository und laufen mit einem Befehl (CTest). Stochastische Tests laufen mit festem Seed; ihre Toleranzen folgen aus dem statistischen Fehler und sind nicht frei gewählt. Ein Regressionstest überwacht Kennzahlen fester Flowsheets. Die Flowsheets der Abschnitte 11.3 bis 11.5 liegen als Dateien in <code>Flowsheets/Validierungs-Flowsheets</code> und lassen sich in der Oberfläche öffnen.</p>
-<p>Ein Vergleich mit anderen Programmen an gemeinsamen Flowsheets liegt nicht vor. Gegen Messdaten geprüft ist der schwankende Splitter (11.2); für den Mischer (11.4) dient eine Verweilzeitkurve aus der Literatur. Abschnitt 11.5 stellt mit der Trockengranulier-Linie einen Fall mit Messdaten aus der Literatur vor. Messwerte, die nur als Bild vorliegen, sind aus der Abbildung abgelesen.</p>
+<p>Die Prüfungen der Verifikation liegen als 18 Testprogramme im Repository und laufen mit einem Befehl (CTest). Stochastische Tests laufen mit festem Seed; ihre Toleranzen folgen aus dem statistischen Fehler und sind nicht frei gewählt. Ein Regressionstest überwacht Kennzahlen fester Flowsheets. Die Flowsheets der Abschnitte 11.3 bis 11.5 liegen als Dateien in <code>Flowsheets/Validierungs-Flowsheets</code> und lassen sich in der Oberfläche öffnen.</p>
+<p>Ein Vergleich mit anderen Programmen an gemeinsamen Flowsheets liegt nicht vor. Gegen Messdaten geprüft sind der schwankende Splitter (11.2) und die Trockengranulier-Linie (11.5); für den Mischer (11.4) dient eine Verweilzeitkurve aus der Literatur. Messwerte, die nur als Bild vorliegen, sind aus der Abbildung abgelesen.</p>
 
 <h3 id="k11-2"><span class="nr">11.2</span>Dosierwaage</h3>
 <p>Engisch &amp; Muzzio (2012) messen den Massenstrom einer Dosierwaage für Laktose mit einer Auffangwaage, die alle 0,1 s abliest. Simuliert wird ein Inlet mit 100 kg/h, gefolgt von einem schwankenden Splitter (μ = 0,6944, τ = 0,3 s), über 30 min mit Δ<i>t</i> = 0,1 s. Beide Datenreihen werden gleich ausgewertet: 1-s-Mittel, Filter ±10 % um den Sollwert, dann iterativ ±3σ.</p>
@@ -691,6 +691,15 @@
 <figure>
   <img src="abbildungen/Val_5_Martinetz_Uebersicht_2.svg" alt="Zeitkonstanten und Messwerte mit den Modellen des Papers">
   <figcaption>Abbildung 11.5 – Trockengranulier-Linie nach Martinetz et al. (2018): a) Aufbau mit den Messstellen, b) Modell der Linie, c) Übertragungsfunktionen der Units, d) Zeitkonstanten (Tab. 2 des Papers), e) Wirkstoffanteil nach dem Sprung von 10 auf 20 %: Messwerte und Modelle des Papers.</figcaption>
+</figure>
+<p>In StoSiS wird jede Übertragungsfunktion zu einer Kette von Behältern (Abbildung 11.6 a). Ein Faktor 1 / (1 + <i>sT</i>) ist ein ideal durchmischter Behälter (Kessel) mit der mittleren Verweilzeit <i>T</i>, die Totzeit e<sup>−<i>sT</i><sub>d</sub></sup> ein Behälter mit Pfropfenströmung. Bei der Presse sind <i>T</i><sub>1</sub>, <i>T</i><sub>2</sub> und <i>T</i><sub>3</sub> gleich; der Zähler hebt einen Faktor des Nenners auf, und es bleibt ein Kessel mit <i>T</i><sub>1</sub>. Wirkstoff und Hilfsstoffe kommen aus zwei Inlets über einen Merger, alle Behälter starten im Dauerbetrieb, der Zeitschritt Δ<i>t</i> ist 0,5 s. Die Kennwerte sind die aus Tab. 2 des Papers, ohne Anpassung. Je Durchsatz liegt eine Flowsheet-Datei in <code>Flowsheets/Validierungs-Flowsheets</code>.</p>
+<p>Im Kontinuum folgt StoSiS dem Modell des Papers auf 2 · 10<sup>−4</sup> %-Punkte, der Partikelmodus mit 2000 Karten je Zeitschritt und Inlet streut darum ohne Versatz (Abbildung 11.6 b). Gegen die Messwerte liegt die mittlere quadratische Abweichung (RMSD) von StoSiS zwischen 0,61 und 1,10 Masse-%, die der Modelle des Papers (dort Tab. 3) zwischen 0,47 und 1,23 Masse-% (c). StoSiS trifft die Messung damit so gut wie das Modell der Autoren. Die Werte von StoSiS sind gegen die abgelesenen Messpunkte gerechnet, die des Papers gegen die Originaldaten.</p>
+<figure>
+  <img src="abbildungen/Val_5_Martinetz_StoSiS_1.svg" alt="Modell der Linie in StoSiS und Wirkstoffanteil aus StoSiS bei vier Durchsätzen">
+</figure>
+<figure>
+  <img src="abbildungen/Val_5_Martinetz_StoSiS_2.svg" alt="Messwerte, Modelle des Papers und StoSiS übereinander, RMSD im Vergleich">
+  <figcaption>Abbildung 11.6 – Trockengranulier-Linie in StoSiS: a) die Linie aus Behältern mit den Kennwerten aus Tab. 2 des Papers, b) Wirkstoffanteil nach dem Kompaktor und an der Presse im Kontinuum und im Partikelmodus, c) Messwerte, Modelle des Papers und StoSiS übereinander, darunter die RMSD zur Messung.</figcaption>
 </figure>
 
 <h2 id="k12"><span class="nr">12</span>Begriffe</h2>

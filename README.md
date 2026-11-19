@@ -38,7 +38,9 @@ Implemented:
   compartment models after Levenspiel and a blender, checked against their
   exact residence time distribution, and a dry granulation line after
   Martinetz et al. (2018) at four throughputs, checked against the line model
-  and the measured step response of the paper (`test_levenspiel`).
+  and the measured step response of the paper, and the product screening of a
+  mobile recycling plant for concrete rubble after Mittelsdorf Recycling /
+  IAB Weimar (2017) (`test_levenspiel`).
 - **Multiple runs:** global seed with a separate random stream per unit,
   mean and spread after Welford, bands and percentiles; validated against an
   analytical solution.

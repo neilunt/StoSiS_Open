@@ -1,0 +1,103 @@
+{
+    "format": "StoSiS-Flowsheet",
+    "version": 2,
+    "program": "StoSiS 0.3.0",
+    "info": "Case Study 1, Produktsiebung der mobilen RC-Anlage nach Mittelsdorf Recycling / IAB Weimar (2017), Abschlussbericht UIP NKa3-002103. Zulauf: Input der Produktsiebung 0/40 mm, Sieblinie aus Bild 21 dort (unter 0,063 mm angenommen: 0 bei 0,02 mm). Drei-Deck-Produktsieb 20 / 10 mm quadratisch und 5 mm Schlitz als drei Siebe nach Plitt; Trenngroessen 16,2 / 10,0 / 5,5 mm und alpha = 18 an die Produktsieblinien (Bild 22, 23) angepasst, nicht aus dem Bericht. Durchsatz 100 t/h angenommen (im Bericht nicht angegeben). Stoff Sand steht fuer die Gesteinskoernung; die Siebe trennen nur nach Groesse.",
+    "simulation": {
+        "duration": 20.0,
+        "dt": 1.0,
+        "seed": 1,
+        "runs": 1,
+        "representation": "continuum",
+        "sizeGrid": { "type": "logarithmic", "classes": 1000, "dMin": 2e-05, "dMax": 0.05 },
+        "cards": {
+            "perSlice": 2000,
+            "rule": "sum",
+            "numberShare": 0.5,
+            "exponent": 0.8,
+            "sliceLimits": true,
+            "upperFactor": 2.0,
+            "splitFactor": 5.0
+        }
+    },
+    "execution": { "detailedLog": false, "cardHistory": true },
+    "units": [
+        {
+            "id": "node_0",
+            "type": "Inlet",
+            "name": "Input Produktsiebung 0/40",
+            "position": [0.0, 0.0],
+            "settings": {
+                "material": "Sand",
+                "temperature": 293.15,
+                "pressure": 101325.0,
+                "massFlow": [[0.0, 27.7778]],
+                "sizeDistribution": { "type": "table", "position": 0.0001, "width": 0.25, "points": [
+                    [2e-05, 0.0], [6.3e-05, 0.0146], [0.000125, 0.0276], [0.00025, 0.0488], [0.0005, 0.0943],
+                    [0.001, 0.1545], [0.002, 0.2179], [0.004, 0.3089], [0.0056, 0.3772], [0.008, 0.4715],
+                    [0.0112, 0.5772], [0.016, 0.6878], [0.0224, 0.8211], [0.0315, 0.9821], [0.045, 1.0]] }
+            }
+        }
+,
+        {
+            "id": "node_1",
+            "type": "Screen",
+            "name": "Oberdeck 20 mm",
+            "position": [260.0, 0.0],
+            "settings": { "model": "plitt", "cutSize": 0.0162, "alpha": 18.0, "beta": 0.5, "offset": 0.0 }
+        }
+,
+        {
+            "id": "node_2",
+            "type": "Screen",
+            "name": "Mitteldeck 10 mm",
+            "position": [520.0, 120.0],
+            "settings": { "model": "plitt", "cutSize": 0.01, "alpha": 18.0, "beta": 0.5, "offset": 0.0 }
+        }
+,
+        {
+            "id": "node_3",
+            "type": "Screen",
+            "name": "Unterdeck 5 mm Schlitz",
+            "position": [780.0, 240.0],
+            "settings": { "model": "plitt", "cutSize": 0.0055, "alpha": 18.0, "beta": 0.5, "offset": 0.0 }
+        }
+,
+        {
+            "id": "node_4",
+            "type": "Outlet",
+            "name": "16/32",
+            "position": [520.0, -120.0]
+        }
+,
+        {
+            "id": "node_5",
+            "type": "Outlet",
+            "name": "8/16",
+            "position": [780.0, 0.0]
+        }
+,
+        {
+            "id": "node_6",
+            "type": "Outlet",
+            "name": "4/8",
+            "position": [1040.0, 120.0]
+        }
+,
+        {
+            "id": "node_7",
+            "type": "Outlet",
+            "name": "0/4",
+            "position": [1040.0, 360.0]
+        }
+    ],
+    "connections": [
+        { "from": "node_0", "output": 1, "to": "node_1", "input": 1, "recycle": "no" },
+        { "from": "node_1", "output": 1, "to": "node_4", "input": 1, "recycle": "no" },
+        { "from": "node_1", "output": 2, "to": "node_2", "input": 1, "recycle": "no" },
+        { "from": "node_2", "output": 1, "to": "node_5", "input": 1, "recycle": "no" },
+        { "from": "node_2", "output": 2, "to": "node_3", "input": 1, "recycle": "no" },
+        { "from": "node_3", "output": 1, "to": "node_6", "input": 1, "recycle": "no" },
+        { "from": "node_3", "output": 2, "to": "node_7", "input": 1, "recycle": "no" }
+    ]
+}
