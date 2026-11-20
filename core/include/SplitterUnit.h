@@ -209,9 +209,9 @@ namespace stosis
         // einer zufaelligen Startposition einmal ringsum durchgegangen. Jede
         // Karte zahlt f_i * s auf das Konto jedes Ausgangs i ein und geht ganz
         // in den Ausgang mit dem hoechsten Kontostand, dessen Konto um s
-        // belastet wird. s ist ihr Anteil an der Kartendichte der Scheibe
-        // (ComputeCardShares mit der eingestellten Regel, Summe 1) - nicht
-        // ihre Masse: Sehr leichte Karten bewegten ein Massenkonto kaum,
+        // belastet wird. s ist ihr Gewicht nach der Regel der Kartendichte
+        // ohne Abflachung (ComputeAccountShares, Summe 1; warum ohne: siehe
+        // dort) - nicht ihre Masse: Sehr leichte Karten bewegten ein Massenkonto kaum,
         // gingen geschlossen in einen Ausgang und teilten sich auf Dauer etwa
         // haelftig statt im Verhaeltnis f. Mit dem Anteil geht von benachbarten
         // Karten jede (1/f)-te nach A, fuer leichte wie fuer schwere. Die
@@ -252,7 +252,7 @@ namespace stosis
                     return ca != cb ? ca < cb : input.GetCardSize(a) < input.GetCardSize(b);
                 });
 
-            // Anteil jeder Karte an der Kartendichte; ohne Masse zaehlt jede gleich.
+            // Gewicht jeder Karte (ohne Abflachung); ohne Masse zaehlt jede gleich.
             m_sizes.resize(numCards);
             m_masses.resize(numCards);
             for (size_t k = 0; k < numCards; ++k)
@@ -260,7 +260,7 @@ namespace stosis
                 m_sizes[k] = input.GetCardSize(k);
                 m_masses[k] = input.GetCardMass(k);
             }
-            std::vector<double> shares = ComputeCardShares(m_sizes, m_masses, m_cardSettings, m_countMin);
+            std::vector<double> shares = ComputeAccountShares(m_sizes, m_masses, m_cardSettings, m_countMin);
             if (!(std::accumulate(shares.begin(), shares.end(), 0.0) > 0.0))
                 shares.assign(numCards, 1.0 / static_cast<double>(numCards));
 

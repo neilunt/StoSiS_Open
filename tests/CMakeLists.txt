@@ -26,10 +26,11 @@ set(STOSIS_TESTS
     test_flowsheet_file  # Flowsheet als Datei: Rundlauf, Fehler, Struktur (Kap. 3.3, 3.4)
     test_levenspiel      # Kompartiment-Modelle und Mischer aus Dateien gegen exakte RTD (Kap. 11.3, 11.4)
     test_regression      # alle Ergebnisse gegen gespeicherte Referenzwerte
+    test_particle_vs_continuum # Regressions-Flowsheets: Partikelmodus gegen Kontinuum (Kap. 9.7)
 )
 
 foreach(name IN LISTS STOSIS_TESTS)
-    add_executable(${name} ${name}.cpp TestSupport.h)
+    add_executable(${name} ${name}.cpp TestSupport.h RegressionFlowsheets.h)
     target_link_libraries(${name} PRIVATE stosis_core)
     target_compile_definitions(${name} PRIVATE STOSIS_DATA_DIR="${CMAKE_SOURCE_DIR}/data" STOSIS_VALIDATION_DIR="${CMAKE_SOURCE_DIR}/Flowsheets/Validierungs-Flowsheets")
     set_target_properties(${name} PROPERTIES FOLDER "Tests")

@@ -800,6 +800,11 @@ int main()
             worstSteady, 100.0 * worstSteady / 2.0, worstStart, balance, massOut, massContinuum);
         Check(balance < 1e-12, "Flowsheet: Zulauf = Ablauf + Inhalt der Verzoegerung (1e-12)");
         Check(worstSteady <= 0.01 * 2.0, "Flowsheet: stationaer wie das Kontinuum (je Schritt hoechstens 1 %)");
+        // The inflow starts at 2 kg/s at t = 0: of the first step, too, the
+        // share 1 - r leaves after q steps. The continuum must not lose it
+        // (interpolation between "nothing before t = 0" and the first step).
+        Check(worstStart <= 0.01 * 2.0 && NearRel(massOut, massContinuum, 1e-4),
+            "Flowsheet: auch im Anlauf wie das Kontinuum (je Schritt 1 %, Ablauf 1e-4)");
     }
     {
         // d) Start flowsheet of the user interface: Inlet -> Merger ->

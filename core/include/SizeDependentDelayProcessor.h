@@ -224,10 +224,26 @@ namespace stosis
             {
                 // Zeitpunkt im Eingangssignal, der jetzt am Ausgang ankommt.
                 const double sourceTime = static_cast<double>(k) * m_dt - m_delays[s];
-                if (sourceTime < 0.0 || m_dt <= 0.0)
+                if (sourceTime <= -m_dt || m_dt <= 0.0)
                     continue; // noch nichts angekommen -> bleibt 0
 
                 const double trapezoid = m_sizeWeights[s];
+                if (sourceTime < 0.0)
+                {
+                    // Between -dt and 0: before t = 0 nothing flowed in (the
+                    // input of step -1 is 0), so of step 0 the share
+                    // w = 1 - r arrives now and r one step later - as in the
+                    // particle mode (inflow spread over the step). Without
+                    // this the share 1 - r of the first step would be lost.
+                    const double w = sourceTime / m_dt + 1.0;
+                    for (size_t c = 0; c < numC; ++c)
+                    {
+                        const double value = m_history[0][c * numS + s];
+                        out.SetValue(c, s, w * value);
+                        m_slotWeights[c] += trapezoid * w * value;
+                    }
+                    continue;
+                }
                 const double sourceIndex = sourceTime / m_dt;
                 const size_t i0 = static_cast<size_t>(sourceIndex);
                 if (i0 >= k)

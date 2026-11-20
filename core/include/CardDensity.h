@@ -124,4 +124,22 @@ namespace stosis
                 shares[k] = weight[k] / total;
         return shares;
     }
+
+    // Weight of each card in the account of the splitter (methods handbook
+    // 9.4): s_i = a_i / sum a with a_i = M(m_i / sum m, n_i / sum n) by the
+    // rule of the card density, but WITHOUT the flattening. It depends only on
+    // the card itself and the totals of its slice, and half a card carries
+    // exactly half the weight. With the flattening the weight would also
+    // depend on the other cards of the same size; in a recycle these are
+    // there because of earlier decisions of the account, and the mass split
+    // drifts (splitter 70/30 in a loop: 29.76 % instead of 30 % to the
+    // recycle). The flattening stays where cards are placed (inlet, limits
+    // per slice, card view).
+    inline std::vector<double> ComputeAccountShares(const std::vector<double>& sizes, const std::vector<double>& masses,
+        const SCardSettings& settings, double countMin)
+    {
+        SCardSettings unflattened = settings;
+        unflattened.exponent = 1.0;
+        return ComputeCardShares(sizes, masses, unflattened, countMin);
+    }
 }
