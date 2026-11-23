@@ -201,7 +201,17 @@ namespace stosis
         // Screen with grade efficiency (coarse = output 1, fines = output 2).
         std::string AddScreenNode(const std::string& name, double posX, double posY)
         {
-            return AddNode(name, ENodeType::Screen, 1, 2, posX, posY, std::make_unique<CScreenUnit>());
+            return AddScreenNode(name, 2, posX, posY);
+        }
+
+        // Screen with numOutputs - 1 decks (Methodenhandbuch 7.5): output 1 =
+        // coarse product of the top deck, ..., last output = fines. Empty if
+        // numOutputs < 2.
+        std::string AddScreenNode(const std::string& name, size_t numOutputs, double posX, double posY)
+        {
+            if (numOutputs < 2)
+                return std::string();
+            return AddNode(name, ENodeType::Screen, 1, numOutputs, posX, posY, std::make_unique<CScreenUnit>(numOutputs));
         }
 
         // Compound separator: share per compound to output 1 (abgetrennt), rest to output 2.
@@ -219,9 +229,10 @@ namespace stosis
         // Knoten mit vorgegebener ID (Flowsheet-Datei, Methodenhandbuch 3.4):
         // Aus der ID leitet sich der Zufallsstrom der Unit ab (GetUnitSeed),
         // deshalb behaelt ein geladenes Flowsheet seine IDs. numPorts = Zahl
-        // der Ausgaenge beim Splitter bzw. der Eingaenge beim Merger, bei den
-        // anderen Typen ohne Bedeutung. Leer, wenn die ID leer oder vergeben
-        // ist oder ein Splitter/Merger keinen Port haette.
+        // der Ausgaenge beim Splitter und Sieb bzw. der Eingaenge beim Merger,
+        // bei den anderen Typen ohne Bedeutung. Leer, wenn die ID leer oder
+        // vergeben ist, ein Splitter/Merger keinen Port oder ein Sieb weniger
+        // als zwei Ausgaenge haette.
         std::string AddNodeWithId(const std::string& id, ENodeType type, const std::string& name,
             size_t numPorts, double posX, double posY)
         {
@@ -246,7 +257,9 @@ namespace stosis
             case ENodeType::Vessel:
                 return AddNode(name, type, 1, 1, posX, posY, std::make_unique<CVesselUnit>(), id);
             case ENodeType::Screen:
-                return AddNode(name, type, 1, 2, posX, posY, std::make_unique<CScreenUnit>(), id);
+                return numPorts >= 2
+                    ? AddNode(name, type, 1, numPorts, posX, posY, std::make_unique<CScreenUnit>(numPorts), id)
+                    : std::string();
             case ENodeType::CompoundSeparator:
                 return AddNode(name, type, 1, 2, posX, posY, std::make_unique<CCompoundSeparatorUnit>(), id);
             case ENodeType::Classifier:
@@ -589,8 +602,11 @@ namespace stosis
                 }
                 else if (node.type == ENodeType::Screen)
                 {
-                    entries.push_back({ node.id, 0, base + ", Grobgut)" });
-                    entries.push_back({ node.id, 1, base + ", Feingut)" });
+                    // Two outputs: Grobgut, Feingut; more: Grobgut 1 ... n-1 (one per deck), Feingut.
+                    for (size_t port = 0; port + 1 < node.numOutputs; ++port)
+                        entries.push_back({ node.id, port, base + ", Grobgut"
+                            + (node.numOutputs > 2 ? " " + std::to_string(port + 1) : std::string()) + ")" });
+                    entries.push_back({ node.id, node.numOutputs - 1, base + ", Feingut)" });
                 }
                 else if (node.type == ENodeType::CompoundSeparator)
                 {

@@ -13,7 +13,7 @@ struct SNodeTemplate
     QString menuText; // Text im Rechtsklick-Menue
     QString group;    // Gruppe in der Palette
     stosis::ENodeType type;
-    size_t numPorts;  // Ausgaenge beim Splitter, Eingaenge beim Merger
+    size_t numPorts;  // Ausgaenge beim Splitter und Sieb, Eingaenge beim Merger
 };
 
 inline const std::vector<SNodeTemplate>& GetNodeTemplates()
@@ -27,7 +27,9 @@ inline const std::vector<SNodeTemplate>& GetNodeTemplates()
         { "Merger 3",   "Merger (3 Eingaenge)",   "Stromfuehrung",    stosis::ENodeType::Merger,   3 },
         { "Prozess",    "Prozess-Einheit",        "Prozesse",         stosis::ENodeType::Process,  0 },
         { "Behaelter",  "Behaelter (Hold-up)",    "Prozesse",         stosis::ENodeType::Vessel,   0 },
-        { "Sieb",       "Sieb (Grob- und Feingut)", "Trennen",        stosis::ENodeType::Screen,   0 },
+        { "Sieb 2",     "Sieb (2 Ausgaenge: Grob- und Feingut)", "Trennen", stosis::ENodeType::Screen, 2 },
+        { "Sieb 3",     "Sieb (3 Ausgaenge, 2 Decks)", "Trennen",   stosis::ENodeType::Screen,   3 },
+        { "Sieb 4",     "Sieb (4 Ausgaenge, 3 Decks)", "Trennen",   stosis::ENodeType::Screen,   4 },
         { "Sichter",    "Sichter (Schwer- und Leichtgut)", "Trennen", stosis::ENodeType::Classifier, 0 },
         { "Stofftrenner", "Stofftrenner (Anteil je Stoff)", "Trennen", stosis::ENodeType::CompoundSeparator, 0 },
     };

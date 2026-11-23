@@ -99,41 +99,116 @@ namespace stosis
         }
     };
 
-    // Screen: classifies the feed by size into coarse (output 1) and fines
-    // (output 2) with a grade efficiency T(d) (Plitt, Molerus-Hoffmann,
-    // Teipel-Hennig, as in Dyssol). Several decks are several screens in
-    // series. Continuum and particle mode (account method per compound and
-    // size range): CTwoWaySeparatorUnit.
-    class CScreenUnit : public CTwoWaySeparatorUnit
+    // Checks the decks of a screen with numDecks decks: every deck valid and
+    // the cut sizes falling from deck 1 (top) downwards. Empty if valid,
+    // otherwise one sentence per problem.
+    inline std::string CheckScreenDecks(const std::vector<SScreenSettings>& decks, size_t numDecks)
+    {
+        if (decks.size() != numDecks)
+            return "Das Sieb braucht " + std::to_string(numDecks) + (numDecks == 1 ? " Deck." : " Decks.");
+        std::string text;
+        for (size_t k = 0; k < decks.size(); ++k)
+        {
+            const std::string problems = decks[k].Check();
+            if (!problems.empty())
+                text += (numDecks > 1 ? "Deck " + std::to_string(k + 1) + ": " : std::string()) + problems + " ";
+            if (k > 0 && !(decks[k].cutSize < decks[k - 1].cutSize))
+                text += "Trenngroesse von Deck " + std::to_string(k + 1) + " muss kleiner sein als die von Deck "
+                    + std::to_string(k) + ". ";
+        }
+        if (!text.empty())
+            text.pop_back();
+        return text;
+    }
+
+    // Shares of the outputs of a screen for particles of size d. The feed
+    // meets deck 1 (top, largest cut size) first; what stays on deck k is
+    // output k, what passes falls onto deck k + 1, and what passes the lowest
+    // deck is the last output (fines):
+    //   t_k = T_k(d) * (1 - T_1(d)) ... (1 - T_(k-1)(d)),  t_n = (1 - T_1(d)) ... (1 - T_(n-1)(d)).
+    // With one deck: t_1 = T(d) (coarse), t_2 = 1 - T(d) (fines).
+    inline void ComputeScreenShares(const std::vector<SScreenSettings>& decks, double size, std::vector<double>& shares)
+    {
+        shares.resize(decks.size() + 1);
+        double passing = 1.0;
+        for (size_t k = 0; k < decks.size(); ++k)
+        {
+            const double t = decks[k].GradeEfficiency(size);
+            shares[k] = passing * t;
+            passing *= 1.0 - t;
+        }
+        shares[decks.size()] = passing;
+    }
+
+    // Screen with one or more decks (Methodenhandbuch 7.5): n outputs, n - 1
+    // decks, each with its own grade efficiency T_k(d) (Plitt,
+    // Molerus-Hoffmann, Teipel-Hennig, as in Dyssol). Output 1 is the coarse
+    // product of the top deck, output k the coarse product of deck k, the last
+    // output the fines of the lowest deck (ComputeScreenShares). With two
+    // outputs: coarse (output 1) and fines (output 2). Continuum and particle
+    // mode as in CSeparatorUnit; the account share s of a card is taken
+    // without flattening (ComputeAccountShares), because a screen often sits
+    // in a recycle (mill circuit), where the flattening would couple the
+    // shares with earlier decisions of the account (see CardDensity.h).
+    class CScreenUnit : public CSeparatorUnit
     {
     public:
-        const SScreenSettings& GetSettings() const { return m_settings; }
+        explicit CScreenUnit(size_t numOutputs = 2)
+            : CSeparatorUnit(numOutputs, false)
+        {
+            // Default cut sizes 100, 50, 25 um ... from the top deck downwards.
+            m_decks.resize(GetNumOutputs() - 1);
+            for (size_t k = 0; k < m_decks.size(); ++k)
+                m_decks[k].cutSize = 100e-6 / std::pow(2.0, static_cast<double>(k));
+        }
 
-        // Takes the settings only if they are valid.
+        size_t GetNumDecks() const { return m_decks.size(); }
+        const std::vector<SScreenSettings>& GetDecks() const { return m_decks; }
+
+        // Takes the decks only if they are valid (CheckScreenDecks).
+        bool SetDecks(const std::vector<SScreenSettings>& decks)
+        {
+            if (!CheckScreenDecks(decks, m_decks.size()).empty())
+                return false;
+            m_decks = decks;
+            return true;
+        }
+
+        // Deck 1 (top deck); with two outputs the only deck.
+        const SScreenSettings& GetSettings() const { return m_decks.front(); }
+
+        // Sets deck 1; only if valid together with the other decks.
         bool SetSettings(const SScreenSettings& settings)
         {
-            if (!settings.Check().empty())
-                return false;
-            m_settings = settings;
-            return true;
+            std::vector<SScreenSettings> decks = m_decks;
+            decks.front() = settings;
+            return SetDecks(decks);
         }
 
         std::string DescribeForLog() const override
         {
-            char text[256];
-            std::snprintf(text, sizeof(text), "%s, x_cut = %g %s, alpha = %g", GetScreenModelLabel(m_settings.model),
-                m_settings.cutSize * kSizeDisplayFactor, kSizeDisplayUnit, m_settings.alpha);
-            std::string result = text;
-            if (m_settings.model == EScreenModel::TeipelHennig)
+            std::string result;
+            if (m_decks.size() > 1)
+                result = std::to_string(m_decks.size()) + " Decks: ";
+            for (size_t k = 0; k < m_decks.size(); ++k)
             {
-                std::snprintf(text, sizeof(text), ", beta = %g, Offset = %g", m_settings.beta, m_settings.offset);
+                const SScreenSettings& deck = m_decks[k];
+                char text[256];
+                std::snprintf(text, sizeof(text), "%s%s, x_cut = %g %s, alpha = %g", k > 0 ? "; " : "",
+                    GetScreenModelLabel(deck.model), deck.cutSize * kSizeDisplayFactor, kSizeDisplayUnit, deck.alpha);
                 result += text;
+                if (deck.model == EScreenModel::TeipelHennig)
+                {
+                    std::snprintf(text, sizeof(text), ", beta = %g, Offset = %g", deck.beta, deck.offset);
+                    result += text;
+                }
             }
             for (char& c : result)
                 if (c == '.')
                     c = ',';
             if (IsParticleMode())
-                result += "; Karten nach dem Konto-Verfahren, Anteil je Karte T(d)";
+                result += m_decks.size() > 1 ? "; Karten nach dem Konto-Verfahren, Anteile je Karte aus T_k(d)"
+                                             : "; Karten nach dem Konto-Verfahren, Anteil je Karte T(d)";
             return result;
         }
 
@@ -141,23 +216,29 @@ namespace stosis
         void InitializeShares(const SSimulationGrid& grid) override
         {
             const SSizeGrid sizes = grid.GetSizeGrid();
-            m_nodeShare.resize(grid.numSizeClasses);
+            m_nodeShares.resize(grid.numSizeClasses);
             for (size_t s = 0; s < grid.numSizeClasses; ++s)
-                m_nodeShare[s] = m_settings.GradeEfficiency(sizes.GetSizeAt(s));
+                ComputeScreenShares(m_decks, sizes.GetSizeAt(s), m_nodeShares[s]);
         }
 
-        double NodeShare(size_t /*compound*/, size_t sizeIdx) const override
+        void NodeShares(size_t /*compound*/, size_t sizeIdx, std::vector<double>& shares) const override
         {
-            return sizeIdx < m_nodeShare.size() ? m_nodeShare[sizeIdx] : 0.0;
+            if (sizeIdx < m_nodeShares.size())
+                std::copy(m_nodeShares[sizeIdx].begin(), m_nodeShares[sizeIdx].end(), shares.begin());
+            else
+            {
+                std::fill(shares.begin(), shares.end(), 0.0);
+                shares.back() = 1.0;
+            }
         }
 
-        double CardShare(const CStreamSlice& input, size_t card) const override
+        void CardShares(const CStreamSlice& input, size_t card, std::vector<double>& shares) const override
         {
-            return m_settings.GradeEfficiency(input.GetCardSize(card));
+            ComputeScreenShares(m_decks, input.GetCardSize(card), shares);
         }
 
     private:
-        SScreenSettings m_settings;
-        std::vector<double> m_nodeShare; // T(d) at the nodes of the size grid
+        std::vector<SScreenSettings> m_decks;            // deck 1 (top) ... deck n - 1
+        std::vector<std::vector<double>> m_nodeShares;   // shares of the outputs at the nodes of the size grid
     };
 }

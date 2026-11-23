@@ -353,6 +353,47 @@ int main()
             "Sieb: unbekanntes Modell ist ein Fehler");
     }
 
+    // 1b') Screen with three outputs (two decks): number of outputs and both
+    //      decks survive the round trip; a wrong number of outputs is an error.
+    {
+        CFlowsheetGraph g1;
+        const std::string in = g1.AddInletNode("Zulauf", 0, 0);
+        const std::string sc = g1.AddScreenNode("Sieb3", 3, 120, 0);
+        std::vector<SScreenSettings> decks(2);
+        decks[0].model = EScreenModel::MolerusHoffmann;
+        decks[0].cutSize = 60e-6;
+        decks[0].alpha = 12.0;
+        decks[1].model = EScreenModel::TeipelHennig;
+        decks[1].cutSize = 30e-6;
+        decks[1].alpha = 2.5;
+        decks[1].beta = 0.75;
+        decks[1].offset = 0.05;
+        const bool taken = g1.GetScreen(sc)->SetDecks(decks);
+        g1.AddConnection(in, 0, sc, 0);
+        g1.AddConnection(sc, 0, g1.AddOutletNode("ueber 60", 240, -60), 0);
+        g1.AddConnection(sc, 1, g1.AddOutletNode("30 bis 60", 240, 0), 0);
+        g1.AddConnection(sc, 2, g1.AddOutletNode("unter 30", 240, 60), 0);
+        const std::string text1 = WriteFlowsheetJson(g1, SFlowsheetFileSettings());
+        CFlowsheetGraph g2;
+        const SFlowsheetReadResult read = ReadFlowsheetJson(text1, g2);
+        const CScreenUnit* screen = read.ok ? g2.GetScreen(sc) : nullptr;
+        bool same = screen && screen->GetNumOutputs() == 3 && screen->GetNumDecks() == 2
+            && g2.FindNode(sc)->numOutputs == 3 && g2.GetConnections().size() == g1.GetConnections().size();
+        for (size_t k = 0; same && k < 2; ++k)
+        {
+            const SScreenSettings& r = screen->GetDecks()[k];
+            same = r.model == decks[k].model && r.cutSize == decks[k].cutSize && r.alpha == decks[k].alpha
+                && r.beta == decks[k].beta && r.offset == decks[k].offset;
+        }
+        Check(taken && read.ok && read.warnings.empty() && same && WriteFlowsheetJson(g2, read.settings) == text1
+            && Contains(text1, "\"outputs\": 3") && Contains(text1, "\"decks\""),
+            "Sieb mit 3 Ausgaengen: Rundlauf mit Zahl der Ausgaenge und beiden Decks");
+        CFlowsheetGraph g3, g4;
+        Check(!ReadFlowsheetJson(Replace(text1, "\"outputs\": 3", "\"outputs\": 2"), g3).ok
+            && !ReadFlowsheetJson(Replace(text1, "\"outputs\": 3", "\"outputs\": 1"), g4).ok,
+            "Sieb: Deckzahl passt nicht zu den Ausgaengen oder nur ein Ausgang ist ein Fehler");
+    }
+
     // 1c) Compound separator and classifier in series: inlet -> magnet ->
     //     air classifier -> two outlets, all values off the defaults.
     {

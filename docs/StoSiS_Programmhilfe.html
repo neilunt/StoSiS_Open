@@ -84,12 +84,13 @@
   <li><b>Kurven als CSV …:</b> speichert die gezeigten Kurven mit allen Zeitschritten, unabhängig vom Ausschnitt: Spalte <code>t_s</code>, dann je Kurve der Mittelwert über die Läufe, bei Streuband auch „unten“ und „oben“, bei „Einzelläufe zeigen“ jeder gezeichnete Lauf. Trennzeichen Semikolon, Dezimalpunkt; Kopfzeilen mit <code>#</code> nennen Größe, Einheit, Läufe und Zeitschritt. Der Dialog beginnt im Ordner <code>Kurven</code> im StoSiS-Ordner, danach im zuletzt benutzten Ordner; fehlt der Ordner, legt StoSiS ihn an.</li>
 </ul>
 <h2 id="sieb">Sieb</h2>
-<p>Das Sieb steht in der Palette unter „Trennen“. Ausgang 1 führt das Grobgut, Ausgang 2 das Feingut; so heißen die beiden auch in den Ergebnissen. Ein Mehrdecksieb entsteht aus mehreren Sieben hintereinander, das Feingut des einen in den Zulauf des nächsten.</p>
+<p>Das Sieb steht in der Palette unter „Trennen“, als „Sieb 2“, „Sieb 3“ und „Sieb 4“ mit zwei, drei oder vier Ausgängen. Die Zahl der Ausgänge liegt beim Anlegen fest; für eine andere Zahl das Sieb neu anlegen. Beim Sieb 2 führt Ausgang 1 das Grobgut, Ausgang 2 das Feingut. Beim Sieb 3 und 4 führt Ausgang <i>k</i> das Grobgut von Deck <i>k</i> und der letzte Ausgang das Feingut; in den Ergebnissen heißen sie „Grobgut 1“, „Grobgut 2“, … und „Feingut“. Beispiel Sieb 3 mit Deck 1 bei 60 µm und Deck 2 bei 30 µm: Ausgang 1 über 60 µm, Ausgang 2 zwischen 30 und 60 µm, Ausgang 3 unter 30 µm.</p>
 <ul>
+  <li><b>Decks:</b> Bei mehreren Decks steht über den Eingaben ein Reiter je Deck, „Deck 1 (oben)“ zuerst. Jedes Deck hat seine eigene Trennkurve; die Trenngröße muss von Deck zu Deck kleiner werden.</li>
   <li><b>Modell:</b> Plitt, Molerus-Hoffmann oder Teipel-Hennig. Unter den Eingaben steht die Formel des gewählten Modells, darunter die bezogene Größe <i>x</i> (Herleitung im Methodenhandbuch, Kapitel 7.5).</li>
   <li><b>Trenngröße x_cut</b> in µm und <b>Trennschärfe α</b>; je größer α, desto steiler die Kurve. <b>β</b> und <b>Offset</b> erscheinen nur bei Teipel-Hennig.</li>
-  <li><b>Vorschau:</b> der Trenngrad T(d) über dem Größenbereich des Rasters, Größe logarithmisch (linear, wenn das Raster bei 0 beginnt), x_cut gestrichelt. Sie folgt jeder Eingabe sofort, auch vor „Übernehmen“.</li>
-  <li><b>Übernehmen</b> schreibt die Werte in das Sieb; ungültige Werte nennt eine rote Zeile, der Knopf ist dann gesperrt.</li>
+  <li><b>Vorschau:</b> bei einem Deck der Trenngrad T(d), bei mehreren Decks der Anteil jedes Ausgangs, jeweils über dem Größenbereich des Rasters, Größe logarithmisch (linear, wenn das Raster bei 0 beginnt), x_cut gestrichelt. Sie folgt jeder Eingabe sofort, auch vor „Übernehmen“.</li>
+  <li><b>Übernehmen</b> schreibt die Werte aller Decks in das Sieb; ungültige Werte nennt eine rote Zeile, der Knopf ist dann gesperrt.</li>
 </ul>
 <h2 id="sichter">Sichter</h2>
 <p>Der Sichter steht in der Palette unter „Trennen“ und trennt nach der Sinkgeschwindigkeit, also nach Größe und Dichte. Ausgang 1 führt das Schwergut, Ausgang 2 das Leichtgut; so heißen die beiden auch in den Ergebnissen.</p>

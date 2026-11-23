@@ -192,14 +192,30 @@ namespace stosis
                 }
                 break;
             case ENodeType::Screen:
+                j["outputs"] = node.numOutputs;
                 if (const CScreenUnit* screen = graph.GetScreen(node.id))
                 {
-                    const SScreenSettings& s = screen->GetSettings();
-                    settings["model"] = KeyOf(kScreenModels, s.model);
-                    settings["cutSize"] = s.cutSize;
-                    settings["alpha"] = s.alpha;
-                    settings["beta"] = s.beta;
-                    settings["offset"] = s.offset;
+                    // One deck: its values directly in "settings" (as before
+                    // multi-deck screens); several decks: "decks" from the top down.
+                    const auto deckToJson = [](const SScreenSettings& s)
+                    {
+                        json deck = json::object();
+                        deck["model"] = KeyOf(kScreenModels, s.model);
+                        deck["cutSize"] = s.cutSize;
+                        deck["alpha"] = s.alpha;
+                        deck["beta"] = s.beta;
+                        deck["offset"] = s.offset;
+                        return deck;
+                    };
+                    if (screen->GetNumDecks() == 1)
+                        settings = deckToJson(screen->GetSettings());
+                    else
+                    {
+                        json decks = json::array();
+                        for (const SScreenSettings& s : screen->GetDecks())
+                            decks.push_back(deckToJson(s));
+                        settings["decks"] = std::move(decks);
+                    }
                     j["settings"] = std::move(settings);
                 }
                 break;
@@ -658,17 +674,47 @@ namespace stosis
                 reader.Fail(where, v.Check());
         }
 
-        void ReadScreen(CReader& reader, const json& s, const std::string& where, CScreenUnit& screen)
+        void ReadScreenDeck(CReader& reader, const json& s, const std::string& where, SScreenSettings& v)
         {
-            reader.Object(s, where, { "model", "cutSize", "alpha", "beta", "offset" });
-            SScreenSettings v = screen.GetSettings();
             reader.ReadEnum(s, "model", where, kScreenModels, v.model);
             reader.ReadNumber(s, "cutSize", where, v.cutSize);
             reader.ReadNumber(s, "alpha", where, v.alpha);
             reader.ReadNumber(s, "beta", where, v.beta);
             reader.ReadNumber(s, "offset", where, v.offset);
-            if (!screen.SetSettings(v))
-                reader.Fail(where, v.Check());
+        }
+
+        // One deck: values directly in "settings"; several decks: "decks"
+        // (array from the top deck down, one entry per deck).
+        void ReadScreen(CReader& reader, const json& s, const std::string& where, CScreenUnit& screen)
+        {
+            std::vector<SScreenSettings> decks = screen.GetDecks();
+            // "decks" is only there with several decks; no warning if it is missing.
+            if (const auto found = s.find("decks"); found != s.end())
+            {
+                const json* list = &*found;
+                reader.Object(s, where, { "decks" });
+                const std::string at = where + ", decks";
+                if (!list->is_array() || list->size() != decks.size())
+                    reader.Fail(at, "Liste mit " + std::to_string(decks.size()) + " Decks erwartet (eines je Ausgang ausser dem Feingut)");
+                for (size_t k = 0; k < decks.size(); ++k)
+                {
+                    const std::string deckAt = at + ", Deck " + std::to_string(k + 1);
+                    const json& deck = (*list)[k];
+                    if (!deck.is_object())
+                        reader.Fail(deckAt, "Objekt { ... } erwartet");
+                    reader.Object(deck, deckAt, { "model", "cutSize", "alpha", "beta", "offset" });
+                    ReadScreenDeck(reader, deck, deckAt, decks[k]);
+                }
+            }
+            else
+            {
+                reader.Object(s, where, { "model", "cutSize", "alpha", "beta", "offset" });
+                if (decks.size() != 1 && !s.empty())
+                    reader.Fail(where, "Sieb mit " + std::to_string(decks.size()) + " Decks: Werte je Deck unter \"decks\" erwartet");
+                ReadScreenDeck(reader, s, where, decks.front());
+            }
+            if (!screen.SetDecks(decks))
+                reader.Fail(where, CheckScreenDecks(decks, screen.GetNumDecks()));
         }
 
         void ReadCompoundSeparator(CReader& reader, const json& s, const std::string& where, CCompoundSeparatorUnit& separator)
@@ -714,7 +760,7 @@ namespace stosis
             const std::string where = at + " (" + (name.empty() ? id : name) + ")";
 
             std::vector<std::string> known = { "id", "type", "name", "position" };
-            if (type == ENodeType::Splitter)
+            if (type == ENodeType::Splitter || type == ENodeType::Screen)
                 known.push_back("outputs");
             if (type == ENodeType::Merger)
                 known.push_back("inputs");
@@ -741,6 +787,9 @@ namespace stosis
             }
             size_t ports = 2;
             if (type == ENodeType::Splitter)
+                reader.ReadCount(unit, "outputs", where, ports);
+            // Screen: without "outputs" (files from before multi-deck screens) two outputs, no warning.
+            if (type == ENodeType::Screen && unit.find("outputs") != unit.end())
                 reader.ReadCount(unit, "outputs", where, ports);
             if (type == ENodeType::Merger)
                 reader.ReadCount(unit, "inputs", where, ports);

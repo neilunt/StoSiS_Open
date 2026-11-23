@@ -34,6 +34,8 @@ public:
 
     explicit GradeEfficiencyPreview(const QString& axisTitle, QWidget* parent = nullptr);
 
+    void SetAxisTitle(const QString& axisTitle) { m_axisTitle = axisTitle; update(); }
+
     // Curves over sizeMin ... sizeMax [m]; without curves the message is shown instead.
     void SetCurves(std::vector<SCurve> curves, double sizeMin, double sizeMax, const QString& message = QString());
 
