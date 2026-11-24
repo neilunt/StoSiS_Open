@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StoSiS – Methods Handbook</title>
+<style>
+  :root { --text: #1f2328; --muted: #5b6470; --line: #dfe3e8; --bg: #ffffff; --panel: #f6f7f9; --accent: #2563eb; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 17px/1.62 "Segoe UI", system-ui, -apple-system, sans-serif; }
+  main { max-width: 49rem; margin: 0 auto; padding: 2.75rem 1.25rem 4rem; }
+  h1 { font-size: 2.1rem; line-height: 1.2; margin: 0 0 .35rem; }
+  .sub { color: var(--muted); margin: 0 0 1.6rem; font-size: 1.05rem; }
+  h2 { font-size: 1.45rem; line-height: 1.3; margin: 3rem 0 .6rem; padding-top: .4rem; border-top: 1px solid var(--line); }
+  h2 .nr, h3 .nr { color: var(--muted); font-weight: 600; margin-right: .4rem; }
+  h3 { font-size: 1.12rem; margin: 1.8rem 0 .4rem; }
+  h4 { font-size: .8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+       margin: 1.2rem 0 .3rem; }
+  p { margin: 0 0 .85rem; }
+  ul { margin: 0 0 .9rem; padding-left: 1.3rem; }
+  li { margin: .15rem 0; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-size: .9em; }
+
+  nav.inhalt { background: var(--panel); border-radius: .5rem; padding: .9rem 1.2rem; margin: 1.2rem 0 1.5rem; }
+  nav.inhalt ol { margin: 0; padding-left: 0; columns: 2; column-gap: 2rem; list-style: none; counter-reset: nr; }
+  nav.inhalt li { break-inside: avoid; counter-increment: nr; }
+  nav.inhalt li::before { content: counters(nr, ".") "\00a0\00a0"; color: var(--muted); }
+  nav.inhalt ol ol { columns: auto; margin: .05rem 0 .35rem 1.1rem; font-size: .9em; }
+  nav.inhalt ol ol li { margin: 0; }
+
+  .formel { font-family: "Times New Roman", serif; font-size: 1.12rem; text-align: center; margin: .6rem 0 1rem; }
+  .formel i { font-style: italic; }
+
+  table { border-collapse: collapse; width: 100%; font-size: .93rem; margin: .4rem 0 1rem; }
+  th { text-align: left; font-weight: 600; color: var(--muted); border-bottom: 2px solid var(--line); padding: .35rem .5rem; }
+  td { border-bottom: 1px solid var(--line); padding: .4rem .5rem; vertical-align: top; }
+
+  figure { margin: 1.2rem 0 1.4rem; }
+  figure img { max-width: 100%; border: 1px solid var(--line); border-radius: .3rem; }
+  figcaption { font-size: .88rem; color: var(--muted); margin-top: .4rem; }
+
+  dl.begriffe dt { font-weight: 600; margin-top: .6rem; }
+  dl.begriffe dd { margin: 0 0 .2rem 0; }
+  .lit p { font-size: .92rem; margin-bottom: .45rem; }
+
+  @media (max-width: 640px) { nav.inhalt ol { columns: 1; } }
+  @media print {
+    body { font-size: 11pt; }
+    main { max-width: none; padding: 0; }
+    h2 { break-before: auto; }
+    h2, h3, h4 { break-after: avoid; }
+    figure, table, .zusammen { break-inside: avoid; }
+    /* a figure taller than a page would be cut: shrink it to fit one page */
+    figure img { max-height: 22cm; width: auto; display: block; margin: 0 auto; border: none; }
+    a { color: #000; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<h1>StoSiS – Methods Handbook</h1>
+<p class="sub">Model, assumptions and methods</p>
+
+<p>StoSiS is a dynamic flowsheet simulation for solids process engineering. This handbook describes what the program computes and how: the assumptions of the model, the methods, their limits and how they are verified. Most chapters follow the same structure – purpose, assumptions, method, limits, verification.</p>
+<p>The program interface is in German. Where this handbook refers to an element of the interface, the German name is given in quotation marks. A German version of this handbook is <a href="StoSiS_Methodenhandbuch.html">StoSiS_Methodenhandbuch.html</a>.</p>
+
+<nav class="inhalt">
+<ol>
+  <li><a href="#k1">Overview</a></li>
+  <li><a href="#k2">Basic assumptions</a></li>
+  <li><a href="#k3">Flowsheet and time steps</a>
+    <ol>
+      <li><a href="#k3-1">Time steps and order</a></li>
+      <li><a href="#k3-2">Recycles</a></li>
+      <li><a href="#k3-3">The “Struktur” window</a></li>
+      <li><a href="#k3-4">Flowsheet as a file</a></li>
+    </ol></li>
+  <li><a href="#k4">Size grid</a></li>
+  <li><a href="#k5">Inlet and size distributions</a></li>
+  <li><a href="#k6">Compounds, temperature and pressure</a></li>
+  <li><a href="#k7">Units</a>
+    <ol>
+      <li><a href="#k7-1">Merger</a></li>
+      <li><a href="#k7-2">Splitter</a></li>
+      <li><a href="#k7-3">Size-dependent delay</a></li>
+      <li><a href="#k7-4">Vessel</a></li>
+      <li><a href="#k7-5">Screen</a></li>
+      <li><a href="#k7-6">Compound separator</a></li>
+      <li><a href="#k7-7">Classifier</a></li>
+      <li><a href="#k7-8">Outlet</a></li>
+    </ol></li>
+  <li><a href="#k8">Random numbers and multiple runs</a></li>
+  <li><a href="#k9">Particle mode: MC particles</a>
+    <ol>
+      <li><a href="#k9-1">Weighted Monte Carlo particles</a></li>
+      <li><a href="#k9-2">The card index picture</a></li>
+      <li><a href="#k9-3">MC particle density and MC particles at the inlet</a></li>
+      <li><a href="#k9-4">Account method</a></li>
+      <li><a href="#k9-5">Limits per packet</a></li>
+      <li><a href="#k9-6">Mapping onto the grid</a></li>
+      <li><a href="#k9-7">Verification of the particle mode</a></li>
+    </ol></li>
+  <li><a href="#k10">Evaluation</a></li>
+  <li><a href="#k11">Verification and validation</a>
+    <ol>
+      <li><a href="#k11-1">Levels of verification</a></li>
+      <li><a href="#k11-2">Loss-in-weight feeder</a></li>
+      <li><a href="#k11-3">Compartment models after Levenspiel</a></li>
+      <li><a href="#k11-4">Continuous blender</a></li>
+      <li><a href="#k11-5">Dry granulation line</a></li>
+    </ol></li>
+  <li><a href="#k12">Glossary</a></li>
+  <li><a href="#k13">References</a></li>
+</ol>
+</nav>
+
+
+<h2 id="k1"><span class="nr">1</span>Overview</h2>
+<p>A flowsheet consists of units whose inputs and outputs are connected by streams. A stream carries the mass flow density over the particle size, separately for each compound, together with temperature and pressure. The computation proceeds in time steps: in each step every unit processes exactly one packet from each input. A packet, also called a stream slice, is the material that passes a connection during one time step; it moves from unit to unit with the time steps.</p>
+<p>Units may contain random processes, for example a fluctuating split fraction. A result is then not a single curve but a statistic over many runs with different random numbers.</p>
+<p>There are two representations of the particles, each valid for a whole simulation:</p>
+<ul>
+  <li><b>Continuum:</b> the stream is a distribution on a fixed size grid.</li>
+  <li><b>Particle mode:</b> the stream is a list of weighted Monte Carlo particles, called MC particles here. Each MC particle carries a size and a mass per compound (Chapter 9).</li>
+</ul>
+<p>The computational core is plain C++ without any dependency on the interface; it also runs in automated tests and in batch mode. The interface (Qt) is used to build, configure and evaluate flowsheets. A flowsheet can be saved with all its settings as a JSON file (Chapter 3).</p>
+<h4>Scope</h4>
+<p>Available units: inlet, outlet, merger, splitter (fixed or fluctuating), vessel (four mixing types or batch), a size-dependent delay and three separators: screen (by size, with up to three decks), compound separator (by compound) and classifier (by settling velocity). All units work in particle mode. Processes that change particles – coagulation, breakage, growth, nucleation – are not yet included.</p>
+
+
+<h2 id="k2"><span class="nr">2</span>Basic assumptions</h2>
+<ul>
+  <li>A stream is described by the mass flow density per compound over the particle size. A particle number is not stored; when needed, it follows from mass, size and density.</li>
+  <li>Particles are spheres of solid without pores; their density is the solid density of the compound.</li>
+  <li>Temperature and pressure are properties of each stream and travel with the material. There is no global ambient temperature.</li>
+  <li>An inlet delivers exactly one compound. Mixtures form when streams join in a merger.</li>
+  <li>Units compute without iteration, step by step. The time step must be shorter than the shortest residence or recycle time in the flowsheet.</li>
+  <li>Randomness arises only in units with a random process. A flowsheet without such units is computed once.</li>
+  <li>Internally, all quantities are in SI units (m, kg, s, K, Pa); the interface shows particle sizes in µm.</li>
+</ul>
+
+
+<h2 id="k3"><span class="nr">3</span>Flowsheet and time steps</h2>
+<p>Material is to move through the flowsheet in time, also through recycles and through units with memory (hold-up). The “Struktur” (structure) window shows how StoSiS divides the flowsheet for this; with all settings, the flowsheet can be saved as a file.</p>
+
+<h3 id="k3-1"><span class="nr">3.1</span>Time steps and order</h3>
+<h4>Assumptions</h4>
+<p>Each unit has numbered inputs and outputs (ports); at most one connection is attached to each port. Streams are divided and joined only in splitters and mergers, so that the mass balance at every node is unambiguous. All units share a global clock <i>t<sub>k</sub></i> = <i>k</i>·Δ<i>t</i> with <i>k</i> = 0, 1, 2, …</p>
+<p>The time step Δ<i>t</i> is the time span that one computation step covers. It applies to the whole simulation and is set in the interface under “Zeitschritt dt [s]” (time step), for example 0.1 s. A packet is thus the material that passes a connection during Δ<i>t</i>; its mass is mass flow times Δ<i>t</i> (at 100 kg/h and Δ<i>t</i> = 0.1 s about 2.8 g). A simulation over the duration <i>t</i><sub>end</sub> consists of <i>t</i><sub>end</sub>/Δ<i>t</i> steps, and the results are available at the times <i>t<sub>k</sub></i>. A smaller Δ<i>t</i> resolves faster changes and shorter residence times but needs correspondingly more steps; it must be shorter than the shortest residence or recycle time in the flowsheet (Chapter 2).</p>
+<h4>Method</h4>
+<p>In each time step (macro step) every unit computes exactly once: it receives one packet at each input and delivers one packet at each output. What remains inside a unit between two steps is its internal state.</p>
+<p>The units compute one after the other in flow direction and read the outputs of their predecessors from the same step, as in the Gauss-Seidel method. The order comes from a topological sort (Kahn 1962). Within one step, material thus passes through chains of any length without artificial delay.</p>
+<h4>Limits</h4>
+<p>All units use the same time step; there are no finer sub-steps within a unit.</p>
+
+<h3 id="k3-2"><span class="nr">3.2</span>Recycles</h3>
+<h4>Method</h4>
+<p>A cycle has no first unit, so the topological sort gets stuck there. The graph then selects one unit of the cycle and tears its still open feeds: the target reads the stream of the previous step, and the connection acts like a short pipe with the dead time Δ<i>t</i>. If two recycles enter the same merger, both are torn there. The unit is chosen by a fixed rule, so that the result does not depend on the order in which the flowsheet was drawn:</p>
+<ul>
+  <li>preferably a merger, since every cycle needs a junction;</li>
+  <li>there, an input that comes from a separator – that is where the recycle stream begins, and fresh feed stays undelayed;</li>
+  <li>otherwise the unit with the most inputs already computed.</li>
+</ul>
+<p>A connection can also be marked as a recycle by hand. Torn connections are drawn as orange dashed lines in the flowsheet.</p>
+<h4>Limits</h4>
+<p>Each cycle receives a dead time of one time step. The steady state does not depend on it; the transient shifts by Δ<i>t</i>.</p>
+<h4>Verification</h4>
+<ul>
+  <li>Cycle of merger and splitter 50/50 with 10 kg/s feed: the start-up follows exactly <i>M<sub>k</sub></i> = 10 + ½ <i>M</i><sub><i>k</i>−1</sub>, with 20 kg/s in the merger at steady state.</li>
+  <li>Cycle with 1 s delay and 30 % recycle: merger 14.2857 kg/s, outlet 10 kg/s; the mass balance including hold-up closes exactly.</li>
+</ul>
+
+<h3 id="k3-3"><span class="nr">3.3</span>The “Struktur” window</h3>
+<p>The “Struktur” (structure) window shows how the graph divides the flowsheet – as a picture (Figure 3.1) and as a tree in flow direction:</p>
+<ul>
+  <li>Each unit is placed to the right of or below the predecessor at its first input.</li>
+  <li>The left part of each box shows the step, that is the position in the computation order starting from 1; the right part shows the name of the unit and below it its ID from the file (Chapter 3.4).</li>
+  <li>A cycle is a group of units that reach each other through connections (strongly connected component).</li>
+  <li>A torn connection ends in an orange “→ Name”: the named unit reads the stream of the previous time step there. A further feed to a unit placed elsewhere ends in a gray “→ Name”.</li>
+</ul>
+<figure>
+  <img src="abbildungen/GUI_Struktur_Bild.png" alt="Structure window, tab picture, with two recycles into the same merger">
+  <figcaption>Figure 3.1 – “Struktur” (structure) window, tab “Bild” (picture), for a flowsheet with two recycles into Merger1: via Prozess1 and via Splitter2, three parallel branches and Merger2. Both recycles are torn at Merger1 (orange “→ Merger1”); the branches of Prozess2 and Prozess3 join in Merger2 (gray “→ Merger2”). Merger2 is at step 11: it computes last because it waits for all three branches.</figcaption>
+</figure>
+<h4>Verification</h4>
+<p>Start flowsheet: order inlet, merger, splitter, outlet, process, one cycle of merger, splitter and process, tear process → merger. With two inlets before one merger, the merger appears below the first inlet and a reference below the second.</p>
+
+<h3 id="k3-4"><span class="nr">3.4</span>Flowsheet as a file</h3>
+<p>A flowsheet can be saved as a file (JSON, format “StoSiS-Flowsheet”, format version 2). It contains all inputs:</p>
+<ul>
+  <li>simulation: duration, Δ<i>t</i>, seed, number of runs, representation, size grid, MC particles;</li>
+  <li>execution: detailed runtime log (it changes the computing time, not the results);</li>
+  <li>units with ID, type, name, position and all settings;</li>
+  <li>connections from output to input with “recycle”: “manual” (marked by hand), “auto” (torn by the graph) or “no”.</li>
+</ul>
+<p>Fixed rules apply when writing and reading:</p>
+<ul>
+  <li>Every value is written out, including default values; a file thus computes the same even if a default value changes.</li>
+  <li>The graph determines computation order and tears anew from the connections when loading. “auto” is for information only; if the new tear differs, a notice is shown.</li>
+  <li>The ID of a unit is kept, because the random stream of the unit is derived from it (Chapter 8).</li>
+  <li>Compounds appear only by name and refer to the materials file (Chapter 6).</li>
+  <li>A missing field takes its default value with a notice; an unknown field is skipped with a notice; an invalid value stops reading with the location given. Files of format version 1 (“recycle” as true/false) are still read.</li>
+</ul>
+<h4>Limits</h4>
+<p>The interface saves and opens flowsheets; when opening, the file is first read into a new flowsheet, and on an error the current one remains. Computing from a file without the interface is possible only in the test programs. Compound data, results, evaluation, MC particle view and window layout are not stored in the file.</p>
+<h4>Verification</h4>
+<p>A flowsheet with all unit types and non-default settings is written, read and written again: both texts are identical, and with the same seed all results agree exactly, in the continuum as in particle mode. Files with another format, a newer version, fractions not summing to 1 or a connection to an unknown unit are rejected with the location given. The same file in format version 1 gives the version 2 file again when written.</p>
+
+
+<h2 id="k4"><span class="nr">4</span>Size grid</h2>
+<h4>Purpose</h4>
+<p>In the continuum the grid is the stream: each stream consists of values at the grid points. In particle mode it serves only to count the MC particles for display and comparison.</p>
+<h4>Method</h4>
+<p>The default is a geometric grid in which each grid point is larger than the previous one by a fixed factor <i>r</i> (Figure 4.1):</p>
+<p class="formel"><i>d<sub>i</sub></i> = <i>d</i><sub>min</sub> · <i>r<sup>i</sup></i>, &nbsp; default 1 µm to 1 mm with 300 grid points</p>
+<p>A linear grid can also be selected. At each grid point the mass flow density <i>q</i>(<i>t</i>, <i>d</i>) is stored – a density, not an amount per class. Results thus do not depend on the class width, and every integral has a meaning. On the geometric grid, integration uses the trapezoidal rule in ln <i>d</i>:</p>
+<p class="formel"><i>ṁ</i>(<i>t</i>) = ∫ <i>d</i> · <i>q</i>(<i>t</i>, <i>d</i>) d(ln <i>d</i>) ≈ ln <i>r</i> · [ ½ <i>d</i><sub>0</sub><i>q</i><sub>0</sub> + <i>d</i><sub>1</sub><i>q</i><sub>1</sub> + … + ½ <i>d<sub>n</sub>q<sub>n</sub></i> ]</p>
+<p>The same matrix yields the mass flow over time, the size distribution of the throughput and the total mass. Before computing, the program checks every inlet against the grid and reports if more than 0.1 % of its distribution lies outside.</p>
+<figure>
+  <img src="abbildungen/HB_Raster_Linear_Log_en.svg" alt="Position of the grid points: linear versus logarithmic grid">
+  <figcaption>Figure 4.1 – Position of the grid points on a logarithmic axis. A linear grid (here up to 200 µm) crowds the grid points at large particles and hardly resolves small ones; the geometric grid spreads them evenly, with 100 grid points per decade and 2.3 % spacing between neighbors.</figcaption>
+</figure>
+<h4>Limits</h4>
+<p>In the continuum, material outside [<i>d</i><sub>min</sub>, <i>d</i><sub>max</sub>] is missing. The resolution is limited by the number of grid points.</p>
+<h4>Verification</h4>
+<p>The fraction captured by the grid matches the exact cumulative distribution <i>Q</i><sub>3</sub>(<i>d</i><sub>max</sub>) − <i>Q</i><sub>3</sub>(<i>d</i><sub>min</sub>) for five distributions to 1.3 · 10<sup>−6</sup>. The mass balance over delay and splitter closes to 3 · 10<sup>−14</sup> kg of 50 kg.</p>
+
+
+<h2 id="k5"><span class="nr">5</span>Inlet and size distributions</h2>
+<h4>Purpose</h4>
+<p>The inlet feeds material with a given mass flow and a given size distribution into the flowsheet.</p>
+<h4>Assumptions</h4>
+<p>The mass flow <i>ṁ</i>(<i>t</i>) is piecewise linear between support points and continued as a constant outside them. The shape of the distribution stays the same over time; only its height follows the mass flow: <i>q</i>(<i>t</i>, <i>d</i>) = <i>ṁ</i>(<i>t</i>) · <i>q</i><sub>3</sub>(<i>d</i>).</p>
+<h4>Method</h4>
+<p>The distribution is given as mass density <i>q</i><sub>3</sub>(<i>d</i>) or cumulative distribution <i>Q</i><sub>3</sub>(<i>d</i>) – <i>Q</i><sub>3</sub>(<i>d</i>) is the mass fraction of all particles smaller than <i>d</i>.</p>
+<table>
+  <tr><th>Distribution</th><th>Parameters</th><th>Cumulative distribution or density</th></tr>
+  <tr><td>Log-normal (default)</td><td><i>d</i><sub>50</sub>, σ<sub>ln</sub></td><td><i>q</i><sub>3</sub> = 1/(<i>d</i> σ<sub>ln</sub> √(2π)) · exp(−ln²(<i>d</i>/<i>d</i><sub>50</sub>) / (2σ<sub>ln</sub>²))</td></tr>
+  <tr><td>RRSB</td><td><i>d</i>′, <i>n</i></td><td><i>Q</i><sub>3</sub> = 1 − exp(−(<i>d</i>/<i>d</i>′)<sup><i>n</i></sup>)</td></tr>
+  <tr><td>GGS</td><td><i>d</i><sub>max</sub>, <i>m</i></td><td><i>Q</i><sub>3</sub> = (<i>d</i>/<i>d</i><sub>max</sub>)<sup><i>m</i></sup> for <i>d</i> ≤ <i>d</i><sub>max</sub></td></tr>
+  <tr><td>Table</td><td>points (<i>d<sub>i</sub></i>, <i>Q</i><sub>3,<i>i</i></sub>)</td><td><i>Q</i><sub>3</sub> linear in ln <i>d</i> between the points</td></tr>
+  <tr><td>Normal (not recommended)</td><td><i>d</i><sub>0</sub>, σ</td><td>Gaussian bell curve; allows <i>d</i> &lt; 0, hence with a warning</td></tr>
+</table>
+<p>The default is log-normal with <i>d</i><sub>50</sub> = 100 µm and σ<sub>ln</sub> = 0.25: particle sizes are positive and their distributions mostly skewed. RRSB (Rosin-Rammler-Sperling-Bennett) and GGS (Gates-Gaudin-Schuhmann) are common in comminution. The table takes measured distributions, for example from a sieve analysis, without inventing a shape between the points.</p>
+<p>In the continuum, each grid point receives exactly the mass that falls to it when the mass is shared according to the position between the neighbors (hat function in ln <i>d</i>). The sum over all grid points is thus exactly <i>Q</i><sub>3</sub>(<i>d</i><sub>max</sub>) − <i>Q</i><sub>3</sub>(<i>d</i><sub>min</sub>), even if the density jumps, as for GGS at the largest grain. In particle mode the inlet creates MC particles according to the MC particle density (Chapter 9.3).</p>
+<h4>Limits</h4>
+<p>The distribution is constant in time; a changing distribution arises only via several inlets and a merger. The hat function smooths the peak slightly – for the default inlet by at most 7 · 10<sup>−4</sup> of the maximum.</p>
+<h4>Verification</h4>
+<p>For all distributions, <i>Q</i><sub>3</sub>(quantile(<i>p</i>)) = <i>p</i> holds to 10<sup>−8</sup> relative, and the mass fed in each time step matches the feed profile.</p>
+
+
+<h2 id="k6"><span class="nr">6</span>Compounds, temperature and pressure</h2>
+<h4>Purpose</h4>
+<p>Several compounds are to pass through the flowsheet together, and compound properties such as density, heat capacity or viscosity are to be available at the respective temperature and pressure.</p>
+<h4>Assumptions</h4>
+<p>A stream carries a separate distribution on the same grid for each compound, together with one temperature and one pressure. Simple units such as splitter and delay pass both on unchanged.</p>
+<h4>Method</h4>
+<p>The compound data are stored in a materials file in JSON format (<code>data/Materialien.json</code>) with 18 compounds. Each property is a constant, a formula (ideal gas, Sutherland, Antoine, polynomials) or a table over temperature, each with its range of validity, source and review status. If there are several entries, the first one with temperature and pressure in range applies, then one with the temperature in range, otherwise the one with the nearest temperature limit; values outside the range or beyond the measured points are flagged. The active compounds of a flowsheet follow from its inlets.</p>
+<p>Only the heat capacity <i>c<sub>p</sub></i>(<i>T</i>) is stored; the enthalpy follows by integration, <i>h</i>(<i>T</i>) = ∫ <i>c<sub>p</sub></i> d<i>T</i> from 298.15 K. When streams join, the energy balance applies: the mixing temperature is the temperature at which the enthalpy of the mixture equals the sum of the enthalpies fed in. It is solved with Newton's method, safeguarded by bisection between the coldest and the warmest inlet temperature. For constant heat capacity this gives</p>
+<p class="formel"><i>T</i><sub>mix</sub> = Σ <i>ṁ<sub>i</sub></i> <i>c</i><sub><i>p</i>,<i>i</i></sub> <i>T<sub>i</sub></i> / Σ <i>ṁ<sub>i</sub></i> <i>c</i><sub><i>p</i>,<i>i</i></sub></p>
+<p>The pressure after mixing is the lowest input pressure of a stream carrying material. A junction has only one pressure, and material flows only from higher to lower pressure.</p>
+<h4>Limits</h4>
+<p>The values are initially taken from the database of Dyssol (Skorych, Dosta &amp; Heinrich 2020) and are marked as unreviewed until they are checked; conspicuous entries carry a warning. If a compound lacks the heat capacity, the temperature is averaged by mass and a notice is given. There is no gas phase as carrier medium.</p>
+<h4>Verification</h4>
+<ul>
+  <li>Sand at 20 °C and 80 °C in the mass ratio 10 : 5 mixes to 40.000 °C, sand with urea to 48.92 °C – the closed-form solution for constant heat capacity.</li>
+  <li>The mass balance per compound over merger and splitter holds to 10<sup>−15</sup>.</li>
+  <li>The viscosities of nitrogen, oxygen and air lie within 1 % of the reference equations of Lemmon &amp; Jacobsen (2004) up to 500 K.</li>
+</ul>
+
+
+<h2 id="k7"><span class="nr">7</span>Units</h2>
+
+<h3 id="k7-1"><span class="nr">7.1</span>Merger</h3>
+<p>The merger adds the mass flow densities of its inputs per compound; temperature and pressure follow from Chapter 6. In particle mode it concatenates the MC particles of all inputs (Figure 7.1).</p>
+<figure>
+  <img src="abbildungen/HB_Merger_Skizze_en.svg" alt="Merger: two feeds of different temperature and pressure join into one output; in particle mode the MC particles are concatenated">
+  <figcaption>Figure 7.1 – Merger with two feeds. The mass flows add up, the temperature follows from the energy balance, the pressure is the lowest input pressure. In particle mode the MC particles of all inputs are concatenated.</figcaption>
+</figure>
+<p>Because the energy balance uses the heat capacity of each compound, the mixing temperature of two different compounds does not lie on the straight line of the mass fractions (Figure 7.2).</p>
+<figure>
+  <img src="abbildungen/HB_Merger_Mischtemperatur_en.svg" alt="Mixing temperature over the mass fraction of the warm feed for sand with sand and sand with urea">
+  <figcaption>Figure 7.2 – Mixing temperature over the mass fraction of the warm feed (80 °C) added to sand at 20 °C. For the same compound, the energy balance gives the same as a mass average, so 40.0 °C at a ratio of 10 : 5. Urea, with 1544.7 J/(kg K), has almost twice the heat capacity of sand (830 J/(kg K)) and raises the mixture to 48.9 °C.</figcaption>
+</figure>
+
+<h3 id="k7-2"><span class="nr">7.2</span>Splitter</h3>
+<h4>Purpose</h4>
+<p>The splitter divides a stream among two or three outputs as a pure quantity divider: the fraction is the same for all particle sizes (Figure 7.3).</p>
+<figure>
+  <img src="abbildungen/HB_Splitter_Skizze_en.svg" alt="Splitter with three outputs; each output has the same size distribution as the feed, only smaller">
+  <figcaption>Figure 7.3 – Splitter with three outputs and the fractions 0.5, 0.3 and the rest 0.2. Each output receives the same size distribution as the feed, only correspondingly less.</figcaption>
+</figure>
+<h4>Assumptions</h4>
+<p>The fractions are fixed or fluctuate around a mean with correlation in time. The last output always receives the rest.</p>
+<h4>Method</h4>
+<p>In fluctuating mode, the fraction <i>g<sub>i</sub></i> of each output except the last follows an Ornstein-Uhlenbeck (OU) process (Uhlenbeck &amp; Ornstein 1930) with mean μ, standard deviation σ and correlation time τ:</p>
+<p class="formel">d<i>g</i> = −(<i>g</i> − μ)/τ · d<i>t</i> + σ √(2/τ) d<i>W</i></p>
+<p>The process is stationary and normally distributed, always returns to the mean and has exactly one correlation time. It is updated exactly (Gillespie 1996) instead of with the Euler method, so that mean, standard deviation and time behavior do not depend on the time step:</p>
+<p class="formel"><i>g</i><sub><i>k</i>+1</sub> = μ + (<i>g<sub>k</sub></i> − μ) <i>a</i> + σ √(1 − <i>a</i>²) ξ, &nbsp; <i>a</i> = e<sup>−Δ<i>t</i>/τ</sup>, &nbsp; ξ ~ N(0, 1)</p>
+<p>The process starts already in equilibrium, <i>g</i>(0) ~ N(μ, σ²). Fractions outside [0, 1] are clipped; if the sum of the fluctuating fractions exceeds 1, they are scaled down proportionally. Mass is conserved exactly in every step. The random process continues without feed, so that the random sequence depends only on the seed. In particle mode the account method distributes the MC particles (Chapter 9.4); it only implements the fraction and adds no fluctuation of its own (Figure 7.4).</p>
+<figure>
+  <img src="abbildungen/HB_Splitter_OU_en.svg" alt="Fraction of a fluctuating splitter over time with the bands mean plus minus one and two standard deviations">
+  <figcaption>Figure 7.4 – Fraction of a fluctuating splitter over 40 s with μ = 0.3, σ = 0.05 and τ = 2 s, updated exactly with Δ<i>t</i> = 0.1 s. The Ornstein-Uhlenbeck process sets the fraction in each step; this is the real fluctuation. In the continuum every value of the distribution is multiplied by it; in particle mode the account method distributes whole MC particles so that the output receives this fraction. On average the fraction lies within the band μ ± σ two thirds of the time.</figcaption>
+</figure>
+<h4>Limits</h4>
+<p>For large σ, clipping shifts the mean slightly; the editor gives a notice if μ ± 3σ lies outside [0, 1]. Separation by size is done by the screen (Chapter 7.5), by compound by the compound separator (7.6), by size and density by the classifier (7.7).</p>
+<h4>Verification</h4>
+<table>
+  <tr><th>Case</th><th>Expectation</th><th>Result</th></tr>
+  <tr><td>μ = 0.3, σ = 0.05, τ = 2 s, Δ<i>t</i> = 0.1 s</td><td>mean 0.3, standard deviation 0.05, autocorrelation after 2 s e<sup>−1</sup> = 0.368</td><td>0.301 / 0.049 / 0.353</td></tr>
+  <tr><td>the same with Δ<i>t</i> = 0.5 s</td><td>same statistics</td><td>0.301 / 0.050 / 0.368</td></tr>
+  <tr><td>τ = 0</td><td>no autocorrelation</td><td>0.005</td></tr>
+  <tr><td>three outputs, σ = 0.03 and 0.06</td><td>standard deviation of the rest √(0.03² + 0.06²) = 0.067</td><td>0.066</td></tr>
+</table>
+
+<h3 id="k7-3"><span class="nr">7.3</span>Size-dependent delay</h3>
+<p>The delay holds back material for a time that depends on its size:</p>
+<p class="formel"><i>t</i><sub>delay</sub>(<i>d</i>) = <i>t</i><sub>ref</sub> · (<i>d</i> / <i>d</i><sub>ref</sub>)<sup><i>p</i></sup></p>
+<p>Its hold-up is a ring buffer of the last inputs; between the points in time it interpolates linearly. Before the start the feed counts as zero, and the interpolation also runs between this zero value and the first step; so the first feed step arrives completely as well. Each place in the buffer keeps the temperature and pressure of its material, and material arriving at the same time is mixed as in the merger. The unit is a placeholder for transport models based on residence time distributions.</p>
+<p>In particle mode, each MC particle has the delay of its own size, in time steps <i>t</i><sub>delay</sub>/Δ<i>t</i> = <i>q</i> + <i>r</i> with whole steps <i>q</i> and the remainder 0 ≤ <i>r</i> &lt; 1. Of the feed of one step, the fraction 1 − <i>r</i> leaves after <i>q</i> steps and the rest <i>r</i> after <i>q</i> + 1, as for plug flow in the vessel (7.4). MC particles are not divided: the account method sends each whole MC particle “early” or “late” (Chapter 9.4). The MC particles wait in bins, one per exit step, and carry the temperature and pressure of their entry step. If the delay of an MC particle reaches beyond the end of the simulation, it remains as hold-up in the unit.</p>
+
+<h3 id="k7-4"><span class="nr">7.4</span>Vessel</h3>
+<h4>Purpose</h4>
+<p>The vessel holds back material – a stirred tank, a fluidized bed, a pipe or a silo. It smooths fluctuations of the feed and gives the material a residence time distribution.</p>
+<h4>Assumptions</h4>
+<p>The outflow follows a fixed mean residence time τ, as for through-flow with τ = <i>V</i>/<i>Q</i>; a batch has no outflow. Which material leaves is determined by the mixing behavior. Four cases with the same mean residence time can be selected (Figures 7.5 and 7.6; Danckwerts 1953, Levenspiel 1999):</p>
+<table>
+  <tr><th>Mixing</th><th>Who leaves</th><th>Residence time distribution</th></tr>
+  <tr><td>ideally mixed</td><td>all material with the same probability, independent of its age</td><td>exponential</td></tr>
+  <tr><td>plug flow</td><td>the oldest first</td><td>everything exactly τ</td></tr>
+  <tr><td>cascade of <i>n</i> tanks</td><td>tank by tank, each τ/<i>n</i></td><td>Erlang (gamma)</td></tr>
+  <tr><td>core flow</td><td>the fraction φ as plug flow in κτ through the core, the rest mixed through the outer zone</td><td>early breakthrough, long tail</td></tr>
+</table>
+<p>The outer zone has τ<sub>R</sub> = (1 − φκ) τ / (1 − φ), so that the mean stays τ; the defaults are φ = 60 % and κ = 0.3. At <i>t</i> = 0 the vessel is empty, filled as in continuous operation (feed at <i>t</i> = 0 times τ, with its size distribution) or filled with a given mass, compound and size distribution.</p>
+<figure>
+  <img src="abbildungen/HB_Behaelter_Skizze_en.svg" alt="Four vessel types: stirred tank, pipe, cascade of three tanks and core-flow silo, grains colored by age">
+  <figcaption>Figure 7.5 – The four mixing types of the vessel with examples; the color shows the age of the material. In the mixed tank every age is everywhere, in the pipe the order is kept, in the cascade the material gets older from tank to tank, and in the silo the core passes quickly while the outer zone stays for a long time.</figcaption>
+</figure>
+<figure>
+  <img src="abbildungen/HB_Behaelter_Verweilzeit_en.svg" alt="Residence time distribution of the four mixing types over time">
+  <figcaption>Figure 7.6 – Residence time distribution <i>E</i>(<i>t</i>) of the four mixing types, all with the mean τ. Ideally mixed exponential, cascade of three tanks with a hump, plug flow entirely at τ (arrow). In core flow (φ = 60 %, κ = 0.3), 60 % pass through the core at 0.3 τ (arrow), the rest forms a long tail with τ<sub>R</sub> = 2.05 τ.</figcaption>
+</figure>
+<p>Only in the ideally mixed vessel does the probability of leaving in the next step not depend on age (Figure 7.7). With the survival curve <i>S</i>(<i>t</i>), the fraction still in the vessel after the time <i>t</i>, this probability is <i>p</i>(<i>t</i>) = 1 − <i>S</i>(<i>t</i> + Δ<i>t</i>) / <i>S</i>(<i>t</i>). Therefore only the mixed vessel and the tanks of the cascade need no memory; in the pipe an MC particle must remember its age, in the silo its zone.</p>
+<figure>
+  <img src="abbildungen/HB_Behaelter_Austritt_en.svg" alt="Probability of leaving in the next step over the age for the four mixing types">
+  <figcaption>Figure 7.7 – Probability that material of a given age leaves in the next step (Δ<i>t</i> = 0.02 τ). Ideally mixed 1.98 % at every age; plug flow 0 up to age τ, then 100 %; in the cascade it rises with age towards 1 − e<sup>−3Δ<i>t</i>/τ</sup> = 5.8 %; in core flow it jumps to 64 % at 0.3 τ and then stays at 0.97 %.</figcaption>
+</figure>
+<h4>Method</h4>
+<p>Each step brings the feed times Δ<i>t</i> into the vessel; the output shows what leaves during the step, divided by Δ<i>t</i>. The step formulas are exact for a feed that is constant within the step. In the ideally mixed vessel the content decreases according to d<i>H</i>/d<i>t</i> = −<i>H</i>/τ; per step, the fractions leaving the content and the feed of the same step are</p>
+<p class="formel"><i>a</i> = 1 − e<sup>−Δ<i>t</i>/τ</sup>, &nbsp;&nbsp; <i>b</i> = 1 − (τ/Δ<i>t</i>) <i>a</i> ≈ Δ<i>t</i>/(2τ)</p>
+<p>In plug flow a feed step leaves after τ; if τ/Δ<i>t</i> = <i>q</i> + <i>r</i> is not an integer, the fraction 1 − <i>r</i> leaves after <i>q</i> steps and the rest after <i>q</i> + 1. In the cascade, material from one tank moves on by <i>m</i> tanks in one step with the Poisson probability <i>P<sub>m</sub></i> (λ = <i>n</i>Δ<i>t</i>/τ), material from the feed with <i>Q<sub>m</sub></i> = P(<i>X</i> &gt; <i>m</i>)/λ; whatever would go beyond the last tank leaves. Core flow combines a plug-flow part and an ideally mixed part. Temperature and pressure follow for each zone from the energy balance, as in the merger.</p>
+<p>In particle mode whole MC particles leave. Which ones is decided by the account method with the accounts “go” and “stay” (Chapter 9.4): each MC particle leaves with the same probability regardless of weight and age, and every size region loses its share. An MC particle only remembers where it is – in the content, in a tank, or in the step in which it leaves. In continuous operation, by Little's law (Little 1961), <i>N</i> τ/Δ<i>t</i> MC particles are in the vessel. The stock therefore grows with τ/Δ<i>t</i>: it holds (τ/Δ<i>t</i> + 2) feed steps with at most 2 <i>N</i> MC particles each (upper limit per packet), at least the set value × <i>N</i> and at most 10 million MC particles. Only beyond that are newly arriving MC particles merged in pairs as in the limits per packet (Chapter 9.5). Example: a tank with τ = 641 s at Δ<i>t</i> = 0.5 s and 2000 MC particles per step holds about 5.1 million MC particles.</p>
+<p>Besides the outflow, the content is a result of its own (“Behälter, Inhalt” in the interface, vessel content). After each step StoSiS records the mass per compound and size in kg, in particle mode mapped onto the grid like the streams (Chapter 9.6), together with temperature and pressure of the mixture. For the content <i>H<sub>k</sub></i> after step <i>k</i>, with inflow <i>ṁ</i><sub>in,<i>k</i></sub> and outflow <i>ṁ</i><sub>out,<i>k</i></sub> in kg/s,</p>
+<p class="formel"><i>H<sub>k</sub></i> = <i>H</i><sub><i>k</i>−1</sub> + (<i>ṁ</i><sub>in,<i>k</i></sub> − <i>ṁ</i><sub>out,<i>k</i></sub>) Δ<i>t</i></p>
+<p>Because step <i>k</i> takes in the feed of a whole Δ<i>t</i>, <i>H<sub>k</sub></i> corresponds to the content of a continuously computed vessel at time <i>t<sub>k</sub></i> + Δ<i>t</i>. For a constant feed <i>ṁ</i> into the empty, ideally mixed vessel this is <i>H<sub>k</sub></i> = τ <i>ṁ</i> (1 − e<sup>−(<i>k</i>+1)Δ<i>t</i>/τ</sup>); with τ = 10 s and 1 kg/s the content rises to 10 kg. For the batch, the content is the actual result.</p>
+<h4>Limits</h4>
+<p>The residence time is fixed. A controlled fill level, a prescribed discharge (metering screw) and a size-dependent discharge are not included. The MC particle view shows only the outflow, not the MC particles in the content. If the stock is full, the outflow carries fewer, heavier MC particles and fluctuates more.</p>
+<h4>Verification</h4>
+<table>
+  <tr><th>Case</th><th>Expectation</th><th>Result</th></tr>
+  <tr><td>Constant feed into the empty vessel, all four mixing types</td><td>outflow per step = mean of the closed-form survival curve over the step</td><td>continuum to 6 · 10<sup>−14</sup>; particle mode (400 MC particles per step) at most 3.7 MC particles per step, accumulated 8</td></tr>
+  <tr><td>Pulse</td><td>mean residence time τ</td><td>continuum exact; particle mode with MC particles of equal weight to 0.4 %</td></tr>
+  <tr><td>Mass balance; filling as in continuous operation; washout of another compound</td><td>exact; outflow = feed from the first step, <i>N</i> τ/Δ<i>t</i> MC particles in stock; decay as (1 − <i>a</i>)<sup><i>k</i></sup></td><td>met, in both representations</td></tr>
+  <tr><td>Stock according to τ/Δ<i>t</i> (τ/Δ<i>t</i> = 100, <i>N</i> = 100)</td><td>room for (τ/Δ<i>t</i> + 2) × 2 <i>N</i> = 20 400 MC particles, nothing merged</td><td>met; 10 000 MC particles in stock</td></tr>
+  <tr><td>Stock full (τ/Δ<i>t</i> = 100, stock limited to 10 × <i>N</i> MC particles)</td><td>outflow = feed</td><td>feed merged about 10 : 1, outflow off by 0.36 % on average</td></tr>
+  <tr><td>Fluctuating splitter upstream (σ = 0.05, τ<sub>OU</sub> = 2 s, τ = 10 s)</td><td>standard deviation of the outflow from the step formula</td><td>1000 runs: off by 0.8 %; particle mode follows the continuum to at most 1.1 % per step</td></tr>
+  <tr><td>Plug flow, τ/Δ<i>t</i> = 50.5, one heavy and one light MC particle (10 : 1) per size</td><td>outflow = feed</td><td>at most 9.7 % per step; without redrawing 82 % in every second step</td></tr>
+  <tr><td>Fluctuating feed (σ/μ = 0.167, τ<sub>OU</sub> = 2 s) directly into the mixed vessel, 400 MC particles per step</td><td>target <i>a</i> · content/Δ<i>t</i> + <i>b</i> · feed</td><td>standard deviation 0.94 % around the target, off by 0.05 % on average</td></tr>
+  <tr><td>Content as result: 1 kg/s into the empty, ideally mixed vessel (τ = 10 s, Δ<i>t</i> = 0.2 s), 400 MC particles per step</td><td><i>H<sub>k</sub></i> = τ <i>ṁ</i> (1 − e<sup>−(<i>k</i>+1)Δ<i>t</i>/τ</sup>) and balance per step; at the end equal to the mass in the vessel</td><td>continuum to 3 · 10<sup>−15</sup>, balance to 2 · 10<sup>−14</sup> in both representations; particle mode at most 6 feed MC particles off the continuum</td></tr>
+  <tr><td>Batch with an initial filling of 30 kg at 350 K, without feed</td><td>content the same in every step, at the filling temperature</td><td>met, in both representations</td></tr>
+</table>
+
+<h3 id="k7-5"><span class="nr">7.5</span>Screen</h3>
+<h4>Purpose</h4>
+<p>The screen divides the feed by particle size into coarse (output 1) and fines (output 2). The same unit describes any classifier whose separation can be expressed by a grade efficiency curve over size; if a classifier also separates noticeably by density, the classifier unit (7.7) is the right one. A screen has two to four outputs, that is one to three decks on top of each other (multi-deck screen); the number of outputs is fixed when the unit is created.</p>
+<figure>
+  <img src="abbildungen/HB_Sieb_Schwingsieb_en.svg" alt="Vibrating screen from the side: coarse grains run over the deck into the coarse fraction, fine ones fall through the meshes into the fines">
+  <figcaption>Figure 7.8 – Vibrating screen from the side. Grains larger than the mesh size <i>w</i> run over the vibrating deck into the coarse fraction (output 1), finer ones fall through the meshes into the fines (output 2). Grains just below <i>w</i> need many attempts, and some reach the end of the deck before passing; therefore the grade efficiency is a continuous curve instead of a step.</figcaption>
+</figure>
+<h4>Assumptions</h4>
+<p>Separation is by size only, the same for all compounds. The grade efficiency <i>T</i>(<i>d</i>) is the mass fraction of particles of size <i>d</i> that goes to the coarse fraction; it is fixed in time and does not depend on the load. The screen holds nothing back; temperature and pressure stay the same. The three grade efficiency curves of Dyssol (Skorych et al. 2020) can be selected, with the cut size <i>x</i><sub>cut</sub> (where <i>T</i> is about 0.5), the sharpness α and, for Teipel-Hennig only, a second sharpness β and the offset <i>o</i>. All three depend only on the relative size <i>x</i> = <i>d</i>/<i>x</i><sub>cut</sub>:</p>
+<table>
+  <tr><th>Model</th><th>Grade efficiency <i>T</i>(<i>d</i>)</th><th><i>T</i>(<i>x</i><sub>cut</sub>)</th></tr>
+  <tr><td>Plitt (1971)</td><td>1 − exp(−0.693 <i>x</i><sup>α</sup>)</td><td>0.49993</td></tr>
+  <tr><td>Molerus-Hoffmann (1969)</td><td>1 / (1 + <i>x</i><sup>−2</sup> exp(α (1 − <i>x</i>²)))</td><td>0.5</td></tr>
+  <tr><td>Teipel-Hennig (Hennig and Teipel 2016)</td><td>(1 − (1 + 3 <i>x</i><sup>(<i>x</i> + α) β</sup>)<sup>−1/2</sup>) (1 − <i>o</i>) + <i>o</i></td><td>0.5 (1 − <i>o</i>) + <i>o</i></td></tr>
+</table>
+<p>The larger α, the steeper the curve; for the same α, however, the three models differ in steepness (Figure 7.9). They can be compared via the sharpness of separation κ = <i>d</i><sub>25</sub>/<i>d</i><sub>75</sub>, the ratio of the sizes with <i>T</i> = 0.25 and <i>T</i> = 0.75; an ideal step would have κ = 1. The number 0.693 in Plitt's model is ln 2, so that <i>T</i>(<i>x</i><sub>cut</sub>) is almost 0.5. The offset <i>o</i> is the fraction that reaches the coarse fraction regardless of size, for example fines sticking to coarse grains. The probability model of Dyssol (normal distribution over the classes) is not included because it depends on the size grid.</p>
+<figure>
+  <img src="abbildungen/HB_Sieb_Trennkurven_en.svg" alt="Grade efficiency of the three models over d divided by x_cut at equal sharpness">
+  <figcaption>Figure 7.9 – The three grade efficiency curves over <i>d</i>/<i>x</i><sub>cut</sub> at the same sharpness α = 4 (Teipel-Hennig with β = 0.5 and <i>o</i> = 0). The cut size only shifts the curves along the size axis. At equal α, κ = 0.67 (Plitt), 0.80 (Molerus-Hoffmann) and 0.32 (Teipel-Hennig).</figcaption>
+</figure>
+<h4>Several decks</h4>
+<p>A screen with <i>n</i> outputs has <i>n</i> − 1 decks, each with its own grade efficiency curve <i>T<sub>k</sub></i>(<i>d</i>) and cut size; the cut sizes decrease from top to bottom. The feed first hits deck 1. What stays on deck <i>k</i> goes to output <i>k</i>, the undersize falls onto the next deck, and the undersize of the lowest deck is the fines in the last output. The fraction <i>t<sub>k</sub></i> of size <i>d</i> in output <i>k</i> is thus</p>
+<p class="formel"><i>t<sub>k</sub></i>(<i>d</i>) = <i>T<sub>k</sub></i>(<i>d</i>) · (1 − <i>T</i><sub>1</sub>(<i>d</i>)) ⋯ (1 − <i>T</i><sub><i>k</i>−1</sub>(<i>d</i>)),&nbsp;&nbsp; <i>t<sub>n</sub></i>(<i>d</i>) = (1 − <i>T</i><sub>1</sub>(<i>d</i>)) ⋯ (1 − <i>T</i><sub><i>n</i>−1</sub>(<i>d</i>)),</p>
+<p>together 1 for every size. Example with two decks at 60 and 30 µm: output 1 receives the material above 60 µm, output 2 that between 30 and 60 µm, output 3 that below 30 µm, each with the transitions of the grade efficiency curves. With one deck, <i>t</i><sub>1</sub> = <i>T</i>(<i>d</i>) is the coarse fraction and <i>t</i><sub>2</sub> = 1 − <i>T</i>(<i>d</i>) the fines.</p>
+<h4>Method</h4>
+<p>In the continuum, at each grid point and for each compound, the feed times <i>t<sub>k</sub></i>(<i>d</i>) goes to output <i>k</i>, for one deck thus <i>T</i>(<i>d</i>) to the coarse fraction and 1 − <i>T</i>(<i>d</i>) to the fines. The last output receives the rest, so mass is conserved exactly. In particle mode whole MC particles go according to the account method (Chapter 9.4), each MC particle bringing its own fractions <i>t<sub>k</sub></i>. An MC particle that can go to only one output (for example <i>T</i> = 0 or <i>T</i> = 1 with one deck) goes there without an account.</p>
+<h4>Limits</h4>
+<p>The grade efficiency curve does not depend on throughput, screen area or moisture; overloading and the residence time on the screen are not modeled. The decks act independently of each other: each separates its feed with the same curve, however much arrives. The screen does not separate by density or compound (for that, 7.6 and 7.7). An MC particle carries one size; a mixture of different sizes in one MC particle, for example after an agglomeration, is separated as a whole by this size.</p>
+<p>The cut size <i>x</i><sub>cut</sub> is not the mesh size <i>w</i>. A rigid sphere above <i>w</i> passes no mesh; below <i>w</i> a grain passes per attempt only with a certain probability, for a square mesh without wire fraction about (1 − <i>d</i>/<i>w</i>)² (Gaudin 1939), that is 1 % at <i>d</i> = 0.9 <i>w</i>. Many grains just below <i>w</i> therefore reach the end of the deck, and <i>x</i><sub>cut</sub> is usually below <i>w</i>. Elongated grains, slotted screens and mesh tolerances, on the other hand, also let grains above <i>w</i> through. The three curves reach 1 only asymptotically. <i>x</i><sub>cut</sub> and α should therefore be chosen so that practically nothing above the mesh size goes to the fines. An example of values that are too flat: Plitt with α = 8 and <i>x</i><sub>cut</sub> = <i>w</i> still sends 23 % of grains 10 % above <i>w</i> to the fines; with <i>x</i><sub>cut</sub> = 0.8 <i>w</i> and α = 18 it is only 2 · 10<sup>−17</sup> already at <i>d</i> = <i>w</i>.</p>
+<h4>Verification</h4>
+<table>
+  <tr><th>Case</th><th>Expectation</th><th>Result</th></tr>
+  <tr><td>All three models with the default values of Dyssol (<i>x</i><sub>cut</sub> = 2 mm, α = 8, β = 0.5, <i>o</i> = 0.2), 10 µm to 10 mm</td><td>the same values as the formulas in Dyssol; <i>T</i> rises with <i>d</i></td><td>off by at most 6 · 10<sup>−17</sup>; met</td></tr>
+  <tr><td>Continuum, two compounds, Molerus-Hoffmann</td><td>coarse = <i>T</i>(<i>d</i>) · feed, coarse + fines = feed</td><td>exact and to 10<sup>−15</sup></td></tr>
+  <tr><td>Particle mode, two compounds with 2000 MC particles each around <i>x</i><sub>cut</sub> = 100 µm, Plitt with α = 3, 1000 steps</td><td>coarse 0.56962 of the feed; each compound and size range with its <i>T</i>(<i>d</i>)</td><td>0.56956; per compound and range off by at most 7.6 · 10<sup>−4</sup>; number of MC particles and mass conserved in every step</td></tr>
+  <tr><td>Accounts in the same case</td><td>at most half an MC particle share (2.07 · 10<sup>−4</sup>)</td><td>2.06 · 10<sup>−4</sup></td></tr>
+  <tr><td>MC particles with <i>T</i> = 0 and <i>T</i> = 1, 200 steps</td><td>always to the fines or the coarse fraction</td><td>met</td></tr>
+  <tr><td>Three decks (Plitt at 2 mm, Molerus-Hoffmann at 500 µm, Teipel-Hennig at 100 µm), continuum, two compounds</td><td>like three screens in series, each fed with the fines of the previous one; sum of the four outputs = feed</td><td>to 1.1 · 10<sup>−16</sup> and 1.1 · 10<sup>−16</sup> of the largest value</td></tr>
+  <tr><td>Two decks at 60 and 30 µm (Plitt, α = 20), two log-normal compounds (<i>d</i><sub>50</sub> = 45 µm, σ<sub>ln</sub> = 0.5 and 70 µm, 0.4) with 2000 MC particles each, 1000 steps</td><td>fractions of the three outputs from the distributions exactly 0.3827 / 0.4595 / 0.1577 (sharp cut: 0.3744 / 0.4648 / 0.1608)</td><td>0.3827 / 0.4596 / 0.1577; per compound, range and output off by at most 7.6 · 10<sup>−5</sup>; accounts below one MC particle share (3.7 · 10<sup>−4</sup> at 4.8 · 10<sup>−4</sup>)</td></tr>
+  <tr><td>Settings of several decks</td><td>rising or equal cut sizes, an invalid deck and a wrong number of decks rejected; fractions per size between 0 and 1, sum 1</td><td>met</td></tr>
+</table>
+
+<h3 id="k7-6"><span class="nr">7.6</span>Compound separator</h3>
+<h4>Purpose</h4>
+<p>The compound separator divides the feed by compound: of each compound a fixed fraction goes to output 1 (“separated”), the rest to output 2. This describes, for example, a magnet that removes iron scrap from construction waste, or manual sorting.</p>
+<figure>
+  <img src="abbildungen/HB_Stofftrenner_Magnet_en.svg" alt="Overband magnet above a conveyor belt lifts iron out of the crushed material">
+  <figcaption>Figure 7.10 – Overband magnet as an example of the compound separator. The magnet lifts iron out of the crushed material and carries it with its own belt out of the material stream (output 1); concrete, brick and wood travel on (output 2). In the model, what remains of this is one fraction per compound, for example iron 0.95 and all others 0.</figcaption>
+</figure>
+<h4>Assumptions</h4>
+<p>The fraction <i>f<sub>k</sub></i> depends only on the compound <i>k</i>, not on size, and is fixed in time. Compounds without an entry go entirely to output 2. Each compound thus has the same size distribution in both outputs. The compound separator holds nothing back; temperature and pressure stay the same.</p>
+<h4>Method</h4>
+<p>In the continuum, <i>f<sub>k</sub></i> · feed goes to output 1 at each grid point. In particle mode the account method distributes whole MC particles as in the screen (Chapter 9.4), with <i>T</i> = <i>f<sub>k</sub></i> instead of <i>T</i>(<i>d</i>). An MC particle with several compounds, which exists only after a coagulation, goes as a whole with the mass-averaged fraction Σ <i>m<sub>k</sub></i> <i>f<sub>k</sub></i> / Σ <i>m<sub>k</sub></i>, with the mass <i>m<sub>k</sub></i> of compound <i>k</i> in the MC particle.</p>
+<h4>Limits</h4>
+<p>A magnet that captures fine iron less well than coarse iron is not modeled. Intergrown grains, for example reinforcing steel in concrete, are separated by the compound separator only as an MC particle with several compounds and then according to the average. If a compound in the list does not occur in the flowsheet, a notice is given.</p>
+<h4>Verification</h4>
+<table>
+  <tr><th>Case</th><th>Expectation</th><th>Result</th></tr>
+  <tr><td>Continuum, three compounds with <i>f</i> = 0.95 / 0 / 0.1</td><td>output 1 = <i>f<sub>k</sub></i> · feed, both outputs together = feed</td><td>exact and to 10<sup>−15</sup></td></tr>
+  <tr><td>Particle mode, three compounds with 1000 MC particles each, <i>f</i> = 0.95 / 0 / 0.3, 1000 steps</td><td>output 1 0.22143 of the feed; each compound and size range with its <i>f<sub>k</sub></i></td><td>0.22133; per compound and range off by at most 4.8 · 10<sup>−3</sup>; accounts below half an MC particle share</td></tr>
+  <tr><td>One MC particle of iron (<i>f</i> = 0.95) and sand (<i>f</i> = 0) in equal masses, 1000 steps</td><td>fraction 0.475</td><td>475 times in output 1</td></tr>
+</table>
+
+
+<h3 id="k7-7"><span class="nr">7.7</span>Classifier</h3>
+<h4>Purpose</h4>
+<p>The classifier separates by settling velocity in a fluid, that is by size and density at the same time. With air it describes an air classifier, with water a settling tank or an upflow classifier. Output 1 receives the heavy fraction, which settles, output 2 the light fraction, which the fluid carries away. In the processing of concrete rubble it thus separates light materials such as wood and plastics from the mineral fraction.</p>
+<h4>Assumptions</h4>
+<p>The particles are spheres (Chapter 2). What matters is the steady settling velocity <i>w</i><sub>s</sub> of a single grain of size <i>d</i> and density ρ<sub>p</sub> in the fluid at rest with density ρ<sub>f</sub> and dynamic viscosity η. At this velocity the weight force <i>F</i><sub>G</sub> minus the buoyancy <i>F</i><sub>A</sub> equals the drag force <i>F</i><sub>W</sub>:</p>
+<p class="formel"><i>F</i><sub>G</sub> − <i>F</i><sub>A</sub> = <i>F</i><sub>W</sub></p>
+<p>Inserted, with the gravitational acceleration <i>g</i> and the drag coefficient <i>c<sub>w</sub></i>:</p>
+<p class="formel">(π/6) <i>d</i>³ (ρ<sub>p</sub> − ρ<sub>f</sub>) <i>g</i> = <i>c<sub>w</sub></i> (π/4) <i>d</i>² ρ<sub>f</sub> <i>w</i><sub>s</sub>²/2, &nbsp;&nbsp; <i>c<sub>w</sub></i> = 24/Re + 4/√Re + 0.4, &nbsp;&nbsp; Re = <i>w</i><sub>s</sub> <i>d</i> ρ<sub>f</sub> / η</p>
+<p>The drag coefficient <i>c<sub>w</sub></i> says how strongly the fluid slows the grain. For a sphere it depends only on the Reynolds number Re, the ratio of inertial to viscous forces (<i>c<sub>w</sub></i> ≈ 253 at Re = 0.1; 0.42 for 20 mm sand in air). The formula after Kaskas (Brauer 1971; Stieß 2009) holds from the Stokes regime up to Re = 2 · 10<sup>5</sup>. For small Re it turns into Stokes' law, for large Re it approaches the Newton value 0.4 (Figure 7.11).</p>
+<figure>
+  <img src="abbildungen/HB_Sichter_Kaskas_en.svg" alt="Drag coefficient after Kaskas over the Reynolds number with the limiting cases of Stokes and Newton">
+  <figcaption>Figure 7.11 – Drag coefficient after Kaskas over the Reynolds number with the limiting cases of Stokes (24/Re) and Newton (0.4). Beyond Re = 2 · 10<sup>5</sup> (gray) the formula is not supported by data; there the classifier gives a notice.</figcaption>
+</figure>
+<p>The grade efficiency is one of the three grade efficiency curves of the screen (Chapter 7.5), plotted over <i>x</i> = <i>w</i><sub>s</sub> / <i>w</i><sub>cut</sub> instead of <i>d</i> / <i>x</i><sub>cut</sub>. The cut velocity <i>w</i><sub>cut</sub> is the upward air velocity <i>u</i> for the air classifier (Figure 7.12) and the surface loading <i>Q</i>/<i>A</i> for the settling tank, the volume flow <i>Q</i> of the water through the tank area <i>A</i> (Figure 7.13). Density and viscosity of the fluid and the density of each compound come from the materials file, at the temperature and pressure of the feed. A grain that is not heavier than the fluid does not settle and goes to the light fraction.</p>
+<figure>
+  <img src="abbildungen/HB_Sichter_Windsichter_en.svg" alt="Air classifier: riser with upward air, heavy grains fall, light ones rise">
+  <figcaption>Figure 7.12 – Air classifier (riser). The feed slides into the tube from the side, the air flows upward from below with the air velocity <i>u</i>. Grains with <i>w</i><sub>s</sub> &gt; <i>u</i> fall into the heavy fraction, grains with <i>w</i><sub>s</sub> &lt; <i>u</i> are carried by the air into the light fraction; so <i>w</i><sub>cut</sub> = <i>u</i>. Turbulence and collisions of the grains blur the boundary into a grade efficiency curve.</figcaption>
+</figure>
+<figure>
+  <img src="abbildungen/HB_Sichter_Absetzbecken_en.svg" alt="Settling tank with paths of settling grains and the limiting path w_s equal to Q over A">
+  <figcaption>Figure 7.13 – Settling tank after Hazen (1904). A grain entering at the top needs the time <i>H</i>/<i>w</i><sub>s</sub> to reach the bottom at the depth <i>H</i>, and has the time <i>L</i>/<i>v</i> until the overflow at the tank length <i>L</i> and flow velocity <i>v</i>. It settles if <i>w</i><sub>s</sub> ≥ <i>H v</i>/<i>L</i> = <i>Q</i>/(<i>B L</i>) = <i>Q</i>/<i>A</i>, with the width <i>B</i> and the area <i>A</i> = <i>B L</i> of the tank. The depth cancels out, so <i>w</i><sub>cut</sub> = <i>Q</i>/<i>A</i>.</figcaption>
+</figure>
+<h4>Method</h4>
+<p>With the Archimedes number Ar = <i>d</i>³ (ρ<sub>p</sub> − ρ<sub>f</sub>) ρ<sub>f</sub> <i>g</i> / η², which contains only grain and fluid data and no <i>w</i><sub>s</sub>, the force balance reads</p>
+<p class="formel"><i>c<sub>w</sub></i> Re² = 24 Re + 4 Re<sup>3/2</sup> + 0.4 Re² = 4/3 Ar</p>
+<p>In √Re this is a polynomial that rises and is convex. Newton's method, started above the solution (each term alone gives an upper bound), therefore falls monotonically onto the only root. In the continuum the classifier computes a table of <i>T</i> per compound and grid point and renews it only when temperature or pressure of the feed change; <i>T</i> · feed goes to the heavy fraction. In particle mode the account method distributes whole MC particles as in the screen (Chapter 9.4), each with its own <i>T</i>(<i>w</i><sub>s</sub>(<i>d</i>, ρ)). An MC particle with several compounds has the density <i>m</i> / Σ (<i>m<sub>k</sub></i>/ρ<sub><i>k</i></sub>), the mass <i>m</i> of the MC particle divided by the volume of all compounds with their densities ρ<sub><i>k</i></sub>. Each compound thus gets its own grade efficiency curve over size; the lighter the compound, the further right it lies (Figure 7.14).</p>
+<figure>
+  <img src="abbildungen/HB_Sichter_Trennkurven_en.svg" alt="Grade efficiency curves of the classifier for four compounds of different density">
+  <figcaption>Figure 7.14 – Grade efficiency curves of the classifier with its default values (air at 293.15 K, Plitt, <i>w</i><sub>cut</sub> = 0.5 m/s, α = 4) for four compounds of the materials file: <i>T</i> = 0.5 at 81 µm (CaO, 3340 kg/m³), 102 µm (Sand, 2200 kg/m³), 130 µm (Coal, 1400 kg/m³) and 184 µm (Milk, 751 kg/m³). In water, Milk would not settle and would go entirely to the light fraction.</figcaption>
+</figure>
+<h4>Limits</h4>
+<p>The computation uses a single grain: hindered settling at high solids concentration, grain shape, load and turbulence in the classifying zone enter only through the sharpness α. The fluid is not a stream of its own; air and water enter neither the balance nor the outputs. Beyond Re = 2 · 10<sup>5</sup> the formula of Kaskas is not supported by data, and the classifier then gives a notice. If a compound lacks the density or the materials file lacks the fluid, this material goes entirely to the light fraction with a notice.</p>
+<h4>Verification</h4>
+<table>
+  <tr><th>Case</th><th>Expectation</th><th>Result</th></tr>
+  <tr><td>Air and water, densities 1400, 2200 and 7870 kg/m³, 0.1 µm to 100 mm (Re up to 9.6 · 10<sup>5</sup>)</td><td>force balance with <i>c<sub>w</sub></i> after Kaskas; <i>w</i><sub>s</sub> rises with <i>d</i></td><td>off by at most 1.1 · 10<sup>−15</sup>; met</td></tr>
+  <tr><td>Sand in air, 1 µm and 0.1 µm</td><td><i>w</i><sub>s</sub> lies about √Re/6 below Stokes (3.5 · 10<sup>−4</sup> and 1.1 · 10<sup>−5</sup>)</td><td>met to 1 %</td></tr>
+  <tr><td>Sand in air, 20 mm</td><td>Newton regime</td><td><i>w</i><sub>s</sub> = 33.8 m/s, Re = 4.5 · 10<sup>4</sup>, <i>c<sub>w</sub></i> = 0.42</td></tr>
+  <tr><td>Continuum, sand and coal, in air (<i>w</i><sub>cut</sub> = 1 m/s) and in water (0.01 m/s), Molerus-Hoffmann</td><td>heavy fraction = <i>T</i> · feed per compound and grid point; at every size sand at least as much in the heavy fraction as coal</td><td>exact; met</td></tr>
+  <tr><td>Particle mode, air, Plitt with α = 3 and <i>w</i><sub>cut</sub> = 0.3 m/s, 2000 MC particles each of sand and coal, 1000 steps</td><td>heavy fraction 0.61059 of the feed; each compound and size range with its <i>T</i></td><td>0.61104; per compound and range off by at most 1.8 · 10<sup>−3</sup>; accounts below half an MC particle share</td></tr>
+  <tr><td>Compound without density, unknown fluid, MC particle with Re &gt; 2 · 10<sup>5</sup></td><td>to the light fraction or computed, each with a notice</td><td>met</td></tr>
+</table>
+
+<h3 id="k7-8"><span class="nr">7.8</span>Outlet</h3>
+<p>The outlet receives the arriving stream and records it.</p>
+
+
+<h2 id="k8"><span class="nr">8</span>Random numbers and multiple runs</h2>
+<h4>Purpose</h4>
+<p>The same seed is to give the same result on every system, and units are to receive random numbers independent of each other. Many runs yield the statistics of a result.</p>
+<h4>Method</h4>
+<ul>
+  <li><b>Generator:</b> Mersenne Twister mt19937_64 (Matsumoto &amp; Nishimura 1998); uniform distribution from the upper 53 bits; normal distribution with the polar method (Marsaglia &amp; Bray 1964). The normal distribution of the C++ standard library is not used because its algorithm differs between libraries.</li>
+  <li><b>Seed per unit:</b> Seed<sub>unit</sub> = SplitMix64(Seed ⊕ SplitMix64(FNV-1a(node ID))), with SplitMix64 after Steele, Lea &amp; Flood (2014). The random sequence of a unit thus depends only on the global seed and its identifier, not on the drawing order, and two units do not fluctuate in step.</li>
+  <li><b>Runs:</b> run 1 uses the set seed, further runs use derived seeds. The default is 20 runs.</li>
+  <li><b>Statistics:</b> mean and variance per cell are updated in one pass with Welford's method (Welford 1962), numerically stable and with Bessel's correction. Full matrices are kept for run 1, the mean and the standard deviation; for each run, the mass flow over time, the size distribution and the total mass are stored in addition.</li>
+  <li><b>Display:</b> mean with a band of ±1σ, ±2σ or the 5–95 % percentiles (linear interpolation, type 7 after Hyndman &amp; Fan 1996), optionally with the individual runs. The marginal distributions of the standard deviation heatmap are computed from the individual runs, not by integrating the standard deviation matrix, because the size classes are correlated with each other.</li>
+</ul>
+<h4>Limits</h4>
+<p>The uncertainty of a mean falls as 1/√<i>N</i>: a hundred times more runs make it only ten times more accurate. Percentiles are meaningful only from about 20 runs.</p>
+<h4>Verification</h4>
+<p>For a splitter behind a constant feed <i>ṁ</i>, the variance of the mass <i>M</i> that reaches an output within the time <i>T</i> has a closed form:</p>
+<p class="formel">E[<i>M</i>] = μ <i>ṁ</i> <i>T</i>, &nbsp;&nbsp; Var[<i>M</i>] = 2 <i>ṁ</i>² σ² τ ( <i>T</i> − τ (1 − e<sup>−<i>T</i>/τ</sup>) )</p>
+<p>With <i>ṁ</i> = 10 kg/s, μ = 0.3, σ = 0.05, τ = 2 s and <i>T</i> = 40 s the expectation is 120.000 kg ± 6.164 kg; 2000 runs give 120.058 kg ± 6.094 kg. The deviation of the standard deviation of −1.1 % lies within the statistical uncertainty of 1.6 %. The error falls with the number of runs as 1/√<i>N</i> (Figure 8.1).</p>
+<figure>
+  <img src="abbildungen/HB_Konvergenz_MonteCarlo_en.svg" alt="Relative error of mean and standard deviation over the number of runs">
+  <figcaption>Figure 8.1 – Relative error of mean and standard deviation of the mass <i>M</i> over the number of runs <i>N</i> (root mean square over 40 repetitions) with the theory: slope −½, a hundred times more runs give a ten times smaller error.</figcaption>
+</figure>
+
+
+<h2 id="k9"><span class="nr">9</span>Particle mode: MC particles</h2>
+
+<h3 id="k9-1"><span class="nr">9.1</span>Weighted Monte Carlo particles</h3>
+<p>In particle mode a stream consists of MC particles. An MC particle is a weighted Monte Carlo particle, in the literature also called a weighted simulation particle (Zhao, Kruis &amp; Zheng 2009; Kotalczyk &amp; Kruis 2017): a computational particle that represents a group of identical real particles.</p>
+<p>An MC particle stands for a group of identical particles within one packet, that is within one time step Δ<i>t</i>. It carries a size <i>d</i> and a mass <i>m</i><sub><i>k</i></sub> per compound <i>k</i>: the mass of these particles in the packet. Rates arise only where a flow is needed (results, plots, continuum): mass flow <i>ṁ</i><sub><i>k</i></sub> = <i>m</i><sub><i>k</i></sub> / Δ<i>t</i>. Its weight <i>w</i> – the number of real particles it represents – follows for compact spheres from mass and size:</p>
+<p class="formel"><i>w</i> = Σ<sub><i>k</i></sub> (<i>m</i><sub><i>k</i></sub> / ρ<sub><i>k</i></sub>) / (π <i>d</i>³ / 6)</p>
+<p>The principle is that of a survey in which a few respondents with their characteristics stand for many people: a few thousand MC particles per packet describe a stream of billions of particles. Where there is much material there are many MC particles; size ranges without material cost nothing.</p>
+<p>Particles instead of a grid pay off when a particle carries several properties, such as size, porosity and fractal dimension. In the continuum each property needs an axis of the grid, and each cell stores a number whether material lies there or not. An MC particle stores only its properties and its weight. With <i>M</i> classes per axis, <i>n</i> properties and <i>N</i> MC particles this gives:</p>
+<p class="formel">Grid: <i>M</i><sup><i>n</i></sup> numbers &nbsp;&nbsp;&nbsp;&nbsp; MC particles: <i>N</i> · (<i>n</i> + 1) numbers</p>
+<p>The grid grows exponentially with the number of properties, the MC particles grow linearly (Figure 9.1). With 32 classes per axis and 2000 MC particles:</p>
+<table>
+  <tr><th>Properties <i>n</i></th><th>Grid <i>M</i><sup><i>n</i></sup></th><th>MC particles <i>N</i> · (<i>n</i> + 1)</th></tr>
+  <tr><td>1</td><td>32</td><td>4000</td></tr>
+  <tr><td>3</td><td>32 768</td><td>8000</td></tr>
+  <tr><td>5</td><td>3.4 · 10<sup>7</sup></td><td>12 000</td></tr>
+</table>
+<p>In the grid, empty cells also occupy memory: in the example distribution with three properties, 99 % of the mass lies in 1017 of the 32 768 cells (3.1 %). MC particles lie only where material is, and carry exact values instead of classes. For a single property, on the other hand, the grid is smaller and free of noise; in this example the crossover lies at <i>n</i> ≈ 2.6. This agrees with the estimate of Shima et al. (2009) for cloud droplets, according to which computational particles need less computing time than a grid from about two to four properties on. The price of MC particles is a statistical noise wherever MC particles are drawn or distributed at random; it falls as 1/√<i>N</i>.</p>
+<figure>
+  <img src="abbildungen/MC_21_Raster_Karten_3D_en.svg" alt="Grid with 32 by 32 by 32 cells versus 2000 MC particles and stored numbers over the number of properties">
+  <figcaption>Figure 9.1 – Grid versus MC particles for an assumed example distribution over size, porosity and fractal dimension (larger particles are more open). Left the grid with 32 classes per axis: the turquoise cells carry 99 % of the mass, all 32 768 cells occupy memory. Right 2000 MC particles from the same distribution with four numbers each, in gray their shadow on the floor. Below, the stored numbers over the number of properties <i>n</i>.</figcaption>
+</figure>
+<p>For processes such as coagulation, in which pairs of particles matter, the difference grows further (Figure 9.2). A grid couples every cell with every other, that is (<i>M</i><sup><i>n</i></sup>)² cell pairs per time step; with 32 classes and three properties these are 1.1 · 10<sup>9</sup>. A Monte Carlo method, in contrast, does not search all pairs: it draws partners and accepts a pair with a probability proportional to the coagulation kernel (acceptance-rejection; Kruis, Maisels &amp; Fissan 2000). In a time-driven method this is about one attempt per MC particle and time step, that is of the order of <i>N</i> pairs, independent of the number of properties; even all <i>N</i>² pairs of MC particles would stay at 4 · 10<sup>6</sup>. If the grid paired only the occupied cells, there would still be 1017² ≈ 10<sup>6</sup> pairs for three properties, about 500 times the drawn pairs of MC particles.</p>
+<figure>
+  <img src="abbildungen/MC_22_Koagulation_Paare_en.svg" alt="Pairs per time step in coagulation: grid versus MC particles over the number of properties">
+  <figcaption>Figure 9.2 – Pairs per time step in coagulation over the number of properties <i>n</i>, with 32 classes per axis and 2000 MC particles as in Figure 9.1. The grid couples every cell with every other; MC particles need all pairs <i>N</i>² or, with drawn partners, about <i>N</i> – both independent of <i>n</i>. Open circle: only the 1017 occupied cells from Figure 9.1 paired.</figcaption>
+</figure>
+<div class="zusammen">
+<p>The building blocks of weighted Monte Carlo methods reappear in the particle mode:</p>
+<table>
+  <tr><th>Weighted Monte Carlo method</th><th>Particle mode</th></tr>
+  <tr><td>simulation particle</td><td>MC particle</td></tr>
+  <tr><td>properties: size, composition</td><td>size <i>d</i>, mass flow <i>ṁ</i><sub><i>k</i></sub> per compound</td></tr>
+  <tr><td>weight: number of real particles represented</td><td>weight <i>w</i></td></tr>
+  <tr><td>number of simulation particles</td><td>MC particles per inlet packet, <i>N</i></td></tr>
+  <tr><td>distribution of the simulation particles over size, for example via weighting functions (DeVille, Riemer &amp; West 2011)</td><td>MC particle density (Chapter 9.3)</td></tr>
+  <tr><td>splitting and merging of simulation particles (Zhao, Kruis &amp; Zheng 2009; Kotalczyk &amp; Kruis 2017)</td><td>limits per packet (Chapter 9.5)</td></tr>
+  <tr><td>events between simulation particles, for example coagulation</td><td>not yet included (Chapter 1); size, composition and weight are available on every MC particle</td></tr>
+</table>
+</div>
+<p>“Monte Carlo” describes the method: random numbers decide what happens to the particles. In particle mode these are the fluctuating split fraction of a splitter, the random start positions of the account method in splitter and vessel, and the drawing of the leaving MC particles in the bins of the vessel (Chapter 9.4); many runs give the statistics (Chapter 8). At the inlet, by contrast, the MC particles are created without randomness, one in the middle of each strip of equal area under the MC particle density (Chapter 9.3), and are thus free of noise. In one dimension this is the point set with the smallest discrepancy, as used by quasi-Monte Carlo methods; for the coagulation equation, Lécot &amp; Wagner (2004) likewise order the particles by mass and use low-discrepancy sequences instead of random numbers.</p>
+<p>The representation applies to the whole simulation, from inlet to outlet. A simulation in particle mode starts only if all units of the flowsheet can process MC particles. The number of MC particles per inlet packet, <i>N</i>, is adjustable (default 2000); it determines how accurately one run reproduces the distribution.</p>
+
+<h3 id="k9-2"><span class="nr">9.2</span>The card index picture</h3>
+<p>The two representations can be pictured as a type case and a card index (Figure 9.3). The continuum resembles a type case with a fixed compartment for each size and compound, in which only the mass lying in it is recorded. In particle mode a card index takes its place: one card per MC particle, holding size, mass per compound and weight. A further property is a further line on the card, and cards exist only for what actually occurs. After this picture, the German interface of StoSiS calls an MC particle a “Karte” (card); the windows in Figures 9.5 and 10.1 use this term.</p>
+<figure>
+  <img src="abbildungen/HB_Setzkasten_Karteikarte_en.svg" alt="An agglomerate of sand and coal in the type case and on an index card">
+  <figcaption>Figure 9.3 – Thought example, an agglomerate of sand and coal in both representations: in the type case (continuum) its mass lands in two compartments and looks like two loose grains; on the card the composition is kept, and a new property is a new line.</figcaption>
+</figure>
+<p>Depending on the field, the weighted computational particle has different names in the literature: <em>weighted simulation particle</em> (Zhao, Kruis &amp; Zheng 2009), <em>parcel</em> (Dukowicz 1980) or <em>super-droplet</em> (Shima et al. 2009). This handbook uses “MC particle” throughout and “particle” only for the real grains: “an MC particle represents a million particles”. Likewise, MC particle density, number of MC particles and mass per MC particle refer to the computational particles, whereas particle density, particle number and particle mass refer to the real grains.</p>
+
+<h3 id="k9-3"><span class="nr">9.3</span>MC particle density and MC particles at the inlet</h3>
+<h4>Purpose</h4>
+<p>The MC particles are to be distributed over size so that both mass-based results (mass flow, d<sub>50</sub>) and number-based results (fines, particle number) have usable statistics.</p>
+<h4>Method</h4>
+<p>The MC particle density <i>c</i> over ln <i>d</i> is a mean of the mass density <i>q</i><sub>3</sub>* and the number density <i>q</i><sub>0</sub>* (both per ln <i>d</i>, area 1), flattened with the exponent γ:</p>
+<p class="formel"><i>c</i>(<i>d</i>) ∝ <i>M</i>(<i>q</i><sub>3</sub>*, <i>q</i><sub>0</sub>*)<sup>γ</sup></p>
+<table>
+  <tr><th>Rule</th><th>Mean <i>M</i></th><th>Property</th></tr>
+  <tr><td>Sum (default)</td><td>(1 − <i>f</i>) <i>q</i><sub>3</sub>* + <i>f</i> <i>q</i><sub>0</sub>*</td><td>without flattening, no MC particle carries more than 1/(1 − <i>f</i>) times the mean mass and 1/<i>f</i> times the mean particle number</td></tr>
+  <tr><td>Quadratic</td><td>((1 − <i>f</i>) <i>q</i><sub>3</sub>*² + <i>f</i> <i>q</i><sub>0</sub>*²)<sup>1/2</sup></td><td>follows the larger one more strongly; bounds 1 + √(<i>f</i>/(1 − <i>f</i>)) and 1 + √((1 − <i>f</i>)/<i>f</i>)</td></tr>
+  <tr><td>Product</td><td><i>q</i><sub>3</sub>*<sup>1 − <i>f</i></sup> · <i>q</i><sub>0</sub>*<sup><i>f</i></sup></td><td>one hump between mass and number, thin edges, no bound</td></tr>
+</table>
+<p>The fraction <i>f</i> weights the number (0 = mass only, 1 = number only); γ = 1 means no flattening, smaller values give both edges more MC particles; the interface shows the effect as a preview (Figure 9.5). The default is the sum with <i>f</i> = 0.5 and γ = 0.8. The sum is a defensive mixture in the sense of Hesterberg (1995): because mass and number each contribute with a fixed share, the weight of every MC particle stays bounded. All three means are homogeneous of degree 1, so that splitting and merging of MC particles stay consistent.</p>
+<p><b>Packet-internal weight of an MC particle.</b> The same mean <i>M</i> also rates each single MC particle <i>i</i> of a packet, from its mass share <i>m<sub>i</sub></i>/Σ<i>m</i> and its number share <i>n<sub>i</sub></i>/Σ<i>n</i> in the packet (particle number <i>n<sub>i</sub></i> ∝ <i>m<sub>i</sub></i>/<i>d<sub>i</sub></i>³):</p>
+<p class="formel"><i>a<sub>i</sub></i> = <i>M</i>(<i>m<sub>i</sub></i>/Σ<i>m</i>, <i>n<sub>i</sub></i>/Σ<i>n</i>), &nbsp;&nbsp; <i>s<sub>i</sub></i> = <i>a<sub>i</sub></i> / Σ<i>a</i></p>
+<p>The weight <i>s<sub>i</sub></i> is packet-internal: all sums run only over the MC particles of the same packet, and Σ<i>s</i> = 1 in every packet. It tells how much an MC particle carries compared with the other MC particles of its packet, not how much mass or how many particles it carries in absolute terms; that is the real weight <i>w</i> from Chapter 9.1. Between different packets <i>s</i> is not comparable. Example: an MC particle with <i>s</i> = 0.001 carries one thousandth of its packet; if the mass flow doubles, the same MC particle carries twice the mass and twice the particles with the same <i>s</i>. With flattening it becomes the share in the MC particle density, the packet-internal weight <i>ŝ<sub>i</sub></i> ∝ <i>a<sub>i</sub></i> · ρ<sub><i>i</i></sub><sup>γ − 1</sup>, also normalized to 1 per packet; ρ<sub><i>i</i></sub> is the density of <i>a</i> over ln <i>d</i> at the size of the MC particle (sum of <i>a</i> of MC particles of that size divided by the width of their cell in ln <i>d</i>). At the inlet every MC particle carries <i>ŝ</i> ≈ 1/<i>N</i>. Splitter and screen use <i>s</i>, compound separator, classifier and the limits per packet use <i>ŝ</i> (Chapters 9.4, 9.5).</p>
+<p>At the inlet the area under the MC particle density is divided into <i>N</i> equal strips (Figure 9.4). Each strip receives one MC particle, placed in its middle; its mass is the mass of the strip, exact from <i>Q</i><sub>3</sub>. Sizes and mass fractions are thus fixed once, and each time step scales them with the current mass flow – without randomness, the same in every step.</p>
+<figure>
+  <img src="abbildungen/MC_27_Anteil_s_Schritte_en.svg" alt="MC particle density and MC particles at the inlet in five steps">
+  <figcaption>Figure 9.4 – MC particle density and MC particles at the inlet in five steps, here with 12 coarse cells and <i>N</i> = 10 instead of about 4000 cells and 2000 MC particles: a) mass density <i>q</i><sub>3</sub>*, b) number density <i>q</i><sub>0</sub>*, c) mixture by the sum, d) flattening with γ = 0.8 and normalization, e) cumulative curve in <i>N</i> equal pieces, one MC particle in the middle of each.</figcaption>
+</figure>
+<p>Particles below the smallest grid point, <i>d</i><sub>min</sub>, count for the MC particle density as if they had the size <i>d</i><sub>min</sub>. The grid does not resolve below it, and for distributions whose particle number grows without limit towards small sizes (for example RRSB with <i>n</i> &lt; 3), the number would otherwise be unbounded.</p>
+<figure>
+  <img src="abbildungen/GUI_Kartendichte.png" alt="Settings of the MC particle density with preview">
+  <figcaption>Figure 9.5 – Setting of the MC particle density with preview (German interface, “Kartendichte”): mass (turquoise), number (orange) and MC particle density (purple) for log-normal with d<sub>50</sub> = 100 µm, σ<sub>ln</sub> = 0.5 and 1000 MC particles; below, each MC particle as a tick and the mass and particle number per MC particle relative to the mean.</figcaption>
+</figure>
+<h4>Limits</h4>
+<p>The noise of a size region falls with the square root of the number of MC particles lying there. The two edges serve as indicators: the finest 5 % of the particles and the coarsest 5 % of the mass. If an edge receives fewer than 10 MC particles per time step, the inlet reports this together with remedies still possible with the current settings. For distributions with many very fine particles, some of the MC particles lie below <i>d</i><sub>min</sub>.</p>
+<h4>Verification</h4>
+<p>The placement agrees with an independent calculation; for the sum without flattening, mass and particle number per MC particle stay below the bounds. At the inlet each MC particle in the interior carries the share 1/<i>N</i> of the MC particle density to within 0.1 %.</p>
+
+
+<h3 id="k9-4"><span class="nr">9.4</span>Account method</h3>
+<p>Splitter, vessel, delay, screen, compound separator and classifier distribute whole MC particles to their targets without copying them or rolling a die for each MC particle (Figure 9.6). The MC particles of a step are ordered by compound and, within it, by size, and are passed through once in a ring starting from a random position. Each MC particle deposits into the account of every target and goes entirely to the one with the highest balance; this account is charged. The accounts carry over from step to step, and their sum stays zero. Ordering by compound ensures that each compound on its own is divided in the right proportion. In statistics this selection is called systematic sampling: the same chance for every MC particle as with a die, but without its scatter in the count.</p>
+<figure>
+  <img src="abbildungen/MC_24_Konto_Verfahren_en.svg" alt="Account method step by step at the splitter and in the vessel">
+  <figcaption>Figure 9.6 – Account method: a) one step at the splitter 30/70 with ten MC particles of equal weight – output A receives exactly 3 of 10, spread over all sizes; b) six steps with random start versus random choice per MC particle (3 ± 1.4 MC particles per step); c) in the vessel with the accounts “stay” and “go”.</figcaption>
+</figure>
+<h4>Splitter</h4>
+<p>Each MC particle deposits <i>f<sub>i</sub></i> · <i>s</i> into the account of each output <i>i</i>; the chosen account is charged <i>s</i>. Here <i>s</i> is the packet-internal weight of the MC particle without flattening (Chapter 9.3): <i>s<sub>i</sub></i> = <i>a<sub>i</sub></i> / Σ<i>a</i> with <i>a<sub>i</sub></i> = <i>M</i>(<i>m<sub>i</sub></i>/Σ<i>m</i>, <i>n<sub>i</sub></i>/Σ<i>n</i>), the mean of the mass and number share of the MC particle in its packet; <i>s</i> adds up to 1 per packet. Thus <i>s</i> depends only on the MC particle itself, and half an MC particle carries half the weight. With flattening, every further MC particle of the same size would lower the weight; in a cycle such MC particles lie exactly where the account previously divided into the recycle, and a splitter 70/30 would return 29.76 % instead of 30 % of the mass. This way, of neighboring MC particles every (1/<i>f</i>)-th goes to an output with the fraction <i>f</i> – for light MC particles just as for heavy ones, by number as by mass. The start position comes from a separate random stream; the course of the fluctuating fraction is therefore the same in the continuum and in particle mode for the same seed.</p>
+<p>The mass per output deviates from the target by about one MC particle per step and stays of the order of 10<sup>−5</sup> of the throughput over many steps. There is no rescaling: a factor per output would be a ratio of random quantities and would bias outputs with few MC particles.</p>
+<h4>Vessel</h4>
+<p>As each MC particle in the vessel either goes or stays in a step, there are two accounts, “go” and “stay”. Each MC particle deposits the exit fraction <i>a</i> per step and 1 − <i>a</i>, respectively (Chapter 7.4), and the chosen account is charged one whole MC particle. Each MC particle thus has the same exit probability regardless of its weight; with shares of the MC particle density, heavy MC particles between light ones would leave less often. The MC particles of each zone lie in bins per compound and size class (100 classes per decade), unordered within a bin. StoSiS computes the walk of the account over all <i>n</i> MC particles from a random start in one jump: with <i>g</i> = account “go” − ½, the <i>k</i>-th leaving MC particle is at position <i>j<sub>k</sub></i> = ⌊(<i>k</i> − 1 − <i>g</i>)/<i>a</i>⌋ + 1, that is every (1/<i>a</i>)-th; afterwards <i>g</i> has grown by <i>n a</i> minus the number of leaving MC particles, exactly as after the walk MC particle by MC particle. The positions give how many MC particles leave each bin; which ones is drawn within the bin, so that leaving depends neither on age nor on weight. A step thus touches only the leaving MC particles, not the whole stock. In the cascade each tank draws one target after the other, first the exit, then one tank further and so on, each with the share of the rest; so every target is right to within one MC particle. The feed of a step has its own account with the fraction <i>b</i>.</p>
+<p>Rolling a die per MC particle would give the same on average, but would scatter with the number of MC particles instead of the number of real particles. In the standard case (2000 MC particles per step, τ = 10 s, Δ<i>t</i> = 0.2 s) the outflow would thus fluctuate by 2.2 % per step; with the account method and MC particles of equal weight by 0.05 %; the real particles – about 10<sup>9</sup> per step – fluctuate by 0.003 %.</p>
+<h4>Delay</h4>
+<p>As each MC particle leaves either after the whole steps <i>q</i> of its delay or one step later (Chapter 7.3), there are two accounts, “early” and “late”. Each MC particle deposits 1 − <i>r</i> and <i>r</i>, respectively, where <i>r</i> is the remainder of its own delay, and the chosen account is charged one whole MC particle. Both accounts apply to all MC particles; how many steps “early” and “late” mean is stored in the MC particle. Because the two accounts sum to zero, one balance <i>l</i> for “late” is enough: an MC particle goes “late” if <i>l</i> &gt; ½ after its deposit. The number of “late” MC particles among the first <i>i</i> is then exactly the rounded sum of the remainders, <i>L<sub>i</sub></i> = ⌈<i>l</i><sub>0</sub> + <i>r</i><sub>1</sub> + … + <i>r<sub>i</sub></i> − ½⌉.</p>
+<p>In the output of a step, MC particles of different sizes from different entry steps come together. Each group with the same whole delay <i>q</i> is balanced only within its entry step; per exit step each group therefore deviates by about one MC particle, not the whole stream. In the standard case (2000 MC particles, about 25 groups) the outflow per step lies up to 0.5 % off the continuum, without systematic error; mass is conserved exactly.</p>
+<h4>Screen</h4>
+<p>As each MC particle goes either to the coarse or to the fine fraction, there are two accounts for one deck, “coarse” and “fines”, and one per output for several decks (Chapter 7.5). Each MC particle deposits <i>t<sub>k</sub></i>(<i>d</i>) · <i>s</i> with its own size <i>d</i> into the account of output <i>k</i>, for one deck thus <i>T</i>(<i>d</i>) · <i>s</i> and (1 − <i>T</i>(<i>d</i>)) · <i>s</i>, and goes to the output with the highest balance among those with <i>t<sub>k</sub></i> &gt; 0. As in the splitter, <i>s</i> is the packet-internal weight without flattening, because a screen often sits in a recycle, for example in a grinding circuit with the oversize returning to the mill. Because the fractions depend on size, there is one set of accounts per compound and size range (factor 2, like the ranges of the MC particle view): a balance thus never wanders into another range or compound, and within a range in which <i>T</i> changes little, every (1/<i>T</i>)-th MC particle goes to the coarse fraction for one deck. A balance stays below half an MC particle share for one deck and below a whole one for several. MC particles that can go to only one output touch no account.</p>
+<p>Compound separator and classifier (Chapters 7.6, 7.7) compute in the same way with two outputs, with the same pairs of accounts per compound and size range (“separated” and “rest” or “heavy” and “light”), but with the packet-internal weight <i>ŝ</i> with flattening (Chapter 9.3). Only the fraction of the MC particle differs: for the compound separator the fraction <i>f<sub>k</sub></i> of its compound, for the classifier <i>T</i>(<i>w</i><sub>s</sub>) with the settling velocity from its size and density.</p>
+<h4>Limits</h4>
+<p>If the MC particles differ in weight, for example with a fluctuating feed, the outflow of a vessel scatters about as with random selection of the MC particles (0.83 % at σ/μ = 0.167 and 400 MC particles per step). A single pulse of <i>N</i> MC particles of different weight shows a noise of about σ<sub><i>T</i></sub> · CV / √<i>N</i> in the mass-weighted residence time, with the coefficient of variation CV of the weights; in continuous operation it averages out over the MC particles in stock.</p>
+
+<h3 id="k9-5"><span class="nr">9.5</span>Limits per packet</h3>
+<p>Behind mergers, splitters and recycles the number of MC particles changes: a cycle with the recycle fraction <i>R</i> multiplies it by 1/(1 − <i>R</i>), a small splitter fraction thins it out. Therefore two limits apply to the packet at every output of a unit; in the interface they are switched on with “Grenzen je Stromscheibe” (limits per stream slice). They are measured with the packet-internal weight <i>ŝ</i>, the share in the MC particle density (Chapter 9.3): not with the real weight <i>w</i>, not with the mass and not with the particle number alone, but with the mean of mass and number share in the packet, flattened as at the inlet. At the inlet every MC particle carries <i>ŝ</i> ≈ 1/<i>N</i>; 5/<i>N</i> is thus five times an average inlet MC particle.</p>
+<ul>
+  <li><b>At most 2<i>N</i> MC particles per packet.</b> Merging starts only when a packet holds more than 2<i>N</i> MC particles. Its MC particles are then ordered by compound combination and, within it, by size. Possible pairs are two MC particles that are neighbors in this order, have the same compound combination and carry at most 5/<i>N</i> together. The pairs with the smallest sum <i>ŝ</i><sub>1</sub> + <i>ŝ</i><sub>2</sub> are merged first, for equal sums the one with the smallest size gap. These are not simply the smallest MC particles: light pairs lie where there are more MC particles than the MC particle density asks for, while the deliberately light MC particles at the edges of the distribution have a normal <i>ŝ</i> and remain. Afterwards the shares are recomputed and merging continues until at most 2<i>N</i> MC particles remain or no pair fits. Mass and particle number are conserved, the new size follows from <i>d</i>³ = (<i>m</i><sub>1</sub> + <i>m</i><sub>2</sub>) / (<i>m</i><sub>1</sub>/<i>d</i><sub>1</sub>³ + <i>m</i><sub>2</sub>/<i>d</i><sub>2</sub>³).</li>
+  <li><b>No MC particle with <i>ŝ</i> above 5/<i>N</i>.</b> A heavier MC particle is split into <i>k</i> = ⌈<i>ŝ N</i>/5⌉ equal pieces of the same size and composition; the distribution does not change.</li>
+</ul>
+<p>Example: two equal feeds at a merger give 2<i>N</i> MC particles with <i>ŝ</i> ≈ 1/(2<i>N</i>) each, just within the limit; nothing is merged. In a cycle with <i>R</i> = 0.9 about 10<i>N</i> MC particles would gather without the limit, with the limit 2<i>N</i> remain. Inlets are exempt; their MC particles already follow the MC particle density.</p>
+<p><b>Verification:</b> 20 000 MC particles from ten packets are merged into 4000, and d<sub>10</sub>, d<sub>50</sub> and d<sub>90</sub> shift by at most 0.014 %; a recycle with <i>R</i> = 0.9 keeps at most 4000 MC particles in the cycle; splitting changes the result on the grid by 5.5 · 10<sup>−16</sup>.</p>
+
+<h3 id="k9-6"><span class="nr">9.6</span>Mapping onto the grid</h3>
+<p>For curves, heatmap and evaluation, the MC particles are mapped onto the size grid: each MC particle gives its mass proportionally to the two neighboring grid points, linearly according to its position in ln <i>d</i> (cloud-in-cell). Mass and mean ln <i>d</i> are conserved exactly. An MC particle view (“Karten” in the interface) also shows the distributions directly from the MC particles – density, cumulative curve, MC particles per class and the course over time – next to the mean of all runs.</p>
+
+<h3 id="k9-7"><span class="nr">9.7</span>Verification of the particle mode</h3>
+<ul>
+  <li>Inlet → outlet: the mass flow at the outlet matches the feed profile in every step (relative 10<sup>−12</sup>), the cumulative distribution deviates from the continuum by less than 0.2 % of the mass flow.</li>
+  <li>Two inlets → merger → fluctuating splitter: with the same seed, the outlet mass flows per step lie at most about one MC particle off the continuum; every compound arrives completely.</li>
+  <li>MC particles of very unequal weight (splitter 70/30): of the finest 5 % of the particles, 69.97 % of the MC particles and 69.92 % of the mass go to the 70 % output, and no output is left without a fine MC particle in any step.</li>
+  <li>Loss-in-weight feeder (Chapter 11): mean and standard deviation in particle mode as in the continuum.</li>
+  <li>Vessel (Chapter 7.4): all four mixing types against their closed-form residence time distribution, mass balance exact, stock according to Little, lot drawing for MC particles of equal size and different weight and for a fluctuating feed.</li>
+  <li>Delay (Chapter 7.3): with the same delay 2.3 Δ<i>t</i> for all MC particles, 70 % of the feed arrives after 2 steps, then the whole feed in every step; the number of MC particles is kept (± 2). A pulse of 2000 MC particles with size-dependent delay arrives completely, each MC particle after <i>q</i> or <i>q</i> + 1 steps; the mean arrival matches the mean delay (10.3173 versus 10.3174 steps), and in each fifth of the sizes as many MC particles go “late” as the remainders add up to (at most 0.95 MC particles off). In the flowsheet, feed = outflow + content holds to 10<sup>−15</sup>; if the feed starts already at <i>t</i> = 0 with 2 kg/s, MC particles and continuum lie at most 0.4 % apart per step also during start-up, and the outflow mass up to 40 s is the same (76.2728 kg). With the delay in a recycle (splitter 70/30), the outlet lies at most 0.29 % off the continuum at steady state, and the merger stays below 2<i>N</i> MC particles.</li>
+</ul>
+<h4>Continuum versus particle mode</h4>
+<p>The ten flowsheets of the regression test (Chapter 11.1) run once on the size grid and once with <i>N</i> = 500, 2000 and 8000 MC particles per inlet packet. At every output and every vessel content the comparison covers:</p>
+<ul>
+  <li>the mass flow per step: largest deviation, relative to the mean mass flow of this output,</li>
+  <li>the total mass over the whole simulation time, relative,</li>
+  <li>the cumulative distribution <i>Q</i><sub>3</sub> of the throughput: largest distance between the two curves in percentage points.</li>
+</ul>
+<p>The table shows the worst output of each flowsheet. The exponent <i>a</i> gives how the deviation of the mass flow falls with the number of MC particles (deviation ∼ <i>N</i><sup><i>a</i></sup>, from <i>N</i> = 500 and 8000). Pure noise of the MC particles gives <i>a</i> = −0.5. “Chain” means inlet → delay → outlet with the reference time <i>t</i><sub>ref</sub> and the size exponent <i>p</i> of the delay (7.3).</p>
+<table>
+  <tr><th>Flowsheet</th><th>Mass flow per step<br><i>N</i> = 2000</th><th>Mass flow per step<br><i>N</i> = 8000</th><th><i>a</i></th><th>Total mass<br><i>N</i> = 8000</th><th><i>Q</i><sub>3</sub> distance<br><i>N</i> = 2000 [pp]</th></tr>
+  <tr><td>Start flowsheet (inlet → delay → outlet)</td><td>0.77 %</td><td>0.16 %</td><td>−0.93</td><td>5.9 · 10<sup>−6</sup></td><td>0.014</td></tr>
+  <tr><td>Cycle: two inlets, fluctuating splitter, delay in the recycle</td><td>2.1 %</td><td>1.0 %</td><td>−0.79</td><td>1.4 · 10<sup>−5</sup></td><td>0.013</td></tr>
+  <tr><td>Chain, <i>t</i><sub>ref</sub> = 2 s, <i>p</i> = 1</td><td>0.83 %</td><td>0.26 %</td><td>−0.77</td><td>4.9 · 10<sup>−6</sup></td><td>0.010</td></tr>
+  <tr><td>Chain, <i>t</i><sub>ref</sub> = 0.37 s, <i>p</i> = −1</td><td>0.34 %</td><td>0.081 %</td><td>−1.06</td><td>9.8 · 10<sup>−7</sup></td><td>0.004</td></tr>
+  <tr><td>Chain without delay</td><td>10<sup>−13</sup> %</td><td>10<sup>−13</sup> %</td><td>–</td><td>4 · 10<sup>−16</sup></td><td>0.004</td></tr>
+  <tr><td>Chain, <i>t</i><sub>ref</sub> = 5 s, <i>p</i> = 3</td><td>1.5 %</td><td>0.89 %</td><td>−0.58</td><td>6.1 · 10<sup>−5</sup></td><td>0.023</td></tr>
+  <tr><td>Splitter 20/30/50 → merger, RRSB distribution</td><td>0.56 %</td><td>0.16 %</td><td>−0.99</td><td>1.0 · 10<sup>−5</sup></td><td>0.009</td></tr>
+  <tr><td>Start flowsheet, logarithmic grid</td><td>0.60 %</td><td>0.15 %</td><td>−0.96</td><td>2.3 · 10<sup>−6</sup></td><td>0.008</td></tr>
+  <tr><td>the same with recycle (splitter 70/30)</td><td>3.9 %</td><td>1.4 %</td><td>−0.63</td><td>2.3 · 10<sup>−5</sup></td><td>0.012</td></tr>
+  <tr><td>Cycle, logarithmic grid</td><td>4.1 %</td><td>1.1 %</td><td>−0.71</td><td>1.8 · 10<sup>−6</sup></td><td>0.016</td></tr>
+</table>
+<p>All deviations of the mass flow fall with <i>N</i> at least as 1/√<i>N</i>. Only 30 to 40 % of the MC particles flow in the recycle; there the noise at <i>N</i> = 2000 is still 2 to 4 % per step. The test therefore checks the mass flow per step at <i>N</i> = 8000 to 2 %, the total mass at <i>N</i> = 8000 to 10<sup>−4</sup> and <i>Q</i><sub>3</sub> at <i>N</i> = 2000 to one percentage point (pp). Where <i>Q</i><sub>3</sub> does not fall further (chains with <i>p</i> = 1 and 3, 0.01 to 0.02 percentage points), the grid error of the continuum remains; for <i>p</i> = 3 the mass flow therefore also falls more slowly. For the two cycles, in addition, the mean over 20 runs matches the continuum to 0.5 %, and the standard deviation per step is the same (1.000 to 1.002 times).</p>
+
+
+<h2 id="k10"><span class="nr">10</span>Evaluation</h2>
+<p>Curves show mass flow, temperature and pressure over time or the distribution over size, each with a band over the runs. The heatmap shows the mass flow density over time and size with both marginal distributions; it can be switched between run 1, mean and standard deviation.</p>
+<p>For the content of a vessel (Chapter 7.4), mass appears everywhere instead of mass flow: in the curves the quantity “Masse (Inhalt)” (mass, content) in kg, in the heatmap the mass density in kg/µm. Its margins show the mass over time and the time-averaged size distribution, because an integral over time, as for the throughput of a stream, would have no meaning here.</p>
+<p>The “Auswertung” (evaluation) window processes the mass flow of an output the way a measurement is evaluated (after Engisch &amp; Muzzio 2012); for the content of a vessel it reads the mass like a load cell:</p>
+<ul>
+  <li>Mean over time windows, for example 1 s as with a scale; the start-up time can be excluded.</li>
+  <li>Outlier filter: first set point ± <i>x</i> %, then repeatedly ± <i>k</i>σ until nothing changes.</li>
+  <li>Key figures: mean, standard deviation, relative standard deviation, skewness and the correlation of neighboring values.</li>
+  <li>Density histogram with a band over all runs, probability plot and time series; export as CSV.</li>
+</ul>
+<p>Only streams that depend on a unit with randomness are offered. For a deterministic stream, the course over time would otherwise appear as a spurious scatter. A runtime log records which unit computed when and for how long.</p>
+<figure>
+  <img src="abbildungen/GUI_Auswertung.png" alt="Evaluation window">
+  <figcaption>Figure 10.1 – “Auswertung” (evaluation) window: window means of the mass flow with key figures, density histogram, probability plot and time series.</figcaption>
+</figure>
+
+
+<h2 id="k11"><span class="nr">11</span>Verification and validation</h2>
+
+<h3 id="k11-1"><span class="nr">11.1</span>Levels of verification</h3>
+<p>Checks are made on three levels.</p>
+<ul>
+  <li><b>Verification:</b> does the program compute what the model says? Analytical solutions, balances and the convergence behavior with 1/√<i>N</i> serve this purpose.</li>
+  <li><b>Comparison with other programs</b> such as Dyssol or PharmaPy: same models, same results?</li>
+  <li><b>Validation:</b> does the model match reality? Only an experiment can show this.</li>
+</ul>
+<p>The verification checks are 19 test programs in the repository and run with one command (CTest). Stochastic tests run with a fixed seed; their tolerances follow from the statistical error and are not chosen freely. A regression test monitors key figures of fixed flowsheets. The flowsheets of Sections 11.3 to 11.5 are available as files in <code>Flowsheets/Validierungs-Flowsheets</code> and can be opened in the interface.</p>
+<p>A comparison with other programs on common flowsheets is not yet available. Checked against measured data are the fluctuating splitter (11.2) and the dry granulation line (11.5); for the blender (11.4) a residence time curve from the literature serves as reference. Measured values available only as a figure were read off the figure.</p>
+
+<h3 id="k11-2"><span class="nr">11.2</span>Loss-in-weight feeder</h3>
+<p>Engisch &amp; Muzzio (2012) measure the mass flow of a loss-in-weight feeder for lactose with a catch scale read every 0.1 s. The feeder controls its mass flow via a load cell to the set point of 70 kg/h; what remains is a fluctuation from the screws, the agitator and the powder flow. In StoSiS an inlet with 100 kg/h is followed by a fluctuating splitter: its mean share μ = 0.6944 stands for the controller, the Ornstein-Uhlenbeck process (σ = 0.81 kg/h, τ = 0.3 s) for the remaining fluctuation. The simulation covers 30 min with Δ<i>t</i> = 0.1 s. Both data series are evaluated in the same way: 1-s means, filter ±10 % around the set point, then iteratively ±3σ.</p>
+<figure>
+  <img src="abbildungen/HB_Dosierwaage_StoSiS_en.svg" alt="Loss-in-weight feeder: setup, model in StoSiS, measurement, StoSiS and both overlaid with key figures">
+  <figcaption>Figure 11.1 – Loss-in-weight feeder after Engisch &amp; Muzzio (2012): a) setup, simplified, b) model in StoSiS with its parameters, c) measured distribution of the 1-s values, read off the paper, d) mass flow from StoSiS in the first minute, e) measurement and StoSiS overlaid: distribution with the band from 20 runs, probability plot and key figures.</figcaption>
+</figure>
+<p>Both distributions are normal and statistically indistinguishable: mean and standard deviation match the measurement to 0.04 % and 1 %, and 28 of 32 bars of the measured histogram lie within the band from 20 runs (Figure 11.1 e). This validates the shape of the fluctuation, not its prediction: μ and σ are fitted to the measurement. The correlation time τ cannot be determined from the distribution; τ = 0 to 3 s gives the same histogram, only the correlation of successive 1-s values changes (0.03 to 0.81), and that would need the raw data. Periodic components in the measured signal, for example from stirrers and screws, are not reproduced by the Ornstein-Uhlenbeck process.</p>
+
+<h3 id="k11-3"><span class="nr">11.3</span>Compartment models after Levenspiel</h3>
+<p>Levenspiel (1999) builds real apparatus from pipes (plug flow), mixed tanks, bypasses, dead zones and recycles; for these compartment models the residence time distribution is known exactly. Four of them are rebuilt in StoSiS from splitter, vessel and merger. A tracer pulse of 1 kg in the first time step (Δ<i>t</i> = 0.1 s) passes through each. The comparison uses the cumulative curve <i>F</i>(<i>t</i>), the fraction of the tracer that has left by time <i>t</i>. The reference here is a formula, not a measurement: this checks whether StoSiS computes the models correctly (verification).</p>
+<p>Each figure shows a) the original model, b) the rebuild in StoSiS with its parameters, c) the exact solution, d) the outflow in StoSiS and e) both overlaid with mean and standard deviation of the residence time. The flowsheet files are in <code>Flowsheets/Validierungs-Flowsheets</code>.</p>
+<figure>
+  <img src="abbildungen/Val_4b_Parallele_Wege_en.svg" alt="Parallel paths: original, StoSiS and comparison">
+  <figcaption>Figure 11.2 – Parallel paths (Levenspiel 1999, ch. 12): 40 % through a pipe (step at 5 s), 60 % through a tank with 12 s; the exact residence time density is <i>E</i>(<i>t</i>) = 0.4 · δ(<i>t</i> − 5 s) + 0.6/(12 s) · exp(−<i>t</i>/12 s). Mean 9.2 s in all three computations; particle mode off by 0.3 %.</figcaption>
+</figure>
+<figure>
+  <img src="abbildungen/Val_4d_Kessel_in_Reihe_en.svg" alt="Three tanks in series: original, StoSiS and comparison">
+  <figcaption>Figure 11.3 – Three tanks in series (Levenspiel 1999, ch. 14) in two ways: one vessel with a cascade of three tanks (exact) and three separate vessels (off by 6 · 10<sup>−4</sup> of the peak, because each downstream vessel takes its feed as constant within a step). The exact solution is the Erlang distribution <i>E</i>(<i>t</i>) = <i>t</i>² / (2 · (3 s)³) · exp(−<i>t</i>/3 s) with the mean 9 s.</figcaption>
+</figure>
+<p>The two remaining cases run in the same test. A tank with 20 % bypass and 20 % dead zone matches the exact solution per step to 10<sup>−9</sup> of the maximum. For the pipe with recycle (<i>R</i> = 1.5), each further pass takes one time step longer in StoSiS, because the cycle is torn (Chapter 3.2): the mean lies <i>R</i> · Δ<i>t</i> = 0.15 s above the 5 s after Levenspiel, and with this dead time StoSiS agrees exactly.</p>
+<p>In particle mode the means match to at most 0.7 %. Individual steps are noisy because a single pulse has only 2000 MC particles (Chapter 9.4).</p>
+
+<h3 id="k11-4"><span class="nr">11.4</span>Continuous blender</h3>
+<p>Engisch &amp; Muzzio (2016) determine the residence time of each unit in a direct compaction line with a tracer experiment and describe it as tanks in series. For the blender they show a residence time curve with the mean 68.8 s and the standard deviation 22.4 s (their Fig. 17). From this follows the number of tanks <i>n</i> = (mean/std. dev.)² = 9.4; StoSiS models the blender as a vessel with a cascade of 9 tanks (Δ<i>t</i> = 0.2 s). The curve is available only as a figure and was read off it pixel by pixel: time axis from the drawn lines for mean and standard deviation, area normalized to 1.</p>
+<figure>
+  <img src="abbildungen/Val_4f_Mischer_Verweilzeitkurve_en.svg" alt="Blender: original figure from the paper, StoSiS and comparison with the curve read off">
+  <figcaption>Figure 11.4 – Blender: c) the original figure (Engisch &amp; Muzzio 2016, CC BY 4.0) with the mean (red line) and ± one standard deviation (green lines), e) the curve read off from it (diamonds) versus the tank model and StoSiS. The curve read off has 68.8 s and 21.5 s; the difference to 22.4 s lies in the flat tail near the zero line. With 9 tanks the result is 22.9 s, because only whole tanks are possible.</figcaption>
+</figure>
+<p>A second case from the paper (base case with 41.6 s and 12 s, that is 12 tanks) runs in the same test and matches the key figures at 41.60 s and 12.01 s; the paper gives no curve for it. This checks the shape of the curve for a fixed tank model. The number of tanks is taken from the paper and is not predicted.</p>
+
+
+<h3 id="k11-5"><span class="nr">11.5</span>Dry granulation line</h3>
+<p>Martinetz et al. (2018) study a continuous line of feeders, blender, bucket conveyor, roller compactor, pneumatic conveyor and tablet press. For each unit they determine a model (transfer function) from step experiments: blender and compactor as two tanks with dead time, the two conveyors as pure dead time (half the collection time), the press as one tank with dead time. The parameters come from experiments at 10 and 15 kg/h and are transferred linearly to 8 and 12.5 kg/h (their Table 2). In the experiments the mass fraction of the active pharmaceutical ingredient (API) at the entry of the whole line steps from 10 to 20 %; it is measured after the compactor (NIR probe, near-infrared spectroscopy in the granule stream) and at the tablets (NIR chemical imaging, NIR-CI, plus offline UV/Vis), twice at each of the four throughputs.</p>
+<p>Figure 11.5 summarizes the case. The original figures are not freely licensed; the figure is an own representation, and the measured values were read off the figures of the paper.</p>
+<figure>
+  <img src="abbildungen/Val_5_Martinetz_Uebersicht_1.svg" alt="Dry granulation line after Martinetz et al. 2018: setup, model of the line and transfer functions">
+</figure>
+<figure>
+  <img src="abbildungen/Val_5_Martinetz_Uebersicht_2.svg" alt="Time constants and measured values with the models of the paper">
+  <figcaption>Figure 11.5 – Dry granulation line after Martinetz et al. (2018): a) setup with the measurement positions, b) model of the line, c) transfer functions of the units, d) time constants (Table 2 of the paper), e) API mass fraction after the step from 10 to 20 %: measured values and models of the paper.</figcaption>
+</figure>
+<p>In StoSiS each transfer function becomes a chain of vessels (Figure 11.6 a). A factor 1 / (1 + <i>sT</i>) is an ideally mixed vessel (tank) with the mean residence time <i>T</i>, the dead time e<sup>−<i>sT</i><sub>d</sub></sup> a vessel with plug flow. For the press, <i>T</i><sub>1</sub>, <i>T</i><sub>2</sub> and <i>T</i><sub>3</sub> are equal; the numerator cancels one factor of the denominator, leaving one tank with <i>T</i><sub>1</sub>. API and excipients come from two inlets via a merger, all vessels start in continuous operation, and the time step Δ<i>t</i> is 0.5 s. The parameters are those of Table 2 of the paper, without fitting. For each throughput a flowsheet file is available in <code>Flowsheets/Validierungs-Flowsheets</code>.</p>
+<p>In the continuum StoSiS follows the model of the paper to 2 · 10<sup>−4</sup> percentage points; the particle mode with 2000 MC particles per inlet packet scatters around it without offset (Figure 11.6 b). Against the measured values, the root mean square deviation (RMSD) of StoSiS lies between 0.61 and 1.10 wt%, that of the models of the paper (their Table 3) between 0.47 and 1.23 wt% (c). StoSiS thus matches the measurement as well as the authors' model. The values of StoSiS are computed against the measured points read off, those of the paper against the original data.</p>
+<figure>
+  <img src="abbildungen/Val_5_Martinetz_StoSiS_1.svg" alt="Model of the line in StoSiS and API mass fraction from StoSiS at four throughputs">
+</figure>
+<figure>
+  <img src="abbildungen/Val_5_Martinetz_StoSiS_2.svg" alt="Measured values, models of the paper and StoSiS overlaid, RMSD in comparison">
+  <figcaption>Figure 11.6 – Dry granulation line in StoSiS: a) the line of vessels with the parameters from Table 2 of the paper, b) API mass fraction after the compactor and at the press in the continuum and in particle mode, c) measured values, models of the paper and StoSiS overlaid, below the RMSD to the measurement.</figcaption>
+</figure>
+
+<h2 id="k12"><span class="nr">12</span>Glossary</h2>
+<dl class="begriffe">
+  <dt>Flowsheet, unit, port</dt><dd>The flow diagram of process units, connected through numbered inputs and outputs (ports).</dd>
+  <dt>Macro step, packet (stream slice)</dt><dd>One global time step Δ<i>t</i>; the material that passes a connection during this step. A packet moves from unit to unit with the time steps; at an inlet it carries <i>N</i> MC particles in particle mode.</dd>
+  <dt>Hold-up</dt><dd>Material that remains in a unit between two steps.</dd>
+  <dt>Residence time, residence time distribution</dt><dd>Time from entry to exit; its distribution <i>E</i>(<i>t</i>) and cumulative curve <i>F</i>(<i>t</i>) over all material passing through a vessel (Chapter 7.4).</dd>
+  <dt>Stock</dt><dd>The MC particles inside a vessel in particle mode (Chapter 7.4).</dd>
+  <dt>Computation order</dt><dd>The sequence in which the units compute in each time step; in the “Struktur” window the step on the left of each box (Chapter 3.3).</dd>
+  <dt>Cycle</dt><dd>Group of units that reach each other through connections; this is where a connection is torn (Chapter 3.2).</dd>
+  <dt>Torn connection</dt><dd>The connection in a cycle whose target reads the stream of the previous step.</dd>
+  <dt>Run, seed</dt><dd>One complete simulation with one sequence of random numbers; the start value of this sequence.</dd>
+  <dt>Grid point</dt><dd>Size at which the mass flow density is stored in the continuum.</dd>
+  <dt><i>Q</i><sub>3</sub>, <i>q</i><sub>3</sub>, <i>q</i><sub>3</sub>*, <i>q</i><sub>0</sub>*</dt><dd>Cumulative mass distribution, its density over <i>d</i>, the mass density and the number density per ln <i>d</i> (area 1).</dd>
+  <dt>MC particle</dt><dd>Weighted Monte Carlo particle (simulation particle) of the particle mode: a group of identical particles within one packet, with size and mass per compound; called “Karte” (card) in the German interface (Chapters 9.1, 9.2).</dd>
+  <dt>Weight of an MC particle</dt><dd>The real weight <i>w</i>: number of real particles that an MC particle represents in its packet (Chapter 9.1).</dd>
+  <dt>Packet-internal weight</dt><dd>Share <i>s</i> of an MC particle in its packet, from the mean of its mass and number share; with flattening <i>ŝ</i>, the share in the MC particle density. Sums to 1 per packet and is meaningful only within the packet (Chapter 9.3).</dd>
+  <dt>MC particle density</dt><dd>The density according to which MC particles are distributed over size (Chapter 9.3).</dd>
+  <dt>Account method</dt><dd>Distributes whole MC particles to targets without rolling a die for each one: each MC particle deposits into every account and goes to the one with the highest balance (Chapter 9.4).</dd>
+  <dt>Grade efficiency, grade efficiency curve, cut size, sharpness</dt><dd>Mass fraction of the particles of one size that goes to the coarse fraction (screen) or heavy fraction (classifier); its course over size; the size with the grade efficiency 0.5; κ = <i>d</i><sub>25</sub>/<i>d</i><sub>75</sub>, 1 for an ideal step (Chapter 7.5).</dd>
+  <dt>Settling velocity, cut velocity</dt><dd>Steady velocity at which a single grain settles in the fluid at rest; the settling velocity at which a classifier sends about half to the heavy fraction (Chapter 7.7).</dd>
+  <dt>Heavy fraction, light fraction</dt><dd>The two outputs of the classifier: what settles, and what the fluid carries away.</dd>
+</dl>
+
+
+<h2 id="k13"><span class="nr">13</span>References</h2>
+<div class="lit">
+<p>Brauer, H. (1971): Grundlagen der Einphasen- und Mehrphasenströmungen. Sauerländer, Aarau.</p>
+<p>Danckwerts, P. V. (1953): Continuous flow systems. Distribution of residence times. Chemical Engineering Science 2(1), 1–13.</p>
+<p>DeVille, R. E. L.; Riemer, N.; West, M. (2011): Weighted Flow Algorithms (WFA) for stochastic particle coagulation. Journal of Computational Physics 230(23), 8427–8451.</p>
+<p>Dukowicz, J. K. (1980): A particle-fluid numerical model for liquid sprays. Journal of Computational Physics 35(2), 229–253.</p>
+<p>Engisch, W. E.; Muzzio, F. J. (2012): Method for characterization of loss-in-weight feeder equipment. Powder Technology 228, 395–403.</p>
+<p>Engisch, W. E.; Muzzio, F. J. (2016): Using residence time distributions (RTDs) to address the traceability of raw materials in continuous pharmaceutical manufacturing. Journal of Pharmaceutical Innovation 11, 64–81.</p>
+<p>Gaudin, A. M. (1939): Principles of Mineral Dressing. McGraw-Hill, New York.</p>
+<p>Gillespie, D. T. (1996): Exact numerical simulation of the Ornstein-Uhlenbeck process and its integral. Physical Review E 54, 2084–2091.</p>
+<p>Hazen, A. (1904): On sedimentation. Transactions of the American Society of Civil Engineers 53, 45–88.</p>
+<p>Hennig, M.; Teipel, U. (2016): Stationäre Siebklassierung. Chemie Ingenieur Technik 88, 911–918.</p>
+<p>Hesterberg, T. (1995): Weighted average importance sampling and defensive mixture distributions. Technometrics 37(2), 185–194.</p>
+<p>Hyndman, R. J.; Fan, Y. (1996): Sample quantiles in statistical packages. The American Statistician 50, 361–365.</p>
+<p>Kahn, A. B. (1962): Topological sorting of large networks. Communications of the ACM 5, 558–562.</p>
+<p>Kotalczyk, G.; Kruis, F. E. (2017): A Monte Carlo method for the simulation of coagulation and nucleation based on weighted particles and the concepts of stochastic resolution and merging. Journal of Computational Physics 340, 276–296.</p>
+<p>Kruis, F. E.; Maisels, A.; Fissan, H. (2000): Direct simulation Monte Carlo method for particle coagulation and aggregation. AIChE Journal 46, 1735–1742.</p>
+<p>Lécot, C.; Wagner, W. (2004): A quasi-Monte Carlo scheme for Smoluchowski's coagulation equation. Mathematics of Computation 73, 1953–1966.</p>
+<p>Lemmon, E. W.; Jacobsen, R. T (2004): Viscosity and thermal conductivity equations for nitrogen, oxygen, argon, and air. International Journal of Thermophysics 25, 21–69.</p>
+<p>Levenspiel, O. (1999): Chemical Reaction Engineering. 3rd edition, Wiley, New York.</p>
+<p>Little, J. D. C. (1961): A proof for the queuing formula: L = λW. Operations Research 9(3), 383–387.</p>
+<p>Martinetz, M. C.; Karttunen, A.-P.; Sacher, S.; Wahl, P.; Ketolainen, J.; Khinast, J. G.; Korhonen, O. (2018): RTD-based material tracking in a fully-continuous dry granulation tableting line. International Journal of Pharmaceutics 547, 469–479.</p>
+<p>Marsaglia, G.; Bray, T. A. (1964): A convenient method for generating normal variables. SIAM Review 6, 260–264.</p>
+<p>Matsumoto, M.; Nishimura, T. (1998): Mersenne Twister: a 623-dimensionally equidistributed uniform pseudo-random number generator. ACM Transactions on Modeling and Computer Simulation 8, 3–30.</p>
+<p>Molerus, O.; Hoffmann, H. (1969): Darstellung von Windsichtertrennkurven durch ein stochastisches Modell. Chemie Ingenieur Technik 41(5–6), 340–344.</p>
+<p>Plitt, L. R. (1971): The analysis of solid–solid separations in classifiers. CIM Bulletin 64(708), 42–47.</p>
+<p>Shima, S.; Kusano, K.; Kawano, A.; Sugiyama, T.; Kawahara, S. (2009): The super-droplet method for the numerical simulation of clouds and precipitation: a particle-based and probabilistic microphysics model coupled with a non-hydrostatic model. Quarterly Journal of the Royal Meteorological Society 135, 1307–1320.</p>
+<p>Skorych, V.; Dosta, M.; Heinrich, S. (2020): Dyssol – an open-source flowsheet simulation framework for particulate materials. SoftwareX 12, 100572.</p>
+<p>Steele, G. L.; Lea, D.; Flood, C. H. (2014): Fast splittable pseudorandom number generators. Proceedings OOPSLA 2014.</p>
+<p>Stieß, M. (2009): Mechanische Verfahrenstechnik – Partikeltechnologie 1. 3rd edition, Springer, Berlin.</p>
+<p>Uhlenbeck, G. E.; Ornstein, L. S. (1930): On the theory of the Brownian motion. Physical Review 36, 823–841.</p>
+<p>Welford, B. P. (1962): Note on a method for calculating corrected sums of squares and products. Technometrics 4, 419–420.</p>
+<p>Zhao, H.; Kruis, F. E.; Zheng, C. (2009): Reducing statistical noise and extending the size spectrum by applying weighted simulation particles in Monte Carlo simulation of coagulation. Aerosol Science and Technology 43, 781–793.</p>
+</div>
+
+</main>
+</body>
+</html>

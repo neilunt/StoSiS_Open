@@ -424,5 +424,5 @@ text { font-family: Calibri, Arial, sans-serif; }
 <text class="ta" text-anchor="end" x="632.0" y="552.0">große Karten</text>
 <text class="tl" text-anchor="start" x="8.0" y="572.0">Die Karten sind nach Stoff und Größe geordnet, nicht nach Alter, und der Start ist jedes Mal zufällig: Jede Karte geht so mit 5 % je</text>
 <text class="tl" text-anchor="start" x="8.0" y="586.0">Schritt, egal wie alt sie ist (gedächtnislos), und jede Größengegend verliert 5 % (bis auf eine Karte); der Zulauf des Schritts hat ein eigenes Konto mit b ≈ a/2.</text>
-<text class="ta" text-anchor="start" x="8.0" y="603.0">Farben: A orange, B türkis, „geht“ lila. Splitter: jede Karte zahlt f · s (s = Anteil an der Kartendichte); Behälter: jede Karte zählt 1.</text>
+<text class="ta" text-anchor="start" x="8.0" y="603.0">Farben: A orange, B türkis, „geht“ lila. Splitter: jede Karte zahlt f · s (s = paketinternes Gewicht); Behälter: jede Karte zählt 1.</text>
 </svg>

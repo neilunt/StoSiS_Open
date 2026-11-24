@@ -4,11 +4,13 @@ C++ flowsheet simulation for solids process engineering. The goal is a
 stochastic solution with weighted Monte Carlo particles, accelerated on GPUs
 (CUDA, amplitUDE cluster with NVIDIA H100) and compatible with Dyssol Open.
 
-The model, assumptions and methods are described in the methods handbook
-[`docs/StoSiS_Methodenhandbuch.html`](docs/StoSiS_Methodenhandbuch.html), as PDF
+The model, assumptions and methods are described in the methods handbook, in English
+([`docs/StoSiS_Methods_Handbook.html`](docs/StoSiS_Methods_Handbook.html), PDF:
+[`docs/StoSiS_Methods_Handbook.pdf`](docs/StoSiS_Methods_Handbook.pdf)) and in German
+([`docs/StoSiS_Methodenhandbuch.html`](docs/StoSiS_Methodenhandbuch.html), PDF:
+[`docs/StoSiS_Methodenhandbuch.pdf`](docs/StoSiS_Methodenhandbuch.pdf));
 the figures of its chapter 7 with interactive versions and animations of the units are in
-[`docs/StoSiS_Abbildungen.html`](docs/StoSiS_Abbildungen.html);
-[`docs/StoSiS_Methodenhandbuch.pdf`](docs/StoSiS_Methodenhandbuch.pdf) (in German). This file only gives
+[`docs/StoSiS_Abbildungen.html`](docs/StoSiS_Abbildungen.html) (German). This file only gives
 an overview.
 
 ## Features
@@ -81,7 +83,7 @@ StoSiS/
 │   └── third_party/nlohmann_json   JSON library (MIT)
 ├── gui/src/       stosis_gui: user interface (Qt 6 Widgets), program StoSiS.exe
 ├── data/          material file with instructions and Dyssol license notice
-├── docs/          methods handbook (HTML and PDF), figure page, program help, figures
+├── docs/          methods handbook (English and German, HTML and PDF), figure page, program help, figures
 ├── tests/         automatic tests of the computational core (CTest)
 ├── Flowsheets/    flowsheet files; inside, the validation flowsheets (to open in StoSiS)
 ├── tools/         dmdb_to_json.pl (conversion of the Dyssol material database)

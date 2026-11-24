@@ -67,5 +67,5 @@
 <rect x="312" y="302" width="18" height="24" rx="2" fill="#d6e6f5" stroke="#3b82c4" stroke-width="1.4"/>
 <text class="ts" x="350" y="300">Die Karten aller Eingänge werden aneinandergehängt,</text>
 <text class="ts" x="350" y="315">keine wird verändert. Zusammengelegt wird erst an</text>
-<text class="ts" x="350" y="330">den Grenzen je Stromscheibe.</text>
+<text class="ts" x="350" y="330">den Grenzen je Paket.</text>
 </svg>
