@@ -1,46 +1,115 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="680" height="350" viewBox="0 0 680 350">
-<title>Agglomerate of sand and coal in both representations</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="408" viewBox="0 0 680 408">
+<title>Agglomerate of sand and coal in compartments and on an index card</title>
 <style>
 text { font-family: Calibri, Arial, sans-serif; }
-.t { font-size: 14px; fill: #222222; }
+.t { font-size: 13px; fill: #222222; }
+.tv { font-size: 11px; fill: #222222; }
 .ts { font-size: 12px; fill: #595959; }
 .th { font-size: 14px; font-weight: bold; fill: #222222; }
-.c-amber rect, .c-amber circle, rect.c-amber, circle.c-amber { fill: #FAEEDA; stroke: #854F0B; }
-.c-amber text { fill: #633806; }
-.c-gray rect, .c-gray circle, rect.c-gray, circle.c-gray { fill: #F1EFE8; stroke: #5F5E5A; }
-.c-gray text { fill: #444441; }
-.box { fill: #F7F6F2; stroke: #B4B2A9; }
-.arr { stroke: #5F5E5A; stroke-width: 1.5; fill: none; }
 </style>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
-<text data-titel="1" x="20" y="22" style="font-family: Calibri, Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #222222">Agglomerate of sand and coal: type case versus index card</text>
-<g transform="translate(0,30)">
-<circle class="c-amber" cx="230" cy="48" r="20" stroke-width="0.5"/>
-<text class="t" x="280" y="48" text-anchor="middle" dominant-baseline="central">+</text>
-<circle class="c-gray" cx="330" cy="48" r="20" stroke-width="0.5"/>
-<line x1="362" y1="48" x2="422" y2="48" class="arr" marker-end="url(#arrow)"/>
-<circle class="c-amber" cx="448" cy="48" r="16" stroke-width="0.5"/>
-<circle class="c-gray" cx="476" cy="48" r="16" stroke-width="0.5"/>
-<text class="ts" x="230" y="88" text-anchor="middle">Sand 100 µm</text>
-<text class="ts" x="330" y="88" text-anchor="middle">Coal 100 µm</text>
-<text class="ts" x="462" y="88" text-anchor="middle">Agglomerate 126 µm</text>
-<line x1="440" y1="98" x2="200" y2="124" class="arr" marker-end="url(#arrow)"/>
-<line x1="484" y1="98" x2="500" y2="124" class="arr" marker-end="url(#arrow)"/>
-<rect class="box" x="40" y="128" width="280" height="172" rx="12" stroke-width="0.5"/>
-<text class="th" x="180" y="152" text-anchor="middle">Type case (continuum)</text>
-<g class="c-amber"><rect x="60" y="168" width="240" height="34" rx="4" stroke-width="0.5"/>
-<text class="t" x="180" y="185" text-anchor="middle" dominant-baseline="central">Sand bin 126 µm: + m sand</text></g>
-<g class="c-gray"><rect x="60" y="210" width="240" height="34" rx="4" stroke-width="0.5"/>
-<text class="t" x="180" y="227" text-anchor="middle" dominant-baseline="central">Coal bin 126 µm: + m coal</text></g>
-<text class="ts" x="180" y="266" text-anchor="middle">looks like two loose grains</text>
-<text class="ts" x="180" y="284" text-anchor="middle">cohesion is lost</text>
-<rect class="box" x="360" y="128" width="280" height="172" rx="12" stroke-width="0.5"/>
-<text class="th" x="500" y="152" text-anchor="middle">Index card (MC particle)</text>
-<rect x="380" y="168" width="240" height="76" rx="4" fill="#FFFFFF" stroke="#888780" stroke-width="0.5"/>
-<text class="th" x="500" y="188" text-anchor="middle" dominant-baseline="central">MC particle 17</text>
-<text class="ts" x="500" y="208" text-anchor="middle" dominant-baseline="central">Sand: m sand, coal: m coal</text>
-<text class="ts" x="500" y="228" text-anchor="middle" dominant-baseline="central">represents 1 million real particles</text>
-<text class="ts" x="500" y="266" text-anchor="middle">composition is kept</text>
-<text class="ts" x="500" y="284" text-anchor="middle">new property = new line</text>
-</g>
+<rect width="680" height="408" fill="#ffffff"/>
+<circle cx="329" cy="26" r="12" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.8"/>
+<circle cx="351" cy="26" r="12" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.8"/>
+<text class="ts" x="340.0" y="52.0" text-anchor="middle">Agglomerate of sand and coal, 126 µm</text>
+<line x1="290" y1="62" x2="205" y2="84" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="390" y1="62" x2="475" y2="84" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text class="th" x="20.0" y="98.0">a) Continuum: compartments</text>
+<rect x="94.0" y="128.0" width="208.0" height="56.0" fill="#F7F6F2" stroke="#B4B2A9" stroke-width="0.8"/>
+<rect x="98.0" y="132.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="138.0" y="132.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="178.0" y="132.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="218.0" y="132.0" width="38.0" height="22.0" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.6"/>
+<rect x="258.0" y="132.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="98.0" y="156.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="138.0" y="156.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="178.0" y="156.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="218.0" y="156.0" width="38.0" height="22.0" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.6"/>
+<rect x="258.0" y="156.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<text class="ts" x="88.0" y="147.0" text-anchor="end">Sand</text>
+<text class="ts" x="88.0" y="171.0" text-anchor="end">Coal</text>
+<text class="ts" x="117.0" y="123.0" text-anchor="middle">63</text>
+<text class="ts" x="157.0" y="123.0" text-anchor="middle">80</text>
+<text class="ts" x="197.0" y="123.0" text-anchor="middle">100</text>
+<text class="ts" x="237.0" y="123.0" text-anchor="middle">126</text>
+<text class="ts" x="277.0" y="123.0" text-anchor="middle">159</text>
+<text class="ts" x="306.0" y="123.0">µm</text>
+<text class="tv" x="237.0" y="147.0" text-anchor="middle">1.2 µg</text>
+<text class="tv" x="237.0" y="171.0" text-anchor="middle">0.7 µg</text>
+<text class="ts" x="198.0" y="202.0" text-anchor="middle">2 compounds × 300 sizes = 600 compartments</text>
+<line x1="198.0" y1="212.0" x2="198.0" y2="244.0" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text class="t" x="210.0" y="233.0">+ moisture, 3 classes</text>
+<rect x="110.0" y="260.0" width="208.0" height="56.0" fill="#F7F6F2" stroke="#B4B2A9" stroke-width="0.8"/>
+<rect x="114.0" y="264.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="154.0" y="264.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="194.0" y="264.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="234.0" y="264.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="274.0" y="264.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="114.0" y="288.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="154.0" y="288.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="194.0" y="288.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="234.0" y="288.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="274.0" y="288.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="102.0" y="268.0" width="208.0" height="56.0" fill="#F7F6F2" stroke="#B4B2A9" stroke-width="0.8"/>
+<rect x="106.0" y="272.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="146.0" y="272.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="186.0" y="272.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="226.0" y="272.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="266.0" y="272.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="106.0" y="296.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="146.0" y="296.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="186.0" y="296.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="226.0" y="296.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="266.0" y="296.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="94.0" y="276.0" width="208.0" height="56.0" fill="#F7F6F2" stroke="#B4B2A9" stroke-width="0.8"/>
+<rect x="98.0" y="280.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="138.0" y="280.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="178.0" y="280.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="218.0" y="280.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="258.0" y="280.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="98.0" y="304.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="138.0" y="304.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="178.0" y="304.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="218.0" y="304.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<rect x="258.0" y="304.0" width="38.0" height="22.0" fill="#FFFFFF" stroke="#B4B2A9" stroke-width="0.6"/>
+<text class="ts" x="198.0" y="352.0" text-anchor="middle">2 × 300 × 3 = 1800 compartments</text>
+<text class="th" x="400.0" y="98.0">b) Particle mode: index card</text>
+<rect x="430.0" y="112.0" width="180.0" height="98.0" fill="#FFFFFF" stroke="#888780" stroke-width="0.8"/>
+<text class="th" x="442.0" y="130.0">MC particle 17</text>
+<line x1="430.0" y1="137.0" x2="610.0" y2="137.0" stroke="#D9534F" stroke-width="1"/>
+<line x1="430.0" y1="155.0" x2="610.0" y2="155.0" stroke="#C9D7EA" stroke-width="0.8"/>
+<text class="t" x="442.0" y="150.0">Size</text>
+<text class="t" x="598.0" y="150.0" text-anchor="end">126 µm</text>
+<line x1="430.0" y1="173.0" x2="610.0" y2="173.0" stroke="#C9D7EA" stroke-width="0.8"/>
+<text class="t" x="442.0" y="168.0">Sand</text>
+<text class="t" x="598.0" y="168.0" text-anchor="end">1.2 µg</text>
+<line x1="430.0" y1="191.0" x2="610.0" y2="191.0" stroke="#C9D7EA" stroke-width="0.8"/>
+<text class="t" x="442.0" y="186.0">Coal</text>
+<text class="t" x="598.0" y="186.0" text-anchor="end">0.7 µg</text>
+<line x1="430.0" y1="209.0" x2="610.0" y2="209.0" stroke="#C9D7EA" stroke-width="0.8"/>
+<text class="t" x="442.0" y="204.0">Weight w</text>
+<text class="t" x="598.0" y="204.0" text-anchor="end">10<tspan dy="-5" font-size="9px">6</tspan></text>
+<text class="ts" x="520.0" y="220.0" text-anchor="middle">composition is kept</text>
+<line x1="520.0" y1="230.0" x2="520.0" y2="252.0" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text class="t" x="532.0" y="245.0">+ moisture</text>
+<rect x="430.0" y="262.0" width="180.0" height="116.0" fill="#FFFFFF" stroke="#888780" stroke-width="0.8"/>
+<text class="th" x="442.0" y="280.0">MC particle 17</text>
+<line x1="430.0" y1="287.0" x2="610.0" y2="287.0" stroke="#D9534F" stroke-width="1"/>
+<line x1="430.0" y1="305.0" x2="610.0" y2="305.0" stroke="#C9D7EA" stroke-width="0.8"/>
+<text class="t" x="442.0" y="300.0">Size</text>
+<text class="t" x="598.0" y="300.0" text-anchor="end">126 µm</text>
+<line x1="430.0" y1="323.0" x2="610.0" y2="323.0" stroke="#C9D7EA" stroke-width="0.8"/>
+<text class="t" x="442.0" y="318.0">Sand</text>
+<text class="t" x="598.0" y="318.0" text-anchor="end">1.2 µg</text>
+<line x1="430.0" y1="341.0" x2="610.0" y2="341.0" stroke="#C9D7EA" stroke-width="0.8"/>
+<text class="t" x="442.0" y="336.0">Coal</text>
+<text class="t" x="598.0" y="336.0" text-anchor="end">0.7 µg</text>
+<line x1="430.0" y1="359.0" x2="610.0" y2="359.0" stroke="#C9D7EA" stroke-width="0.8"/>
+<text class="t" x="442.0" y="354.0">Weight w</text>
+<text class="t" x="598.0" y="354.0" text-anchor="end">10<tspan dy="-5" font-size="9px">6</tspan></text>
+<rect x="431.0" y="360.0" width="178.0" height="17.0" fill="#EAF3DE" stroke="none" stroke-width="0"/>
+<line x1="430.0" y1="377.0" x2="610.0" y2="377.0" stroke="#C9D7EA" stroke-width="0.8"/>
+<text class="t" x="442.0" y="372.0">Moisture</text>
+<text class="t" x="598.0" y="372.0" text-anchor="end">1.5 %</text>
+<text class="ts" x="520.0" y="396.0" text-anchor="middle">one more line</text>
 </svg>
